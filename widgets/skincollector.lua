@@ -8,7 +8,7 @@ local TEMPLATES = require "widgets/templates"
 local SPEECH_TIME = 9
 local IDLE_SPEECH_DELAY = 180
 
-local SkinCollector = Class(Widget, function(self, num_items, mini_game, start_text)
+local SkinCollector = Class(Widget, function(self, num_items, mini_game, start_text, is_birthday)
     Widget._ctor(self, "SkinCollector")
 
 	self.mini_game = mini_game
@@ -20,6 +20,10 @@ local SkinCollector = Class(Widget, function(self, num_items, mini_game, start_t
   	self.innkeeper:GetAnimState():SetBank("skin_collector")
     self.innkeeper:GetAnimState():SetBuild("skin_collector")
     self.innkeeper:GetAnimState():PlayAnimation("idle", true)
+	if not is_birthday then
+		self.innkeeper:GetAnimState():Hide("max_head_hat")
+		self.innkeeper:GetAnimState():Hide("max_torso_sash")
+	end
     self.innkeeper:SetScale(-.55, .55, .55)
     self.innkeeper:SetPosition(0, -0)
     self.innkeeper:Hide()
@@ -92,7 +96,7 @@ function SkinCollector:Say(text, rarity, name, number)
 		str = string.gsub(str, "<number>", number)
 	end
 
-	self.last_speech_time = GetTime()
+	self.last_speech_time = GetStaticTime()
 
 	if not (self.innkeeper:GetAnimState():IsCurrentAnimation("dialog_pre") or self.innkeeper:GetAnimState():IsCurrentAnimation("dial_loop")) then
 		self.innkeeper:GetAnimState():PlayAnimation("dialog_pre", false)
@@ -166,7 +170,7 @@ function SkinCollector:OnUpdate(dt)
 	end
 
 	if not self.crow_game then
-		if self.intro_done and (GetTime() - self.last_speech_time) > IDLE_SPEECH_DELAY then
+		if self.intro_done and (GetStaticTime() - self.last_speech_time) > IDLE_SPEECH_DELAY then
 			-- It's been a while since the last speech. Say something random
 			self:Say(STRINGS.UI.TRADESCREEN.SKIN_COLLECTOR_SPEECH.IDLE)
 		end

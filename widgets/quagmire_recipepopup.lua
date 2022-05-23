@@ -69,13 +69,13 @@ function RecipePopup:BuildNoSpinner()
         end
     end)
     self.button:SetOnDown(function()
-        if self.last_recipe_click and (GetTime() - self.last_recipe_click) < 1 then
+        if self.last_recipe_click and (GetStaticTime() - self.last_recipe_click) < 1 then
             self.recipe_held = true
             self.last_recipe_click = nil
         end
     end)
     self.button:SetOnClick(function()
-        self.last_recipe_click = GetTime()
+        self.last_recipe_click = GetStaticTime()
         if not self.recipe_held then
             if not DoRecipeClick(self.owner, self.recipe) then
                 self.owner.HUD.controls.crafttabs:Close()
@@ -105,9 +105,9 @@ function RecipePopup:Refresh()
     local builder = owner.replica.builder
     local inventory = owner.replica.inventory
 
-    local knows = builder:KnowsRecipe(recipe.name)
+    local knows = builder:KnowsRecipe(recipe)
     local buffered = builder:IsBuildBuffered(recipe.name)
-    local can_build = buffered or builder:CanBuild(recipe.name)
+    local can_build = buffered or builder:HasIngredients(recipe)
 
     self:BuildNoSpinner()
 
@@ -127,7 +127,7 @@ function RecipePopup:Refresh()
     local hint_tech_ingredient = nil
 
 	local ingredient = recipe.ingredients[1]
-    local has_enough, num_found = inventory:Has(ingredient.type, RoundBiasedUp(ingredient.amount * builder:IngredientMod()))
+    local has_enough, num_found = inventory:Has(ingredient.type, RoundBiasedUp(ingredient.amount * builder:IngredientMod()), true)
 	local name = STRINGS.NAMES[string.upper(ingredient.type)]
 
     self.ingredient = self.ingredient_backing:AddChild(Image(ingredient:GetAtlas(), ingredient.type..".tex"))

@@ -41,6 +41,8 @@ local function UpdateStats(inst, maxhealth, maxhunger, maxsanity)
 end
 
 local function RoyalUpgrade(inst, silent)
+    inst.overrideskinmode = "powerup"
+    inst.overrideskinmodebuild = "wurt_stage2"
 
     UpdateStats(inst, TUNING.WURT_HEALTH_KINGBONUS, TUNING.WURT_HUNGER_KINGBONUS, TUNING.WURT_SANITY_KINGBONUS)
 
@@ -53,6 +55,8 @@ local function RoyalUpgrade(inst, silent)
 end
 
 local function RoyalDowngrade(inst, silent)
+    inst.overrideskinmode = nil
+    inst.overrideskinmodebuild = nil
 
     UpdateStats(inst, TUNING.WURT_HEALTH, TUNING.WURT_HUNGER, TUNING.WURT_SANITY)
 
@@ -82,7 +86,7 @@ local function UpdateTentacleWarnings(inst)
 			local p2x, p2y, p2z = t.Transform:GetWorldPosition()
 			local dist = VecUtil_Length(p1x - p2x, p1z - p2z)
 
-			if t.replica.health ~= nil and not t.replica.health:IsDead() then
+			if not IsEntityDead(t, true) then
 				if inst._active_warnings[t] == nil then
 					local fx = SpawnPrefab("wurt_tentacle_warning")
 					fx.entity:SetParent(t.entity)
@@ -195,17 +199,10 @@ local function OnPreLoad(inst, data)
     end
 end
 
-local function OnRespawn(inst)
-    if TheWorld.components.mermkingmanager and TheWorld.components.mermkingmanager:HasKing() then
-        inst.overrideskinmode = "powerup"
-    else
-        inst.overrideskinmode = nil
-    end
-end
-
 local function CLIENT_Wurt_HostileTest(inst, target)
     return (target:HasTag("hostile") or target:HasTag("pig"))
         and not target:HasTag("merm") and not target:HasTag("manrabbit")
+        and not target:HasTag("frog")
 end
 
 local function common_postinit(inst)
@@ -221,6 +218,7 @@ local function common_postinit(inst)
     inst.customidleanim = "idle_wurt"
 
     inst.AnimState:AddOverrideBuild("wurt_peruse")
+    inst.AnimState:SetHatOffset(0, 20) -- This is not networked.
 
     if TheNet:GetServerGameMode() == "lavaarena" then
         --do nothing
@@ -236,6 +234,37 @@ local function common_postinit(inst)
     inst.HostileTest = CLIENT_Wurt_HostileTest
 end
 
+local function IsNonPlayerMerm(this)
+    return this:HasTag("merm") and not this:HasTag("player")
+end
+
+local MAX_TARGET_SHARES = 8
+local SHARE_TARGET_DIST = 20
+
+local function OnAttacked(inst, data)
+    local attacker = data and data.attacker
+    if attacker and inst.components.combat:CanTarget(attacker) then
+        inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, IsNonPlayerMerm, MAX_TARGET_SHARES)
+    end
+end
+
+local function OnRepelMerm(doer, follower)
+    if follower.DoDisapproval then
+        follower:DoDisapproval()
+    end
+end
+
+local function OnMurdered(inst, data)
+    local victim = data.victim
+    if inst.components.repellent and
+        victim ~= nil  and victim:IsValid() and
+        victim:HasTag("fish") and
+        not inst.components.health:IsDead() then
+        -- This act is not looked too highly upon.
+        inst.components.repellent:Repel(inst)
+    end
+end
+
 local function master_postinit(inst)
     inst.starting_inventory = start_inv[TheNet:GetServerGameMode()] or start_inv.default
 
@@ -243,6 +272,7 @@ local function master_postinit(inst)
 
 	inst.components.sanity.no_moisture_penalty = true
 
+    -- Keep in sync with merm + mermking (minus bonuses for TUNING balancing)!
     inst.components.foodaffinity:AddFoodtypeAffinity(FOODTYPE.VEGGIE, 1.33)
     inst.components.foodaffinity:AddPrefabAffinity  ("kelp",          1.33) -- prevents the negative stats, otherwise foodtypeaffinity would have suffice
     inst.components.foodaffinity:AddPrefabAffinity  ("kelp_cooked",   1.33) -- prevents the negative stats, otherwise foodtypeaffinity would have suffice
@@ -258,16 +288,24 @@ local function master_postinit(inst)
 	inst:AddComponent("preserver")
 	inst.components.preserver:SetPerishRateMultiplier(FishPreserverRate)
 
+    inst:AddComponent("repellent")
+    inst.components.repellent:AddRepelTag("merm")
+    inst.components.repellent:AddIgnoreTag("mermking")
+    inst.components.repellent:SetOnlyRepelsFollowers(true)
+    inst.components.repellent:SetOnRepelFollowerFn(OnRepelMerm)
+
     if inst.components.eater ~= nil then
         inst.components.eater:SetDiet({ FOODGROUP.VEGETARIAN }, { FOODGROUP.VEGETARIAN })
     end
 
 	inst.components.locomotor:SetFasterOnGroundTile(GROUND.MARSH, true)
 
+    inst.components.builder.mashturfcrafting_bonus = 2
+
     inst:ListenForEvent("onmermkingcreated", function() RoyalUpgrade(inst) end, TheWorld)
     inst:ListenForEvent("onmermkingdestroyed", function() RoyalDowngrade(inst) end, TheWorld)
-
-    inst:ListenForEvent("ms_respawnedfromghost", OnRespawn)
+    inst:ListenForEvent("onattacked", OnAttacked)
+    inst:ListenForEvent("murdered", OnMurdered)
 
     inst.peruse_brimstone = peruse_brimstone
     inst.peruse_birds = peruse_birds

@@ -14,6 +14,7 @@ return{
         {
             MOUNTED = "Grrr, can't reach!",
             HASPET = "Don't need 'nother pet, glort.",
+			TICOON = "Huh? You not right one!",
         },
 		SHAVE =
 		{
@@ -58,7 +59,16 @@ return{
 			LOCKED_GATE = "Grrr... want in!",
             HOSTBUSY = "Hey! Trying to talk to you!",
             CARNIVAL_HOST_HERE = "Fancy Birdfolk over here!",
-            NOCARNIVAL = "Huh? Where the Birdfolk go?"
+            NOCARNIVAL = "Huh? Where the Birdfolk go?",
+			EMPTY_CATCOONDEN = "Glargh... no stuff in there, where they hide it?!",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDERS = "Need more scratchy fluffies to play!",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "Hmm, no good hidey spots here.",
+			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "Glurgh. Bored of this game.",
+		},
+		OPEN_CRAFTING = 
+		{
+            PROFESSIONALCHEF = "Fancy cooking man can do it, florpt.",
+			SHADOWMAGIC = "...Don't like stories in that book.",
 		},
         COOK =
         {
@@ -89,7 +99,7 @@ return{
 --fallback to speech_wilson.lua         READ =
 --fallback to speech_wilson.lua         {
 --fallback to speech_wilson.lua             GENERIC = "only_used_by_wickerbottom",
---fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom"
+--fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom",
 --fallback to speech_wilson.lua         },
 
         GIVE =
@@ -121,6 +131,8 @@ return{
 			CARNIVALGAME_INVALID_ITEM = "It not want that.",
 			CARNIVALGAME_ALREADY_PLAYING = "Me next, me next!",
             SPIDERNOHAT = "Spiderfolk no need hat in there.",
+            TERRARIUM_REFUSE = "Glurph. Gotta try something else.",
+            TERRARIUM_COOLDOWN = "There no tree inside for giving to, flurp! Will check later.",
         },
         GIVETOPLAYER =
         {
@@ -161,6 +173,7 @@ return{
         {
             TARGETINCOMBAT = "They look mad...",
             INUSE = "Let me on, florpt!",
+			SLEEPING = "WAKE UP, BIG FUZZY!",
         },
         SADDLE =
         {
@@ -324,11 +337,48 @@ return{
         {
 --fallback to speech_wilson.lua             ONCOOLDOWN = "only_used_by_wanda",
         },
+
+        ENTER_GYM =
+        {
+--fallback to speech_wilson.lua             NOWEIGHT = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             UNBALANCED = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             ONFIRE = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             SMOULDER = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             HUNGRY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             FULL = "only_used_by_wolfang",
+        },
+
+        APPLYMODULE =
+        {
+            COOLDOWN = "only_used_by_wx78",
+            NOTENOUGHSLOTS = "only_used_by_wx78",
+        },
+        REMOVEMODULES =
+        {
+            NO_MODULES = "only_used_by_wx78",
+        },
+        CHARGE_FROM =
+        {
+            NOT_ENOUGH_CHARGE = "only_used_by_wx78",
+            CHARGE_FULL = "only_used_by_wx78",
+        },
+
+        HARVEST =
+        {
+            DOER_ISNT_MODULE_OWNER = "Glurph. You boring!",
+        },
     },
 
+	ANNOUNCE_CANNOT_BUILD =
+	{
+		NO_INGREDIENTS = "Don't got stuff for that!",
+		NO_TECH = "Glurgh... don't know how to make...",
+		NO_STATION = "Can't make it right now, florp.",
+	},
+
 	ACTIONFAIL_GENERIC = "Grrr... can't do it, florpt.",
-	ANNOUNCE_BOAT_LEAK = "Yay! Boat getting wetter!",
-	ANNOUNCE_BOAT_SINK = "...Maybe boat too wet now.",
+	ANNOUNCE_BOAT_LEAK = "Boat getting wetter!",
+	ANNOUNCE_BOAT_SINK = "Boat too wet!",
 	ANNOUNCE_DIG_DISEASE_WARNING = "Look better?", --removed
 	ANNOUNCE_PICK_DISEASE_WARNING = "Gluurgh... smell bad.", --removed
 	ANNOUNCE_ADVENTUREFAIL = "Grrr, messed up!",
@@ -343,6 +393,11 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_NORMALTOWIMPY = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_WIMPYTONORMAL = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_MIGHTYTONORMAL = "only_used_by_wolfang",
+    ANNOUNCE_EXITGYM = {
+--fallback to speech_wilson.lua         MIGHTY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         NORMAL = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         WIMPY = "only_used_by_wolfang",
+    },
 
 	ANNOUNCE_BEES = "Glorp! Buzzy stingers!",
 	ANNOUNCE_BOOMERANG = "Glorp! Come-back stick hurts.",
@@ -440,11 +495,11 @@ return{
 	ANNOUNCE_NODAYSLEEP_CAVE = "Not sleepy, florp.",
 	ANNOUNCE_NOHUNGERSLEEP = "Need food, then sleepy-time.",
 	ANNOUNCE_NOSLEEPONFIRE = "Not gonna sleep there, glort.",
+    ANNOUNCE_NOSLEEPHASPERMANENTLIGHT = "Glurgh... IRONFOLK TOO BRIGHT.",
 	ANNOUNCE_NODANGERSIESTA = "Too scary for nap!",
 	ANNOUNCE_NONIGHTSIESTA = "Don't want nap, want bedtime!",
 	ANNOUNCE_NONIGHTSIESTA_CAVE = "Glurp... too scary in here...",
 	ANNOUNCE_NOHUNGERSIESTA = "Belly too rumbly!",
-	ANNOUNCE_NODANGERAFK = "Gotta be careful, florp!",
 	ANNOUNCE_NO_TRAP = "Easy, florp!",
 	ANNOUNCE_PECKED = "Ow! OW! Ouchie!",
 	ANNOUNCE_QUAKE = "Ground shaking!",
@@ -580,6 +635,10 @@ return{
 --fallback to speech_wilson.lua         "only_used_by_walter",
 --fallback to speech_wilson.lua 	},
 
+    -- wx specific
+    ANNOUNCE_WX_SCANNER_NEW_FOUND = "only_used_by_wx78",
+--fallback to speech_wilson.lua     ANNOUNCE_WX_SCANNER_FOUND_NO_DATA = "only_used_by_wx78",
+
     --quagmire event
     QUAGMIRE_ANNOUNCE_NOTRECIPE = "Glurgh, that not gonna taste good together.",
     QUAGMIRE_ANNOUNCE_MEALBURNT = "Oops...",
@@ -706,8 +765,8 @@ return{
 
 	ANNOUNCE_FIRENETTLE_TOXIN =
 	{
-		"Ouchie! Is hot! Don't like it, florp!",
-		"Is a bad plant! Makes insides burny!",
+		"Ouchie! It hot! Don't like it, florp!",
+		"It a bad plant! Makes insides burny!",
 	},
 	ANNOUNCE_FIRENETTLE_TOXIN_DONE = "Glurgh... feel bit better now.",
 
@@ -720,10 +779,42 @@ return{
         "Hey, you listening?",
 	},
 
+	ANNOUNCE_KITCOON_HIDEANDSEEK_START = "Hide now! Me coming!",
+	ANNOUNCE_KITCOON_HIDEANDSEEK_JOIN = "Wanna play too, florp!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND = 
+	{
+		"Found you, florp!",
+		"Ha ha, you easy to find.",
+		"Me is best at this game!",
+		"Need to find better hidey spot than that, flort!",
+	},
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_ONE_MORE = "Is one left somewhere!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE = "You last one!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE_TEAM = "{name} find last one? Glurgh... coulda done it...",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TIME_ALMOST_UP = "Where they hiding?! Time almost up!!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_LOSEGAME = "No fair! Scratchy fluffies cheat!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR = "Hmm, don't smell no scratchy fluffies out here.",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR_RETURN = "Smell scratchy fluffies nearby, flort!",
+	ANNOUNCE_KITCOON_FOUND_IN_THE_WILD = "You lost? Will take you home, florp!",
+
+	ANNOUNCE_TICOON_START_TRACKING	= "Hey, where you going florp?",
+	ANNOUNCE_TICOON_NOTHING_TO_TRACK = "What wrong? Can't find nothing?",
+	ANNOUNCE_TICOON_WAITING_FOR_LEADER = "Coming!! Wait up, flort!",
+	ANNOUNCE_TICOON_GET_LEADER_ATTENTION = "He smell something!",
+	ANNOUNCE_TICOON_NEAR_KITCOON = "There something nearby...",
+	ANNOUNCE_TICOON_LOST_KITCOON = "What happen? Can't smell them no more?",
+	ANNOUNCE_TICOON_ABANDONED = "You no fun anymore. Bye-bye!",
+	ANNOUNCE_TICOON_DEAD = "Don't think he gonna be helping anymore, florp.",
+
     -- YOTB
     ANNOUNCE_CALL_BEEF = "HEY! Come here!!",
     ANNOUNCE_CANTBUILDHERE_YOTB_POST = "Too far away, flort.",
     ANNOUNCE_YOTB_LEARN_NEW_PATTERN =  "Yay! New dress-up thing!",
+
+    -- AE4AE
+    ANNOUNCE_EYEOFTERROR_ARRIVE = "Sky is falling, glorp!!",
+    ANNOUNCE_EYEOFTERROR_FLYBACK = "Why you come back, flurt? Said go away!!",
+    ANNOUNCE_EYEOFTERROR_FLYAWAY = "Y-Yeah, big eye better run away! Glurgh...",
 
 	BATTLECRY =
 	{
@@ -824,7 +915,7 @@ return{
         },
         WOLFGANG =
         {
-            GENERIC = "Hello muscly moustache man!",
+            GENERIC = "Hello muscly mustache man!",
             ATTACKER = "Not fair, you way bigger!",
             MURDERER = "Grrr, you just a bully!",
             REVIVER = "This mean you not scared of me anymore?",
@@ -1116,7 +1207,7 @@ return{
 		ORANGEAMULET = "It make me feel fancy, flurp.",
 		YELLOWSTAFF = "Has pretty yellow rock on it.",
 		YELLOWGEM = "There sunshine inside it.",
-		ORANGEGEM = "Weird orangey rock",
+		ORANGEGEM = "Weird orangey rock.",
         OPALSTAFF = "Rainbow light stick!",
         OPALPRECIOUSGEM = "There so many colors, flort!",
         TELEBASE =
@@ -1220,7 +1311,7 @@ return{
             GENERIC = "Short and stumpy.",
             BLOOM = "Floaty lights!",
         },
-        MUSHTREE_TALL_WEBBED = "This one claimed by Spiderfolk",
+        MUSHTREE_TALL_WEBBED = "This one claimed by Spiderfolk.",
         SPORE_TALL =
         {
             GENERIC = "Pretty!",
@@ -1252,7 +1343,7 @@ return{
         SPIDERHOLE = "Spiderfolk hole!",
         SPIDERHOLE_ROCK = "All webby...",
         STALAGMITE = "Cave rock.",
-        STALAGMITE_TALL = "Big cave rock",
+        STALAGMITE_TALL = "Big cave rock.",
 
         TURF_CARPETFLOOR = "Fuzzy ground.",
         TURF_CHECKERFLOOR = "Ground bit.",
@@ -1574,14 +1665,18 @@ return{
         CHESSPIECE_MOON = "It look just like real thing!",
         CHESSPIECE_CARRAT = "Veggie rat look happy.",
         CHESSPIECE_MALBATROSS = "It very fancy looking statue.",
-        CHESSPIECE_CRABKING = "Glurgh, he made crab lady sad!",
+        CHESSPIECE_CRABKING = "Glurgh, he make crab lady sad!",
         CHESSPIECE_TOADSTOOL = "No more glurp-glurping.",
         CHESSPIECE_STALKER = "Not so spooky now.",
         CHESSPIECE_KLAUS = "Can't chase me anymore!",
-        CHESSPIECE_BEEQUEEN = "That's what you get, stingy lady!",
+        CHESSPIECE_BEEQUEEN = "That what you get, stingy lady!",
         CHESSPIECE_ANTLION = "How she stay so still?",
         CHESSPIECE_BEEFALO = "It just rock, real thing better.",
+		CHESSPIECE_KITCOON = "Aww, they having a nap.",
+		CHESSPIECE_CATCOON = "It pretty good statue, has dead butterfly!",
         CHESSPIECE_GUARDIANPHASE3 = "Glorp! Oh, it not real.",
+        CHESSPIECE_EYEOFTERROR = "Oh no... got dried out, glorp...",
+        CHESSPIECE_TWINSOFTERROR = "Ha ha, they just rocks now!",
 
         CHESSJUNK1 = "It all broken.",
         CHESSJUNK2 = "Didn't do it!!",
@@ -2508,7 +2603,7 @@ return{
         HALLOWEENCANDY_4 = "Didn't know Spiderfolk could be tasty!",
         HALLOWEENCANDY_5 = "Will eat you in one bite, florp!",
         HALLOWEENCANDY_6 = "Taste good to me, florp.",
-        HALLOWEENCANDY_7 = "Can eat yours if you don't want them, florp",
+        HALLOWEENCANDY_7 = "Can eat yours if you don't want them, florp.",
         HALLOWEENCANDY_8 = "Yummy yum!",
         HALLOWEENCANDY_9 = "Even better than normal worm!",
         HALLOWEENCANDY_10 = "Mmm, taste like swamp!",
@@ -2723,6 +2818,8 @@ return{
 			BURNT = "Aww...",
 		},
 		WARG = "What big teeth he have!",
+        WARGLET = "What big teeth he have!",
+        
 		WASPHIVE = "Look scary... but sweet stuff inside...",
 		WATERBALLOON = "Don't worry, won't throw at you... (hee-hee)",
 		WATERMELON = "Gimme!!",
@@ -3585,7 +3682,7 @@ return{
         GLOWBERRYMOUSSE = "Oooh, it glowing!!",
         VOLTGOATJELLY = "Ooooooh, it jiggly!",
         NIGHTMAREPIE = "Hee-hee, it has funny face.",
-        BONESOUP = "Don't want it, florp",
+        BONESOUP = "Don't want it, florp.",
         MASHEDPOTATOES = "Mushy mash!",
         POTATOSOUFFLE = "Wha-? This potato!!",
         MOQUECA = "There fish inside!",
@@ -4054,6 +4151,47 @@ return{
 
         BEEF_BELL = "Big fuzzies really like bell.",
 
+		-- YOT Catcoon
+		KITCOONDEN = 
+		{
+			GENERIC = "It too tiny to fit inside...",
+            BURNT = "Glurp! Didn't do it!!",
+			PLAYING_HIDEANDSEEK = "Nobody hiding in there?",
+			PLAYING_HIDEANDSEEK_TIME_ALMOST_UP = "Where they go?!",
+		},
+
+		KITCOONDEN_KIT = "Building house easy! Done it lots of times, flort.",
+
+		TICOON = 
+		{
+			GENERIC = "It big squishy kitty! Hello!",
+			ABANDONED = "Maybe we play later, okay?",
+			SUCCESS = "He did good job, florp.",
+			LOST_TRACK = "His nose not so good after all.",
+			NEARBY = "Think he smell something nearby.",
+			TRACKING = "He looking for something!",
+			TRACKING_NOT_MINE = "Wait... this not the right squishy kitty.",
+			NOTHING_TO_TRACK = "Guess he not smell anything around.",
+			TARGET_TOO_FAR_AWAY = "Come on squishy kitty, wanna try somewhere else!",
+		},
+		
+		YOT_CATCOONSHRINE =
+        {
+            GENERIC = "It home for shiny kitty.",
+            EMPTY = "Will find present for you, florp.",
+            BURNT = "Uh oh...",
+        },
+
+		KITCOON_FOREST = "Ha ha! It fluffy AND scratchy!",
+		KITCOON_SAVANNA = "Ha ha! It fluffy AND scratchy!",
+		KITCOON_MARSH = "You from swamp too? You best one.",
+		KITCOON_DECIDUOUS = "Ha ha! It fluffy AND scratchy!",
+		KITCOON_GRASS = "Ha ha! It fluffy AND scratchy!",
+		KITCOON_ROCKY = "It so little!",
+		KITCOON_DESERT = "It so little!",
+		KITCOON_MOON = "It so little!",
+		KITCOON_YOT = "It so little!",
+
         -- Moon Storm
         ALTERGUARDIAN_PHASE1 = {
             GENERIC = "Glorp! Didn't do it! Didn't do it!",
@@ -4173,6 +4311,102 @@ return{
         FIGKABAB = "Blegh, fruit ruined with meat!",
         KOALEFIG_TRUNK = "Glurgh... fruit have yucky nose juice all over...",
         FROGNEWTON = "Glurph! There frog leg in this!",
+
+        -- The Terrorarium
+        TERRARIUM = {
+            GENERIC = "It so... glowy...",
+            CRIMSON = "It look kinda funny inside.",
+            ENABLED = "WHAT GOING ON?!",
+			WAITING_FOR_DARK = "Ooooh! Wanna float like that too!",
+			COOLDOWN = "Where little tree go, florp?",
+			SPAWN_DISABLED = "It not working.",
+        },
+
+        -- Wolfgang
+        MIGHTY_GYM = 
+        {
+            GENERIC = "Can do it too! Mermfolk super strong, flurt!",
+            BURNT = "Glurp! Didn't do it!!",
+        },
+
+        DUMBBELL = "Muscly mustache man leave rocks everywhere.",
+        DUMBBELL_GOLDEN = "Muscly mustache man leave rocks everywhere.",
+		DUMBBELL_MARBLE = "Muscly mustache man leave rocks everywhere.",
+        DUMBBELL_GEM = "Muscly mustache man leave rocks everywhere.",
+        POTATOSACK = "Snacks! Mine!!",
+
+
+        TERRARIUMCHEST = 
+		{
+			GENERIC = "It smell strange, not from here.",
+			BURNT = "Didn't do it!!",
+			SHIMMER = "Maybe have extra shiny treasure inside?",
+		},
+
+		EYEMASKHAT = "Feels like hug from a slug.",
+
+        EYEOFTERROR = "Glurp...",
+        EYEOFTERROR_MINI = "Grrrr, not afraid of little chompy eyes!",
+        EYEOFTERROR_MINI_GROUNDED = "It gonna open soon!",
+
+        FROZENBANANADAIQUIRI = "Cold fruit tastes yummy, florp!",
+        BUNNYSTEW = "Glorp... Bunny's bath was too hot...",
+        MILKYWHITES = "Squishy!",
+
+        CRITTER_EYEOFTERROR = "Will make sure no get dry, glorp. Very important.",
+
+        SHIELDOFTERROR ="How come it allowed to bite, but me get in trouble?!",
+        TWINOFTERROR1 = "M-mermfolk not scared of any Ironfolk, flort!",
+        TWINOFTERROR2 = "M-mermfolk not scared of any Ironfolk, flort!",
+
+        -- Year of the Catcoon
+        CATTOY_MOUSE = "It so fast!",
+        KITCOON_NAMETAG = "Fish necklace for little kitties.",
+
+		KITCOONDECOR1 =
+        {
+            GENERIC = "Ha ha, it fun to hit!",
+            BURNT = "Awww...",
+        },
+		KITCOONDECOR2 =
+        {
+            GENERIC = "It have little fishy on it!",
+            BURNT = "Nooo!!",
+        },
+
+		KITCOONDECOR1_KIT = "It not hard to build, florp.",
+		KITCOONDECOR2_KIT = "It need building still!",
+
+        -- WX78
+        WX78MODULE_MAXHEALTH = "Crunchy.",
+        WX78MODULE_MAXSANITY1 = "Crunchy.",
+        WX78MODULE_MAXSANITY = "Crunchy.",
+        WX78MODULE_MOVESPEED = "Crunchy.",
+        WX78MODULE_MOVESPEED2 = "Crunchy.",
+        WX78MODULE_HEAT = "Crunchy.",
+        WX78MODULE_NIGHTVISION = "Crunchy.",
+        WX78MODULE_COLD = "Crunchy.",
+        WX78MODULE_TASER = "Crunchy.",
+        WX78MODULE_LIGHT = "Crunchy.",
+        WX78MODULE_MAXHUNGER1 = "Crunchy.",
+        WX78MODULE_MAXHUNGER = "Crunchy.",
+        WX78MODULE_MUSIC = "Crunchy.",
+        WX78MODULE_BEE = "Crunchy.",
+        WX78MODULE_MAXHEALTH2 = "Crunchy.",
+
+        WX78_SCANNER = 
+        {
+            GENERIC ="Bug? No? Hmm...",
+            HUNTING = "Bug? No? Hmm...",
+            SCANNING = "Bug? No? Hmm...",
+        },
+
+        WX78_SCANNER_ITEM = "Bug? No? Hmm...",
+        WX78_SCANNER_SUCCEEDED = "Why it all blinky?",
+
+        WX78_MODULEREMOVER = "Haha! Ironfolk weird.",
+
+        SCANDATA = "Glurgh... can Wicker-lady read it?",
     },
 
     DESCRIBE_GENERIC = "What that?",

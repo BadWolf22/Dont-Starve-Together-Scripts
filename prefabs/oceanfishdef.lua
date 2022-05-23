@@ -27,6 +27,7 @@ eel		165.16, 212.12
 7	YOT Koi 2			188.88, 238.88	+-		+-		+-									OMNI			easy-medium catch
 8   Snowy Whitefish		190.90, 270.70			++											OMNI			long pulls
 9   Berryfish		    210.50, 315.14														BERRY			easy-medium catch
+
 ]]
 
 --[[ Catching Behaviours
@@ -113,6 +114,7 @@ local LOOT = {
     POPCORN =		{ "corn_cooked" },
     ICE =			{ "fishmeat", "ice", "ice" },
     PLANTMEAT =		{ "plantmeat" },
+	MEDIUM_YOT =	{ "fishmeat", "lucky_goldnugget", "lucky_goldnugget" },
 }
 
 local PERISH = {
@@ -135,6 +137,13 @@ local COOKING_PRODUCT = {
     CORN =      "corn_cooked",
 	PLANTMEAT = "plantmeat_cooked",
 }
+
+local function MEDIUM_YOT_ONCOOKED_FN(inst, cooker, chef)
+	if inst.components.lootdropper ~= nil then
+		inst.components.lootdropper:SpawnLootPrefab("lucky_goldnugget")
+		inst.components.lootdropper:SpawnLootPrefab("lucky_goldnugget")
+	end
+end
 
 local DIET = {
 	OMNI = { caneat = { FOODGROUP.OMNI } },--, preferseating = { FOODGROUP.OMNI } },
@@ -926,7 +935,7 @@ local FISH_DEFS =
 
 		set_hook_time = SET_HOOK_TIME_MEDIUM,
 		breach_fx = BREACH_FX_MEDIUM,
-		loot = LOOT.MEDIUM,
+		loot = LOOT.ICE,
 		cooking_product = COOKING_PRODUCT.MEDIUM,
         perish_product = PERISH.MEDIUM,
         fishtype = "meat",
@@ -987,6 +996,8 @@ local FISH_DEFS =
 	},	
 }
 
+-- Fish School Data
+
 local SCHOOL_VERY_COMMON		= 4
 local SCHOOL_COMMON				= 2
 local SCHOOL_UNCOMMON			= 1
@@ -1037,7 +1048,7 @@ local SCHOOL_WEIGHTS = {
 		{
 	        oceanfish_small_2 = SCHOOL_UNCOMMON,
 	        oceanfish_small_4 = SCHOOL_RARE,
-	        oceanfish_medium_9 = SCHOOL_COMMON,
+	        oceanfish_medium_9 = SCHOOL_VERY_COMMON,
 	    },		
     },
 }
@@ -1050,12 +1061,18 @@ SCHOOL_WEIGHTS[SEASONS.SUMMER] = deepcopy(SCHOOL_WEIGHTS[SEASONS.AUTUMN])
 SCHOOL_WEIGHTS[SEASONS.AUTUMN][GROUND.OCEAN_SWELL].oceanfish_small_6 = SCHOOL_UNCOMMON
 SCHOOL_WEIGHTS[SEASONS.WINTER][GROUND.OCEAN_SWELL].oceanfish_medium_8 = SCHOOL_UNCOMMON
 SCHOOL_WEIGHTS[SEASONS.SPRING][GROUND.OCEAN_COASTAL].oceanfish_small_7 = SCHOOL_UNCOMMON
-SCHOOL_WEIGHTS[SEASONS.SPRING][GROUND.OCEAN_WATERLOG].oceanfish_small_7 = SCHOOL_UNCOMMON
+SCHOOL_WEIGHTS[SEASONS.AUTUMN][GROUND.OCEAN_WATERLOG].oceanfish_small_6 = SCHOOL_COMMON
+SCHOOL_WEIGHTS[SEASONS.SPRING][GROUND.OCEAN_WATERLOG].oceanfish_small_7 = SCHOOL_COMMON
 SCHOOL_WEIGHTS[SEASONS.SUMMER][GROUND.OCEAN_SWELL].oceanfish_small_8 = SCHOOL_UNCOMMON
 
 
 local function SpecialEventSetup()
 	if IsAny_YearOfThe_EventActive() then
+		FISH_DEFS.oceanfish_medium_6.loot = LOOT.MEDIUM_YOT
+		FISH_DEFS.oceanfish_medium_6.oncooked_fn = MEDIUM_YOT_ONCOOKED_FN
+		FISH_DEFS.oceanfish_medium_7.loot = LOOT.MEDIUM_YOT
+		FISH_DEFS.oceanfish_medium_7.oncooked_fn = MEDIUM_YOT_ONCOOKED_FN
+
 		for _, season in pairs(SCHOOL_WEIGHTS) do
 			season[GROUND.OCEAN_COASTAL].oceanfish_medium_6 = SCHOOL_UNCOMMON / 2
 			season[GROUND.OCEAN_SWELL].oceanfish_medium_6 = SCHOOL_UNCOMMON / 2

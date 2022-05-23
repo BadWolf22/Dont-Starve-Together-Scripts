@@ -39,6 +39,11 @@ local assets =
     Asset("DYNAMIC_ATLAS", "images/bg_spiral_anim_overlay.xml"),
     Asset("PKGREF", "images/bg_spiral_anim_overlay.tex"),
 
+	Asset("INV_IMAGE", "equip_slot_body_hud"),
+	Asset("INV_IMAGE", "equip_slot_head_hud"),
+	Asset("INV_IMAGE", "equip_slot_hud"),
+
+	Asset("IMAGE", "images/waterfall_mask.tex"),
 
 	Asset("IMAGE", "images/waterfall_mask.tex"),
 	Asset("IMAGE", "levels/textures/waterfall_noise1.tex"),
@@ -214,11 +219,30 @@ local prefabs =
 	-- summer carnival
 	"carnival_host",
 
+	-- deprecated bird tacklesketch
+	"oceanfishingbobber_malbatross_tacklesketch",
+	"oceanfishingbobber_goose_tacklesketch",
+	"oceanfishingbobber_crow_tacklesketch",
+	"oceanfishingbobber_robin_tacklesketch",
+	"oceanfishingbobber_robin_winter_tacklesketch",
+	"oceanfishingbobber_canary_tacklesketch",
+
 	-- Farming
 	"slow_farmplot", -- deprecated but still used in old worlds and mods
     "fast_farmplot", -- deprecated but still used in old worlds and mods
     "nutrients_overlay",
     "lordfruitfly",
+
+	-- YOT Catcoon
+	"kitcoon_forest",
+	"kitcoon_savanna",
+	"kitcoon_marsh",
+	"kitcoon_deciduous",
+	"kitcoon_grass",
+	"kitcoon_rocky",
+	"kitcoon_desert",
+	"kitcoon_moon",
+	"kitcoon_yot",
 }
 
 for k, v in pairs(require("prefabs/farm_plant_defs").PLANT_DEFS) do

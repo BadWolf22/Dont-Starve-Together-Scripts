@@ -47,6 +47,7 @@ local assets =
     Asset("ANIM", "anim/status_boat.zip"),
     Asset("ANIM", "anim/status_were.zip"),
     Asset("ANIM", "anim/status_wathgrithr.zip"),
+    Asset("ANIM", "anim/status_wolfgang.zip"),
     Asset("ANIM", "anim/status_meter_circle.zip"),
     Asset("ANIM", "anim/status_clear_bg.zip"),
     Asset("ANIM", "anim/hunger_health_pulse.zip"),
@@ -112,6 +113,9 @@ local assets =
     Asset("ANIM", "anim/ink_over.zip"),
 
     Asset("ANIM", "anim/leaves_canopy.zip"),
+
+    Asset("ANIM", "anim/status_wx.zip"),
+    Asset("ANIM", "anim/status_wet_wx.zip"),
 }
 
 local prefabs =

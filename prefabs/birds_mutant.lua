@@ -148,6 +148,8 @@ local function commonPreMain(inst)
     inst.Physics:SetCollisionGroup(COLLISION.CHARACTERS)
     inst.Physics:ClearCollisionMask()
     inst.Physics:CollidesWith(COLLISION.WORLD)
+    inst.Physics:CollidesWith(COLLISION.OBSTACLES)
+    inst.Physics:CollidesWith(COLLISION.SMALLOBSTACLES)
     inst.Physics:SetMass(1)
     inst.Physics:SetSphere(1)
 
@@ -178,6 +180,10 @@ local function commonPostMain(inst)
 
     inst:AddComponent("eater")
     inst.components.eater:SetDiet({ FOODTYPE.SEEDS }, { FOODTYPE.SEEDS })
+
+    inst:AddComponent("sleeper")
+    inst.components.sleeper:SetResistance(2)
+	inst.components.sleeper.sleeptestfn = nil -- they don't sleep at night or day
 
     inst:AddComponent("sanityaura")
 	inst.components.sanityaura.aura = -TUNING.SANITYAURA_SMALL
@@ -243,6 +249,9 @@ local function runnerfn()
 
     inst.trappedbuild = "bird_mutant_build"
 
+    MakeSmallBurnableCharacter(inst, "mooncrow_body")
+    MakeTinyFreezableCharacter(inst, "mooncrow_body")
+
     inst = commonPostMain(inst)
 
 	return inst
@@ -272,6 +281,9 @@ local function spitterfn()
     end
 
     inst.trappedbuild = "bird_mutant_spitter_build"
+
+    MakeSmallBurnableCharacter(inst, "robin_body")
+    MakeTinyFreezableCharacter(inst, "robin_body")
 
 	inst = commonPostMain(inst)
 	inst.LaunchProjectile = LaunchProjectile

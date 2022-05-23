@@ -193,6 +193,9 @@ function PlayerAvatarPopup:Layout(data, show_net_profile)
     if not TheInput:ControllerAttached() then
         self.close_button = self.proot:AddChild(TEMPLATES.SmallButton(STRINGS.UI.PLAYER_AVATAR.CLOSE, 26, .5, function() self:Close() end))
         self.close_button:SetPosition(0, -269)
+	else
+		self.close_text = self.proot:AddChild(Text(UIFONT, 25, TheInput:GetLocalizedControl(TheInput:GetControllerID(), CONTROL_USE_ITEM_ON_ITEM) .. "  " .. STRINGS.UI.PLAYER_AVATAR.CLOSE))
+        self.close_text:SetPosition(0, -275)
     end
 end
 
@@ -418,22 +421,25 @@ function PlayerAvatarPopup:UpdateEquipWidgetForSlot(image_group, slot, equipdata
     local default = DEFAULT_IMAGES[slot] or "trinket_5.tex"
     if name == "none" then
         if slot == EQUIPSLOTS.BODY then
-            atlas = "images/hud.xml"
+            --atlas = "images/hud2.xml"
             name = "equip_slot_body_hud"
         elseif slot == EQUIPSLOTS.HANDS then
-            atlas = "images/hud.xml"
+            --atlas = "images/hud2.xml"
             name = "equip_slot_hud"
         elseif slot == EQUIPSLOTS.HEAD then
-            atlas = "images/hud.xml"
+            --atlas = "images/hud2.xml"
             name = "equip_slot_head_hud"
         else
             name = "default"
         end
-    elseif softresolvefilepath("images/inventoryimages/"..name..".xml") ~= nil then
+    end
+
+	if softresolvefilepath("images/inventoryimages/"..name..".xml") ~= nil then
         atlas = "images/inventoryimages/"..name..".xml"
     else
         atlas = GetInventoryItemAtlas(name..".tex")
     end
+
     image_group._image:SetTexture(atlas, name..".tex", default)
 end
 

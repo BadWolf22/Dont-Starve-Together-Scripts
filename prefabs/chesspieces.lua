@@ -4,18 +4,18 @@ end
 
 local PIECES =
 {
-    {name="pawn",       moonevent=false},
-    {name="rook",       moonevent=true},
-    {name="knight",     moonevent=true},
-    {name="bishop",     moonevent=true},
-    {name="muse",       moonevent=false},
-    {name="formal",     moonevent=false},
-    {name="hornucopia", moonevent=false},
-    {name="pipe",       moonevent=false},
+    {name="pawn",			moonevent=false,    gymweight=3},
+    {name="rook",			moonevent=true,     gymweight=3},
+    {name="knight",			moonevent=true,     gymweight=3},
+    {name="bishop",			moonevent=true,     gymweight=3},
+    {name="muse",			moonevent=false,    gymweight=3},
+    {name="formal",			moonevent=false,    gymweight=3},
+    {name="hornucopia",		moonevent=false,    gymweight=3},
+    {name="pipe",			moonevent=false,    gymweight=3},
 
-    {name="deerclops",  moonevent=false},
-    {name="bearger",    moonevent=false},
-    {name="moosegoose", moonevent=false,
+    {name="deerclops",		moonevent=false,    gymweight=4},
+    {name="bearger",		moonevent=false,    gymweight=4},
+    {name="moosegoose",		moonevent=false,    gymweight=4,
         common_postinit = function(inst)
             inst._altname = net_bool(inst.GUID, "chesspiece_moosegoose._altname")
             inst.displaynamefn = function(inst)
@@ -27,23 +27,27 @@ local PIECES =
             MooseGooseRandomizeName(inst)
         end,
     },
-    {name="dragonfly",  moonevent=false},
-    {name="clayhound",  moonevent=false},
-    {name="claywarg",   moonevent=false},
-    {name="butterfly",  moonevent=false},
-    {name="anchor",     moonevent=false},
-    {name="moon",       moonevent=false},
-    {name="carrat",     moonevent=false},
-    {name="beefalo",    moonevent=false},
-    {name="crabking",   moonevent=false},
-    {name="malbatross", moonevent=false},
-    {name="toadstool",	moonevent=false},
-    {name="stalker",	moonevent=false},
-    {name="klaus",		moonevent=false},
-    {name="beequeen",	moonevent=false},
-    {name="antlion",	moonevent=false},
-    {name="minotaur",	moonevent=false},
-    {name="guardianphase3", moonevent=false},
+    {name="dragonfly",		moonevent=false,    gymweight=4},
+    {name="clayhound",		moonevent=false,    gymweight=3},
+    {name="claywarg",		moonevent=false,    gymweight=3},
+    {name="butterfly",		moonevent=false,    gymweight=3},
+    {name="anchor",			moonevent=false,    gymweight=3},
+    {name="moon",			moonevent=false,    gymweight=4},
+    {name="carrat",			moonevent=false,    gymweight=3},
+    {name="beefalo",		moonevent=false,    gymweight=3},
+    {name="crabking",		moonevent=false,    gymweight=4},
+    {name="malbatross",		moonevent=false,    gymweight=4},
+    {name="toadstool",		moonevent=false,    gymweight=4},
+    {name="stalker",		moonevent=false,    gymweight=4},
+    {name="klaus",			moonevent=false,    gymweight=4},
+    {name="beequeen",		moonevent=false,    gymweight=4},
+    {name="antlion",		moonevent=false,    gymweight=4},
+    {name="minotaur",		moonevent=false,    gymweight=4},
+    {name="guardianphase3", moonevent=false,    gymweight=4},
+    {name="eyeofterror",	moonevent=false,    gymweight=4},
+    {name="twinsofterror",	moonevent=false,    gymweight=4},
+    {name="kitcoon",		moonevent=false,    gymweight=3},
+    {name="catcoon",		moonevent=false,    gymweight=3},
 }
 
 local MOON_EVENT_RADIUS = 12
@@ -205,6 +209,12 @@ local function onload(inst, data)
     end
 end
 
+local function islightgymweight(id)
+    if PIECES[id].gymweight then
+
+    end
+end
+
 local function makepiece(pieceid, materialid)
     local build = GetBuildName(pieceid, materialid)
 
@@ -252,6 +262,8 @@ local function makepiece(pieceid, materialid)
         inst.AnimState:PlayAnimation("idle")
 
         inst:AddTag("heavy")
+        inst.gymweight = PIECES[pieceid].gymweight or 2
+
         if PIECES[pieceid].moonevent and (materialid == nil or MATERIALS[materialid].name ~= MOONGLASS_NAME) then
             inst:AddTag("chess_moonevent")
             inst:AddTag("event_trigger")
@@ -335,7 +347,7 @@ local function builderonbuilt(inst, builder)
     if prototyper ~= nil and prototyper.CreateItem ~= nil then
         prototyper:CreateItem("chesspiece_"..PIECES[inst.pieceid].name)
     else
-        local piece = SpawnPrefab("chesspiece_"..PIECES[inst.pieceid].name)
+        local piece = SpawnPrefab("chesspiece_"..PIECES[inst.pieceid].name.."_marble")
         piece.Transform:SetPosition(builder.Transform:GetWorldPosition())
     end
 

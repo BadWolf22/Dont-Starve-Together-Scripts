@@ -493,7 +493,6 @@ function WorldCustomizationTab:VerifyValidSeasonSettings()
 end
 
 function WorldCustomizationTab:LoadPreset(preset)
-
     local presetdata = nil
     if preset ~= nil then
         presetdata = Levels.GetDataForLevelID(preset)
@@ -617,6 +616,10 @@ function WorldCustomizationTab:CollectOptions()
     end
 
     return ret
+end
+
+function WorldCustomizationTab:UpdateSaveSlot(slot)
+    self.slot = slot
 end
 
 function WorldCustomizationTab:SetDataForSlot(slot)

@@ -1,6 +1,8 @@
 require "util"
 local TechTree = require("techtree")
 
+local IS_BETA = BRANCH == "staging" --or BRANCH == "dev"
+
 PI = 3.14159
 PI2 = PI*2
 DEGREES = PI/180
@@ -154,7 +156,7 @@ CONTROL_USE_ITEM_ON_ITEM = 59
 CONTROL_MAP_ZOOM_IN = 60
 CONTROL_MAP_ZOOM_OUT = 61
 
-CONTROL_OPEN_DEBUG_MENU = 62
+CONTROL_OPEN_DEBUG_MENU = 70 --62 steam deck is 70
 
 CONTROL_TOGGLE_SAY = 63
 CONTROL_TOGGLE_WHISPER = 64
@@ -168,6 +170,18 @@ CONTROL_MENU_MISC_3 = 70  -- L
 CONTROL_MENU_MISC_4 = 71  -- R
 
 CONTROL_INSPECT_SELF = 72 -- Keyboard self inspect [I]
+
+CONTROL_SERVER_PAUSE = 73
+
+CONTROL_CRAFTING_MODIFIER = 74		-- this + CONTROL_OPEN_CRAFTING to open with the search box ready to type in
+CONTROL_CRAFTING_PINLEFT = 75
+CONTROL_CRAFTING_PINRIGHT = 76
+
+CONTROL_INV_11 = 77 -- Sequence ordering difference but makes backwards compatability easier.
+CONTROL_INV_12 = 78
+CONTROL_INV_13 = 79
+CONTROL_INV_14 = 80
+CONTROL_INV_15 = 81
 
 CONTROL_CUSTOM_START = 100
 
@@ -362,8 +376,8 @@ CHARACTER_VIDEOS =
 	wilson = {"https://bit.ly/3w9VYcN"},
 	willow = {"https://bit.ly/3rFOkU3"},
 	wendy = {"https://bit.ly/3fI3PbR"},
---	wolfgang = {},
---	wx78 = {},
+	wolfgang = {"https://klei.gg/33A9mNx"},
+	wx78 = {"https://klei.gg/3F9qqc1"},
 --	wickerbottom = {},
 	wes = {"https://bit.ly/2QLFpn4"},
 	waxwell = {"https://bit.ly/3rF0UD0"},
@@ -614,7 +628,7 @@ GROUND =
 
     FARMING_SOIL = 47,
 
-	-- PUBLIC USE SPACE FOR MODS is 70 to 89 --
+	-- PUBLIC USE SPACE FOR MODS is 70 to 109 --
 
     --NOISE -- from 110 to 127 -- TODO: move noise tile range to > 255
 	FUNGUSMOON_NOISE = 120,
@@ -685,8 +699,11 @@ SPECIAL_EVENTS =
     YOTP = "year_of_the_pig",
     YOTC = "year_of_the_carrat",
     YOTB = "year_of_the_beefalo",
+    YOT_CATCOON = "year_of_the_catcoon",
 }
 WORLD_SPECIAL_EVENT = SPECIAL_EVENTS.NONE
+--WORLD_SPECIAL_EVENT = IS_BETA and SPECIAL_EVENTS.YOT_CATCOON or SPECIAL_EVENTS.NONE
+WORLD_EXTRA_EVENTS = {}
 
 FESTIVAL_EVENTS =
 {
@@ -701,6 +718,16 @@ PREVIOUS_FESTIVAL_EVENTS_ORDER =
     { id = FESTIVAL_EVENTS.LAVAARENA, season = 2 },
     { id = FESTIVAL_EVENTS.QUAGMIRE, season = 1 },
     { id = FESTIVAL_EVENTS.LAVAARENA, season = 1 },
+}
+
+IS_YEAR_OF_THE_SPECIAL_EVENTS =
+{
+    [SPECIAL_EVENTS.YOTG] = true,
+    [SPECIAL_EVENTS.YOTV] = true,
+    [SPECIAL_EVENTS.YOTP] = true,
+    [SPECIAL_EVENTS.YOTC] = true,
+    [SPECIAL_EVENTS.YOTB] = true,
+	[SPECIAL_EVENTS.YOT_CATCOON] = true,
 }
 
 
@@ -725,8 +752,10 @@ SPECIAL_EVENT_MUSIC =
     --winter's feast carol
     [SPECIAL_EVENTS.WINTERS_FEAST] =
     {
-        bank = "music_frontend_winters_feast.fsb",
-        sound = "dontstarve/music/music_FE_WF",
+  --      bank = "music_frontend_winters_feast.fsb",
+  --      sound = "dontstarve/music/music_FE_WF",
+        bank = "music_frontend.fsb",
+        sound = "dontstarve/music/music_FE_wolfgang",
     },
 
     --year of the gobbler
@@ -762,6 +791,12 @@ SPECIAL_EVENT_MUSIC =
     {
         bank = "music_frontend_yotb.fsb",
         sound = "yotb_2021/music/FE",
+    },
+
+    [SPECIAL_EVENTS.YOT_CATCOON] =
+    {
+        bank = "music_frontend_yotg.fsb",
+        sound = "dontstarve/music/music_FE_yotg",
     },
 
 	-- crow carnival
@@ -825,17 +860,48 @@ local FESTIVAL_EVENT_INFO =
 ---------------------------------------------------------
 -- Refers to holiday-specific events.
 function IsSpecialEventActive(event)
-    return WORLD_SPECIAL_EVENT == event
+    return WORLD_SPECIAL_EVENT == event or WORLD_EXTRA_EVENTS[event] == true
 end
 
 function IsAnySpecialEventActive()
-    return WORLD_SPECIAL_EVENT ~= SPECIAL_EVENTS.NONE
+    return WORLD_SPECIAL_EVENT ~= SPECIAL_EVENTS.NONE or not IsTableEmpty(WORLD_EXTRA_EVENTS)
+end
+
+function GetActiveSpecialEventCount()
+    return (WORLD_SPECIAL_EVENT ~= SPECIAL_EVENTS.NONE and 1 or 0) + GetTableSize(WORLD_EXTRA_EVENTS)
+end
+
+function GetFirstActiveSpecialEvent()
+    if WORLD_SPECIAL_EVENT ~= SPECIAL_EVENTS.NONE then
+        return WORLD_SPECIAL_EVENT
+    end
+    return next(WORLD_EXTRA_EVENTS), nil --, nil prevents the value from getting returned by next
+end
+
+function GetAllActiveEvents(special_event, extra_events)
+    local all_events = {}
+    if special_event then
+        all_events[special_event] = true
+    end
+    for event in pairs(extra_events or {}) do
+        all_events[event] = true
+    end
+    all_events[SPECIAL_EVENTS.NONE] = nil
+    return all_events
 end
 
 ---------------------------------------------------------
 -- Checks if any of the "Year of the <creature>" events are active
 function IsAny_YearOfThe_EventActive()
-	return WORLD_SPECIAL_EVENT == SPECIAL_EVENTS.YOTG or WORLD_SPECIAL_EVENT == SPECIAL_EVENTS.YOTV or WORLD_SPECIAL_EVENT == SPECIAL_EVENTS.YOTP or WORLD_SPECIAL_EVENT == SPECIAL_EVENTS.YOTC or WORLD_SPECIAL_EVENT == SPECIAL_EVENTS.YOTB
+	if IS_YEAR_OF_THE_SPECIAL_EVENTS[WORLD_SPECIAL_EVENT] then
+        return true
+    end
+    for special_event in pairs(WORLD_EXTRA_EVENTS) do
+        if IS_YEAR_OF_THE_SPECIAL_EVENTS[special_event] then
+            return true
+        end
+    end
+    return false
 end
 
 function GetSpecialEventSkinTag()
@@ -921,10 +987,12 @@ end
 FE_MUSIC =
     (FESTIVAL_EVENT_MUSIC[WORLD_FESTIVAL_EVENT] ~= nil and FESTIVAL_EVENT_MUSIC[WORLD_FESTIVAL_EVENT].sound) or
     (SPECIAL_EVENT_MUSIC[WORLD_SPECIAL_EVENT] ~= nil and SPECIAL_EVENT_MUSIC[WORLD_SPECIAL_EVENT].sound) or
+    --"dontstarve/music/music_FE"
+    "dontstarve/music/music_FE_WX"
     --"dontstarve/music/music_moonstorm_FE"
     --"dontstarve/music/music_FE_webber"
-    --"dontstarve/music/music_FE"
-    "dontstarve/music/music_FE_wanda"
+    --"dontstarve/music/music_FE_wanda"
+    --"terraria1/common/music_main_eot"
 
 ---------------------------------------------------------
 NUM_HALLOWEENCANDY = 14
@@ -972,6 +1040,7 @@ TECH =
     PIGOFFERING_THREE = { PIGOFFERING = 3 },
     CARRATOFFERING_THREE = { CARRATOFFERING = 3 },
     BEEFOFFERING_THREE = { BEEFOFFERING = 3 },
+    CATCOONOFFERING_THREE = { CATCOONOFFERING = 3 },
     MADSCIENCE_ONE = { MADSCIENCE = 1 },
 	CARNIVAL_PRIZESHOP_ONE = { CARNIVAL_PRIZESHOP = 1 },
 	CARNIVAL_HOSTSHOP_ONE = { CARNIVAL_HOSTSHOP = 1 },
@@ -979,6 +1048,7 @@ TECH =
 
     FOODPROCESSING_ONE = { FOODPROCESSING = 1 },
 	FISHING_ONE = { FISHING = 1 },
+	FISHING_TWO = { FISHING = 2 },
 
 	HERMITCRABSHOP_ONE = { HERMITCRABSHOP = 1 },
 	HERMITCRABSHOP_THREE = { HERMITCRABSHOP = 3 },
@@ -986,6 +1056,8 @@ TECH =
     HERMITCRABSHOP_SEVEN = { HERMITCRABSHOP = 7 },
 
     TURFCRAFTING_ONE = { TURFCRAFTING = 1 },
+    TURFCRAFTING_TWO = { TURFCRAFTING = 2 },
+	MASHTURFCRAFTING_TWO = { MASHTURFCRAFTING = 2},
 
 	WINTERSFEASTCOOKING_ONE = { WINTERSFEASTCOOKING = 1 },
 
@@ -996,10 +1068,13 @@ TECH =
     YOTP = { SCIENCE = 10 }, -- ApplySpecialEvent() will change this from lost to 0
     YOTC = { SCIENCE = 10 }, -- ApplySpecialEvent() will change this from lost to 0
     YOTB = { SCIENCE = 10 }, -- ApplySpecialEvent() will change this from lost to 0
+    YOT_CATCOON = { SCIENCE = 10 }, -- ApplySpecialEvent() will change this from lost to 0
 
     LOST = { MAGIC = 10, SCIENCE = 10, ANCIENT = 10 },
 
-    SPIDERCRAFT_ONE = { SPIDERCRAFT = 1 }
+    SPIDERCRAFT_ONE = { SPIDERCRAFT = 1 },
+
+    ROBOTMODULECRAFT_ONE = { ROBOTMODULECRAFT = 1 },
 }
 
 -- See cell_data.h
@@ -1229,7 +1304,8 @@ CUSTOM_RECIPETABS =
     NATURE        = { str = "NATURE",			sort = 999, icon = "tab_nature.tex",        owner_tag = "plantkin"     },
 	SLINGSHOTAMMO =	{ str = "SLINGSHOTAMMO",	sort = 999, icon = "tab_slingshot.tex",	    owner_tag = "pebblemaker"  },
 	BALLOONOMANCY = { str = "BALLOONOMANCY",	sort = 999, icon = "tab_balloonomancy.tex",	owner_tag = "balloonomancer",	icon_atlas = "images/hud2.xml" },
-	CLOCKMAKER =	{ str = "CLOCKMAKER",		sort = 999, icon = "tab_clockmaker.tex",	owner_tag = "clockmaker",		icon_atlas = "images/hud2.xml"},
+	CLOCKMAKER    =	{ str = "CLOCKMAKER",		sort = 999, icon = "tab_clockmaker.tex",	owner_tag = "clockmaker",		icon_atlas = "images/hud2.xml"},
+    STRONGMAN     =	{ str = "STRONGMAN",		sort = 999, icon = "tab_strongman.tex",	    owner_tag = "strongman",		icon_atlas = "images/hud2.xml"},
 }
 
 QUAGMIRE_RECIPETABS =
@@ -1548,6 +1624,8 @@ ShadeTypes = {}
 
 HUD_ATLAS = "images/hud.xml"
 UI_ATLAS = "images/ui.xml"
+CRAFTING_ATLAS = "images/crafting_menu.xml"
+CRAFTING_ICONS_ATLAS = "images/crafting_menu_icons.xml"
 
 SNOW_THRESH = .015
 
@@ -1555,7 +1633,7 @@ VIBRATION_CAMERA_SHAKE = 0
 VIBRATION_BLOOD_FLASH = 1
 VIBRATION_BLOOD_OVER = 2
 
-NUM_SKIN_PRESET_SLOTS = 10
+NUM_SKIN_PRESET_SLOTS = 25
 
 --Neither of these are used anymore, kept here only for mods.
 NUM_SAVE_SLOTS = 5
@@ -1869,15 +1947,15 @@ DARKGREY = {.12, .12, .12, 1}
 
 -- A coherent palette for UI elements
 UICOLOURS = {
-    GOLD_CLICKABLE = RGB(215, 210, 157, 255), -- interactive text & menu
-    GOLD_FOCUS = RGB(251, 193, 92, 255), -- menu active item
-    GOLD_SELECTED = RGB(245, 243, 222, 255), -- titles and non-interactive important text
-    GOLD_UNIMPORTANT = RGB(213, 213, 203, 255), -- non-interactive non-important text
-    HIGHLIGHT_GOLD = RGB(243, 217, 161, 255),
+    GOLD_CLICKABLE = RGB(215, 210, 157), -- interactive text & menu
+    GOLD_FOCUS = RGB(251, 193, 92), -- menu active item
+    GOLD_SELECTED = RGB(245, 243, 222), -- titles and non-interactive important text
+    GOLD_UNIMPORTANT = RGB(213, 213, 203), -- non-interactive non-important text
+    HIGHLIGHT_GOLD = RGB(243, 217, 161),
     GOLD = GOLD,
     BROWN_MEDIUM = RGB(107, 84, 58),
     BROWN_DARK = RGB(80, 61, 39),
-    BLUE = RGB(80, 143, 244, 255),
+    BLUE = RGB(80, 143, 244),
     GREY = GREY,
     BLACK = BLACK,
     WHITE = WHITE,
@@ -2048,8 +2126,8 @@ else
         "forest",
         "cave",
     }
-    assert(SERVER_LEVEL_LOCATIONS[1] == "forest", "Invalid server start level location.")
 end
+assert(BRANCH == "dev" or SERVER_LEVEL_LOCATIONS[1] == "forest", "Invalid server start level location.")
 
 EVENTSERVER_LEVEL_LOCATIONS =
 {
@@ -2075,6 +2153,9 @@ SERVER_LEVEL_CONFIGS =
 		shard_link = true,
 	},
 }
+
+-- Mirrors constant from CloudSaves.h
+CLOUD_SAVES_SAVE_OFFSET = 100000
 
 COMMAND_PERMISSION = {
     ADMIN = "ADMIN", -- only admins see and can activate
@@ -2180,9 +2261,8 @@ INVENTORY_PROGRESS =
 	CHECK_EVENT = 2,
 	CHECK_DLC = 3,
 	CHECK_DAILY_GIFT = 4,
-	CHECK_COOKBOOK = 5,
-	CHECK_PLANTREGISTRY = 6,
-	CHECK_INVENTORY = 7,
+	CHECK_KEYVALUESTORES = 5,
+	CHECK_INVENTORY = 6,
 }
 
 CURRENT_BETA = 1 -- set to 0 if there is no beta. Note: release builds wont use this so only staging and dev really care
@@ -2231,6 +2311,7 @@ TEXT_FILTER_CTX_UNKNOWN = 0
 TEXT_FILTER_CTX_GAME = 1
 TEXT_FILTER_CTX_CHAT = 2
 TEXT_FILTER_CTX_NAME = 3
+TEXT_FILTER_CTX_SERVERNAME = 0 -- not sure how we want to handle this
 
 
 CHARACTER_BUTTON_OFFSET =
@@ -2287,4 +2368,75 @@ STORM_TYPES =
     NONE = 0,
     SANDSTORM = 1,
     MOONSTORM = 2,
+}
+
+LOADING_SCREEN_TIP_OPTIONS = 
+{
+    ALL = 1,
+    TIPS_ONLY = 2,
+    LORE_ONLY = 3,
+    NONE = 4,
+}
+
+LOADING_SCREEN_TIP_CATEGORIES =
+{
+    CONTROLS = 1,
+    SURVIVAL = 2,
+    LORE = 3,
+    LOADING_SCREEN = 4,
+    OTHER = 5,
+}
+
+LOADING_SCREEN_TIP_ICONS =
+{
+    CONTROLS = { atlas = "images/loading_screen_icons.xml", icon = "icon_tooltips.tex" },
+    SURVIVAL = { atlas = "images/loading_screen_icons.xml", icon = "icon_survival.tex" },
+    LORE = { atlas = "images/loading_screen_icons.xml", icon = "icon_lore.tex" },
+    LOADING_SCREEN = { atlas = "images/loading_screen_icons.xml", icon = "icon_lore.tex" },
+    OTHER = { atlas = "images/loading_screen_icons.xml", icon = "icon_survival.tex" },
+}
+
+LOADING_SCREEN_TIP_CATEGORY_WEIGHTS_START =
+{
+    CONTROLS = 4,
+    SURVIVAL = 3,
+    LORE = 1,
+    LOADING_SCREEN = 2,
+    OTHER = 0,
+}
+
+LOADING_SCREEN_TIP_CATEGORY_WEIGHTS_END =
+{
+    CONTROLS = 0.5,
+    SURVIVAL = 2,
+    LORE = 4,
+    LOADING_SCREEN = 3.5,
+    OTHER = 0,
+}
+
+LOADING_SCREEN_CONTROL_TIP_KEYS =
+{
+    TIP_ATTACK = { attack = CONTROL_ATTACK },
+    TIP_FORCE_ATTACK = { modifier = CONTROL_FORCE_ATTACK, attack = CONTROL_ATTACK },
+    TIP_HOLD_INSPECT = { inspect = CONTROL_FORCE_INSPECT},
+    TIP_HOLD_ACTION = { action = CONTROL_ACTION },
+    TIP_HOLD_PRIMARY = { primary = CONTROL_ATTACK },
+    TIP_HOLD_MOUSE = { primary = CONTROL_PRIMARY },
+    TIP_HALF_STACK = { modifier = CONTROL_FORCE_STACK, primary = CONTROL_PRIMARY },
+    TIP_DROP_ITEMS = { modifier = CONTROL_FORCE_TRADE, secondary = CONTROL_SECONDARY },
+    TIP_ROTATE_CAMERA = { rotateleft = CONTROL_ROTATE_LEFT, rotateright = CONTROL_ROTATE_RIGHT },
+    TIP_SHOW_MAP = { map = CONTROL_MAP },
+    TIP_INSPECT_SELF = { inspectself = CONTROL_INSPECT_SELF },
+    TIP_CHAT = { chat = CONTROL_TOGGLE_SAY, whisper = CONTROL_TOGGLE_WHISPER },
+    TIP_PLAYER_STATUS = { playerstatus = CONTROL_SHOW_PLAYER_STATUS },
+    TIP_INVENTORY_SLOTS = { inv_0 = CONTROL_INV_10, inv_9 = CONTROL_INV_9 },
+}
+
+-- When using a controller or on console, some control IDs are different than on non-console, but use the same tips.
+LOADING_SCREEN_CONTROLLER_ID_LOOKUP =
+{
+    [CONTROL_ATTACK] = CONTROL_CONTROLLER_ATTACK,
+    [CONTROL_ACTION] = CONTROL_CONTROLLER_ACTION,
+    [CONTROL_FORCE_INSPECT] = CONTROL_INSPECT,
+    [CONTROL_SHOW_PLAYER_STATUS] = CONTROL_MENU_MISC_4,
 }

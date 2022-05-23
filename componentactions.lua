@@ -110,9 +110,13 @@ local COMPONENT_ACTIONS =
 {
     SCENE = --args: inst, doer, actions, right
     {
-        activatable = function(inst, doer, actions)
+        activatable = function(inst, doer, actions, right)
             if inst:HasTag("inactive") then
-                table.insert(actions, ACTIONS.ACTIVATE)
+				if right or (inst.replica.inventoryitem == nil and not inst:HasTag("activatable_forceright")) then
+					if not inst:HasTag("smolder") and not inst:HasTag("fire") then
+		                table.insert(actions, ACTIONS.ACTIVATE)
+					end
+				end
             end
         end,
 
@@ -123,6 +127,12 @@ local COMPONENT_ACTIONS =
                 elseif inst:HasTag("anchor_raised") then
                     table.insert(actions, ACTIONS.LOWER_ANCHOR)
                 end
+            end
+        end,
+
+        battery = function(inst, doer, actions)
+            if inst:HasTag("battery") and doer:HasTag("batteryuser") then
+                table.insert(actions, ACTIONS.CHARGE_FROM)
             end
         end,
 
@@ -170,7 +180,7 @@ local COMPONENT_ACTIONS =
         combat = function(inst, doer, actions, right)
             if not right and
                 doer:CanDoAction(ACTIONS.ATTACK) and
-                inst.replica.health ~= nil and not inst.replica.health:IsDead() and
+                not IsEntityDead(inst, true) and
                 inst.replica.combat ~= nil and inst.replica.combat:CanBeAttacked(doer) then
                 table.insert(actions, ACTIONS.ATTACK)
             end
@@ -211,7 +221,6 @@ local COMPONENT_ACTIONS =
                         table.insert(actions, ACTIONS.ABANDON)
                     end
                 elseif inst.replica.container == nil then
-                    --V2C: @Scott: Should this always be available???
                     table.insert(actions, ACTIONS.PET)
                 end
             end
@@ -268,6 +277,12 @@ local COMPONENT_ACTIONS =
             end
         end,
 
+		prototyper = function(inst, doer, actions, right)
+			if not right then
+                table.insert(actions, ACTIONS.OPEN_CRAFTING)
+			end
+		end,
+
         fertilizerresearchable = function(inst, doer, actions, right)
             if right then
                 PlantRegistryResearch(inst, doer, actions)
@@ -295,6 +310,26 @@ local COMPONENT_ACTIONS =
                 table.insert(actions, ACTIONS.PICKUP)
             end
         end,
+
+        kitcoon = function(inst, doer, actions, right)
+            if right then
+	            if inst.replica.follower ~= nil and inst.replica.follower:GetLeader() == doer then
+					if doer:HasTag("near_kitcoonden") and FindEntity(inst, TUNING.KITCOON_NEAR_DEN_DIST, nil, {"kitcoonden"}) ~= nil then
+	                    table.insert(actions, ACTIONS.RETURN_FOLLOWER)
+					else
+	                    table.insert(actions, ACTIONS.ABANDON)
+					end
+	            end
+			else
+                table.insert(actions, ACTIONS.PET)
+            end
+        end,
+
+		hideandseekhidingspot = function(inst, doer, actions, right)
+            if right then
+				table.insert(actions, ACTIONS.HIDEANSEEK_FIND)
+			end
+		end,
 
         lock = function(inst, doer, actions)
             if inst:HasTag("unlockable") then
@@ -638,7 +673,7 @@ local COMPONENT_ACTIONS =
 
         yotc_racecompetitor = function(inst, doer, actions, right)
             if (inst:HasTag("has_prize") or inst:HasTag("has_no_prize"))
-                    and (inst.replica.health == nil or not inst.replica.health:IsDead()) then
+                    and not IsEntityDead(inst) then
                 table.insert(actions, ACTIONS.PICKUP)
             end
         end,
@@ -662,6 +697,19 @@ local COMPONENT_ACTIONS =
                     )) then
 
                     table.insert(actions, ACTIONS.YOTB_SEW)
+                end
+            end
+        end,
+
+        mightygym = function(inst, doer, actions, right)
+            if doer:HasTag("player") and doer:HasTag("strongman") and 
+                not inst:HasTag("hasstrongman") then
+                
+                if right and inst:HasTag("loaded") then
+                    -- TODO: unload gym action
+                    table.insert(actions, ACTIONS.UNLOAD_GYM)
+                else
+                    table.insert(actions, ACTIONS.ENTER_GYM)
                 end
             end
         end,
@@ -1200,10 +1248,12 @@ local COMPONENT_ACTIONS =
         end,
 
         useabletargeteditem = function(inst, doer, target, actions)
-            if target ~= nil and target.prefab ~= nil
-                    and inst:HasTag(target.prefab.."_targeter")
-                    and not inst:HasTag("inuse_targeted") then
-                table.insert(actions, ACTIONS.USEITEMON)
+            if target ~= nil then
+				if (target.prefab ~= nil and inst:HasTag(target.prefab.."_targeter") and not inst:HasTag("inuse_targeted")) 
+					or (inst.UseableTargetedItem_ValidTarget ~= nil and inst.UseableTargetedItem_ValidTarget(inst, target, doer)) then
+
+					table.insert(actions, ACTIONS.USEITEMON)
+				end
             end
         end,
 
@@ -1353,13 +1403,13 @@ local COMPONENT_ACTIONS =
         end,
 
         quagmire_slaughtertool = function(inst, doer, target, actions)
-            if target:HasTag("canbeslaughtered") and target.replica.health ~= nil and not target.replica.health:IsDead() then
+            if target:HasTag("canbeslaughtered") and not IsEntityDead(target) then
                 table.insert(actions, ACTIONS.SLAUGHTER)
             end
         end,
 
         spidermutator = function(inst, doer, target, actions)
-            if target:HasTag("spider") and target.replica.health ~= nil and not target.replica.health:IsDead() then
+            if target:HasTag("spider") and not IsEntityDead(target) then
                 table.insert(actions, ACTIONS.MUTATE_SPIDER)
             end
         end,
@@ -1387,17 +1437,24 @@ local COMPONENT_ACTIONS =
         end,
 
         complexprojectile = function(inst, doer, pos, actions, right)
-            if right and not TheWorld.Map:IsGroundTargetBlocked(pos) then
+            if right and not TheWorld.Map:IsGroundTargetBlocked(pos) 
+				and (inst.replica.equippable == nil or not inst.replica.equippable:IsRestricted(doer)) then
+
                 table.insert(actions, ACTIONS.TOSS)
             end
         end,
 
         deployable = function(inst, doer, pos, actions, right)
-            if right and inst.replica.inventoryitem ~= nil and inst.replica.inventoryitem:CanDeploy(pos, nil, doer, (doer.components.playercontroller ~= nil and doer.components.playercontroller.deployplacer ~= nil) and doer.components.playercontroller.deployplacer.Transform:GetRotation() or 0) then
-                if inst:HasTag("tile_deploy") then
-                    table.insert(actions, ACTIONS.DEPLOY_TILEARRIVE)
-                else
-                    table.insert(actions, ACTIONS.DEPLOY)
+            if right and inst.replica.inventoryitem ~= nil then
+                if CLIENT_REQUESTED_ACTION == ACTIONS.DEPLOY_TILEARRIVE or CLIENT_REQUESTED_ACTION == ACTIONS.DEPLOY then
+                    --CanDeploy will still run before the actual deploy itself.
+                    table.insert(actions, CLIENT_REQUESTED_ACTION)
+                elseif inst.replica.inventoryitem:CanDeploy(pos, nil, doer, (doer.components.playercontroller ~= nil and doer.components.playercontroller.deployplacer ~= nil) and doer.components.playercontroller.deployplacer.Transform:GetRotation() or 0) then
+                    if inst:HasTag("tile_deploy") then
+                        table.insert(actions, ACTIONS.DEPLOY_TILEARRIVE)
+                    else
+                        table.insert(actions, ACTIONS.DEPLOY)
+                    end
                 end
             end
         end,
@@ -1532,9 +1589,10 @@ local COMPONENT_ACTIONS =
 
         complexprojectile = function(inst, doer, target, actions, right)
             if right and
-                not (doer.components.playercontroller ~= nil and
-                    doer.components.playercontroller.isclientcontrollerattached) and
-                not TheWorld.Map:IsGroundTargetBlocked(target:GetPosition()) then
+                not (doer.components.playercontroller ~= nil and doer.components.playercontroller.isclientcontrollerattached) and
+                not TheWorld.Map:IsGroundTargetBlocked(target:GetPosition()) and
+				(inst.replica.equippable == nil or not inst.replica.equippable:IsRestricted(doer)) then
+                
                 table.insert(actions, ACTIONS.TOSS)
             end
         end,
@@ -1586,6 +1644,16 @@ local COMPONENT_ACTIONS =
         lighter = function(inst, doer, target, actions, right)
             if right and target:HasTag("canlight") and not ((target:HasTag("fueldepleted") and not target:HasTag("burnableignorefuel")) or target:HasTag("INLIMBO")) then
                 table.insert(actions, ACTIONS.LIGHT)
+            end
+        end,
+
+        mightydumbbell = function(inst, doer, target, actions, right)
+            if right and doer == target then
+                if inst:HasTag("lifting") then
+                    table.insert(actions, ACTIONS.STOP_LIFT_DUMBBELL)
+                else
+                    table.insert(actions, ACTIONS.LIFT_DUMBBELL)
+                end
             end
         end,
 
@@ -1994,6 +2062,30 @@ local COMPONENT_ACTIONS =
             end
         end,
 
+        upgrademodule = function(inst, doer, actions, right)
+            if doer:HasTag("upgrademoduleowner") then
+                local success = doer.CanUpgradeWithModule == nil or doer:CanUpgradeWithModule(inst)
+
+                if success then
+                    table.insert(actions, ACTIONS.APPLYMODULE)
+                else
+                    table.insert(actions, ACTIONS.APPLYMODULE_FAIL)
+                end
+            end
+        end,
+
+        upgrademoduleremover = function(inst, doer, actions, right)
+            if doer:HasTag("upgrademoduleowner") then
+                local success = doer.CanRemoveModules == nil or doer:CanRemoveModules()
+
+                if success then
+                    table.insert(actions, ACTIONS.REMOVEMODULES)
+                else
+                    table.insert(actions, ACTIONS.REMOVEMODULES_FAIL)
+                end
+            end
+        end,
+
         useableitem = function(inst, doer, actions)
             if not inst:HasTag("inuse") and
                 inst.replica.equippable ~= nil and
@@ -2026,6 +2118,17 @@ local COMPONENT_ACTIONS =
         repellent = function(inst, doer, actions, right)
             if doer:HasTag("spiderwhisperer") then
                 table.insert(actions, ACTIONS.REPEL)
+            end
+        end,
+
+        mightydumbbell = function(inst, doer, actions)
+            if doer:HasTag("strongman") and 
+              (inst.replica.equippable ~= nil and inst.replica.equippable:IsEquipped()) then
+                if inst:HasTag("lifting") then
+                    table.insert(actions, ACTIONS.STOP_LIFT_DUMBBELL)
+                else
+                    table.insert(actions, ACTIONS.LIFT_DUMBBELL)
+                end
             end
         end,
     },

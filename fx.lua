@@ -37,8 +37,6 @@ local function OceanTreeLeafFxFallUpdate(inst)
     inst.Transform:SetPosition(x, y - inst.fall_speed * FRAMES, z)
 end
 
-
-
 local fx =
 {
     {
@@ -272,6 +270,7 @@ local fx =
         bank = "small_puff",
         build = "smoke_puff_small",
         anim = "puff",
+        fn = FinalOffset1,
         --sound = "dontstarve/common/deathpoof",
     },
     {
@@ -554,6 +553,15 @@ local fx =
         anim = "medium",
         sound = "dontstarve/common/spawn/spawnportal_spawnplayer",
         fn = FinalOffset1,
+    },
+    {
+        name = "spawn_fx_medium_static",
+        bank = "spawn_fx",
+        build = "puff_spawning",
+        anim = "medium",
+        sound = "dontstarve/common/spawn/spawnportal_spawnplayer",
+        fn = FinalOffset1,
+        update_while_paused = true
     },
     --[[{
         name = "spawn_fx_large",
@@ -1251,6 +1259,12 @@ local fx =
     },
     {
         name = "redpouch_yotb_unwrap",
+        bank = "redpouch",
+        build = "redpouch",
+        anim = "unwrap",
+    },
+    {
+        name = "redpouch_yot_catcoon_unwrap",
         bank = "redpouch",
         build = "redpouch",
         anim = "unwrap",
@@ -2247,6 +2261,115 @@ local fx =
         bank = "oceantree_leaf_fx",
         build = "oceantree_leaf_fx",
         anim = "chop",
+    },
+    {
+        name = "boss_ripple_fx",
+        bank = "malbatross_ripple",
+        build = "malbatross_ripple",
+        anim = "idle",
+        fn = function(inst)
+            inst.AnimState:SetLayer(LAYER_BELOW_GROUND)
+            inst.AnimState:SetSortOrder(ANIM_SORT_ORDER_BELOW_GROUND.BOAT_TRAIL)
+            inst.AnimState:SetOceanBlendParams(TUNING.OCEAN_SHADER.EFFECT_TINT_AMOUNT)
+        end,
+    },
+    {
+        name = "wolfgang_mighty_fx",
+        bank = "fx_wolfgang",
+        build = "fx_wolfgang",
+        anim = "idle",
+        nofaced = true,
+        fn = FinalOffsetNegative1,
+    },    
+    {
+        name = "mighty_gym_bell_fail_fx",
+        bank = "mighty_gym",
+        build = "mighty_gym",
+        anim = "gym_bell_fx",
+        nofaced = true,
+        fn = function(inst)
+            inst.AnimState:SetMultColour(1,0,0,1)
+            inst.AnimState:SetFinalOffset(1)
+        end,
+    },  
+    {
+        name = "mighty_gym_bell_perfect_fx",
+        bank = "mighty_gym",
+        build = "mighty_gym",
+        anim = "gym_bell_fx",
+        nofaced = true,
+        fn = function(inst)
+            inst.AnimState:SetMultColour(1,1,1,1)
+            inst.AnimState:SetFinalOffset(1)
+        end,
+    },  
+    {
+        name = "mighty_gym_bell_succeed_fx",
+        bank = "mighty_gym",
+        build = "mighty_gym",
+        anim = "gym_bell_fx",
+        nofaced = true,
+        fn = function(inst)
+            inst.AnimState:SetMultColour(1,1,0,1)
+            inst.AnimState:SetFinalOffset(1)
+        end,
+    },
+
+    {
+        name = "minotaur_blood1",
+        bank = "rook_rhino_blood_fx",
+        build = "rook_rhino_blood_fx",
+        anim = "blood1",
+        sound = "ancientguardian_rework/minotaur2/blood_splurt_small",
+        nofaced = true,
+        fn = function(inst)
+            inst.AnimState:SetMultColour(1, 1, 1, .5)
+            inst.Transform:SetTwoFaced()
+        end,
+    },
+
+    {
+        name = "minotaur_blood2",
+        bank = "rook_rhino_blood_fx",
+        build = "rook_rhino_blood_fx",
+        anim = "blood2",
+        sound = "ancientguardian_rework/minotaur2/blood_splurt_small",
+        nofaced = true,
+        fn = function(inst)
+            inst.AnimState:SetMultColour(1, 1, 1, .5)
+            inst.Transform:SetTwoFaced()
+        end,
+    },
+
+    {
+        name = "minotaur_blood3",
+        bank = "rook_rhino_blood_fx",
+        build = "rook_rhino_blood_fx",
+        anim = "blood3",
+        sound = "ancientguardian_rework/minotaur2/blood_splurt_small",
+        nofaced = true,
+        fn = function(inst)
+            inst.AnimState:SetMultColour(1, 1, 1, .5)
+            inst.Transform:SetTwoFaced()
+        end,
+    },
+
+    {
+        name = "wx78_heat_steam",
+        bank = "wx_fx",
+        build = "wx_fx",
+        anim = "steam",
+    },
+    {
+        name = "wx78_musicbox_fx",
+        bank = "wx_fx",
+        build = "wx_fx",
+        anim = "music1",
+        nofaced = true,
+        fn = function(inst)
+            inst.AnimState:PlayAnimation("music"..math.random(1, 4))
+            inst.AnimState:SetFinalOffset(1)
+        end,
     },
 }
 

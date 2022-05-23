@@ -66,6 +66,7 @@ local function ConfigureRunState(inst)
 
     elseif inst.replica.inventory:IsHeavyLifting() then
         inst.sg.statemem.heavy = true
+		inst.sg.statemem.heavy_fast = inst:HasTag("mightiness_mighty")
     elseif inst:HasTag("wereplayer") then
         inst.sg.statemem.iswere = true
         if inst:HasTag("weremoose") then
@@ -97,7 +98,8 @@ local function ConfigureRunState(inst)
 end
 
 local function GetRunStateAnim(inst)
-    return (inst.sg.statemem.heavy and "heavy_walk")
+    return ((inst.sg.statemem.heavy and inst.sg.statemem.heavy_fast) and "heavy_walk_fast")
+		or (inst.sg.statemem.heavy and "heavy_walk")
         or (inst.sg.statemem.sandstorm and "sand_walk")
         or ((inst.sg.statemem.groggy or inst.sg.statemem.moosegroggy or inst.sg.statemem.goosegroggy) and "idle_walk")
         or (inst.sg.statemem.careful and "careful_walk")
@@ -221,6 +223,7 @@ local actionhandlers =
                 or (action.target:HasTag("quickactivation") and "doshortaction")
                 or "dolongaction"
         end),
+    ActionHandler(ACTIONS.OPEN_CRAFTING, "dostandingaction"),
     ActionHandler(ACTIONS.PICK,
         function(inst, action)
             return (inst.replica.rider ~= nil and inst.replica.rider:IsRiding() and "dolongaction")
@@ -249,9 +252,7 @@ local actionhandlers =
     ActionHandler(ACTIONS.BUILD,
         function(inst, action)
             local rec = GetValidRecipe(action.recipe)
-            return (rec ~= nil and rec.buildingstate)
-                or (rec ~= nil and rec.tab.shop and "give")
-                or (action.recipe == "livinglog" and inst:HasTag("plantkin") and "form_log")
+            return (rec ~= nil and rec.sg_state)
                 or (inst:HasTag("hungrybuilder") and "dohungrybuild")
                 or (inst:HasTag("fastbuilder") and "domediumaction")
                 or (inst:HasTag("slowbuilder") and "dolongestaction")
@@ -381,7 +382,7 @@ local actionhandlers =
     ActionHandler(ACTIONS.FEED, "dolongaction"),
     ActionHandler(ACTIONS.ATTACK,
         function(inst, action)
-            if not (inst.sg:HasStateTag("attack") and action.target == inst.sg.statemem.attacktarget or inst.replica.health:IsDead()) then
+            if not (inst.sg:HasStateTag("attack") and action.target == inst.sg.statemem.attacktarget or IsEntityDead(inst)) then
                 local equip = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
                 if equip == nil then
                     return "attack"
@@ -541,20 +542,45 @@ local actionhandlers =
     ActionHandler(ACTIONS.USE_HEAVY_OBSTACLE, "dolongaction"),
     ActionHandler(ACTIONS.ADVANCE_TREE_GROWTH, "dolongaction"),
 
+    ActionHandler(ACTIONS.HIDEANSEEK_FIND, "dolongaction"),
+    ActionHandler(ACTIONS.RETURN_FOLLOWER, "dolongaction"),
+
     ActionHandler(ACTIONS.DISMANTLE_POCKETWATCH, "dolongaction"),   
+
+    ActionHandler(ACTIONS.LIFT_DUMBBELL, function(inst, action) 
+        if inst:HasTag("liftingdumbbell") then
+            return "use_dumbbell_pst"
+        else
+            return "use_dumbbell_pre"
+        end
+    end), 
+
+    ActionHandler(ACTIONS.ENTER_GYM, "give"),
+    ActionHandler(ACTIONS.LIFT_GYM_FAIL, "mighty_gym_lift"),
+    ActionHandler(ACTIONS.LIFT_GYM_SUCCEED_PERFECT, "mighty_gym_lift"),
+    ActionHandler(ACTIONS.LIFT_GYM_SUCCEED, "mighty_gym_lift"),
+
+    ActionHandler(ACTIONS.APPLYMODULE, "applyupgrademodule"),
+    ActionHandler(ACTIONS.APPLYMODULE_FAIL, "applyupgrademodule_fail"),
+    ActionHandler(ACTIONS.REMOVEMODULES, "use_inventory_item_busy"),
+    ActionHandler(ACTIONS.REMOVEMODULES_FAIL, "removeupgrademodules_fail"),
+    ActionHandler(ACTIONS.CHARGE_FROM, "doshortaction"),
 }
 
 local events =
 {
     EventHandler("locomote", function(inst)
-
         if (inst.sg:HasStateTag("busy") or inst:HasTag("busy")) and (inst:HasTag("jumping") and inst.sg:HasStateTag("jumping")) then
             return
         end
         local is_moving = inst.sg:HasStateTag("moving")
         local should_move = inst.components.locomotor:WantsToMoveForward()
 
-        if inst:HasTag("sleeping") then
+        if inst:HasTag("ingym") then
+            if should_move and not inst.sg:HasStateTag("exiting_gym") then
+                inst.sg:GoToState("mighty_gym_exit")
+            end
+        elseif inst:HasTag("sleeping") then
             if should_move and not inst.sg:HasStateTag("waking") then
                 inst.sg:GoToState("wakeup")
             end
@@ -615,7 +641,9 @@ local states =
                         "idle_groggy" or
                         "idle_loop"
                 end
-            else
+            elseif inst.player_classified ~= nil and inst.player_classified.inmightygym:value() > 0 then
+				anim = "mighty_gym_active_loop"
+			else
                 anim =
                     (inst.replica.inventory ~= nil and inst.replica.inventory:IsHeavyLifting() and "heavy_idle") or
                     (   inst:GetStormLevel() >= TUNING.SANDSTORM_FULL_LEVEL and
@@ -674,7 +702,7 @@ local states =
 
             --heavy lifting
             TimeEvent(1 * FRAMES, function(inst)
-                if inst.sg.statemem.heavy then
+                if inst.sg.statemem.heavy and not inst.sg.statemem.heavy_fast then
                     PlayFootstep(inst, nil, true)
                     DoFoleySounds(inst)
                 end
@@ -812,8 +840,20 @@ local states =
             end),
 
             --heavy lifting
+            TimeEvent(0 * FRAMES, function(inst)
+                if inst.sg.statemem.heavy and inst.sg.statemem.heavy_fast then
+                    DoRunSounds(inst)
+                    DoFoleySounds(inst)
+                end
+            end),
+            TimeEvent(9 * FRAMES, function(inst)
+                if inst.sg.statemem.heavy and inst.sg.statemem.heavy_fast then
+                    DoRunSounds(inst)
+                    DoFoleySounds(inst)
+                end
+            end),
             TimeEvent(11 * FRAMES, function(inst)
-                if inst.sg.statemem.heavy or
+                if (inst.sg.statemem.heavy and not inst.sg.statemem.heavy_fast) or
                     inst.sg.statemem.sandstorm or
                     inst.sg.statemem.careful then
                     DoRunSounds(inst)
@@ -824,7 +864,7 @@ local states =
                 end
             end),
             TimeEvent(36 * FRAMES, function(inst)
-                if inst.sg.statemem.heavy or
+                if (inst.sg.statemem.heavy and not inst.sg.statemem.heavy_fast) or
                     inst.sg.statemem.sandstorm or
                     inst.sg.statemem.careful then
                     DoRunSounds(inst)
@@ -1530,6 +1570,129 @@ local states =
         ontimeout = function(inst)
             inst:ClearBufferedAction()
             inst.sg:GoToState("idle")
+        end,
+    },
+
+    State{
+        name = "use_dumbbell_pre",
+        tags = { "gym", "doing" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+            
+            if inst.GetCurrentMightinessState then
+                local state = inst:GetCurrentMightinessState()
+                if state == "wimpy" then
+                    inst.AnimState:PlayAnimation("dumbbell_skinny_pre")
+                    --inst.AnimState:PushAnimation("dumbbell_skinny_pre_lag", false)
+                elseif state == "normal" then
+                    inst.AnimState:PlayAnimation("dumbbell_normal_pre")
+                    --inst.AnimState:PushAnimation("dumbbell_normal_pre_lag", false)
+                else
+                    inst.AnimState:PlayAnimation("dumbbell_mighty_pre")
+                    --inst.AnimState:PushAnimation("dumbbell_mighty_pre_lag", false)
+                end
+            end
+
+            inst:PerformPreviewBufferedAction()
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        onupdate = function(inst)
+            if inst:HasTag("doing") then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+                inst.sg:GoToState("idle")
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.AnimState:PlayAnimation("pickup_pst")
+            inst.sg:GoToState("idle", true)
+        end,
+    },
+
+    State{
+        name = "use_dumbbell_pre",
+        tags = { "gym", "doing" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+            
+            if inst.GetCurrentMightinessState then
+                local state = inst:GetCurrentMightinessState()
+                if state == "wimpy" then
+                    inst.AnimState:PlayAnimation("dumbbell_skinny_pre")
+                    inst.AnimState:PushAnimation("dumbbell_skinny_lag", false)
+                elseif state == "normal" then
+                    inst.AnimState:PlayAnimation("dumbbell_normal_pre")
+                    inst.AnimState:PushAnimation("dumbbell_normal_lag", false)
+                else
+                    inst.AnimState:PlayAnimation("dumbbell_mighty_pre")
+                    inst.AnimState:PushAnimation("dumbbell_mighty_lag", false)
+                end
+            end
+
+            inst:PerformPreviewBufferedAction()
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        onupdate = function(inst)
+            if inst:HasTag("doing") then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+                inst.sg:GoToState("idle")
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.AnimState:PlayAnimation("pickup_pst")
+            inst.sg:GoToState("idle", true)
+        end,
+    },
+
+    State{
+        name = "use_dumbbell_pst",
+        tags = { "gym", "doing" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+            
+            if inst.GetCurrentMightinessState then
+                local state = inst:GetCurrentMightinessState()
+                if state == "wimpy" then
+                    inst.AnimState:PlayAnimation("dumbbell_skinny_pst")
+                elseif state == "normal" then
+                    inst.AnimState:PlayAnimation("dumbbell_normal_pst")
+                else
+                    inst.AnimState:PlayAnimation("dumbbell_mighty_pst")
+                end
+            end
+
+            inst:PerformPreviewBufferedAction()
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        onupdate = function(inst)
+            if inst:HasTag("doing") then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+                inst.sg:GoToState("idle")
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.AnimState:PlayAnimation("pickup_pst")
+            inst.sg:GoToState("idle", true)
         end,
     },
 
@@ -3052,7 +3215,8 @@ local states =
             if buffaction ~= nil then
 				if buffaction.target ~= nil and buffaction.target:IsValid() then
 					inst:ForceFacePoint(buffaction.target:GetPosition())
-	                inst.sg.statemem.attacktarget = buffaction.target -- this is to allow repeat shooting at the same target
+	                inst.sg.statemem.attacktarget = buffaction.target
+                    inst.sg.statemem.retarget = buffaction.target
 				end
 
                 inst:PerformPreviewBufferedAction()
@@ -3227,6 +3391,13 @@ local states =
                         cooldown = math.max(cooldown, 16 * FRAMES)
                     end
                 end
+            elseif equip ~= nil and equip:HasTag("toolpunch") then
+                inst.AnimState:PlayAnimation("toolpunch")
+                inst.sg.statemem.istoolpunch = true
+                inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon", nil, nil, true)
+                if cooldown > 0 then
+                    cooldown = math.max(cooldown, 13 * FRAMES)
+                end
             elseif equip ~= nil and equip:HasTag("whip") then
                 inst.AnimState:PlayAnimation("whip_pre")
                 inst.AnimState:PushAnimation("whip", false)
@@ -3333,6 +3504,7 @@ local states =
                 if buffaction.target ~= nil and buffaction.target:IsValid() then
                     inst:FacePoint(buffaction.target:GetPosition())
                     inst.sg.statemem.attacktarget = buffaction.target
+                    inst.sg.statemem.retarget = buffaction.target
                 end
             end
 
@@ -3478,6 +3650,7 @@ local states =
                 if buffaction.target ~= nil and buffaction.target:IsValid() then
                     inst:FacePoint(buffaction.target:GetPosition())
                     inst.sg.statemem.attacktarget = buffaction.target
+                    inst.sg.statemem.retarget = buffaction.target
                 end
             end
         end,
@@ -3544,6 +3717,7 @@ local states =
                 if buffaction.target ~= nil and buffaction.target:IsValid() then
                     inst:FacePoint(buffaction.target:GetPosition())
                     inst.sg.statemem.attacktarget = buffaction.target
+                    inst.sg.statemem.retarget = buffaction.target
                 end
             end
 
@@ -4048,6 +4222,66 @@ local states =
     },
 
     --------------------------------------------------------------------------
+	-- Wolfgang Might Gym
+
+	State{
+        name = "mighty_gym_lift",
+        tags = { "busy" },
+
+        onenter = function(inst, snap)
+			local anim = "lift" --(inst.player_classified ~= nil and inst.player_classified.currentmightiness:value() >= 100) and "lift_full" or "lift"
+
+            inst.AnimState:PlayAnimation(anim.."_pre")
+            inst.AnimState:PushAnimation(anim.."_lag", false)
+            inst:PerformPreviewBufferedAction()
+
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        onupdate = function(inst)
+            if inst:HasTag("busy") then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+                inst.sg:GoToState("idle")
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle")
+        end,
+    },
+
+
+    State{
+        name = "mighty_gym_exit",
+        tags = {"exiting_gym"}, --,"busy"
+        onenter = function(inst)
+            print("ENTER THE mighty_gym_exit")
+            inst.entity:SetIsPredictingMovement(false)
+            inst.entity:FlattenMovementPrediction()
+            SendRPCToServer(RPC.exitgym)
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        onupdate = function(inst)
+            if inst:HasTag("busy") and
+                inst.entity:FlattenMovementPrediction() then
+                inst.sg:GoToState("idle", "noanim")
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst.sg:GoToState("idle", "noanim")
+        end,
+
+        onexit = function(inst)
+            inst.entity:SetIsPredictingMovement(true)
+        end,        
+    }, 
+    --------------------------------------------------------------------------
 
     State{
 
@@ -4355,6 +4589,70 @@ local states =
             elseif inst.bufferedaction == nil then
                 inst.sg:GoToState("idle")
             end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle")
+        end,
+    },
+
+    --------------------------------------------------------------------------
+    -- WX78 Rework
+    State {
+        name = "applyupgrademodule",
+        tags = { "busy", "nointerrupt" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+            inst.AnimState:PlayAnimation("upgrade")
+
+            inst:PerformPreviewBufferedAction()
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        onupdate = function(inst)
+            if inst:HasTag("busy") then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+                inst.sg:GoToState("idle")
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle")
+        end,
+    },
+
+    State {
+        name = "applyupgrademodule_fail",
+        tags = { "busy" },
+
+        onenter = function(inst)
+            inst:PerformPreviewBufferedAction()
+
+            inst.sg:GoToState("idle")
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle")
+        end,
+    },
+
+    State {
+        name = "removeupgrademodules_fail",
+        tags = { "busy" },
+
+        onenter = function(inst)
+            inst:PerformPreviewBufferedAction()
+
+            inst.sg:GoToState("idle")
+            inst.sg:SetTimeout(TIMEOUT)
         end,
 
         ontimeout = function(inst)

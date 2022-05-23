@@ -44,7 +44,7 @@ end
 function FindClosestPlayerInRangeSq(x, y, z, rangesq, isalive)
     local closestPlayer = nil
     for i, v in ipairs(AllPlayers) do
-        if (isalive == nil or isalive ~= (v.replica.health:IsDead() or v:HasTag("playerghost"))) and
+        if (isalive == nil or isalive ~= IsEntityDeadOrGhost(v)) and
             v.entity:IsVisible() then
             local distsq = v:GetDistanceSqToPoint(x, y, z)
             if distsq < rangesq then
@@ -72,7 +72,7 @@ end
 function FindClosestPlayerOnLandInRangeSq(x, y, z, rangesq, isalive)
     local closestPlayer = nil
     for i, v in ipairs(AllPlayers) do
-        if (isalive == nil or isalive ~= (v.replica.health:IsDead() or v:HasTag("playerghost"))) and
+        if (isalive == nil or isalive ~= IsEntityDeadOrGhost(v)) and
                 v.entity:IsVisible() and
                 v:IsOnValidGround() then
             local distsq = v:GetDistanceSqToPoint(x, y, z)
@@ -93,7 +93,7 @@ end
 function FindPlayersInRangeSq(x, y, z, rangesq, isalive)
     local players = {}
     for i, v in ipairs(AllPlayers) do
-        if (isalive == nil or isalive ~= (v.replica.health:IsDead() or v:HasTag("playerghost"))) and
+        if (isalive == nil or isalive ~= IsEntityDeadOrGhost(v)) and
             v.entity:IsVisible() and
             v:GetDistanceSqToPoint(x, y, z) < rangesq then
             table.insert(players, v)
@@ -108,7 +108,7 @@ end
 
 function IsAnyPlayerInRangeSq(x, y, z, rangesq, isalive)
     for i, v in ipairs(AllPlayers) do
-        if (isalive == nil or isalive ~= (v.replica.health:IsDead() or v:HasTag("playerghost"))) and
+        if (isalive == nil or isalive ~= IsEntityDeadOrGhost(v)) and
             v.entity:IsVisible() and
             v:GetDistanceSqToPoint(x, y, z) < rangesq then
             return true
@@ -119,6 +119,19 @@ end
 
 function IsAnyPlayerInRange(x, y, z, range, isalive)
     return IsAnyPlayerInRangeSq(x, y, z, range * range, isalive)
+end
+
+function IsAnyOtherPlayerNearInst(inst, rangesq, isalive)
+    local x, y, z = inst.Transform:GetWorldPosition()
+    for i, v in ipairs(AllPlayers) do
+        if (isalive == nil or isalive ~= IsEntityDeadOrGhost(v)) 
+            and v.entity:IsVisible() 
+            and v:GetDistanceSqToPoint(x, y, z) < rangesq 
+            and v ~= inst then
+            return true
+        end
+    end
+    return false
 end
 
 -- Get a location where it's safe to spawn an item so it won't get lost in the ocean
@@ -407,21 +420,41 @@ function ErodeCB(inst, erode_time, cb, restore)
     end)
 end
 
-function ApplySpecialEvent(event)
-    if event ~= nil and event ~= "default" then
-        WORLD_SPECIAL_EVENT = event
-		print("Overriding World Event to: " .. tostring(event))
-    end
-
-    --LOST tech level when event is not active
+local function ApplyEvent(event)
     for k, v in pairs(SPECIAL_EVENTS) do
-        if v ~= SPECIAL_EVENTS.NONE then
+        if v == event and v ~= SPECIAL_EVENTS.NONE then
             local tech = TECH[k]
             if tech ~= nil then
-                tech.SCIENCE = v == WORLD_SPECIAL_EVENT and 0 or 10
+                tech.SCIENCE = 0
             end
         end
     end
+end
+
+function ApplySpecialEvent(event)
+    if event == nil then
+        return
+    end
+
+    if event ~= "default" then
+        WORLD_SPECIAL_EVENT = event
+        print("Overriding World Event to: " .. tostring(event))
+    end
+
+    --LOST tech level when event is not active
+    ApplyEvent(WORLD_SPECIAL_EVENT)
+end
+
+function ApplyExtraEvent(event)
+    if event == nil or event == "default" or event == SPECIAL_EVENTS.NONE then
+        return
+    end
+
+    WORLD_EXTRA_EVENTS[event] = true
+    print("Adding extra World Event: " .. tostring(event))
+
+    --LOST tech level when event is not active
+    ApplyEvent(event)
 end
 
 local inventoryItemAtlasLookup = {}

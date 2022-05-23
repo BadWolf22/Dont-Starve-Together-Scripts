@@ -133,16 +133,16 @@ function RecipePopup:BuildWithSpinner(horizontal)
         end
     end)
     self.button:SetOnDown(function()
-        if self.last_recipe_click and (GetTime() - self.last_recipe_click) < 1 then
+        if self.last_recipe_click and (GetStaticTime() - self.last_recipe_click) < 1 then
             self.recipe_held = true
             self.last_recipe_click = nil
         end
     end)
     self.button:SetOnClick(function()
-        self.last_recipe_click = GetTime()
+        self.last_recipe_click = GetStaticTime()
         if not self.recipe_held then
             if not DoRecipeClick(self.owner, self.recipe, self.skins_spinner.GetItem()) then
-                self.owner.HUD.controls.crafttabs:Close()
+                self.owner.HUD.controls.craftingmenu:Close()
             end
         end
         self.recipe_held = false
@@ -227,16 +227,16 @@ function RecipePopup:BuildNoSpinner(horizontal)
         end
     end)
     self.button:SetOnDown(function()
-        if self.last_recipe_click and (GetTime() - self.last_recipe_click) < 1 then
+        if self.last_recipe_click and (GetStaticTime() - self.last_recipe_click) < 1 then
             self.recipe_held = true
             self.last_recipe_click = nil
         end
     end)
     self.button:SetOnClick(function()
-        self.last_recipe_click = GetTime()
+        self.last_recipe_click = GetStaticTime()
         if not self.recipe_held then
             if not DoRecipeClick(self.owner, self.recipe) then
-                self.owner.HUD.controls.crafttabs:Close()
+                self.owner.HUD.controls.craftingmenu:Close()
             end
         end
         self.recipe_held = false
@@ -261,9 +261,9 @@ function RecipePopup:Refresh()
     local builder = owner.replica.builder
     local inventory = owner.replica.inventory
 
-    local knows = builder:KnowsRecipe(recipe.name)
+    local knows = builder:KnowsRecipe(recipe)
     local buffered = builder:IsBuildBuffered(recipe.name)
-    local can_build = buffered or builder:CanBuild(recipe.name)
+    local can_build = buffered or builder:HasIngredients(recipe)
     local tech_level = builder:GetTechTrees()
     local should_hint = not knows and ShouldHintRecipe(recipe.level, tech_level) and not CanPrototypeRecipe(recipe.level, tech_level)
 
@@ -332,7 +332,7 @@ function RecipePopup:Refresh()
     end
 
     for i, v in ipairs(recipe.ingredients) do
-        local has, num_found = inventory:Has(v.type, math.max(1, RoundBiasedUp(v.amount * builder:IngredientMod())))
+        local has, num_found = inventory:Has(v.type, math.max(1, RoundBiasedUp(v.amount * builder:IngredientMod())), true)
         local ing = self.contents:AddChild(IngredientUI(v:GetAtlas(), v:GetImage(), v.amount ~= 0 and v.amount or nil, num_found, has, STRINGS.NAMES[string.upper(v.type)], owner, v.type))
         if GetGameModeProperty("icons_use_cc") then
             ing.ing:SetEffect("shaders/ui_cc.ksh")
@@ -382,6 +382,7 @@ function RecipePopup:Refresh()
                 ["CANTRESEARCH"] = "CANTRESEARCH",
                 ["ANCIENTALTAR_HIGH"] = "NEEDSANCIENT_FOUR",
                 ["SPIDERCRAFT"] = "NEEDSSPIDERFRIENDSHIP",
+                ["ROBOTMODULECRAFT"] = "NEEDSCREATURESCANNING",
             }
             local prototyper_tree = GetHintTextForRecipe(owner, recipe)
             str = STRINGS.UI.CRAFTING[hint_text[prototyper_tree] or ("NEEDS"..prototyper_tree)]
@@ -392,6 +393,12 @@ function RecipePopup:Refresh()
         self.teaser:SetMultilineTruncatedString(str, 3, TEASER_TEXT_WIDTH, 38, true)
         self.teaser:Show()
         showamulet = false
+    elseif TheNet:IsServerPaused() then
+        self.button:Hide()
+
+        self.teaser:SetScale(TEASER_SCALE_TEXT)
+        self.teaser:SetMultilineTruncatedString(STRINGS.UI.CRAFTING.GAMEPAUSED, 3, TEASER_TEXT_WIDTH, 38, true)
+        self.teaser:Show()
     else
         self.teaser:Hide()
 

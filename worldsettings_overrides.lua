@@ -447,6 +447,28 @@ local applyoverrides_pre = {
         }
         OverrideTuningVariables(tuning_vars[difficulty])
     end,
+    eyeofterror = function(difficulty)
+        local tuning_vars = {
+            never = {
+                SPAWN_EYEOFTERROR = false,
+            },
+            rare = {
+                EYEOFTERROR_SPAWNDELAY = TUNING.TOTAL_DAY_TIME * 25,
+            },
+            --[[
+            default = {
+                EYEOFTERROR_SPAWNDELAY = TUNING.TOTAL_DAY_TIME * 15,
+            },
+            --]]
+            often = {
+                EYEOFTERROR_SPAWNDELAY = TUNING.TOTAL_DAY_TIME * 10,
+            },
+            always = {
+                EYEOFTERROR_SPAWNDELAY = TUNING.TOTAL_DAY_TIME * 5,
+            },
+        }
+        OverrideTuningVariables(tuning_vars[difficulty])
+    end,
 
 
     --monsters
@@ -2818,7 +2840,7 @@ local applyoverrides_pre = {
         {
             never = {
                 KRAMPUS_THRESHOLD = -1,
-                KRAMPUS_THRESHOLD_VARIATION = 0,
+                KRAMPUS_THRESHOLD_VARIANCE = 0,
                 KRAMPUS_INCREASE_LVL1 = -1,
                 KRAMPUS_INCREASE_LVL2 = -1,
                 KRAMPUS_INCREASE_RAMP = -1,
@@ -2826,7 +2848,7 @@ local applyoverrides_pre = {
             },
             rare = {
                 KRAMPUS_THRESHOLD = 45,
-                KRAMPUS_THRESHOLD_VARIATION = 30,
+                KRAMPUS_THRESHOLD_VARIANCE = 30,
                 KRAMPUS_INCREASE_LVL1 = 75,
                 KRAMPUS_INCREASE_LVL2 = 125,
                 KRAMPUS_INCREASE_RAMP = 1,
@@ -2844,7 +2866,7 @@ local applyoverrides_pre = {
             --]]
             often = {
                 KRAMPUS_THRESHOLD = 20,
-                KRAMPUS_THRESHOLD_VARIATION = 15,
+                KRAMPUS_THRESHOLD_VARIANCE = 15,
                 KRAMPUS_INCREASE_LVL1 = 37,
                 KRAMPUS_INCREASE_LVL2 = 75,
                 KRAMPUS_INCREASE_RAMP = 3,
@@ -2852,7 +2874,7 @@ local applyoverrides_pre = {
             },
             always = {
                 KRAMPUS_THRESHOLD = 10,
-                KRAMPUS_THRESHOLD_VARIATION = 5,
+                KRAMPUS_THRESHOLD_VARIANCE = 5,
                 KRAMPUS_INCREASE_LVL1 = 25,
                 KRAMPUS_INCREASE_LVL2 = 50,
                 KRAMPUS_INCREASE_RAMP = 4,
@@ -2867,6 +2889,16 @@ local applyoverrides_post = {
     hounds = function(difficulty)
         if TheWorld:HasTag("forest") then
             TheWorld:PushEvent("hounded_setdifficulty", difficulty)
+        end
+    end,
+    summerhounds = function(difficulty)
+        if TheWorld:HasTag("forest") then
+            TheWorld:PushEvent("hounded_setsummervariant", difficulty)
+        end
+    end,
+    winterhounds = function(difficulty)
+        if TheWorld:HasTag("forest") then
+            TheWorld:PushEvent("hounded_setwintervariant", difficulty)
         end
     end,
     wormattacks = function(difficulty)

@@ -14,7 +14,7 @@ local rippleassets =
 
 local prefabs =
 {
-    "malbatross_ripple",
+    "boss_ripple_fx",
     "wave_med",
     "splash_green_large",
     "splash_green",
@@ -400,14 +400,10 @@ SetSharedLootTable( 'malbatross',
     {'meat',                                1.00},
     {'meat',                                1.00},
     {'malbatross_beak',                     1.00},
-    {'mast_malbatross_item_blueprint',      1.00},
-    {'malbatross_feathered_weave_blueprint',1.00},
-    {'premiumwateringcan_blueprint',        1.00},
     {'bluegem',                             1},
     {'bluegem',                             1},
     {'bluegem',                             0.3},
     {'yellowgem',                           0.05},
-	{'oceanfishingbobber_malbatross_tacklesketch',1.00},
 	{'chesspiece_malbatross_sketch',		1.00},
 
 })
@@ -583,30 +579,4 @@ local function fn()
     return inst
 end
 
-local function ripplefn()
-    local inst = CreateEntity()
-
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-
-    inst.AnimState:SetBank("malbatross_ripple")
-    inst.AnimState:SetBuild("malbatross_ripple")
-    inst.AnimState:PlayAnimation("idle")
-
-    inst:AddTag("fx")
-
-    inst:ListenForEvent("animover", inst.Remove)
-
-    inst.AnimState:SetLayer(LAYER_BELOW_GROUND)
-    inst.AnimState:SetSortOrder(ANIM_SORT_ORDER_BELOW_GROUND.BOAT_TRAIL)
-
-    inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
-
-    return inst
-end
-
-return Prefab("malbatross", fn, assets, prefabs),
-       Prefab("malbatross_ripple", ripplefn, rippleassets )
+return Prefab("malbatross", fn, assets, prefabs)

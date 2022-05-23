@@ -13,6 +13,7 @@ local Widget = require "widgets/widget"
 
 local DEBUG_MODE = BRANCH == "dev"
 local CONSOLE_HISTORY = {}
+local CONSOLE_LOCALREMOTE_HISTORY = {}
 
 local ConsoleScreen = Class(Screen, function(self)
 	Screen._ctor(self, "ConsoleScreen")
@@ -20,6 +21,8 @@ local ConsoleScreen = Class(Screen, function(self)
 	self:DoInit()
 
 	self.ctrl_pasting = false
+
+	SetConsoleAutopaused(true)
 end)
 
 function ConsoleScreen:OnBecomeActive()
@@ -39,6 +42,12 @@ function ConsoleScreen:OnBecomeInactive()
         self.runtask:Cancel()
         self.runtask = nil
     end
+end
+
+function ConsoleScreen:OnDestroy()
+	SetConsoleAutopaused(false)
+
+	ConsoleScreen._base.OnDestroy(self)
 end
 
 function ConsoleScreen:OnControl(control, down)
@@ -106,6 +115,7 @@ function ConsoleScreen:OnRawKeyHandler(key, down)
 				self.history_idx = len
 			end
 			self.console_edit:SetString( CONSOLE_HISTORY[ self.history_idx ] )
+			self:ToggleRemoteExecute( CONSOLE_LOCALREMOTE_HISTORY[self.history_idx] )
 		end
 	elseif key == KEY_DOWN then
 		local len = #CONSOLE_HISTORY
@@ -113,9 +123,11 @@ function ConsoleScreen:OnRawKeyHandler(key, down)
 			if self.history_idx ~= nil then
 				if self.history_idx == len then
 					self.console_edit:SetString( "" )
+					self:ToggleRemoteExecute( true )
 				else
 					self.history_idx = math.min( len, self.history_idx + 1 )
 					self.console_edit:SetString( CONSOLE_HISTORY[ self.history_idx ] )
+					self:ToggleRemoteExecute( CONSOLE_LOCALREMOTE_HISTORY[self.history_idx] )
 				end
 			end
 		end
@@ -137,6 +149,7 @@ function ConsoleScreen:Run()
 
 	if fnstr ~= "" then
 		table.insert( CONSOLE_HISTORY, fnstr )
+		table.insert( CONSOLE_LOCALREMOTE_HISTORY, self.toggle_remote_execute )
 	end
 
 	if self.toggle_remote_execute then
@@ -166,7 +179,7 @@ end
 function ConsoleScreen:OnTextEntered()
     if self.runtask ~= nil then
         self.runtask:Cancel()
-    end
+	end
     self.runtask = self.inst:DoTaskInTime(0, DoRun, self)
 end
 
@@ -174,9 +187,19 @@ function GetConsoleHistory()
     return CONSOLE_HISTORY
 end
 
+function GetConsoleLocalRemoteHistory()
+    return CONSOLE_LOCALREMOTE_HISTORY
+end
+
 function SetConsoleHistory(history)
     if type(history) == "table" and type(history[1]) == "string" then
         CONSOLE_HISTORY = history
+    end
+end
+
+function SetConsoleLocalRemoteHistory(history)
+    if type(history) == "table" and type(history[1]) == "boolean" then
+        CONSOLE_LOCALREMOTE_HISTORY = history
     end
 end
 
@@ -237,8 +260,8 @@ function ConsoleScreen:DoInit()
 
 	self.console_edit:EnableWordPrediction({width = 1000, mode=Profile:GetConsoleAutocompleteMode()})
 	self.console_edit:AddWordPredictionDictionary({words = prefab_names, delim = '"', postfix='"', skip_pre_delim_check=true})
-	self.console_edit:AddWordPredictionDictionary({words = prefab_names, delim = "'", postfix='"', skip_pre_delim_check=true})
-	local prediction_command = {"spawn", "save", "gonext", "give", "mat", "list", "findnext", "countprefabs", "selectnear", "removeall", "shutdown", "regenerateworld", "reset", "despawn", "godmode", "supergodmode", "armor", "makeboat", "makeboatspiral", "autoteleportplayers", "gatherplayers", "dumpentities", "freecrafting", "selectnext", "sounddebug" }
+	self.console_edit:AddWordPredictionDictionary({words = prefab_names, delim = "'", postfix="'", skip_pre_delim_check=true})
+	local prediction_command = {"setmightiness", "spawn", "save", "gonext", "give", "mat", "list", "findnext", "countprefabs", "selectnear", "removeall", "shutdown", "regenerateworld", "reset", "despawn", "godmode", "supergodmode", "armor", "makeboat", "makeboatspiral", "autoteleportplayers", "gatherplayers", "dumpentities", "freecrafting", "selectnext", "sounddebug" }
 	self.console_edit:AddWordPredictionDictionary({words = prediction_command, delim = "c_", num_chars = 0})
 
 	self.console_edit:SetForceEdit(true)
@@ -249,6 +272,7 @@ function ConsoleScreen:DoInit()
 	self.console_edit.validrawkeys[KEY_RCTRL] = true
 	self.console_edit.validrawkeys[KEY_UP] = true
 	self.console_edit.validrawkeys[KEY_DOWN] = true
+	self.console_edit.validrawkeys[KEY_V] = true
 	self.toggle_remote_execute = false
 
 end

@@ -146,6 +146,24 @@ local MainSounds =
 
     "wanda1.fev",
     "wanda1.fsb",
+
+    "terraria1.fev",
+    "terraria1.fsb",
+
+    "wolfgang2.fev",
+	"wolfgang2.fsb",
+
+	"wolfgang1.fev",
+	"wolfgang1.fsb",
+
+	"yotc_2022_2.fev",
+    "yotc_2022_2.fsb",
+
+    "ancientguardian_rework.fev",
+    "ancientguardian_rework.fsb",
+
+    "WX_rework.fev",
+    "WX_rework.fsb",
 }
 
 function PreloadSoundList(list)

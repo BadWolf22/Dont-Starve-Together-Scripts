@@ -88,7 +88,9 @@ function IsRail()
 	return PLATFORM == "WIN32_RAIL"
 end
 
-
+function IsSteamDeck()
+	return IS_STEAM_DECK
+end
 
 require("stacktrace")
 
@@ -152,12 +154,19 @@ function GetTickTime()
     return 0
 end
 
-local ticktime = GetTickTime()
 function GetTime()
     return 0
 end
 
+function GetStaticTime()
+    return 0
+end
+
 function GetTick()
+    return 0
+end
+
+function GetStaticTick()
     return 0
 end
 

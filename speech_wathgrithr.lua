@@ -14,6 +14,7 @@ return{
         {
             MOUNTED = "I must first dismount from my mighty steed.",
             HASPET = "I can only command one beastie!",
+			TICOON = "I hath already found a guide.",
         },
 		SHAVE =
 		{
@@ -58,7 +59,16 @@ return{
 			LOCKED_GATE = "Thou shalt not keep me out!",
             HOSTBUSY = "His attention lies elsewhere.",
             CARNIVAL_HOST_HERE = "Where art though, raven? Do show yourself!",
-            NOCARNIVAL = "It seems the ravens hath returned to Odin."
+            NOCARNIVAL = "It seems the ravens hath returned to Odin.",
+			EMPTY_CATCOONDEN = "Fie! There's naught to pillage!",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDERS = "This hunt will require more players.",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "This is not a worthy stage for our players!",
+			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "Let us reprise another time.",
+		},
+		OPEN_CRAFTING = 
+		{
+            PROFESSIONALCHEF = "T'would not do to meddle with my ally's effects.",
+			SHADOWMAGIC = "A tragic tale of woe and misery!",
 		},
         COOK =
         {
@@ -89,7 +99,7 @@ return{
 --fallback to speech_wilson.lua         READ =
 --fallback to speech_wilson.lua         {
 --fallback to speech_wilson.lua             GENERIC = "only_used_by_wickerbottom",
---fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom"
+--fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom",
 --fallback to speech_wilson.lua         },
 
         GIVE =
@@ -121,6 +131,8 @@ return{
 			CARNIVALGAME_INVALID_ITEM = "'Tis not to its liking.",
 			CARNIVALGAME_ALREADY_PLAYING = "A warrior must be patient.",
             SPIDERNOHAT = "It hath no use for such things while it's in my pocket.",
+            TERRARIUM_REFUSE = "Perhaps it shall accept a different offering.",
+            TERRARIUM_COOLDOWN = "I shall await the small tree's return before presenting it with another offering.",
         },
         GIVETOPLAYER =
         {
@@ -161,6 +173,7 @@ return{
         {
             TARGETINCOMBAT = "I'll only ride it if it's the victor.",
             INUSE = "I'll need to be faster than that in battle!",
+			SLEEPING = "Rise, beastie! We ride!",
         },
         SADDLE =
         {
@@ -324,7 +337,44 @@ return{
         {
 --fallback to speech_wilson.lua             ONCOOLDOWN = "only_used_by_wanda",
         },
+
+        ENTER_GYM =
+        {
+--fallback to speech_wilson.lua             NOWEIGHT = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             UNBALANCED = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             ONFIRE = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             SMOULDER = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             HUNGRY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             FULL = "only_used_by_wolfang",
+        },
+
+        APPLYMODULE =
+        {
+            COOLDOWN = "only_used_by_wx78",
+            NOTENOUGHSLOTS = "only_used_by_wx78",
+        },
+        REMOVEMODULES =
+        {
+            NO_MODULES = "only_used_by_wx78",
+        },
+        CHARGE_FROM =
+        {
+            NOT_ENOUGH_CHARGE = "only_used_by_wx78",
+            CHARGE_FULL = "only_used_by_wx78",
+        },
+
+        HARVEST =
+        {
+            DOER_ISNT_MODULE_OWNER = "I respect thine loyalty to our metal warrior, scout.",
+        },
     },
+
+	ANNOUNCE_CANNOT_BUILD =
+	{
+		NO_INGREDIENTS = "I must seek out more ingredients!",
+		NO_TECH = "I hath not yet discovered how to make such a thing.",
+		NO_STATION = "I fear 'tis beyond me at this time.",
+	},
 
 	ACTIONFAIL_GENERIC = "If I can't do it, it can't be done!",
 	ANNOUNCE_BOAT_LEAK = "Our vessel hath sprung a leak!",
@@ -343,6 +393,11 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_NORMALTOWIMPY = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_WIMPYTONORMAL = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_MIGHTYTONORMAL = "only_used_by_wolfang",
+    ANNOUNCE_EXITGYM = {
+--fallback to speech_wilson.lua         MIGHTY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         NORMAL = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         WIMPY = "only_used_by_wolfang",
+    },
 
 	ANNOUNCE_BEES = "Back, wee speared creatures!",
 	ANNOUNCE_BOOMERANG = "Urg! I must master the curved weapon.",
@@ -440,11 +495,11 @@ return{
 	ANNOUNCE_NODAYSLEEP_CAVE = "I'll not rest yet.",
 	ANNOUNCE_NOHUNGERSLEEP = "I'll starve overnight! Feast first.",
 	ANNOUNCE_NOSLEEPONFIRE = "I'll not sleep in the flames.",
+    ANNOUNCE_NOSLEEPHASPERMANENTLIGHT = "'Tis too bright for sleep!",
 	ANNOUNCE_NODANGERSIESTA = "Battle is upon us, there'll be no rest!",
 	ANNOUNCE_NONIGHTSIESTA = "No napping in the moonlight.",
 	ANNOUNCE_NONIGHTSIESTA_CAVE = "This doesn't feel like the time for a nap.",
 	ANNOUNCE_NOHUNGERSIESTA = "I'd like a meat snack first.",
-	ANNOUNCE_NODANGERAFK = "Only a coward would leave now!",
 	ANNOUNCE_NO_TRAP = "Thankfully, I am light of foot.",
 	ANNOUNCE_PECKED = "Away, feisty beaker!",
 	ANNOUNCE_QUAKE = "The world shudders!",
@@ -580,6 +635,10 @@ return{
 --fallback to speech_wilson.lua         "only_used_by_walter",
 --fallback to speech_wilson.lua 	},
 
+    -- wx specific
+    ANNOUNCE_WX_SCANNER_NEW_FOUND = "only_used_by_wx78",
+--fallback to speech_wilson.lua     ANNOUNCE_WX_SCANNER_FOUND_NO_DATA = "only_used_by_wx78",
+
     --quagmire event
     QUAGMIRE_ANNOUNCE_NOTRECIPE = "T'were not meant to be a meal.",
     QUAGMIRE_ANNOUNCE_MEALBURNT = "Alas! If I'd only grabbed it sooner.",
@@ -676,7 +735,7 @@ return{
 	},
 
     ANNOUNCE_NOINSPIRATION = "I must warm up my voice... in the heat of battle!",
-    ANNOUNCE_BATTLESONG_INSTANT_TAUNT_BUFF = "\"You scullion! You rampallian! You fustilarian! I’ll tickle your catastrophe!\"",
+    ANNOUNCE_BATTLESONG_INSTANT_TAUNT_BUFF = "\"You scullion! You rampallian! You fustilarian! I'll tickle your catastrophe!\"",
     ANNOUNCE_BATTLESONG_INSTANT_PANIC_BUFF = "\"By the pricking of my thumbs, something wicked this way comes!\"",
 
 --fallback to speech_wilson.lua     ANNOUNCE_WANDA_YOUNGTONORMAL = "only_used_by_wanda",
@@ -720,10 +779,42 @@ return{
         "I should be hunting, not gardening!",
 	},
 
+	ANNOUNCE_KITCOON_HIDEANDSEEK_START = "Let our glorious hunt commence!",
+	ANNOUNCE_KITCOON_HIDEANDSEEK_JOIN = "A hunt is always better with more warriors!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND = 
+	{
+		"You've been found, little beast!",
+		"You would make a fine stagehand, I hardly saw ye!",
+		"You were good, but not good enough!",
+		"You cannot escape my keen eye!",
+	},
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_ONE_MORE = "Only one remains! Victory is imminent!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE = "Glorious victory!!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE_TEAM = "{name} has lead us to glorious victory!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TIME_ALMOST_UP = "Alas! We need to find the last of them soon!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_LOSEGAME = "Arrgh! The little beasties were too clever.",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR = "Perhaps we're too far to find the little beasties.",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR_RETURN = "We have returned to the hunting grounds.",
+	ANNOUNCE_KITCOON_FOUND_IN_THE_WILD = "Hail, tiny beastie!",
+
+	ANNOUNCE_TICOON_START_TRACKING	= "Onward, great beast!!",
+	ANNOUNCE_TICOON_NOTHING_TO_TRACK = "No little beasties in this area.",
+	ANNOUNCE_TICOON_WAITING_FOR_LEADER = "Let us proceed!",
+	ANNOUNCE_TICOON_GET_LEADER_ATTENTION = "It is vying for my attention.",
+	ANNOUNCE_TICOON_NEAR_KITCOON = "I sense there's a little beastie afoot...",
+	ANNOUNCE_TICOON_LOST_KITCOON = "Someone was swifter than I!",
+	ANNOUNCE_TICOON_ABANDONED = "I will finish this hunt solo!",
+	ANNOUNCE_TICOON_DEAD = "My guide hath fallen, and I am left directionless!",
+
     -- YOTB
     ANNOUNCE_CALL_BEEF = "To me, beastie!",
     ANNOUNCE_CANTBUILDHERE_YOTB_POST = "'Tis too far from the festivities!",
     ANNOUNCE_YOTB_LEARN_NEW_PATTERN =  "Aha! A new plan has revealed itself before mine eyes!",
+
+    -- AE4AE
+    ANNOUNCE_EYEOFTERROR_ARRIVE = "Away, spying demon. To arms!",
+    ANNOUNCE_EYEOFTERROR_FLYBACK = "Thou hast returned, now let us finish this battle!",
+    ANNOUNCE_EYEOFTERROR_FLYAWAY = "You would flee this fight? Asgard does not honor cowards!",
 
 	BATTLECRY =
 	{
@@ -1581,7 +1672,11 @@ return{
         CHESSPIECE_BEEQUEEN = "I honor this warrior queen!",
         CHESSPIECE_ANTLION = "The artist hath captured her noble mane perfectly.",
         CHESSPIECE_BEEFALO = "A stone tribute to my faithful steed.",
+		CHESSPIECE_KITCOON = "A mighty pillar for a mighty family!",
+		CHESSPIECE_CATCOON = "You have my respect, fellow hunter.",
         CHESSPIECE_GUARDIANPHASE3 = "You fought well, Champion of Mani.",
+        CHESSPIECE_EYEOFTERROR = "I shall feast my eyes upon this trophy!",
+        CHESSPIECE_TWINSOFTERROR = "A battle I shan't soon forget.",
 
         CHESSJUNK1 = "It's only a pile of fallen warriors.",
         CHESSJUNK2 = "More fallen mechanical warriors.",
@@ -2723,6 +2818,8 @@ return{
 			BURNT = "No use crying over burnt pelts.",
 		},
 		WARG = "Be that you, Fenrir?",
+        WARGLET = "Ha! I've felled more fearsome beasts than ye!",
+        
 		WASPHIVE = "Bees of war!",
 		WATERBALLOON = "Prepare to engage in water-y battle!",
 		WATERMELON = "It makes a good sound when you hit it.",
@@ -3985,12 +4082,12 @@ return{
 		CARNIVALDECOR_FIGURE_KIT = "A box of mystery.",
 
         CARNIVAL_BALL = "This may be useful for testing my companions' reflexes.", --unimplemented
-		CARNIVAL_SEEDPACKET = "'Tis food for birds, not Vikings.'",
+		CARNIVAL_SEEDPACKET = "'Tis food for birds, not Vikings.",
 		CARNIVALFOOD_CORNTEA = "Nay.",
 
         CARNIVAL_VEST_A = "Blood red, to strike fear into the hearts of our enemies!",
         CARNIVAL_VEST_B = "'Tis not unlike the garb of a forest nymph.",
-        CARNIVAL_VEST_C = "'Tis a tree pelt.'",
+        CARNIVAL_VEST_C = "'Tis a tree pelt.",
 
         -- YOTB
         YOTB_SEWINGMACHINE = "The competition will be fierce, thus my beast's outfits must be fiercer!",
@@ -4053,6 +4150,47 @@ return{
         BEAST_BLUEPRINT = "No luck is needed for one who's skilled in battle.",
 
         BEEF_BELL = "This bell commands loyalty from the woolen beasts.",
+
+		-- YOT Catcoon
+		KITCOONDEN = 
+		{
+			GENERIC = "A penthouse for wee beasties.",
+            BURNT = "Not great as a hideaway now.",
+			PLAYING_HIDEANDSEEK = "The wee beasties are out, let us find them!",
+			PLAYING_HIDEANDSEEK_TIME_ALMOST_UP = "We must bring them home quickly!",
+		},
+
+		KITCOONDEN_KIT = "Everything one needs to build a hideaway for tiny beasts.",
+
+		TICOON = 
+		{
+			GENERIC = "A mighty beast worthy of his crown. He will lead us to victory!",
+			ABANDONED = "Curses! We will commence this hunt without your assistance.",
+			SUCCESS = "Glory to you, mighty beast!",
+			LOST_TRACK = "We were not swift enough.",
+			NEARBY = "Do you sense the presence of a wee beast around here?",
+			TRACKING = "He's on the case!",
+			TRACKING_NOT_MINE = "He's on another's case!",
+			NOTHING_TO_TRACK = "Seems there's no beasties to be found.",
+			TARGET_TOO_FAR_AWAY = "They must be too far for him to catch the scent.",
+		},
+		
+		YOT_CATCOONSHRINE =
+        {
+            GENERIC = "Let the festive crafting commence!",
+            EMPTY = "Perhaps it would enjoy a feather?",
+            BURNT = "It seems someone offered it a flame. I do not think it liked it.",
+        },
+
+		KITCOON_FOREST = "A wee beastie that's particularly excellent at hiding.",
+		KITCOON_SAVANNA = "A wee beastie with the heart of a mighty beastie.",
+		KITCOON_MARSH = "A wee beastie with a weapon equipped to its tail. Ferocious!",
+		KITCOON_DECIDUOUS = "A wee beastie with a talent for mischief.",
+		KITCOON_GRASS = "A fairly flammable looking wee beastie.",
+		KITCOON_ROCKY = "A very serious wee beastie.",
+		KITCOON_DESERT = "A wee beastie with not-so-wee ears.",
+		KITCOON_MOON = "A wee beastie imbued with a third eye for finding more hiding spots.",
+		KITCOON_YOT = "A wee beastie with an excellent costume.",
 
         -- Moon Storm
         ALTERGUARDIAN_PHASE1 = {
@@ -4173,6 +4311,102 @@ return{
         FIGKABAB = "Food with a wooden spear lanced through it!",
         KOALEFIG_TRUNK = "The trunk hath been fattened up.",
         FROGNEWTON = "Into my belly with ye!",
+
+        -- The Terrorarium
+        TERRARIUM = {
+            GENERIC = "I can feel the Bifrost's warmth from inside it!",
+            CRIMSON = "Something foul hath taken hold...",
+            ENABLED = "Behold! The glory of the Bifrost!!",
+			WAITING_FOR_DARK = "Something draws near...",
+			COOLDOWN = "The Bifrost is sealed, but for how long?",
+			SPAWN_DISABLED = "The monster shall not terrorize this realm again!",
+        },
+
+        -- Wolfgang
+        MIGHTY_GYM = 
+        {
+            GENERIC = "My friend doth possess strength that could rival mighty Thor's!",
+            BURNT = "T'was a fiery display indeed!",
+        },
+
+        DUMBBELL = "'Tis not just strength, but cunning that makes a warrior!",
+        DUMBBELL_GOLDEN = "He hath strength, next we must work on his bravery!",
+		DUMBBELL_MARBLE = "Train well my friend, and join me in glorious battle!",
+        DUMBBELL_GEM = "My friend, if you want to be fighting fit you must join me in combat!",
+        POTATOSACK = "I have no use for a sack of non-meats.",
+
+
+        TERRARIUMCHEST = 
+		{
+			GENERIC = "T'would be a fine place to keep my weapons.",
+			BURNT = "Consumed by flames.",
+			SHIMMER = "Doth my eyes deceive me? The chest casts jagged light!",
+		},
+
+		EYEMASKHAT = "Follower of Heimdall, watch over my path!",
+
+        EYEOFTERROR = "Be it the plucked eye of Odin, returned for revenge?",
+        EYEOFTERROR_MINI = "I hath no fear of having all eyes upon me!",
+        EYEOFTERROR_MINI_GROUNDED = "I will prepare myself for the coming challenge!",
+
+        FROZENBANANADAIQUIRI = "Monkey drink.",
+        BUNNYSTEW = "A hearty meal worthy of praise!",
+        MILKYWHITES = "The goopy spoils of victory!",
+
+        CRITTER_EYEOFTERROR = "They shall watch and learn from my battles!",
+
+        SHIELDOFTERROR ="Why cower behind a shield when you can strike with it!",
+        TWINOFTERROR1 = "Do thine worst, foul metal fiend!",
+        TWINOFTERROR2 = "Do thine worst, foul metal fiend!",
+
+        -- Year of the Catcoon
+        CATTOY_MOUSE = "T'would make for excellent target practice!",
+        KITCOON_NAMETAG = "To me, tiny beastie! I shall gift thee with a warrior's name!",
+
+		KITCOONDECOR1 =
+        {
+            GENERIC = "A sparring partner for the wee beasties.",
+            BURNT = "Alas, it shall wobble no more.",
+        },
+		KITCOONDECOR2 =
+        {
+            GENERIC = "The beasties must learn to hunt!",
+            BURNT = "It seems the hunt is over.",
+        },
+
+		KITCOONDECOR1_KIT = "Fear not beasties, it will be constructed forthwith!",
+		KITCOONDECOR2_KIT = "I will construct it with the speed of Hermod!",
+
+        -- WX78
+        WX78MODULE_MAXHEALTH = "These boons shall empower our metal warrior.",
+        WX78MODULE_MAXSANITY1 = "These boons shall empower our metal warrior.",
+        WX78MODULE_MAXSANITY = "These boons shall empower our metal warrior.",
+        WX78MODULE_MOVESPEED = "These boons shall empower our metal warrior.",
+        WX78MODULE_MOVESPEED2 = "These boons shall empower our metal warrior.",
+        WX78MODULE_HEAT = "These boons shall empower our metal warrior.",
+        WX78MODULE_NIGHTVISION = "These boons shall empower our metal warrior.",
+        WX78MODULE_COLD = "These boons shall empower our metal warrior.",
+        WX78MODULE_TASER = "These boons shall empower our metal warrior.",
+        WX78MODULE_LIGHT = "These boons shall empower our metal warrior.",
+        WX78MODULE_MAXHUNGER1 = "These boons shall empower our metal warrior.",
+        WX78MODULE_MAXHUNGER = "These boons shall empower our metal warrior.",
+        WX78MODULE_MUSIC = "These boons shall empower our metal warrior.",
+        WX78MODULE_BEE = "These boons shall empower our metal warrior.",
+        WX78MODULE_MAXHEALTH2 = "These boons shall empower our metal warrior.",
+
+        WX78_SCANNER = 
+        {
+            GENERIC ="Hail, wee metal scout!",
+            HUNTING = "Aha! Thou art on the hunt!",
+            SCANNING = "Thou hast the prey in thine sights.",
+        },
+
+        WX78_SCANNER_ITEM = "Rest well, noble scout.",
+        WX78_SCANNER_SUCCEEDED = "Metal warrior! The scout's report is complete!",
+
+        WX78_MODULEREMOVER = "I trust my ally knows what they are doing.",
+
+        SCANDATA = "The metal scout's report!",
     },
 
     DESCRIBE_GENERIC = "It is an artifact of this realm.",

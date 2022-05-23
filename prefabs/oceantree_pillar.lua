@@ -188,7 +188,7 @@ local function Dropleaves(inst)
 end
 
 local function DropItem(inst)
-    if #inst.items_to_drop > 0 then
+    if inst.items_to_drop and #inst.items_to_drop > 0 then
         local ind = math.random(1, #inst.items_to_drop)
         local item_to_spawn = inst.items_to_drop[ind]
 
@@ -304,7 +304,6 @@ local function SpawnMissingVines(inst)
     local ents = TheSim:FindEntities(x, 0, z, MAX, VINE_TAGS)
     local num_existing_vines = ents ~= nil and #ents or 0
 
-    print("FOUND VINES", num_existing_vines)
     if num_existing_vines < 1  then 
 
         local num_new_vines = math.random(1,2)

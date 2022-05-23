@@ -653,8 +653,6 @@ local function create_common(bank, build, tag, common_init, extra_data)
     inst.components.sanityaura.aurafn = CalcSanityAura
 
     ------------------
-    inst:AddComponent("debuffable")
-    ------------------
     
     MakeFeedableSmallLivestock(inst, TUNING.SPIDER_PERISH_TIME)
     MakeHauntablePanic(inst)
@@ -932,9 +930,6 @@ local function create_water()
         return inst
     end
 
-    inst.components.embarker.embark_speed = inst.components.locomotor.runspeed
-    ------------------
-
     inst:AddComponent("amphibiouscreature")
     inst.components.amphibiouscreature:SetBanks("spider_water", "spider_water_water")
     inst.components.amphibiouscreature:SetEnterWaterFn(OnEnterWater)
@@ -952,6 +947,9 @@ local function create_water()
 
     inst.components.locomotor.walkspeed = TUNING.SPIDER_WATER_WALKSPEED
     inst.components.locomotor.runspeed = TUNING.SPIDER_WATER_RUNSPEED
+    ------------------
+
+    inst.components.embarker.embark_speed = inst.components.locomotor.runspeed
     ------------------
 
     inst.components.inventoryitem:SetSinks(false)

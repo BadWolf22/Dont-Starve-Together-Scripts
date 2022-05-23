@@ -23,7 +23,7 @@ local FertilizersPage = Class(Widget, function(self, parent_widget, ismodded)
 	for i, v in ipairs(SORTED_FERTILIZERS) do
 		local def = FERTILIZER_DEFS[v]
 		--not operator used as a cast to boolean.
-		if def and ((not self.ismodded) == (not v.modded)) then
+		if def and ((not self.ismodded) == (not def.modded)) then
 			table.insert(fertilizer_grid_data, {fertilizer = v, def = def})
 		end
 	end
@@ -63,7 +63,7 @@ function FertilizersPage:BuildFertlizerScrollGrid()
 		local _OnGainFocus = w.cell_root.OnGainFocus
 		function w.cell_root.OnGainFocus()
 			_OnGainFocus(w.cell_root)
-			TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_mouseover")
+			TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_mouseover", nil, ClickMouseoverSoundReduction())
 			w.fertilizer_label:SetColour(PLANTREGISTRYUICOLOURS.LOCKEDBROWN)
 			w.cell_root:SetTexture("images/plantregistry.xml", "plant_entry_focus.tex")
 			w.fertilizer_seperator:SetTexture("images/plantregistry.xml", "plant_entry_seperator_focus.tex")

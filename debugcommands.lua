@@ -30,6 +30,54 @@ function d_allmutators()
     c_give("mutator_water")
 end
 
+function d_allcircuits()
+    local module_defs = require("wx78_moduledefs").module_definitions
+
+    local pt = ConsoleWorldPosition()
+    local spacing, num_wide = 2, math.ceil(math.sqrt(#module_defs))
+
+    for y = 0, num_wide - 1 do
+        for x = 0, num_wide - 1 do
+            local def = module_defs[(y*num_wide) + x + 1]
+            local circuit = SpawnPrefab("wx78module_"..def.name)
+            if circuit ~= nil then
+                local spacing_vec = Vector3(x * spacing, 0, y * spacing)
+                circuit.Transform:SetPosition((pt + spacing_vec):Get())
+            end
+        end
+    end
+end
+
+function d_allheavy()
+	local heavy_objs = {
+		"cavein_boulder",
+		"sunkenchest",
+		"sculpture_knighthead",
+		"glassspike",
+		"moon_altar_idol",
+		"oceantreenut",
+		"shell_cluster",
+		"potato_oversized",
+		"chesspiece_knight_stone",
+		"chesspiece_knight_marble",
+		"chesspiece_knight_moonglass",
+		"potatosack"
+	}
+
+	local x,y,z = ConsoleWorldPosition():Get()
+	local start_x = x
+	for i,v in ipairs(heavy_objs) do
+		local obj = SpawnPrefab(v)
+		obj.Transform:SetPosition(x,y,z)
+
+		x = x + 2.5
+		if i == 6 then
+			z = z + 2.5
+			x = start_x
+		end
+	end
+end
+
 function d_spiders()
     local spiders = {
         "spider",
@@ -231,7 +279,7 @@ function d_test_skins_popup(param)
 	TheFrontEnd:PushScreen( SkinsItemPopUp(param or TEST_ITEM_NAME, "Peter", {1.0, 0.2, 0.6, 1.0}) )
 end
 function d_test_skins_announce(param)
-	ThePlayer.HUD.eventannouncer:ShowSkinAnnouncement("Peter", {1.0, 0.2, 0.6, 1.0}, param or TEST_ITEM_NAME)
+	Networking_SkinAnnouncement("Peter", {1.0, 0.2, 0.6, 1.0}, param or TEST_ITEM_NAME)
 end
 function d_test_skins_gift(param)
 	local GiftItemPopUp = require "screens/giftitempopup"
@@ -558,6 +606,65 @@ end
 
 function d_portalfx()
 	TheWorld:PushEvent("ms_newplayercharacterspawned", { player = ThePlayer})
+end
+
+function d_walls(width, height)
+	width = math.floor(width or 10)
+	height = math.floor(height or width)
+
+	local pt = ConsoleWorldPosition()
+	local left = math.floor(pt.x - width/2)
+	local top = math.floor(pt.z + height/2)
+
+	for i = 1, height do
+		SpawnPrefab("wall_wood").Transform:SetPosition(left + 1, 0, top - i)
+		SpawnPrefab("wall_wood").Transform:SetPosition(left + width, 0, top - i)
+	end
+	for i = 2, width-1 do
+		SpawnPrefab("wall_wood").Transform:SetPosition(left + i, 0, top-1)
+		SpawnPrefab("wall_wood").Transform:SetPosition(left + i, 0, top - height)
+	end
+end
+
+-- 	hidingspot = c_select()  kitcoon = SpawnPrefab("kitcoon_deciduous") if not kitcoon.components.hideandseekhider:GoHide(hidingspot, 0) then kitcoon:Remove() end kitcoon = nil hidingspot = nil
+function d_hidekitcoon()
+	local hidingspot = ConsoleWorldEntityUnderMouse()
+	local kitcoon = SpawnPrefab("kitcoon_deciduous") 
+	if not kitcoon.components.hideandseekhider:GoHide(hidingspot, 0) then 
+		kitcoon:Remove() 
+	end 
+end
+
+function d_hidekitcoons()
+	TheWorld.components.specialeventsetup:_SetupYearOfTheCatcoon()
+end
+
+function d_allkitcoons()
+	local kitcoons =
+	{
+		"kitcoon_forest",
+		"kitcoon_savanna",
+		"kitcoon_deciduous",
+		"kitcoon_marsh",
+		"kitcoon_grass",
+		"kitcoon_rocky",
+		"kitcoon_desert",
+		"kitcoon_moon",
+		"kitcoon_yot",
+	}
+
+	_spawn_list(kitcoons, 3, function(inst) inst._first_nuzzle = false end)
+end
+
+function d_allcustomhidingspots()
+	local items = table.getkeys(TUNING.KITCOON_HIDING_OFFSET)
+	_spawn_list(items, 6, function(hidingspot)
+		local kitcoon = SpawnPrefab("kitcoon_rocky") 
+		if not kitcoon.components.hideandseekhider:GoHide(hidingspot, 0) then
+			kitcoon:Remove() 
+			hidingspot.AnimState:SetMultColour(1, 0, 0)
+		end
+	end)
 end
 
 function d_islandstart()
@@ -996,4 +1103,75 @@ function d_cookbook()
 			TheCookbook:AddRecipe(prefab, {"twigs", "berries", "ice", "meat"})
 		end
 	end			
+end
+
+function d_statues(material)
+	local mats = 
+	{
+		"marble",
+		"stone",
+		"moonglass",
+	}
+
+	local items = {
+		"pawn",       
+		"rook",       
+		"knight",     
+		"bishop",     
+		"muse",       
+		"formal",     
+		"hornucopia", 
+		"pipe",       
+		"deerclops",  
+		"bearger",    
+		"moosegoose", 
+		"dragonfly",  
+		"clayhound",  
+		"claywarg",   
+		"butterfly",  
+		"anchor",     
+		"moon",       
+		"carrat",     
+		"beefalo",    
+		"crabking",   
+		"malbatross", 
+		"toadstool",	
+		"stalker",	
+		"klaus",		
+		"beequeen",	
+		"antlion",	
+		"minotaur",	
+		"guardianphase3",
+        "eyeofterror",
+        "twinsofterror",
+        "kitcoon",
+        "catcoon",
+	}
+
+	local material = (type(material) == "string" and table.contains(mats, material)) and material
+					or type(material) == "number" and mats[material]
+					or "marble"
+
+	for i, v in ipairs(items) do
+		items[i] = "chesspiece_".. v .."_" .. (material or "marble")
+	end
+	_spawn_list(items, 5)
+end
+
+function d_craftingstations()
+	local prefabs = {}
+	for k, _ in pairs(PROTOTYPER_DEFS) do
+		table.insert(prefabs, k)
+	end
+	_spawn_list(prefabs, 6)
+end
+
+function d_removeentitywithnetworkid(networkid, x, y, z)
+    local ents = TheSim:FindEntities(x,y,z, 1)
+    for i, ent in ipairs(ents) do
+        if ent and ent.Network and ent.Network:GetNetworkID() == networkid then
+            c_remove(ent)
+            return
+        end
+    end
 end

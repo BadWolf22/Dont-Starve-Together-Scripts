@@ -237,6 +237,9 @@ local TRANSLATE_TO_PREFABS = {
 	["ocean_waterplant"] =	{"waterplant_spawner_rough", "waterplant"},
 	["ocean_wobsterden"] =	{"wobster_den_spawner_shore"},
 	["ocean_bullkelp"] =	{"bullkelp_plant"},
+
+    -- Allow for the Terrarium to be a required world gen prefab, but still disable-able via World Gen settings
+    ["terrariumchest"] =    {"terrariumchest"},
 }
 
 local TRANSLATE_TO_CLUMP = {
@@ -418,6 +421,11 @@ local function Generate(prefab, map_width, map_height, tasks, level, level_type)
     end
 
 	ApplySpecialEvent(current_gen_params.specialevent)
+	for k, event_name in pairs(SPECIAL_EVENTS) do
+		if current_gen_params[event_name] == "enabled" then
+			ApplyExtraEvent(event_name)
+		end
+	end
 
     local min_size = 350
     if current_gen_params.world_size ~= nil then
@@ -497,7 +505,7 @@ local function Generate(prefab, map_width, map_height, tasks, level, level_type)
 		end
 	end
 
-	if prefab ~= "cave" then
+	if (current_gen_params.roads == nil or current_gen_params.roads ~= "never") and prefab ~= "cave" then
 	    WorldSim:SetRoadParameters(
 			ROAD_PARAMETERS.NUM_SUBDIVISIONS_PER_SEGMENT,
 			ROAD_PARAMETERS.MIN_WIDTH, ROAD_PARAMETERS.MAX_WIDTH,
@@ -894,12 +902,16 @@ local function Generate(prefab, map_width, map_height, tasks, level, level_type)
 
     for prefab,count in pairs(double_check) do
 		print ("Checking Required Prefab " .. prefab .. " has at least " .. count .. " instances (" .. (entities[prefab] ~= nil and #entities[prefab] or 0) .. " found).")
-
+		
         if entities[prefab] == nil or #entities[prefab] < count then
-            print(string.format("PANIC: missing required prefab [%s]! Expected %d, got %d", prefab, count, entities[prefab] == nil and 0 or #entities[prefab]))
-            if SKIP_GEN_CHECKS == false then
-                return nil
-            end
+			if level.overrides[prefab] == "never" then
+				print(string.format(" - missing required prefab [%s] was disabled in the world generation options!", prefab))
+			else
+				print(string.format("PANIC: missing required prefab [%s]! Expected %d, got %d", prefab, count, entities[prefab] == nil and 0 or #entities[prefab]))
+				if SKIP_GEN_CHECKS == false then
+					return nil
+				end
+			end
         end
     end
 

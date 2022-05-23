@@ -13,6 +13,8 @@ local TextListPopup = require "screens/redux/textlistpopup"
 local Widget = require "widgets/widget"
 local Text = require "widgets/text"
 
+local KitcoonPuppet = require "widgets/kitcoonpuppet"
+
 require("constants")
 require("tuning")
 
@@ -56,6 +58,12 @@ local ServerCreationScreen = Class(Screen, function(self, prev_screen, save_slot
 
 
     self.title = self.root:AddChild(TEMPLATES.ScreenTitle(STRINGS.UI.SERVERCREATIONSCREEN.HOST_GAME))
+
+    self.kit_puppet = self.root:AddChild(KitcoonPuppet( Profile, nil, {
+        {x = -450, y = 220,},
+        {x = 470, y = 255,},
+        {x = -415, y = -255,},
+    } ))
 
     self.detail_panel = self.detail_panel_frame:InsertWidget( Widget("detail_panel") )
 
@@ -124,12 +132,20 @@ function ServerCreationScreen:OnBecomeActive()
 		self.mods_tab:OnBecomeActive()
 	end
     if self.last_focus then self.last_focus:SetFocus() end
+
+    if self.kit_puppet then
+        self.kit_puppet:Enable()
+    end
 end
 
 function ServerCreationScreen:OnBecomeInactive()
     ServerCreationScreen._base.OnBecomeInactive(self)
     if self.mods_enabled then
         self.mods_tab:OnBecomeInactive()
+    end
+
+    if self.kit_puppet then
+        self.kit_puppet:Disable()
     end
 end
 
@@ -148,8 +164,23 @@ function ServerCreationScreen:GetGameMode()
 	return self.server_settings_tab:GetGameMode()
 end
 
-function ServerCreationScreen:SetDataOnTabs()
+function ServerCreationScreen:UpdateSaveSlot(new_save_slot)
+    self.save_slot = new_save_slot
 
+	if self.mods_enabled then
+        self.mods_tab:UpdateSaveSlot(self.save_slot) --needs to happen before server_settings_tab:SetDataForSlot
+    end
+
+    self.server_settings_tab:UpdateSaveSlot(self.save_slot)
+
+    for i,tab in ipairs(self.world_tabs) do
+        tab:UpdateSaveSlot(self.save_slot)
+    end
+
+    self.snapshot_tab:UpdateSaveSlot(self.save_slot)
+end
+
+function ServerCreationScreen:SetDataOnTabs()
 	if self.mods_enabled then
         self.mods_tab:SetDataForSlot(self.save_slot) --needs to happen before server_settings_tab:SetDataForSlot
     end
@@ -328,15 +359,22 @@ function ServerCreationScreen:Create(warnedOffline, warnedDisabledMods, warnedOu
                         end
                     end,
                     function()
-                        OnNetworkDisconnect("ID_DST_DEDICATED_SERVER_STARTUP_FAILED", false, false)
+						if IsSteam() then
+	                        OnNetworkDisconnect("ID_DST_DEDICATED_SERVER_STARTUP_FAILED", false, false, {help_button = {text=STRINGS.UI.MAINSCREEN.GETHELP, cb = function() VisitURL("https://support.klei.com/hc/en-us/articles/4407489414548") end}})
+						else
+	                        OnNetworkDisconnect("ID_DST_DEDICATED_SERVER_STARTUP_FAILED", false, false)
+						end
                         TheSystemService:StopDedicatedServers()
                     end)
 
                 TheFrontEnd:PushScreen(launchingServerPopup)
             end
 
+            local save_to_cloud = self.save_slot > CLOUD_SAVES_SAVE_OFFSET
+            local use_zip_format = Profile:GetUseZipFileForNormalSaves()
+
             -- Note: StartDedicatedServers launches both dedicated and non-dedicated servers... ~gjans
-            if not TheSystemService:StartDedicatedServers(self.save_slot, is_multi_level, cluster_info, encode_user_path, use_legacy_session_path) then
+            if not TheSystemService:StartDedicatedServers(self.save_slot, is_multi_level, cluster_info, encode_user_path, use_legacy_session_path, save_to_cloud, use_zip_format) then
                 if launchingServerPopup ~= nil then
                     launchingServerPopup:SetErrorStartingServers()
                 end

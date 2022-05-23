@@ -103,12 +103,15 @@ function Tune(overrides)
 
 		DEFAULT_CHARACTER_HEALTH = wilson_health,
 
+		BASE_SURVIVOR_ATTACK = wilson_attack,
+
         WILSON_HEALTH = wilson_health,
         WILSON_ATTACK_PERIOD = wilson_attack_period,
         WILSON_HUNGER = wilson_hunger, --stomach size
         WILSON_HUNGER_RATE = calories_per_day/total_day_time, --calories burnt per day
         WILSON_SANITY = wilson_sanity,
 
+        -- WX78 Refresh: WX78 min and max health variables kept for backwards compatibility & mods
         WX78_MIN_HEALTH = 150,
         WX78_MIN_HUNGER = 150, -- 100 For pax we are increasing this.  Hungers out too easily.
         WX78_MIN_SANITY = 150,
@@ -117,9 +120,9 @@ function Tune(overrides)
         WX78_MAX_HUNGER = 200,
         WX78_MAX_SANITY = 300,
 
-        WX78_HEALTH = 150, -- this is used for the character descriptions, gameplay uses WX78_MIN_HEALTH
-        WX78_HUNGER = 150, -- this is used for the character descriptions, gameplay uses WX78_MIN_HUNGER
-        WX78_SANITY = 150, -- this is used for the character descriptions, gameplay uses WX78_MIN_SANITY
+        WX78_HEALTH = 125,
+        WX78_HUNGER = 125,
+        WX78_SANITY = 150,
 
         HAMMER_LOOT_PERCENT = .5,
         BURNT_HAMMER_LOOT_PERCENT = .25,
@@ -146,10 +149,12 @@ function Tune(overrides)
         TELESTAFF_MOISTURE = 500,
         HAMBAT_USES = 100,
         BATBAT_USES = 75,
-        MULTITOOL_AXE_PICKAXE_USES = 400,
+        MULTITOOL_AXE_PICKAXE_USES = 800,
         RUINS_BAT_USES = 200,
         SADDLEHORN_USES = 10,
         BRUSH_USES = 75,
+
+        MULTITOOL_AXE_PICKAXE_EFFICIENCY = 4/3,
 
         JELLYBEAN_DURATION = total_day_time * .25,
         JELLYBEAN_TICK_RATE = 2,
@@ -278,14 +283,14 @@ function Tune(overrides)
 
 		OCEANFISH_LURE_PREFERENCE =
 		{
-			SMALL_VEGGIE	= { hook = 0.25, special = 1.0, rot = 1.0, seed = 1.50, berry = 1.50, spoon = 0.00, spinnerbait = 0.00, insect = 0.00 },
-			VEGGIE			= { hook = 0.25, special = 1.0, rot = 0.5, seed = 1.50, berry = 1.50, spoon = 0.50, spinnerbait = 0.00, insect = 0.00 },
-			SMALL_OMNI		= { hook = 0.25, special = 1.0, rot = 1.0, seed = 1.00, berry = 1.00, spoon = 1.00, spinnerbait = 0.00, insect = 1.00 },
-			OMNI			= { hook = 0.25, special = 1.0, rot = 0.5, seed = 0.25, berry = 1.00, spoon = 1.00, spinnerbait = 1.00, insect = 1.00 },
-			SMALL_MEAT		= { hook = 0.25, special = 1.0, rot = 1.0, seed = 0.00, berry = 0.00, spoon = 1.00, spinnerbait = 0.00, insect = 1.00 },
-			MEAT			= { hook = 0.25, special = 1.0, rot = 0.5, seed = 0.00, berry = 0.00, spoon = 1.00, spinnerbait = 1.00, insect = 1.00 },
-            WOBSTER         = { hook = 0.25, special = 1.0, rot = 1.0, seed = 0.25, berry = 1.00, spoon = 1.00, spinnerbait = 1.00, insect = 1.00 },
-            BERRY           = { hook = 0.25, special = 1.0, rot = 0.5, seed = 0.50, berry = 2.00, spoon = 0.50, spinnerbait = 0.00, insect = 0.00 },
+			SMALL_VEGGIE	= { hook = 0.25, special = 1.00, rot = 1.00, seed = 1.50, berry = 1.50, spoon = 0.00, spinnerbait = 0.00, insect = 0.00 },
+			VEGGIE			= { hook = 0.25, special = 1.00, rot = 0.50, seed = 1.50, berry = 1.50, spoon = 0.50, spinnerbait = 0.00, insect = 0.00 },
+			SMALL_OMNI		= { hook = 0.25, special = 1.00, rot = 1.00, seed = 1.00, berry = 1.00, spoon = 1.00, spinnerbait = 0.00, insect = 1.00 },
+			OMNI			= { hook = 0.25, special = 1.00, rot = 0.50, seed = 0.25, berry = 1.00, spoon = 1.00, spinnerbait = 1.00, insect = 1.00 },
+			SMALL_MEAT		= { hook = 0.25, special = 1.00, rot = 1.00, seed = 0.00, berry = 0.00, spoon = 1.00, spinnerbait = 0.00, insect = 1.00 },
+			MEAT			= { hook = 0.25, special = 1.00, rot = 0.50, seed = 0.00, berry = 0.00, spoon = 1.00, spinnerbait = 1.00, insect = 1.00 },
+            WOBSTER         = { hook = 0.25, special = 1.00, rot = 1.00, seed = 0.25, berry = 1.00, spoon = 1.00, spinnerbait = 1.00, insect = 1.00 },
+            BERRY           = { hook = 0.25, special = 1.00, rot = 0.50, seed = 0.50, berry = 2.00, spoon = 0.50, spinnerbait = 0.00, insect = 0.00 },
 		},
 
         OCEANFISH_MIN_INTEREST_TO_BITE = 0.2,
@@ -325,7 +330,7 @@ function Tune(overrides)
         FISHINGROD_DAMAGE = wilson_attack*.125,
         UMBRELLA_DAMAGE = wilson_attack*.5,
         CANE_DAMAGE = wilson_attack*.5,
-        MULTITOOL_DAMAGE = wilson_attack*.9,
+        MULTITOOL_DAMAGE = wilson_attack*1.25,
         RUINS_BAT_DAMAGE = wilson_attack * 1.75,
         NIGHTSTICK_DAMAGE = wilson_attack*.85, -- Due to the damage being electric, it will get multiplied by 1.5 against any mob
         MINIFAN_DAMAGE = wilson_attack*.5,
@@ -347,7 +352,9 @@ function Tune(overrides)
 
         CANE_SPEED_MULT = 1.25,
         PIGGYBACK_SPEED_MULT = 0.9,
-        HEAVY_SPEED_MULT = .15,
+        HEAVY_SPEED_MULT = 0.15,
+		ICEHAT_SPEED_MULT = 0.9,
+		RUINS_BAT_SPEED_MULT = 1.1,
 
         TORCH_ATTACK_IGNITE_PERCENT = 1,
 
@@ -371,6 +378,7 @@ function Tune(overrides)
         PIG_HEALTH = 250,
         PIG_ATTACK_PERIOD = 3,
         PIG_TARGET_DIST = 16,
+		PIG_MAX_STUN_LOCKS = 2,
         PIG_LOYALTY_MAXTIME = 2.5*total_day_time,
         PIG_LOYALTY_POLITENESS_MAXTIME_BONUS = .5*total_day_time,
         PIG_LOYALTY_PER_HUNGER = total_day_time/25,
@@ -488,6 +496,7 @@ function Tune(overrides)
         WALRUS_MELEE_RANGE = 5,
         WALRUS_TARGET_DIST = 10,
         WALRUS_LOSETARGET_DIST = 30,
+		WALRUS_MAX_STUN_LOCKS = 4,
         WALRUS_REGEN_PERIOD = total_day_time*2.5,
         WALRUS_REGEN_ENABLED = true,
 
@@ -598,6 +607,8 @@ function Tune(overrides)
         DEER_ATTACKER_REMEMBER_DIST = 20,
         DEER_WALK_SPEED = 2.5,
         DEER_RUN_SPEED = 8,
+		DEER_HIT_RECOVERY = 1,
+		DEER_MAX_STUN_LOCKS = 4,
 
         DEER_HERD_MOVE_DIST = 10,
 
@@ -971,7 +982,7 @@ function Tune(overrides)
         DEERCLOPS_DAMAGE_PLAYER_PERCENT = .5,
         DEERCLOPS_ATTACK_PERIOD = 4,
         DEERCLOPS_ATTACK_RANGE = 8,
-        DEERCLOPS_AOE_RANGE = 6,
+        DEERCLOPS_AOE_RANGE = 12,-- 6,
         DEERCLOPS_AOE_SCALE = 0.8,
         DEERCLOPS_LOSE_TARGET_PERIOD = 60,
 
@@ -1092,6 +1103,8 @@ function Tune(overrides)
         TENTACLE_PILLAR_ARM_STOPATTACK_DIST = 5,
         TENTACLE_PILLAR_ARM_HEALTH = 20,
         TENTACLE_PILLAR_ARM_EMERGE_TIME = seg_time * 12,
+
+        BIG_TENTACLE_DAMAGE = 60,
 
         EYEPLANT_DAMAGE = 20,
         EYEPLANT_HEALTH = 30,
@@ -1237,6 +1250,11 @@ function Tune(overrides)
                 PERDOFFERING = 1,
             }),
 
+            CATCOONSHRINE = TechTree.Create({
+                CATCOONOFFERING = 3,
+                PERDOFFERING = 1,
+            }),
+
             MADSCIENCE = TechTree.Create({
                 MADSCIENCE = 1,
             }),
@@ -1279,11 +1297,16 @@ function Tune(overrides)
             }),
 
             TURFCRAFTING = TechTree.Create({
-                TURFCRAFTING = 1,
+                TURFCRAFTING = 2,
+                MASHTURFCRAFTING = 2,
             }),
 
             SPIDERCRAFT = TechTree.Create({
                 SPIDERCRAFT = 1,
+            }),
+
+            ROBOTMODULECRAFT = TechTree.Create({
+                ROBOTMODULECRAFT = 1,
             }),
 		},
 
@@ -1571,7 +1594,6 @@ function Tune(overrides)
 
         WALTERHAT_PERISHTIME = total_day_time*10,
 
-
         GRASS_REGROW_TIME = total_day_time*3,
         SAPLING_REGROW_TIME = total_day_time*4,
         MARSHBUSH_REGROW_TIME = total_day_time*4,
@@ -1803,13 +1825,13 @@ function Tune(overrides)
         DRY_FAST = total_day_time,
         DRY_MED = 2*total_day_time,
 
-        CALORIES_TINY = calories_per_day/8, -- berries
-        CALORIES_SMALL = calories_per_day/6, -- veggies
-        CALORIES_MEDSMALL = calories_per_day/4,
-        CALORIES_MED = calories_per_day/3, -- meat
-        CALORIES_LARGE = calories_per_day/2, -- cooked meat
-        CALORIES_HUGE = calories_per_day, -- crockpot foods?
-        CALORIES_SUPERHUGE = calories_per_day*2, -- crockpot foods?
+        CALORIES_TINY = calories_per_day/8,			-- berries				 9.375
+        CALORIES_SMALL = calories_per_day/6,		-- veggies				 12.5
+        CALORIES_MEDSMALL = calories_per_day/4,		--						 18.75
+        CALORIES_MED = calories_per_day/3,			-- meat					 25
+        CALORIES_LARGE = calories_per_day/2,		-- cooked meat			 37.5
+        CALORIES_HUGE = calories_per_day,			-- crockpot foods?		 75
+        CALORIES_SUPERHUGE = calories_per_day*2,	-- crockpot foods?		150
 
 		-- food affinity multipliers to add 15 calories
 		AFFINITY_15_CALORIES_TINY = 2.6,
@@ -1859,7 +1881,7 @@ function Tune(overrides)
         REPAIR_THULECITE_PIECES_HEALTH = 100/6,
 
         REPAIR_BOARDS_HEALTH = 50,
-        REPAIR_LOGS_HEALTH = 25/4,
+        REPAIR_LOGS_HEALTH = 50/4,
         REPAIR_STICK_HEALTH = 13,
         REPAIR_CUTGRASS_HEALTH = 13,
         REPAIR_TREEGROWTH_HEALTH = 20,
@@ -2093,6 +2115,7 @@ function Tune(overrides)
         BEARDLORD_DAMAGE = 60,
         BUNNYMAN_HEALTH = 200,
         BUNNYMAN_ATTACK_PERIOD = 2,
+		BUNNYMAN_MAX_STUN_LOCKS = 2,
         BEARDLORD_ATTACK_PERIOD = 1,
         BUNNYMAN_RUN_SPEED = 6,
         BUNNYMAN_WALK_SPEED = 3,
@@ -2277,6 +2300,7 @@ function Tune(overrides)
         BEEQUEEN_MAX_GUARDS_PER_SPAWN = 5,
         BEEQUEEN_TOTAL_GUARDS = 8,
         BEEQUEEN_CHASE_TO_RANGE = 8,
+		BEEQUEEN_MAX_STUN_LOCKS = 4,
 
         BEEQUEEN_DODGE_SPEED = 6,
         BEEQUEEN_DODGE_HIT_RECOVERY = 2,
@@ -2383,12 +2407,8 @@ function Tune(overrides)
         LIGHTER_ATTACK_IGNITE_PERCENT = .5,
         LIGHTER_DAMAGE = wilson_attack*.5,
         WILLOW_LIGHTFIRE_SANITY_THRESH = .5,
-        WX78_RAIN_HURT_RATE = 1,
-        WX78_MIN_MOISTURE_DAMAGE= -.1,
-        WX78_MAX_MOISTURE_DAMAGE = -.5,
-        WX78_MOISTURE_DRYING_DAMAGE = -.3,
 
-        WOLFGANG_HUNGER = 300,
+        WOLFGANG_HUNGER = 200,
         WOLFGANG_START_HUNGER = 200,
         WOLFGANG_START_MIGHTY_THRESH = 225,
         WOLFGANG_END_MIGHTY_THRESH = 220,
@@ -2572,8 +2592,11 @@ function Tune(overrides)
 
         CATCOONDEN_MAXCHILDREN = 1,
         CATCOONDEN_REGEN_TIME = seg_time * 4,
-        CATCOONDEN_RELEASE_TIME = seg_time,
+        CATCOONDEN_RELEASE_TIME = seg_time * 0.5,
         CATCOONDEN_ENABLED = true,
+		CATCOONDEN_INV_SIZE = 20,
+		CATCOONDEN_REPAIR_TIME = 15 * total_day_time,
+		CATCOONDEN_REPAIR_TIME_VAR = 5 * total_day_time,
 
         CATCOON_ATTACK_RANGE = 4,
         CATCOON_MELEE_RANGE = 3,
@@ -2598,6 +2621,12 @@ function Tune(overrides)
         MAX_HAIRBALL_NEUTRAL_INTERVAL = total_day_time,
         CATCOON_PICKUP_ITEM_CHANCE = .67,
         CATCOON_ATTACK_CONNECT_CHANCE = .25,
+		CATCOON_ACTIVATE_CONNECT_CHANCE = 0.25,
+		CATCOON_DEN_LEASH_MAX_DIST = 30,
+
+        CATCOONDEN_REGROWTH_TIME = day_time * 15,
+        CATCOONDEN_REGROWTH_TIME_SPRING_MULT = 0.5,
+        CATCOONDEN_REGROWTH_TIME_AUTUMN_MULT = 1,
 
         GRASSGEKKO_LIFE = 150,
         GRASSGEKKO_WALK_SPEED = 1, --0.5
@@ -2622,13 +2651,17 @@ function Tune(overrides)
         WARG_HEALTH = 600 * 3, --harder for multiplayer
         WARG_DAMAGE = 50,
         WARG_ATTACKPERIOD = 3,
-        WARG_ATTACKRANGE = 5,
+        WARG_ATTACKRANGE = 4,
         WARG_FOLLOWERS = 6,
         WARG_SUMMONPERIOD = 15,
         WARG_MAXHELPERS = 10,
         WARG_TARGETRANGE = 10,
         WARG_NEARBY_PLAYERS_DIST = 30,
         WARG_BASE_HOUND_AMOUNT = 2,
+
+        WARGLET_HEALTH = 600,
+        WARGLET_BASE_HOUND_AMOUNT = 1,
+        WARGLET_MAX_HOUND_AMOUNT = 3,
 
         SMOTHER_DAMAGE = 3,
 
@@ -2776,6 +2809,7 @@ function Tune(overrides)
         RABBITHOLE_REGROWTH_TIME = total_day_time * 5,
         FLOWER_CAVE_REGROWTH_TIME = total_day_time * 5,
         FLOWER_CAVE_REGROWTH_TIME_MULT = 1,
+        REEDS_REGROWTH_TIME = total_day_time * 5,
 
         EVERGREEN_REGROWTH = {
             OFFSPRING_TIME = total_day_time * 5,
@@ -3041,8 +3075,8 @@ function Tune(overrides)
 				WILSON = {},
 				WILLOW = {"lighter", "bernie_inactive"},
 				WENDY = {"abigail_flower"},
-				WOLFGANG = {},
-				WX78 = {},
+				WOLFGANG = {"dumbbell"},
+				WX78 = {"wx78_scanner_item", "wx78_moduleremover"},
 				WICKERBOTTOM = {"papyrus", "papyrus"},
 				WES = {"balloons_empty"},
 				WAXWELL = {"waxwelljournal", "nightmarefuel", "nightmarefuel", "nightmarefuel", "nightmarefuel", "nightmarefuel", "nightmarefuel"},
@@ -3101,6 +3135,10 @@ function Tune(overrides)
                 WANDA = {}, -- TODO
 			},
 		},
+
+		MAX_PINNED_RECIPES = 9,
+		DEFAULT_PINNED_RECIPES = {"torch", "campfire", "axe", "pickaxe", "researchlab"},
+		DEFAULT_PINNED_RECIPES_2 = {"rope", "boards", "cutstone", "transistor", "papyrus"},
 
 		DROP_EVERYTHING_ON_DESPAWN = false,
 
@@ -3187,6 +3225,10 @@ function Tune(overrides)
             MOOSE            = {basic=1, special="winter_ornament_boss_moose"}, -- goose?
             ANTLION          = {basic=1, special="winter_ornament_boss_antlion"},
             MALBATROSS       = {basic=1, special="winter_ornament_boss_malbatross"},
+            EYEOFTERROR      = {basic=1},
+            TWINOFTERROR1     = {basic=1, special="winter_ornament_boss_eyeofterror1"},
+            TWINOFTERROR2     = {basic=1, special="winter_ornament_boss_eyeofterror2"},
+            ALTERGUARDIAN_PHASE3 = {basic=2},
         },
 
         WINTERS_FEAST_LOOT_EXCLUSION =
@@ -3680,7 +3722,7 @@ function Tune(overrides)
                     DAMAGE = wilson_attack*.8,
 					ROW_FAIL_WEAR = 6,
                     ATTACKWEAR = 6,
-                    USES = 600,
+                    USES = 1500,
                     MAX_VELOCITY = 5,
                 },
             },
@@ -3949,8 +3991,8 @@ function Tune(overrides)
         WORMWOOD_BURN_TIME = 4.3,
         WORMWOOD_FIRE_DAMAGE = 1.25,
         ARMORBRAMBLE_DMG = wilson_attack/1.5,
-        ARMORBRAMBLE_ABSORPTION = .65*multiplayer_armor_absorption_modifier,
-        ARMORBRAMBLE = wilson_health*2.5*multiplayer_armor_durability_modifier,
+        ARMORBRAMBLE_ABSORPTION = .8*multiplayer_armor_absorption_modifier,
+        ARMORBRAMBLE = wilson_health*5*multiplayer_armor_durability_modifier,
         TRAP_BRAMBLE_USES = 10,
         TRAP_BRAMBLE_DAMAGE = 40,
         TRAP_BRAMBLE_RADIUS = 2.5,
@@ -4075,21 +4117,29 @@ function Tune(overrides)
 
         MERM_DAMAGE = 30,
         MERM_HEALTH = 250 * 2, -- harder for multiplayer
+        MERM_HEALTH_REGEN_PERIOD = 10,
+        MERM_HEALTH_REGEN_AMOUNT = (10 * (250 * 2)) / (total_day_time * 2), -- 2 days to recover to full to promote keeping Merms versus letting them die for the 4 day cooldown on houses.
         MERM_ATTACK_PERIOD = 3,
         MERM_RUN_SPEED = 8,
         MERM_WALK_SPEED = 3,
         MERM_TARGET_DIST = 10,
         MERM_DEFEND_DIST = 30,
+		MERM_MAX_STUN_LOCKS = 2,
 
-        MERM_LOYALTY_MAXTIME = 3 * total_day_time,
-        MERM_LOYALTY_PER_HUNGER = total_day_time/25,
         MERM_SHARE_TARGET_DIST = 40,
         MERM_MAX_TARGET_SHARES = 5,
 
-        MERM_DAMAGE_KINGBONUS = 40,
-        MERM_HEALTH_KINGBONUS = 560,
+        MERM_LOW_LOYALTY_WARNING_PERCENT = 0.07,
         MERM_LOYALTY_MAXTIME_KINGBONUS = 2 * total_day_time,
         MERM_LOYALTY_PER_HUNGER_KINGBONUS = total_day_time/33,
+
+        MERM_LOYALTY_MAXTIME = 3 * total_day_time,
+        MERM_LOYALTY_PER_HUNGER = total_day_time/25,
+        MERM_FOLLOWER_COUNT = 2,
+        MERM_FOLLOWER_RADIUS = 8,
+
+        MERM_DAMAGE_KINGBONUS = 40,
+        MERM_HEALTH_KINGBONUS = 560,
 
         MERM_GUARD_DAMAGE = 50,
         MERM_GUARD_HEALTH = 660,
@@ -4102,15 +4152,17 @@ function Tune(overrides)
         MERM_GUARD_SHARE_TARGET_DIST = 60,
         MERM_GUARD_MAX_TARGET_SHARES = 8,
 
-        MERM_GUARD_LOYALTY_MAXTIME = 3 * total_day_time,
-        MERM_GUARD_LOYALTY_PER_HUNGER = total_day_time/25,
+        MERM_GUARD_LOYALTY_MAXTIME = 5 * total_day_time,
+        MERM_GUARD_LOYALTY_PER_HUNGER = total_day_time/15,
+        MERM_GUARD_FOLLOWER_COUNT = 5,
+        MERM_GUARD_FOLLOWER_RADIUS = 16,
 
         MERM_KING_HEALTH = 1000,
         MERM_KING_HEALTH_REGEN_PERIOD = 1,
         MERM_KING_HEALTH_REGEN = 2,
         MERM_KING_HUNGER = 200,
         MERM_KING_HUNGER_KILL_TIME = total_day_time * 2,
-        MERM_KING_HUNGER_RATE = 200 / (total_day_time * 4),
+        MERM_KING_HUNGER_RATE = 200 / (total_day_time * 8),
 
         PUNY_MERM_HEALTH = 200,
         PUNY_MERM_DAMAGE = 20,
@@ -4271,7 +4323,7 @@ function Tune(overrides)
         BATTLESONG_DETACH_RADIUS = 16,
 
         INSPIRATION_MAX = 100,
-        INSPIRATION_GAIN_RATE = 0.03,
+        INSPIRATION_GAIN_RATE = 0.024,
         INSPIRATION_GAIN_EPIC_BONUS = 3,
         INSPIRATION_DRAIN_RATE = -2,
         INSPIRATION_DRAIN_BUFFER_TIME = 7.5,
@@ -4462,6 +4514,7 @@ function Tune(overrides)
 		SCHOOL_SPAWNER_BLOCKER_LIFETIME = total_day_time,
 
 		FISH_BOX_PRESERVER_RATE = -1/3,
+		SEEDPOUCH_PRESERVER_RATE = 0.5,
 
 
         -- Wintersfeast 2019
@@ -4552,7 +4605,84 @@ function Tune(overrides)
         MINIBOATLANTERN_LIGHTTIME = total_day_time*6,
         MINIBOATLANTERN_BURNTIME = 1.7,
 
+		YOT_CATCOON_SHRINE_SYMBOLS =
+		{
+			DEFAULT = "feather01",
+			goose_feather = "goose_feather01",
+		},
+		
+        KITCOON_WALK_SPEED = 2,
+        KITCOON_RUN_SPEED = 6,
 
+		KITCOON_LOYALTY_MAX				= seg_time * 4, -- DEPRECATED
+		KITCOON_LOYALTY_EMOTE_CHANCE	= 0.4,
+		KITCOON_NEAR_DEN_DIST			= 10,
+
+		KITCOON_PLAY_DELAY				= 10, -- play with toys
+		KITCOON_PLAYFUL_DELAY			= 10, -- play with other kitcoons
+		KITCOON_PLAYFUL_DELAY_RAND		= 8, -- play with other kitcoons
+
+		KITCOON_NAMING_DIST = 8,
+		KITCOON_NAMING_MAX_LENGTH = 20,
+
+        KITCOON_HIDEANDSEEK_HIDETIMEOUT = 3,
+
+		KITCOONDEN_HIDEANDSEEK_MIN_KITCOONS = 3,
+		KITCOONDEN_HIDEANDSEEK_HIDING_RADIUS_MAX = 30,
+		KITCOONDEN_HIDEANDSEEK_HIDING_RADIUS_MIN_SQ = 5*5,
+		KITCOONDEN_HIDEANDSEEK_TIME_LIMIT = 60,
+
+        KITCOON_HIDING_SOUND_FREQUENCY = 10,
+		KITCOON_HIDING_OFFSET = 
+		{
+			rock1					= {-175,    0,    0},
+			rock2					= {-150,   50,    0},
+			rock_flintless			= {-150,    0,    0},
+			rock_flintless_med		= {  80,    0,    0},
+			rock_flintless_low		= {-150,    0,    0},
+			rock_moon				= {-115,   25,    0},
+			rock_moon_shell			= {-175,    0,    0},
+
+			berrybush				= {-130,    0,    0},
+			berrybush2				= {-100,   25,    0},
+			berrybush_juicy			= {-100,    0,    0},
+
+			oasis_cactus			= { -25,   20,    0},
+			cactus					= { -75,   20,    0},
+		},
+
+        TICOON_SPEED = 3.25,
+		TICOON_EMBARK_SPEED = 7,
+        TICOON_DAMAGE = 30,
+        TICOON_LIFE = 200,
+
+		KITCOON_HIDEANDSEEK_NOT_YOT_REWARDS =
+		{
+			flint					= 10,
+			cutgrass				= 10,
+			twigs					= 10,
+			petals					= 10,
+
+			acorn					= 3,
+			pinecone				= 3,
+			twiggy_nut				= 3,	-- oh, now players can get twiggy trees without them replacing saplings at world gen!
+
+			rocks					= 3,
+			petals_evil				= 3,
+			spoiled_fish_small		= 3,
+
+			feather_robin			= 3,
+			feather_crow			= 3,
+			feather_canary			= 3,
+
+			oceanfish_small_2_inv	= 1,
+			oceanfish_small_4_inv	= 1,
+
+			trinket_3				= 1,
+			trinket_6				= 1,
+			trinket_22				= 2,
+			trinket_24				= 1,
+		},
 
         CRABKING_HEALTH = 20000,
         CRABKING_HEALTH_BONUS = 3000,
@@ -4994,7 +5124,7 @@ function Tune(overrides)
 
 		FIRE_NETTLE_TOXIN_TEMP_MODIFIER = 60,
 		FIRE_NETTLE_TOXIN_DURATION = seg_time * 2,
-		WEED_FIRENETTLE_DAMAGE = 6,
+		WEED_FIRENETTLE_DAMAGE = 3,
 
 		WEED_TILLWEED_MAX_DEBRIS = 5,
 		WEED_TILLWEED_DEBRIS_TIME_MIN = total_day_time * 0.75,
@@ -5150,6 +5280,7 @@ function Tune(overrides)
         YOTB_POSTDISTANCE = 5,
 
         BEEFALO_NAMING_DIST = 12,
+		BEEFALO_NAMING_MAX_LENGTH = 50,
 
         DEERCLOPS_ATTACKS_PER_SEASON = 4,
         DEERCLOPS_ATTACKS_OFF_SEASON = false,
@@ -5180,6 +5311,9 @@ function Tune(overrides)
 
         RABBITHOLE_REGROWTH_TIME_MULT = 0,
         RABBITHOLE_REGROWTH_TIME_SUMMER_MULT = 1,
+
+        REEDS_REGROWTH_TIME_MULT = 0,
+        REEDS_REGROWTH_TIME_SPRING_MULT = 1,
 
         PIGHOUSE_SPAWN_TIME = total_day_time * 4,
         PIGHOUSE_ENABLED = true,
@@ -5343,6 +5477,7 @@ function Tune(overrides)
         ALTERGUARDIAN_PHASE3_SUMMONMAXLOOPS = 60,
         ALTERGUARDIAN_PHASE3_SUMMONRSQ = 400, --20 ^2
         ALTERGUARDIAN_PHASE3_TARGET_DIST = 20,
+		ALTERGUARDIAN_PHASE3_MAX_STUN_LOCKS = 5,
 
         ALTERGUARDIAN_PROJECTILE_SPEED = 20,
 
@@ -5370,13 +5505,16 @@ function Tune(overrides)
 
         MOONSTORM_GOGGLES_PERISHTIME = total_day_time*1,
 
+        MOONSTORM_SPEED_MOD = .4,
+
         STORM_SWAP_TIME = 4/30,
 
         MOON_ALTAR_LINK_AREA_CLEAR_RADIUS = 6,
         MOON_ALTAR_LINK_POINT_VALID_RADIUS_SQ = 2.5*2.5,
         MOON_ALTAR_LINK_ALTAR_MIN_RADIUS_SQ = 2.5*2.5,
 		
-
+        MOONGLASS_CHARGED_PERISH_TIME = total_day_time*1.5,
+        SPARK_PERISH_TIME = total_day_time*0.75,
 
         SPIDER_SUMMON_TIME = 12,
         SPIDER_WHISTLE_USE_AMOUNT = 2.5,
@@ -5492,6 +5630,296 @@ function Tune(overrides)
         WATERTREE_ROOT_CHOPS = 3,
 
         OCEANVINE_REGROW_TIME = total_day_time*2.5,
+
+        -- Eye For An Eye
+        SPAWN_EYEOFTERROR = true,
+        EYEOFTERROR_SPAWNDELAY = total_day_time * 15,
+
+		TERRARIUM_WARNING_TIME = 10,
+		TERRARIUM_SUMMON_DELAY = 5,
+
+        EYEOFTERROR_HEALTH = 5000,
+        EYEOFTERROR_HEALTHPCT_PERDAY = 0.05,
+        EYEOFTERROR_TRANSFORMPERCENT = 0.65,
+        EYEOFTERROR_DAMAGE = 125,
+        EYEOFTERROR_DAMAGEPLAYERPERCENT = 0.5,
+        EYEOFTERROR_DEAGGRO_DIST = 60,
+        EYEOFTERROR_CHARGESPEED = 15,
+        EYEOFTERROR_CHARGEMINDSQ = 0,
+        EYEOFTERROR_CHARGEMAXDSQ = 196,
+        EYEOFTERROR_ATTACK_RANGE = 3,
+        EYEOFTERROR_AOERANGE = 3,
+        EYEOFTERROR_AOE_DAMAGE = 100,
+        EYEOFTERROR_ATTACKPERIOD = 3,
+        EYEOFTERROR_SLEEPRESIST = 4,
+        EYEOFTERROR_CHOMP_SINKHOLERADIUS = 2.0,
+        EYEOFTERROR_MINGUARDS_PERSPAWN = 2,
+        EYEOFTERROR_EYE_MINGUARDS = 2,
+        EYEOFTERROR_MOUTH_MINGUARDS = 4,
+        EYEOFTERROR_EPICSCARE_RANGE = 10,
+
+        EYEOFTERROR_CHARGECD = 7,
+        EYEOFTERROR_MOUTHCHARGECD = 15,
+        EYEOFTERROR_SPAWNCD = 18,
+        EYEOFTERROR_FOCUSCD = 21,
+
+        EYEOFTERROR_MINI_EGGTIME = 15,
+        EYEOFTERROR_MINI_HEALTH = 200,
+        EYEOFTERROR_MINI_DAMAGE = 20,
+        EYEOFTERROR_MINI_ATTACK_RANGE = 4.0,
+        EYEOFTERROR_MINI_HIT_RANGE = 2.25,
+        EYEOFTERROR_MINI_ATTACK_PERIOD = 3,
+
+        TWINS_RESET_DAY_COUNT = 2,  -- 1 higher than we really want, just makes the code simpler.
+
+		-- Twin 1
+		TWIN1_HEALTH				= 10000,  --2.0*TUNING.EYEOFTERROR_HEALTH,
+		TWIN1_DAMAGE				= 250,    --2.0*TUNING.EYEOFTERROR_DAMAGE,
+        TWIN1_AOE_DAMAGE			= 250,    --2.5*TUNING.EYEOFTERROR_AOE_DAMAGE
+        TWIN1_MINGUARDS_PERSPAWN	= 2 + 2,   --TUNING.EYEOFTERROR_MINGUARDS_PERSPAWN + 2
+
+		TWIN1_CHARGECD				= 0.50* 7, --0.50*TUNING.EYEOFTERROR_CHARGECD,
+		TWIN1_MOUTHCHARGECD			= 0.50*15, --0.50*TUNING.EYEOFTERROR_MOUTHCHARGECD,
+		TWIN1_SPAWNCD				= 0.30*18, --0.30*TUNING.EYEOFTERROR_SPAWNCD,
+		TWIN1_FOCUSCD				= 0.60*21, --0.60*TUNING.EYEOFTERROR_FOCUSCD,
+
+        TWIN1_CHARGESPEED			= 20,
+		TWIN1_CHARGETIMEOUT			= 1.0,
+		TWIN1_MOUTH_CHARGESPEED		= 22,
+		TWIN1_MOUTH_CHARGETIMEOUT	= 0.70,
+		TWIN1_TAUNT_CHANCE			= 0.50,
+
+		-- Twin 2
+		TWIN2_HEALTH				= 10000,   --2.0*TUNING.EYEOFTERROR_HEALTH,
+		TWIN2_DAMAGE				= 250,     --2.0*TUNING.EYEOFTERROR_DAMAGE,
+        TWIN2_AOE_DAMAGE			= 250,	   --2.5*TUNING.EYEOFTERROR_AOE_DAMAGE
+        TWIN2_MINGUARDS_PERSPAWN	= 2,       --TUNING.EYEOFTERROR_MINGUARDS_PERSPAWN
+
+		TWIN2_CHARGECD				= 0.25* 7, --0.25*TUNING.EYEOFTERROR_CHARGECD,
+		TWIN2_MOUTHCHARGECD			= 0.25*15, --0.25*TUNING.EYEOFTERROR_MOUTHCHARGECD,
+		TWIN2_SPAWNCD				= 1.00*18, --TUNING.EYEOFTERROR_SPAWNCD,
+		TWIN2_FOCUSCD				= 0.60*21, --0.60*TUNING.EYEOFTERROR_FOCUSCD,
+
+        TWIN2_CHARGESPEED			= 23,      --1.15*TWIN1_CHARGESPEED
+		TWIN2_CHARGETIMEOUT			= 0.40,
+		TWIN2_MOUTH_CHARGESPEED		= 25,
+		TWIN2_MOUTH_CHARGETIMEOUT	= 0.50,
+		TWIN2_TAUNT_CHANCE			= 0.25,
+
+		EYEMASK_PERISHTIME = total_day_time*10,
+
+        SHIELDOFTERROR_DAMAGE = wilson_attack*1.5,
+        SHIELDOFTERROR_ABSORPTION = .8*multiplayer_armor_absorption_modifier,
+        SHIELDOFTERROR_ARMOR = wilson_health*3*multiplayer_armor_durability_modifier,
+        SHIELDOFTERROR_USEDAMAGE = 2,
+        
+        -- Wolfgang
+        MIGHTINESS_MAX = 100,
+        MIGHTINESS_DRAIN_RATE = 0.2, -- per second
+
+        MIGHTINESS_DRAIN_MULT_SLOW = 0.5,
+        MIGHTINESS_DRAIN_MULT_NORMAL = 1,
+        MIGHTINESS_DRAIN_MULT_FAST = 2,
+        MIGHTINESS_DRAIN_MULT_FASTEST = 3,
+        MIGHTINESS_DRAIN_MULT_STARVING = 8,
+
+        WIMPY_THRESHOLD = 25,
+        MIGHTY_THRESHOLD = 75,
+
+        DUMBBELL_CONSUMPTION_ROCK = 0.8,
+        DUMBBELL_CONSUMPTION_GOLD = 0.5,
+        DUMBBELL_CONSUMPTION_MARBLE = 0.3,
+        DUMBBELL_CONSUMPTION_GEM = 0.2,
+
+        DUMBBELL_DAMAGE_ROCK = wilson_attack*.5,
+        DUMBBELL_DAMAGE_GOLD = wilson_attack*.8,
+        DUMBBELL_DAMAGE_MARBLE = wilson_attack,
+        DUMBBELL_DAMAGE_GEM = wilson_attack * 1.25,
+
+		-- Dumbbells are custom made tools (designed by Wolfgang for Wolfgang), not something to be tossed about...
+		DUMBBELL_ATTACK_CONSUMPTION_MULT = 2,
+		DUMBBELL_THROWN_CONSUMPTION_MULT = 10,
+
+		DUMBBELL_SLOW_MARBEL = 0.9,
+
+        DUMBBELL_EFFICIENCY_LOW = 1.5,
+        DUMBBELL_EFFICIENCY_MED = 3.0,
+        DUMBBELL_EFFICIENCY_HIGH = 5.0,
+		DUMBBELL_EFFICIENCY_ATTCK_SCALE = 0.5,
+
+		WOLFGANG_MIGHTINESS_WORK_GAIN = 
+		{
+			CHOP = 0.5,				-- ~0.4s
+			MINE = 1.0,				-- ~0.4s
+			HAMMER = 0.25,			-- ~0.4s -- please dont hammer down other people's bases...
+			DIG = 2,
+			ROW = 0.5,				-- ~0.4s without lag
+			LOWER_SAIL_BOOST = 2,
+			TILL = 1,				-- ~1.1s
+			TERRAFORM = 1.5,
+		},
+
+		WOLFGANG_MIGHTINESS_ATTACK_GAIN_GIANT = 1,
+		WOLFGANG_MIGHTINESS_ATTACK_GAIN_SMALLCREATURE = 0.25,
+		WOLFGANG_MIGHTINESS_ATTACK_GAIN_DEFAULT = 0.5,
+
+		WOLFGANG_MIGHTINESS_DRAIN_DELAY = 4,
+
+        WIMPY_WORK_EFFECTIVENESS = 0.75,
+		WIMPY_HUNGER_RATE_MULT = 0.75,
+
+        MIGHTY_WORK_CHANCE = 0.99,
+        MIGHTY_WORK_EFFECTIVENESS = 1.5,
+        MIGHTY_ROWER_MULT = 1.33,
+		MIGHTY_ROWER_EXTRA_MAX_VELOCITY = 0.5,
+        MIGHTY_ANCHOR_SPEED = 2,
+        MIGHTY_SAIL_BOOST_STRENGTH = 18,
+
+		DEFAULT_SAIL_BOOST_STRENGTH = 10,
+
+		MIGHTY_HEAVY_SPEED_MULT_BONUS = 0.45, -- DEPRECATED
+
+        WOLFGANG_SANITY_DRAIN = 1.1,
+        WOLFGANG_SANITY_NIGHT_DRAIN = 1.25,
+        WOLFGANG_SANITY_NIGHT_DRAIN_SMALL = 1.1,
+        WOLFGANG_SANITY_RANGE = 16,
+        WOLFGANG_SANITY_PER_MONSTER = 1/13,
+
+        BELL_SUCCESS_MIN_2 = nil, -- no perfect here
+        BELL_SUCCESS_MAX_2 = nil, -- no perfect here 
+        BELL_MID_SUCCESS_MIN_2 = 0.37,
+        BELL_MID_SUCCESS_MAX_2 = 0.63,
+
+        BELL_SUCCESS_MIN_3 = nil, -- no perfect here
+        BELL_SUCCESS_MAX_3 = nil, -- no perfect here 
+        BELL_MID_SUCCESS_MIN_3 = 0.25,
+        BELL_MID_SUCCESS_MAX_3 = 0.75,
+
+        BELL_SUCCESS_MIN_4 = 0.45,
+        BELL_SUCCESS_MAX_4 = 0.60,
+        BELL_MID_SUCCESS_MIN_4 = 0.12,
+        BELL_MID_SUCCESS_MAX_4 = 0.90,
+
+        BELL_SUCCESS_MIN_5 = 0.33,
+        BELL_SUCCESS_MAX_5 = 0.69,
+        BELL_MID_SUCCESS_MIN_5 = 0.14,
+        BELL_MID_SUCCESS_MAX_5 = 0.87,
+
+        BELL_SUCCESS_MIN_6 = 0.24,
+        BELL_SUCCESS_MAX_6 = 0.78,
+        BELL_MID_SUCCESS_MIN_6 = 0.12,
+        BELL_MID_SUCCESS_MAX_6 = 0.88,
+
+        BELL_SUCCESS_MIN_7 = 0.44,
+        BELL_SUCCESS_MAX_7 = 0.57,
+        BELL_MID_SUCCESS_MIN_7 = 0.12,
+        BELL_MID_SUCCESS_MAX_7 = 0.86,
+
+        BELL_SUCCESS_MIN_8 = 0.37,
+        BELL_SUCCESS_MAX_8 = 0.66,
+        BELL_MID_SUCCESS_MIN_8 = 0.14,
+        BELL_MID_SUCCESS_MAX_8 = 0.90,
+
+        MIGHTYGYM_WORKOUT_HUNGER = {
+            LOW = 4,
+            MED = 11,
+            HIGH = 22,
+        },
+
+        GYM_RATE = {
+            -- rate in number of hits to reach 100 mightiness
+            LOW = 100/25,
+            MED = 100/15,
+            HIGH = 100/10,
+        },
+
+        RUINS_CAVEIN_OBSTACLE_FALL_DAMAGE = 40,
+
+        -- WX78 Refresh
+        WX78_MAXELECTRICCHARGE = 6,
+        WX78_MINACCEPTABLEMOISTURE = 15,
+        WX78_HUNGRYCHARGEDRAIN_TICKTIME = 300 * FRAMES,
+        WX78_CHARGE_REGENTIME = 3*seg_time,
+        WX78_FROZEN_CHARGELOSS = 2,
+        WX78_MODULE_USES = 4,
+
+        WX78_RAIN_HURT_RATE = 1,            -- DEPRECATED
+        WX78_MAX_MOISTURE_DAMAGE = -.5,     -- DEPRECATED
+        WX78_MOISTURE_DRYING_DAMAGE = -.3,  -- DEPRECATED
+
+        WX78_MOISTUREUPDATERATE = 30, -- Frames count
+        WX78_MOISTURESTEPTRIGGER = 5, -- How many updates there are before a discharge
+        WX78_MIN_MOISTURE_DAMAGE = -0.60,     -- Damage per second
+        WX78_PERCENT_MOISTURE_DAMAGE = -1.2,
+
+        WX78_MAXHEALTH_BOOST = 50,
+
+        WX78_MAXSANITY1_BOOST = 40,
+
+        WX78_MAXSANITY_BOOST = 100,
+        WX78_MAXSANITY_DAPPERNESS = 100/(day_time*10),
+
+        WX78_MAXHUNGER1_BOOST = 40,
+
+        WX78_MAXHUNGER_BOOST = 100,
+        WX78_MAXHUNGER_SLOWPERCENT = 0.80,
+
+        WX78_MOVESPEED_CHIPBOOSTS = {0.00, 0.25, 0.40, 0.50}, -- Set so that speed circuits give diminishing returns.
+
+        WX78_HEATERTEMPPERMODULE = 25,
+        WX78_MINTEMPCHANGEPERMODULE = 20,
+
+        WX78_COLD_ICEMOISTURE = 94, -- Kind of 95; the moisture badge presentation makes this work better.
+        WX78_COLD_ICECOUNT = 2,
+
+        WX78_PERISH_COLDRATE = 0.75,
+        WX78_PERISH_HOTRATE = 1.25,
+
+        WX78_TASERDAMAGE = 20,
+
+        WX78_LIGHT_BASERADIUS = 3.5,
+        WX78_LIGHT_EXTRARADIUS = 1.5,
+
+        WX78_MUSIC_TENDRANGE = 12,
+        WX78_MUSIC_AURADSQ = 256,
+        WX78_MUSIC_UPDATERATE = 144*FRAMES,
+        WX78_MUSIC_DAPPERNESS = 100/(day_time*4.5),
+        WX78_MUSIC_SANITYAURA = 100/(day_time*4.5),
+
+        WX78_BEE_TICKPERIOD = seg_time,
+        WX78_BEE_HEALTHPERTICK = 5.0,
+
+        WX78_MAXHEALTH2_MULT = 3.0, -- A multiplier on WX78_MAXHEALTH_BOOST
+
+        WX78_CHARGING_FOODS = {
+            voltgoatjelly = 1,
+            voltgoatjelly_spice_chili = 1,
+            voltgoatjelly_spice_garlic = 1,
+            voltgoatjelly_spice_sugar = 1,
+            voltgoatjelly_spice_salt = 1,
+            goatmilk = 1,
+        },
+
+        WX78_SCANNER_SCANPERIOD = 10,
+        WX78_SCANNER_MODULETARGETSCANTIME = 10,
+        WX78_SCANNER_MODULETARGETSCANTIME_EPIC = 20,
+
+        WX78_SCANNER_DISTANCES =
+        {
+            {maxdist=10, describe="hot", pingtime=1},
+            {maxdist=15, describe="warmer", pingtime=2},
+        },
+        WX78_SCANNER_SCANDIST = 4.0,
+
+        WX78_SCANNER_RANGE = 7,
+        WX78_SCANNER_PLAYER_PROX = 7,
+
+        WX78_SCANNER_TIMEOUT = total_day_time,
+
+        -- Wurt QoL/AI
+        -- Default fallbacks for follower brain AI distances.
+        FOLLOWER_HELP_LEADERDIST = 18,
+        FOLLOWER_HELP_FINDDIST = 6,
     }
 
     TUNING_MODIFIERS = {}

@@ -14,6 +14,7 @@ return{
         {
             MOUNTED = "I've got to get down if I'm going to do that properly.",
             HASPET = "I think Woby might get jealous if I keep collecting pets.",
+			TICOON = "One of these guys is enough to keep track of.",
         },
 		SHAVE =
 		{
@@ -58,7 +59,16 @@ return{
 			LOCKED_GATE = "I think it's locked.",
             HOSTBUSY = "Excuse me, mister...? Hm, looks like he's busy.",
             CARNIVAL_HOST_HERE = "I thought I saw him around here somewhere...",
-            NOCARNIVAL = "Aw, looks like they all left..."
+            NOCARNIVAL = "Aw, looks like they all left...",
+			EMPTY_CATCOONDEN = "It's empty? Well now I feel kind of bad...",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDERS = "It would be a pretty short game, maybe I should find more first.",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "Uhh, I'm not sure where they could even hide around here.",
+			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "Sorry kitties, I can't play with you all day!",
+		},
+		OPEN_CRAFTING = 
+		{
+            PROFESSIONALCHEF = "I should probably leave that alone.",
+			SHADOWMAGIC = "Maybe you could teach me some magic tricks? I'm a quick learner!",
 		},
         COOK =
         {
@@ -89,7 +99,7 @@ return{
 --fallback to speech_wilson.lua         READ =
 --fallback to speech_wilson.lua         {
 --fallback to speech_wilson.lua             GENERIC = "only_used_by_wickerbottom",
---fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom"
+--fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom",
 --fallback to speech_wilson.lua         },
 
         GIVE =
@@ -121,6 +131,8 @@ return{
 			CARNIVALGAME_INVALID_ITEM = "I had a feeling that wouldn't work...",
 			CARNIVALGAME_ALREADY_PLAYING = "We can wait till they're done. Right Woby?",
             SPIDERNOHAT = "I don't think that would be very comfy for the spider.",
+            TERRARIUM_REFUSE = "I guess that was a silly thing to try...",
+            TERRARIUM_COOLDOWN = "There's no tree to give anything to yet!",
         },
         GIVETOPLAYER =
         {
@@ -161,6 +173,7 @@ return{
         {
             TARGETINCOMBAT = "Hey, calm down! Let me on!",
             INUSE = "I guess this seat's occupied.",
+			SLEEPING = "Sorry to wake you, but could you give me a ride?",
         },
         SADDLE =
         {
@@ -189,7 +202,7 @@ return{
 --fallback to speech_wilson.lua             NOTMINE_SPIDER = "only_used_by_webber",
             NOTMINE_YOTC =
             {
-                "Wait... you're not my Carrat!",
+                "Wait... you're not my carrat!",
                 "Mine was the OTHER orange one.",
             },
 --fallback to speech_wilson.lua 			NO_HEAVY_LIFTING = "only_used_by_wanda",
@@ -324,7 +337,44 @@ return{
         {
 --fallback to speech_wilson.lua             ONCOOLDOWN = "only_used_by_wanda",
         },
+
+        ENTER_GYM =
+        {
+--fallback to speech_wilson.lua             NOWEIGHT = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             UNBALANCED = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             ONFIRE = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             SMOULDER = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             HUNGRY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             FULL = "only_used_by_wolfang",
+        },
+
+        APPLYMODULE =
+        {
+            COOLDOWN = "only_used_by_wx78",
+            NOTENOUGHSLOTS = "only_used_by_wx78",
+        },
+        REMOVEMODULES =
+        {
+            NO_MODULES = "only_used_by_wx78",
+        },
+        CHARGE_FROM =
+        {
+            NOT_ENOUGH_CHARGE = "only_used_by_wx78",
+            CHARGE_FULL = "only_used_by_wx78",
+        },
+
+        HARVEST =
+        {
+            DOER_ISNT_MODULE_OWNER = "I was trying to scratch behind his ears... but I don't think he has any.",
+        },
     },
+
+	ANNOUNCE_CANNOT_BUILD =
+	{
+		NO_INGREDIENTS = "It looks like I need to find more supplies first.",
+		NO_TECH = "Um... I don't think I know how to make one of those yet...",
+		NO_STATION = "I could probably do it if I had a station with the right tools.",
+	},
 
 	ACTIONFAIL_GENERIC = "It won't work.",
 	ANNOUNCE_BOAT_LEAK = "Um. That might be a problem.",
@@ -343,6 +393,11 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_NORMALTOWIMPY = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_WIMPYTONORMAL = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_MIGHTYTONORMAL = "only_used_by_wolfang",
+    ANNOUNCE_EXITGYM = {
+--fallback to speech_wilson.lua         MIGHTY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         NORMAL = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         WIMPY = "only_used_by_wolfang",
+    },
 
 	ANNOUNCE_BEES = "I love bees! Too bad I'm uh... deathly allergic to them.",
 	ANNOUNCE_BOOMERANG = "Hey, who threw that?! Oh, wait...",
@@ -440,11 +495,11 @@ return{
 	ANNOUNCE_NODAYSLEEP_CAVE = "I can't sleep now!",
 	ANNOUNCE_NOHUNGERSLEEP = "I can't sleep on an empty stomach...",
 	ANNOUNCE_NOSLEEPONFIRE = "Um... that's on fire.",
+    ANNOUNCE_NOSLEEPHASPERMANENTLIGHT = "Um, WX? Could you maybe turn the light down a bit?",
 	ANNOUNCE_NODANGERSIESTA = "This isn't the best time for a siesta.",
 	ANNOUNCE_NONIGHTSIESTA = "I'd rather just go to bed.",
 	ANNOUNCE_NONIGHTSIESTA_CAVE = "I can't rest now! There's too much to look at down here!",
 	ANNOUNCE_NOHUNGERSIESTA = "Maybe if I have a snack first.",
-	ANNOUNCE_NODANGERAFK = "No, wait! I can do this!",
 	ANNOUNCE_NO_TRAP = "Huh. I thought for sure there would be a trap.",
 	ANNOUNCE_PECKED = "Ouch!! Th-that hurt!",
 	ANNOUNCE_QUAKE = "Did you feel that, Woby?",
@@ -580,6 +635,10 @@ return{
         "To be continued...",
 	},
 
+    -- wx specific
+    ANNOUNCE_WX_SCANNER_NEW_FOUND = "only_used_by_wx78",
+--fallback to speech_wilson.lua     ANNOUNCE_WX_SCANNER_FOUND_NO_DATA = "only_used_by_wx78",
+
     --quagmire event
     QUAGMIRE_ANNOUNCE_NOTRECIPE = "Huh. I thought that would go alright together.",
     QUAGMIRE_ANNOUNCE_MEALBURNT = "Darnit! It's uh... a bit crispy...",
@@ -641,7 +700,7 @@ return{
 --fallback to speech_wilson.lua 		BOOK_SILVICULTURE = "only_used_by_wurt",
 --fallback to speech_wilson.lua 		BOOK_HORTICULTURE = "only_used_by_wurt",
     },
-    ANNOUNCE_WEAK_RAT = "This Carrat doesn't look healthy...",
+    ANNOUNCE_WEAK_RAT = "This carrat doesn't look healthy...",
 
     ANNOUNCE_CARRAT_START_RACE = "READY-SET-GO!!",
 
@@ -720,10 +779,42 @@ return{
         "It's good to have someone to talk to. Thanks plants!",
 	},
 
+	ANNOUNCE_KITCOON_HIDEANDSEEK_START = "Alright, I'm closing my eyes! Three... two... one...!",
+	ANNOUNCE_KITCOON_HIDEANDSEEK_JOIN = "Can I play too? Uh... I mean, use my Pioneer tracking expertise?",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND = 
+	{
+		"I knew I'd find you!",
+		"There you are!",
+		"Gotcha!",
+		"That was too easy.",
+	},
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_ONE_MORE = "There should be one more hiding somewhere...",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE = "I think that's all of them!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE_TEAM = "Good job {name}, I think that's the last one!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TIME_ALMOST_UP = "Uh oh, I think we're almost out of time.",
+	ANNOUNCE_KITCOON_HIDANDSEEK_LOSEGAME = "Darnit, they're too good at hiding!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR = "I don't think they'd be hiding way out here.",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR_RETURN = "I think we're getting warmer, Woby!",
+	ANNOUNCE_KITCOON_FOUND_IN_THE_WILD = "Woby! Look what I found!",
+
+	ANNOUNCE_TICOON_START_TRACKING	= "I think he knows the way!",
+	ANNOUNCE_TICOON_NOTHING_TO_TRACK = "It doesn't look like he's picking up any scents.",
+	ANNOUNCE_TICOON_WAITING_FOR_LEADER = "Wait up! I'm coming!",
+	ANNOUNCE_TICOON_GET_LEADER_ATTENTION = "Look Woby, I think he's trying to get our attention!",
+	ANNOUNCE_TICOON_NEAR_KITCOON = "I think he smells something nearby!",
+	ANNOUNCE_TICOON_LOST_KITCOON = "I guess he lost the scent.",
+	ANNOUNCE_TICOON_ABANDONED = "I think Woby and I can sniff them out on our own.",
+	ANNOUNCE_TICOON_DEAD = "I-it's okay Woby, he's just taking a nap! Let's keep going.",
+
     -- YOTB
     ANNOUNCE_CALL_BEEF = "Come here, girl! Or boy? It's hard to tell.",
     ANNOUNCE_CANTBUILDHERE_YOTB_POST = "It doesn't make sense to build it so far away...",
     ANNOUNCE_YOTB_LEARN_NEW_PATTERN =  "Hey, I think I can make a new beefalo costume!",
+
+    -- AE4AE
+    ANNOUNCE_EYEOFTERROR_ARRIVE = "I'm pretty sure that's supposed to be attached to something!",
+    ANNOUNCE_EYEOFTERROR_FLYBACK = "Oh good, they came back!",
+    ANNOUNCE_EYEOFTERROR_FLYAWAY = "Aww wait, come back!",
 
 	BATTLECRY =
 	{
@@ -1324,7 +1415,7 @@ return{
             },
 		},
 		ADVENTURE_PORTAL = "Don't be scared Woby, we'll do this together!",
-		AMULET = "I'm invincible!!'",
+		AMULET = "I'm invincible!!",
 		ANIMAL_TRACK = "Tracks! They go this way!",
 		ARMORGRASS = "Smells like a freshly mowed lawn.",
 		ARMORMARBLE = "Will I be able to walk in that?",
@@ -1581,7 +1672,11 @@ return{
         CHESSPIECE_BEEQUEEN = "At least I'm not allergic to bees made out of stone.",
         CHESSPIECE_ANTLION = "She really shook you up, didn't she Woby?",
         CHESSPIECE_BEEFALO = "Aw don't be jealous Woby, you deserve a statue too!",
+		CHESSPIECE_KITCOON = "They're pretty cute, but not as cute as you Woby.",
+		CHESSPIECE_CATCOON = "It's not quite as exciting as a monster statue, is it?",
         CHESSPIECE_GUARDIANPHASE3 = "It's so lifelike, I feel like they're staring right at me!",
+        CHESSPIECE_EYEOFTERROR = "Nothing to see here, folks! Ha ha, get it Woby?",
+        CHESSPIECE_TWINSOFTERROR = "Is this one of those sculptures where the eyes follow you around the room?",
 
         CHESSJUNK1 = "I don't think they're going to get up anytime soon.",
         CHESSJUNK2 = "I don't think they're going to get up anytime soon.",
@@ -2591,7 +2686,7 @@ return{
 		PIGELITEFIGHTER3 = "He's not afraid to get his hands... or anything else dirty.", --WHITE
 		PIGELITEFIGHTER4 = "He's probably really nice once you get to know him.", --GREEN
 
-		CARRAT_GHOSTRACER = "Where can I get a shadow Carrat?",
+		CARRAT_GHOSTRACER = "Where can I get a shadow carrat?",
 
         YOTC_CARRAT_RACE_START = "Let's start this race!",
         YOTC_CARRAT_RACE_CHECKPOINT = "A good race needs some planning.",
@@ -2633,7 +2728,7 @@ return{
         },
         YOTC_CARRAT_GYM_REACTION =
         {
-            GENERIC = "By the time we're done, my Carrat will be ready for anything!",
+            GENERIC = "By the time we're done, my carrat will be ready for anything!",
             RAT = "These reflexes could save your life in the wilderness!",
             BURNT = "I... reacted too slow... to put the fire out...",
         },
@@ -2644,7 +2739,7 @@ return{
             BURNT = "Oh no!!",
         },
 
-        YOTC_CARRAT_GYM_DIRECTION_ITEM = "I'd better start training my Carrat.",
+        YOTC_CARRAT_GYM_DIRECTION_ITEM = "I'd better start training my carrat.",
         YOTC_CARRAT_GYM_SPEED_ITEM = "Do you think we should put it over there, Woby?",
         YOTC_CARRAT_GYM_STAMINA_ITEM = "I'm great at putting things together!",
         YOTC_CARRAT_GYM_REACTION_ITEM = "Maybe I'll put it over here... no, over there!",
@@ -2652,7 +2747,7 @@ return{
         YOTC_CARRAT_SCALE_ITEM = "I never knew skills could be measured by weight.",
         YOTC_CARRAT_SCALE =
         {
-            GENERIC = "Do I get a badge for having the best Carrat?",
+            GENERIC = "Do I get a badge for having the best carrat?",
             CARRAT = "He just needs some more training. We'll get there!",
             CARRAT_GOOD = "Woah, all our training paid off!",
             BURNT = "Why won't everyone just use the fire pit?!",
@@ -2723,6 +2818,8 @@ return{
 			BURNT = "Poor little guys...",
 		},
 		WARG = "Are they a friend of yours, Woby?",
+        WARGLET = "Look Woby, another dog for you to play with!",
+        
 		WASPHIVE = "E-everyone stay calm... we'll be on our way...",
 		WATERBALLOON = "Don't worry, I have great aim! Or maybe you should be worried...",
 		WATERMELON = "A sweet, refreshing snack!",
@@ -3391,7 +3488,7 @@ return{
 		OCEANFISH_SMALL_4 = "You know, sometimes catching smaller fish is the real challenge.",
 		OCEANFISH_SMALL_5 = "Careful the fins don't get stuck in your teeth.",
 		OCEANFISH_SMALL_6 = "It smells like dead leaves.",
-		OCEANFISH_SMALL_7 = "Hey little buddy! Get it, because it's got a bud on it's head?",
+		OCEANFISH_SMALL_7 = "Hey little buddy! Get it, because it's got a bud on its head?",
 		OCEANFISH_SMALL_8 = "Keep it away from anything flammable!",
         OCEANFISH_SMALL_9 = "Hey! It's rude to spit at people!",
 
@@ -4054,6 +4151,47 @@ return{
 
         BEEF_BELL = "The beefalo seem to really like the sound it makes!",
 
+		-- YOT Catcoon
+		KITCOONDEN = 
+		{
+			GENERIC = "Aww, it's like a dog house for cats!",
+            BURNT = "I'm glad I taught those little guys how to stop, drop and roll!",
+			PLAYING_HIDEANDSEEK = "Don't give me any hints, Woby!",
+			PLAYING_HIDEANDSEEK_TIME_ALMOST_UP = "I need to hurry up and find them all!",
+		},
+
+		KITCOONDEN_KIT = "I built a bird house once, a cat house should be easy!",
+
+		TICOON = 
+		{
+			GENERIC = "Is that a real man-eating tiger? I thought they'd be bigger.",
+			ABANDONED = "I hope he's not too upset at me...",
+			SUCCESS = "Look, he found one!",
+			LOST_TRACK = "Maybe he doesn't know where he's going after all.",
+			NEARBY = "I think he smells something nearby!",
+			TRACKING = "Come on Woby, let's follow him!",
+			TRACKING_NOT_MINE = "Whoops, sorry! All man-eating tigers look so alike...",
+			NOTHING_TO_TRACK = "It doesn't look like he's picking up any scents.",
+			TARGET_TOO_FAR_AWAY = "Maybe we should try looking somewhere else.",
+		},
+		
+		YOT_CATCOONSHRINE =
+        {
+            GENERIC = "Come on Woby, let's make something!",
+            EMPTY = "I know a lot about dogs, but what do cats like?",
+            BURNT = "This is exactly why learning fire safety is so important!",
+        },
+
+		KITCOON_FOREST = "Aww, they're so cute even Woby likes them!",
+		KITCOON_SAVANNA = "Aww, they're so cute even Woby likes them!",
+		KITCOON_MARSH = "I wonder if there's a badge for kitten wrangling...",
+		KITCOON_DECIDUOUS = "I wonder if there's a badge for kitten wrangling...",
+		KITCOON_GRASS = "Hey little guy!",
+		KITCOON_ROCKY = "Hey little guy!",
+		KITCOON_DESERT = "Hmm, do you think they'd eat granola?",
+		KITCOON_MOON = "Hmm, do you think they'd eat granola?",
+		KITCOON_YOT = "Hmm, do you think they'd eat granola?",
+
         -- Moon Storm
         ALTERGUARDIAN_PHASE1 = {
             GENERIC = "Woah, is that a space creature?!",
@@ -4173,6 +4311,102 @@ return{
         FIGKABAB = "Aw, did it have to be figs?",
         KOALEFIG_TRUNK = "How many figs are in there?!",
         FROGNEWTON = "Hey, that's pretty good! What's in it?",
+
+        -- The Terrorarium
+        TERRARIUM = {
+            GENERIC = "Woah! That's not normal!",
+            CRIMSON = "Oh no, I think that shadow stuff made the tree sick...",
+            ENABLED = "WOAH! That's REALLY not normal!",
+			WAITING_FOR_DARK = "Spooky!",
+			COOLDOWN = "I guess it can't stay lit up all the time.",
+			SPAWN_DISABLED = "Aww, can't we turn it on for a little bit?",
+        },
+
+        -- Wolfgang
+        MIGHTY_GYM = 
+        {
+            GENERIC = "Wow! I wonder if I could be as strong as Mr. Wolfgang one day...",
+            BURNT = "Aww, I never even got to try it...",
+        },
+
+        DUMBBELL = "I can do it! I just... need to get a good grip on it!",
+        DUMBBELL_GOLDEN = "Uh, m-maybe I should start with something a bit lighter.",
+		DUMBBELL_MARBLE = "Oh... when he said it was made of marble, I kind of hoped he meant the tiny ones.",
+        DUMBBELL_GEM = "Time to hit the gem! Get it? Because gem sounds like gym?",
+        POTATOSACK = "Do you think I'd get muscles if I ate more potatoes, Woby?",
+
+
+        TERRARIUMCHEST = 
+		{
+			GENERIC = "I wonder how it got here?",
+			BURNT = "Aww, and it was such a neat looking chest too...",
+			SHIMMER = "What do you say, Woby? Should we take a look inside?",
+		},
+
+		EYEMASKHAT = "Don't worry Woby. It's just a hat, see?",
+
+        EYEOFTERROR = "Wow! Do you think it escaped from a giant head?",
+        EYEOFTERROR_MINI = "Would you say they're... multipl-eying? Heh. Good one, Walter.",
+        EYEOFTERROR_MINI_GROUNDED = "Ohh, so that's how baby eyeballs are made.",
+
+        FROZENBANANADAIQUIRI = "Don't drink it too fast or you'll get a headache.",
+        BUNNYSTEW = "There's no Pioneer that could say no to this!",
+        MILKYWHITES = "Woby, can you find me a stick? I want to poke it.",
+
+        CRITTER_EYEOFTERROR = "What is it, boy? Do you see something?",
+
+        SHIELDOFTERROR ="I like to think it's smiling.",
+        TWINOFTERROR1 = "Somewhere, some poor giant robot is walking around completely blind...",
+        TWINOFTERROR2 = "Somewhere, some poor giant robot is walking around completely blind...",
+
+        -- Year of the Catcoon
+        CATTOY_MOUSE = "Sorry Woby, that's for the kits to play with.",
+        KITCOON_NAMETAG = "It looks almost like yours, Woby!",
+
+		KITCOONDECOR1 =
+        {
+            GENERIC = "I wonder if the kits think it's a real bird?",
+            BURNT = "I guess it was too convincing, someone tried to cook it!",
+        },
+		KITCOONDECOR2 =
+        {
+            GENERIC = "It's fishing for kits!",
+            BURNT = "That wasn't kindling!",
+        },
+
+		KITCOONDECOR1_KIT = "Don't worry kitties, I'll put this together lickety-split!",
+		KITCOONDECOR2_KIT = "Don't worry kitties, I'll put this together lickety-split!",
+
+        -- WX78
+        WX78MODULE_MAXHEALTH = "Robot guts! Neat!",
+        WX78MODULE_MAXSANITY1 = "Robot guts! Neat!",
+        WX78MODULE_MAXSANITY = "Robot guts! Neat!",
+        WX78MODULE_MOVESPEED = "Robot guts! Neat!",
+        WX78MODULE_MOVESPEED2 = "Robot guts! Neat!",
+        WX78MODULE_HEAT = "Robot guts! Neat!",
+        WX78MODULE_NIGHTVISION = "Robot guts! Neat!",
+        WX78MODULE_COLD = "Robot guts! Neat!",
+        WX78MODULE_TASER = "Robot guts! Neat!",
+        WX78MODULE_LIGHT = "Robot guts! Neat!",
+        WX78MODULE_MAXHUNGER1 = "Robot guts! Neat!",
+        WX78MODULE_MAXHUNGER = "Robot guts! Neat!",
+        WX78MODULE_MUSIC = "Robot guts! Neat!",
+        WX78MODULE_BEE = "Robot guts! Neat!",
+        WX78MODULE_MAXHEALTH2 = "Robot guts! Neat!",
+
+        WX78_SCANNER = 
+        {
+            GENERIC ="Aww, who's a good little robot?",
+            HUNTING = "Aww, who's a good little robot?",
+            SCANNING = "Aww, who's a good little robot?",
+        },
+
+        WX78_SCANNER_ITEM = "I guess it's taking a nap.",
+        WX78_SCANNER_SUCCEEDED = "What is it boy? Do you have something to show WX?",
+
+        WX78_MODULEREMOVER = "Should I start carrying something like this in my first aid kit?",
+
+        SCANDATA = "Neat! Wanna scan me next?",
     },
 
     DESCRIBE_GENERIC = "That sure is a mystery!",

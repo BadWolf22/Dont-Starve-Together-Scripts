@@ -843,6 +843,7 @@ local function MakeHat(name)
         end
 
         inst.components.equippable.dapperness = TUNING.DAPPERNESS_TINY
+        inst.components.equippable.flipdapperonmerms = true
         inst.components.equippable:SetOnEquip(opentop_onequip)
 
         inst:AddComponent("perishable")
@@ -873,6 +874,7 @@ local function MakeHat(name)
         end
 
         inst.components.equippable.dapperness = -TUNING.DAPPERNESS_TINY
+        inst.components.equippable.flipdapperonmerms = true
         inst.components.equippable:SetOnEquip(opentop_onequip)
 
         inst:AddComponent("perishable")
@@ -1198,7 +1200,7 @@ local function MakeHat(name)
         inst.components.heater:SetThermics(false, true)
         inst.components.heater.equippedheat = TUNING.ICEHAT_COOLER
 
-        inst.components.equippable.walkspeedmult = 0.9
+        inst.components.equippable.walkspeedmult = TUNING.ICEHAT_SPEED_MULT
         inst.components.equippable.equippedmoisture = 1
         inst.components.equippable.maxequippedmoisture = 49 -- Meter reading rounds up, so set 1 below
 
@@ -1637,6 +1639,10 @@ local function MakeHat(name)
         inst:AddComponent("waterproofer")
         inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)
 
+        inst:AddComponent("insulator")
+        inst.components.insulator:SetSummer()
+        inst.components.insulator:SetInsulation(TUNING.INSULATION_MED)
+
         return inst
     end
 
@@ -1666,7 +1672,6 @@ local function MakeHat(name)
 
         return inst
     end
-
 
     local function moonstorm_equip(inst, owner)
         _onequip(inst, owner)
@@ -1703,6 +1708,61 @@ local function MakeHat(name)
 
         inst.components.equippable:SetOnEquip(moonstorm_equip)
         inst.components.equippable:SetOnUnequip(moonstorm_unequip)
+
+        inst:AddComponent("waterproofer")
+        inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)
+
+        return inst
+    end
+
+    local function eyemask_custom_init(inst)
+        -- To play an eat sound when it's on the ground and fed.
+        inst.entity:AddSoundEmitter()
+
+        --waterproofer (from waterproofer component) added to pristine state for optimization
+        inst:AddTag("waterproofer")
+
+		inst:AddTag("handfed")
+		inst:AddTag("fedbyall")
+
+		-- for eater
+		inst:AddTag("eatsrawmeat")
+		inst:AddTag("strongstomach")
+    end
+
+	local function eyemask_oneatfn(inst, food)
+		local health = math.abs(food.components.edible:GetHealth(inst)) * inst.components.eater.healthabsorption
+		local hunger = math.abs(food.components.edible:GetHunger(inst)) * inst.components.eater.hungerabsorption
+		inst.components.armor:Repair(health + hunger)
+
+		if not inst.inlimbo then
+			inst.AnimState:PlayAnimation("eat")
+			inst.AnimState:PushAnimation("anim", true)
+
+			inst.SoundEmitter:PlaySound("terraria1/eyemask/eat")
+		end
+	end
+
+    local function eyemask()
+        local inst = simple(eyemask_custom_init)
+
+        inst.components.floater:SetSize("med")
+        inst.components.floater:SetScale(0.72)
+
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+		inst:AddComponent("eater")
+        --inst.components.eater:SetDiet({ FOODGROUP.OMNI }, { FOODGROUP.OMNI }) -- FOODGROUP.OMNI  is default
+		inst.components.eater:SetOnEatFn(eyemask_oneatfn)
+		inst.components.eater:SetAbsorptionModifiers(4.0, 1.75, 0)
+		inst.components.eater:SetCanEatRawMeat(true)
+		inst.components.eater:SetStrongStomach(true)
+		inst.components.eater:SetCanEatHorrible(true)
+
+        inst:AddComponent("armor")
+        inst.components.armor:InitCondition(TUNING.ARMOR_FOOTBALLHAT, TUNING.ARMOR_FOOTBALLHAT_ABSORPTION)
 
         inst:AddComponent("waterproofer")
         inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)
@@ -1821,7 +1881,7 @@ local function MakeHat(name)
         inst.components.equippable:SetOnUnequip(merm_unequip)
 
         inst:AddComponent("perishable")
-        inst.components.perishable:SetPerishTime(TUNING.PERISH_FAST)
+        inst.components.perishable:SetPerishTime(TUNING.PERISH_SLOW)
         inst.components.perishable:StartPerishing()
         inst.components.perishable:SetOnPerishFn(inst.Remove)
 
@@ -1836,9 +1896,7 @@ local function MakeHat(name)
         inst.components.perishable:StartPerishing()
 
         owner:PushEvent("learncookbookstats", inst.prefab)
-        if owner.components.debuffable ~= nil then
-            owner.components.debuffable:AddDebuff("hungerregenbuff", "hungerregenbuff")
-        end
+        owner:AddDebuff("hungerregenbuff", "hungerregenbuff")
     end
 
     local function batnose_unequip(inst, owner)
@@ -1846,9 +1904,7 @@ local function MakeHat(name)
 
         inst.components.perishable:StopPerishing()
 
-        if owner.components.debuffable ~= nil then
-            owner.components.debuffable:RemoveDebuff("hungerregenbuff")
-        end
+        owner:RemoveDebuff("hungerregenbuff")
 
         if owner.components.foodmemory ~= nil then
             owner.components.foodmemory:RememberFood("hungerregenbuff")
@@ -1865,6 +1921,7 @@ local function MakeHat(name)
         end
 
         inst.components.equippable.dapperness = -TUNING.DAPPERNESS_TINY
+        inst.components.equippable.flipdapperonmerms = true
         inst.components.equippable:SetOnEquip(batnose_equip)
         inst.components.equippable:SetOnUnequip(batnose_unequip)
         inst.components.equippable.restrictedtag = "usesvegetarianequipment"
@@ -2043,6 +2100,12 @@ local function MakeHat(name)
 			inst._back = SpawnPrefab("alterguardian_hat_equipped")
 			inst._back:OnActivated(owner, false)
 		end
+
+        local skin_build = inst:GetSkinBuild()
+        if skin_build then
+            inst._front:SetSkin(skin_build, inst.GUID)
+            inst._back:SetSkin(skin_build, inst.GUID)
+        end
 
         if inst._light == nil then
             inst._light = SpawnPrefab("alterguardianhatlight")
@@ -2309,6 +2372,8 @@ local function MakeHat(name)
         }
         table.insert(assets, Asset("ANIM", "anim/ui_alterguardianhat_1x6.zip"))
         fn = alterguardian
+	elseif name == "eyemask" then
+        fn = eyemask
     end
 
     return Prefab(prefabname, fn or default, assets, prefabs)
@@ -2405,5 +2470,6 @@ return  MakeHat("straw"),
         MakeHat("plantregistry"),
         MakeHat("balloon"),
         MakeHat("alterguardian"),
+        MakeHat("eyemask"),
         Prefab("minerhatlight", minerhatlightfn),
         Prefab("alterguardianhatlight", alterguardianhatlightfn)

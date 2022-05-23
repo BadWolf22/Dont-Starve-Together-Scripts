@@ -406,8 +406,14 @@ end
 --called from ServerCreationScreen
 function WorldSettingsTab:RefreshOptionItems()
     for i, v in ipairs(self.worldsettings_widgets) do
+        v:ReloadPreset()
         v:RefreshOptionItems()
     end
+end
+
+--called from ServerCreationScreen
+function WorldSettingsTab:UpdateSaveSlot(slot)
+    self.slot = slot
 end
 
 --called from ServerCreationScreen

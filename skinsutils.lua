@@ -222,7 +222,12 @@ function GetFeaturedPacks()
 	return iaps
 end
 
+local memoized_sub_packs = {}
 function _GetSubPacks(item_key)
+	if memoized_sub_packs[item_key] then
+		return memoized_sub_packs[item_key]
+	end
+
     local sub_packs = {}
 	local output_items = GetPurchasePackOutputItems(item_key)
 	local pack_count = #output_items
@@ -246,8 +251,6 @@ function _GetSubPacks(item_key)
 		end
 	end
 
-
-
 	for _,item in pairs(output_items) do
 		if item_to_packinfo[item].pack ~= item_key then
 			sub_packs[item_to_packinfo[item].pack] = true
@@ -270,6 +273,8 @@ function _GetSubPacks(item_key)
 			end
 		end
 	end
+	
+	memoized_sub_packs[item_key] = sub_packs
 
 	return sub_packs
 end
@@ -302,9 +307,14 @@ function GetPackTotalSets(item_key)
     return count
 end
 
-function IsPackABundle(item_key)
-    local sub_packs = _GetSubPacks(item_key)
+local memoized_is_a_bundle = {}
+function IsPackABundle(item_key)	
+	if memoized_is_a_bundle[item_key] then
+		local value = memoized_is_a_bundle[item_key]
+		return (value > 0), value
+	end
 
+    local sub_packs = _GetSubPacks(item_key)
     local value = 0
 
 	local iap_defs = TheItems:GetIAPDefs()
@@ -321,6 +331,8 @@ function IsPackABundle(item_key)
 			end
 		end
 	end
+	
+	memoized_is_a_bundle[item_key] = value
     return (value > 0), value
 end
 
@@ -650,7 +662,7 @@ function GetSkinUsableOnString(item_type, popup_txt)
 			if granted_skin_data ~= nil and granted_skin_data.base_prefab ~= nil then
 				item2_str = STRINGS.NAMES[string.upper(granted_skin_data.base_prefab)]
 			end
-			local granted_skin_data = GetSkinData(skin_data.granted_items[2])
+			granted_skin_data = GetSkinData(skin_data.granted_items[2])
 			if granted_skin_data ~= nil and granted_skin_data.base_prefab ~= nil then
 				item3_str = STRINGS.NAMES[string.upper(granted_skin_data.base_prefab)]
 			end
@@ -1496,6 +1508,52 @@ function BuildListOfSelectedItems(user_profile, item_type)
     return image_keys
 end
 
+function GetNextOwnedSkin(prefab, cur_skin)
+	local new_skin = nil
+	local skin_list = PREFAB_SKINS[prefab]
+	if skin_list ~= nil then
+		local found = 0
+		if cur_skin ~= nil then
+			for i = 1, #skin_list do
+				if skin_list[i] == cur_skin then
+					found = i
+					break
+				end
+			end
+		end
+		for i = found + 1, #skin_list do
+			if TheInventory:CheckOwnership(skin_list[i]) then
+				new_skin = skin_list[i]
+				break
+			end
+		end
+	end
+	return new_skin
+end
+
+function GetPrevOwnedSkin(prefab, cur_skin)
+	local new_skin = nil
+	local skin_list = PREFAB_SKINS[prefab]
+	if skin_list ~= nil then
+		local found = #skin_list + 1
+		if cur_skin ~= nil then
+			for i = #skin_list, 1, -1 do
+				if skin_list[i] == cur_skin then
+					found = i
+					break
+				end
+			end
+		end
+		for i = found - 1, 1, -1 do
+			if TheInventory:CheckOwnership(skin_list[i]) then
+				new_skin = skin_list[i]
+				break
+			end
+		end
+	end
+	return new_skin
+end
+
 function GetMostRecentlySelectedItem(user_profile, item_type)
     return user_profile:GetCustomizationItemState(item_type, "last_item_key")
 end
@@ -1800,4 +1858,53 @@ function GetSkinModeFromBuild(player)
 	end
 
 	return nil
+end
+
+
+function GetBoxPopupLayoutDetails( num_item_types )
+	local columns = 3
+	local resize_root = nil
+	local resize_root_small = nil
+	local resize_root_small_higher = nil
+
+	-- Decide how many columns there should be
+	if num_item_types == 1 then
+		columns = 1
+	elseif num_item_types == 2 or num_item_types == 4 then
+		columns = 2
+	elseif num_item_types == 3 or num_item_types == 6 then
+		columns = 3
+	elseif num_item_types == 7 or num_item_types == 8 then
+		columns = 4
+	elseif num_item_types == 5 or num_item_types == 10 or num_item_types == 9 then
+		columns = 5
+	elseif num_item_types == 13 then
+		columns = 5
+		resize_root = true
+	elseif num_item_types == 12 or num_item_types == 11 then
+		columns = 6
+	elseif num_item_types == 16 or num_item_types == 17 or num_item_types == 18 then
+		columns = 6
+		resize_root = true
+	elseif num_item_types == 19 then
+		columns = 7
+		resize_root = true
+	elseif num_item_types == 22 or num_item_types == 24 then
+		columns = 8
+		resize_root_small = true
+	elseif num_item_types == 31 or num_item_types == 35 then
+		columns = 9
+		resize_root_small = true
+	elseif num_item_types == 38 then
+		columns = 10
+		resize_root_small = true
+	elseif num_item_types == 41 then
+		columns = 10
+		resize_root_small_higher = true
+	else
+		columns = 10
+		resize_root_small_higher = true
+		print("Warning: Found an unexpected number of items in a box.", num_item_types)
+	end
+	return columns, resize_root, resize_root_small, resize_root_small_higher
 end

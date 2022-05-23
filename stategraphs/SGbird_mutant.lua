@@ -4,7 +4,7 @@ local actionhandlers =
 {
     ActionHandler(ACTIONS.TOSS,
         function(inst, action)
-            if not inst.sg:HasStateTag('busy') then
+            if not inst.sg:HasStateTag("busy") then
                 inst.sg:GoToState("shoot", action.target)
             end
         end),
@@ -13,6 +13,9 @@ local actionhandlers =
 local events =
 {
     CommonHandlers.OnLocomote(false, true),
+
+    CommonHandlers.OnSleep(),
+    CommonHandlers.OnFreeze(),
 
     EventHandler("death", function(inst)
 		inst.sg:GoToState("death", "death")
@@ -32,18 +35,9 @@ local events =
     end),
 
     EventHandler("locomote", function(inst)
-        local is_moving = inst.sg:HasStateTag("moving")
-        local is_running = inst.sg:HasStateTag("running")
-        local is_idling = inst.sg:HasStateTag("idle")
-
-        local should_move = inst.components.locomotor:WantsToMoveForward()
-        local should_run = inst.components.locomotor:WantsToRun()
-
-        --if is_moving and not should_move then
         if not inst.sg:HasStateTag("busy") and not inst.sg:HasStateTag("moving") then
             inst.sg:GoToState("walk")
         end
-        --end
     end),
 
 }
@@ -63,11 +57,6 @@ local states=
         ontimeout = function(inst)
             inst.sg:GoToState("idle_taunt")
         end,
-
-        events =
-        {
-           -- EventHandler("animover", function(inst) inst.sg:GoToState("idle") end),
-        },
     },
 
     State{
@@ -95,11 +84,6 @@ local states=
             inst.AnimState:PlayAnimation("land")
         end,
 
-        timeline=
-        {
-            --TimeEvent(5*FRAMES, function(inst) inst.SoundEmitter:PlaySound("dontstarve/rabbit/hop") end ),
-        },
-
         events =
         {
             EventHandler("animover", function(inst) inst.sg:GoToState("idle") end),
@@ -115,14 +99,6 @@ local states=
             RemovePhysicsColliders(inst)
             inst.AnimState:PlayAnimation("death")
             inst.persists = false
-        end,
-
-        events =
-        {
-      --      EventHandler("animover", function(inst) inst:Remove() end),
-        },
-
-        onexit = function(inst)
         end,
     },
 
@@ -145,9 +121,7 @@ local states=
         {
             TimeEvent(8*FRAMES, function(inst)
 					inst.components.combat:DoAttack()
-                    inst.sg:RemoveStateTag("attack")
-                    inst.sg:RemoveStateTag("busy")
-                    inst.components.combat.target = nil
+                    inst.components.combat:DropTarget()
 				end ),
         },
 
@@ -359,5 +333,8 @@ local states=
         end,
     },
 }
+
+CommonStates.AddSleepStates(states)
+CommonStates.AddFrozenStates(states)
 
 return StateGraph("bird_mutant", states, events, "idle", actionhandlers)

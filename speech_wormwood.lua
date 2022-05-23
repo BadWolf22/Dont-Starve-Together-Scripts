@@ -14,6 +14,7 @@ return{
         {
             MOUNTED = "Not up here",
             HASPET = "Already have Care Friend",
+			TICOON = "Already have friend",
         },
 		SHAVE =
 		{
@@ -58,7 +59,16 @@ return{
 			LOCKED_GATE = "Nope. Locked",
             HOSTBUSY = "Big Tweeter busy",
             CARNIVAL_HOST_HERE = "Hello? Big Tweeter here?",
-            NOCARNIVAL = "Tweeters? Aww..."
+            NOCARNIVAL = "Tweeters? Aww...",
+			EMPTY_CATCOONDEN = "No friend inside",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDERS = "Not many friends to hide",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "Not many hideys for friends",
+			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "Already had fun",
+		},
+		OPEN_CRAFTING = 
+		{
+            PROFESSIONALCHEF = "Not mine",
+			SHADOWMAGIC = "Nope",
 		},
         COOK =
         {
@@ -89,7 +99,7 @@ return{
 --fallback to speech_wilson.lua         READ =
 --fallback to speech_wilson.lua         {
 --fallback to speech_wilson.lua             GENERIC = "only_used_by_wickerbottom",
---fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom"
+--fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom",
 --fallback to speech_wilson.lua         },
 
         GIVE =
@@ -121,6 +131,8 @@ return{
 			CARNIVALGAME_INVALID_ITEM = "Not right",
 			CARNIVALGAME_ALREADY_PLAYING = "Not yet",
             SPIDERNOHAT = "No room",
+            TERRARIUM_REFUSE = "Want something else?",
+            TERRARIUM_COOLDOWN = "Friend is away... will come back later?",
         },
         GIVETOPLAYER =
         {
@@ -161,6 +173,7 @@ return{
         {
             TARGETINCOMBAT = "Too much fighting!",
             INUSE = "Someone else's",
+			SLEEPING = "Upsie daisies!",
         },
         SADDLE =
         {
@@ -324,7 +337,44 @@ return{
         {
 --fallback to speech_wilson.lua             ONCOOLDOWN = "only_used_by_wanda",
         },
+
+        ENTER_GYM =
+        {
+--fallback to speech_wilson.lua             NOWEIGHT = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             UNBALANCED = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             ONFIRE = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             SMOULDER = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             HUNGRY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             FULL = "only_used_by_wolfang",
+        },
+
+        APPLYMODULE =
+        {
+            COOLDOWN = "only_used_by_wx78",
+            NOTENOUGHSLOTS = "only_used_by_wx78",
+        },
+        REMOVEMODULES =
+        {
+            NO_MODULES = "only_used_by_wx78",
+        },
+        CHARGE_FROM =
+        {
+            NOT_ENOUGH_CHARGE = "only_used_by_wx78",
+            CHARGE_FULL = "only_used_by_wx78",
+        },
+
+        HARVEST =
+        {
+            DOER_ISNT_MODULE_OWNER = "Shy?",
+        },
     },
+
+	ANNOUNCE_CANNOT_BUILD =
+	{
+		NO_INGREDIENTS = "Hmm. Need things",
+		NO_TECH = "Don't know how",
+		NO_STATION = "Can't",
+	},
 
 	ACTIONFAIL_GENERIC = "Nope",
 	ANNOUNCE_BOAT_LEAK = "Water! Water coming!",
@@ -343,6 +393,11 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_NORMALTOWIMPY = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_WIMPYTONORMAL = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_MIGHTYTONORMAL = "only_used_by_wolfang",
+    ANNOUNCE_EXITGYM = {
+--fallback to speech_wilson.lua         MIGHTY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         NORMAL = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         WIMPY = "only_used_by_wolfang",
+    },
 
 	ANNOUNCE_BEES = "Buzz! Buzz!",
 	ANNOUNCE_BOOMERANG = "Whoops. Missed it",
@@ -440,11 +495,11 @@ return{
 	ANNOUNCE_NODAYSLEEP_CAVE = "Can't",
 	ANNOUNCE_NOHUNGERSLEEP = "Too hungry",
 	ANNOUNCE_NOSLEEPONFIRE = "Burning!",
+    ANNOUNCE_NOSLEEPHASPERMANENTLIGHT = "Bright, robot friend! Bright!!",
 	ANNOUNCE_NODANGERSIESTA = "Too dangerous",
 	ANNOUNCE_NONIGHTSIESTA = "Can't. It's nighttime",
 	ANNOUNCE_NONIGHTSIESTA_CAVE = "Not in caves",
 	ANNOUNCE_NOHUNGERSIESTA = "Too hungry",
-	ANNOUNCE_NODANGERAFK = "Too scary!",
 	ANNOUNCE_NO_TRAP = "Lucky!",
 	ANNOUNCE_PECKED = "Ouch!",
 	ANNOUNCE_QUAKE = "Rumbles!",
@@ -583,6 +638,10 @@ return{
 --fallback to speech_wilson.lua 	{
 --fallback to speech_wilson.lua         "only_used_by_walter",
 --fallback to speech_wilson.lua 	},
+
+    -- wx specific
+    ANNOUNCE_WX_SCANNER_NEW_FOUND = "only_used_by_wx78",
+--fallback to speech_wilson.lua     ANNOUNCE_WX_SCANNER_FOUND_NO_DATA = "only_used_by_wx78",
 
     --quagmire event
     QUAGMIRE_ANNOUNCE_NOTRECIPE = "Oops. Not good belly stuff",
@@ -724,10 +783,42 @@ return{
         "Nice to talk to other plants",
 	},
 
+	ANNOUNCE_KITCOON_HIDEANDSEEK_START = "Friends hiding now",
+	ANNOUNCE_KITCOON_HIDEANDSEEK_JOIN = "Looking for friends too",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND = 
+	{
+		"Found you",
+		"Peek-a-boo",
+		"Hello there",
+		"Hi hi",
+	},
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_ONE_MORE = "Just one friend left",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE = "Last friend found",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE_TEAM = "Someone found last friend",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TIME_ALMOST_UP = "Find friends fast",
+	ANNOUNCE_KITCOON_HIDANDSEEK_LOSEGAME = "Friends hide too good",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR = "Friends not hiding here",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR_RETURN = "Going back to friends",
+	ANNOUNCE_KITCOON_FOUND_IN_THE_WILD = "Friend not in hidey?",
+
+	ANNOUNCE_TICOON_START_TRACKING	= "Looking for friends?",
+	ANNOUNCE_TICOON_NOTHING_TO_TRACK = "No friend to find",
+	ANNOUNCE_TICOON_WAITING_FOR_LEADER = "He's waiting",
+	ANNOUNCE_TICOON_GET_LEADER_ATTENTION = "Should follow",
+	ANNOUNCE_TICOON_NEAR_KITCOON = "Friend nearby",
+	ANNOUNCE_TICOON_LOST_KITCOON = "Friend already found",
+	ANNOUNCE_TICOON_ABANDONED = "Friend left me",
+	ANNOUNCE_TICOON_DEAD = "Friend left?",
+
     -- YOTB
     ANNOUNCE_CALL_BEEF = "Here Shaggy Buddy!",
     ANNOUNCE_CANTBUILDHERE_YOTB_POST = "Too far for contest",
     ANNOUNCE_YOTB_LEARN_NEW_PATTERN =  "Ooooh! Make new thing",
+
+    -- AE4AE
+    ANNOUNCE_EYEOFTERROR_ARRIVE = "Big peeper peeping!",
+    ANNOUNCE_EYEOFTERROR_FLYBACK = "Big peeper back!",
+    ANNOUNCE_EYEOFTERROR_FLYAWAY = "Where going?",
 
 	BATTLECRY =
 	{
@@ -1585,7 +1676,11 @@ return{
         CHESSPIECE_BEEQUEEN = "No more buzz-buzz",
         CHESSPIECE_ANTLION = "Not moving",
         CHESSPIECE_BEEFALO = "Not fluffy...",
+		CHESSPIECE_KITCOON = "Not hiding?",
+		CHESSPIECE_CATCOON = "No tail swish swoosh",
         CHESSPIECE_GUARDIANPHASE3 = "Big",
+        CHESSPIECE_EYEOFTERROR = "Not watching?",
+        CHESSPIECE_TWINSOFTERROR = "Can't see now",
 
         CHESSJUNK1 = "Machine stuff",
         CHESSJUNK2 = "Lots of machine stuff",
@@ -2727,6 +2822,8 @@ return{
 			BURNT = "Fire bad",
 		},
 		WARG = "Big Bad Woofer",
+        WARGLET = "Big Bad Woofer",
+        
 		WASPHIVE = "Bad Buzz home",
 		WATERBALLOON = "Water Booper",
 		WATERMELON = "Watery Sweet belly stuff",
@@ -4058,6 +4155,47 @@ return{
 
         BEEF_BELL = "Ding dong",
 
+		-- YOT Catcoon
+		KITCOONDEN = 
+		{
+			GENERIC = "Where friends live",
+            BURNT = "Fire very bad",
+			PLAYING_HIDEANDSEEK = "Friends out playing",
+			PLAYING_HIDEANDSEEK_TIME_ALMOST_UP = "Hidey game ending soon",
+		},
+
+		KITCOONDEN_KIT = "Makes house for friends",
+
+		TICOON = 
+		{
+			GENERIC = "Big fur friend",
+			ABANDONED = "Please come back",
+			SUCCESS = "Friend found friend",
+			LOST_TRACK = "Someone found friend first",
+			NEARBY = "Friend near us",
+			TRACKING = "Should follow friend",
+			TRACKING_NOT_MINE = "Looking for other friend",
+			NOTHING_TO_TRACK = "Nothing to find",
+			TARGET_TOO_FAR_AWAY = "Friends are very far",
+		},
+		
+		YOT_CATCOONSHRINE =
+        {
+            GENERIC = "Kitty likes box",
+            EMPTY = "Wants to play?",
+            BURNT = "Fire so evil",
+        },
+
+		KITCOON_FOREST = "Looks like friend hair",
+		KITCOON_SAVANNA = "Friend full of lines",
+		KITCOON_MARSH = "Friend is soggy",
+		KITCOON_DECIDUOUS = "Small fur friend",
+		KITCOON_GRASS = "Scared friend?",
+		KITCOON_ROCKY = "Rocky friend",
+		KITCOON_DESERT = "Hear me, friend?",
+		KITCOON_MOON = "Friend likes night ball",
+		KITCOON_YOT = "Happy friend",
+
         -- Moon Storm
         ALTERGUARDIAN_PHASE1 = {
             GENERIC = "From Night Ball?",
@@ -4177,6 +4315,102 @@ return{
         FIGKABAB = "Friend helped!",
         KOALEFIG_TRUNK = "Think is for belly...?",
         FROGNEWTON = "Squishy",
+
+        -- The Terrorarium
+        TERRARIUM = {
+            GENERIC = "Friend stuck inside?",
+            CRIMSON = "Ohhh, friend looks sick!",
+            ENABLED = "Friend free!",
+			WAITING_FOR_DARK = "Oooooh, friend is pretty!",
+			COOLDOWN = "Where friend go?",
+			SPAWN_DISABLED = "Closed up",
+        },
+
+        -- Wolfgang
+        MIGHTY_GYM = 
+        {
+            GENERIC = "Muscle man home",
+            BURNT = "Oh... poor muscle man...",
+        },
+
+        DUMBBELL = "Rocks",
+        DUMBBELL_GOLDEN = "Heavy!",
+		DUMBBELL_MARBLE = "Heaaavy rocks",
+        DUMBBELL_GEM = "Sparkly rocks",
+        POTATOSACK = "Carry friends",
+
+
+        TERRARIUMCHEST = 
+		{
+			GENERIC = "Shiny gone...",
+			BURNT = "Oh",
+			SHIMMER = "Shiny stuff",
+		},
+
+		EYEMASKHAT = "Friend is watching",
+
+        EYEOFTERROR = "Biiiig peeper!",
+        EYEOFTERROR_MINI = "Little peepers",
+        EYEOFTERROR_MINI_GROUNDED = "Peeper baby?",
+
+        FROZENBANANADAIQUIRI = "Cold friend water",
+        BUNNYSTEW = "Poor Hopper...",
+        MILKYWHITES = "Peeper goop",
+
+        CRITTER_EYEOFTERROR = "Little peeper friend!",
+
+        SHIELDOFTERROR ="Chomp chomp!",
+        TWINOFTERROR1 = "Big machine peeper!",
+        TWINOFTERROR2 = "Big machine peeper!",
+
+        -- Year of the Catcoon
+        CATTOY_MOUSE = "Squeak squeak",
+        KITCOON_NAMETAG = "For furry friends to wear",
+
+		KITCOONDECOR1 =
+        {
+            GENERIC = "Tweeter likes to dance",
+            BURNT = "No! Fire took tweeter",
+        },
+		KITCOONDECOR2 =
+        {
+            GENERIC = "Glub glub is stuck",
+            BURNT = "No! Fire took glub glub",
+        },
+
+		KITCOONDECOR1_KIT = "Makes toy for friends",
+		KITCOONDECOR2_KIT = "Makes toy for friends",
+
+        -- WX78
+        WX78MODULE_MAXHEALTH = "Beep boops",
+        WX78MODULE_MAXSANITY1 = "Beep boops",
+        WX78MODULE_MAXSANITY = "Beep boops",
+        WX78MODULE_MOVESPEED = "Beep boops",
+        WX78MODULE_MOVESPEED2 = "Beep boops",
+        WX78MODULE_HEAT = "Beep boops",
+        WX78MODULE_NIGHTVISION = "Beep boops",
+        WX78MODULE_COLD = "Beep boops",
+        WX78MODULE_TASER = "Beep boops",
+        WX78MODULE_LIGHT = "Beep boops",
+        WX78MODULE_MAXHUNGER1 = "Beep boops",
+        WX78MODULE_MAXHUNGER = "Beep boops",
+        WX78MODULE_MUSIC = "Beep boops",
+        WX78MODULE_BEE = "Beep boops",
+        WX78MODULE_MAXHEALTH2 = "Beep boops",
+
+        WX78_SCANNER = 
+        {
+            GENERIC ="Little friend of robot friend",
+            HUNTING = "Little friend of robot friend",
+            SCANNING = "Little friend of robot friend",
+        },
+
+        WX78_SCANNER_ITEM = "Little friend of robot friend",
+        WX78_SCANNER_SUCCEEDED = "Blinky blink",
+
+        WX78_MODULEREMOVER = "Robot friend fixer",
+
+        SCANDATA = "Hmm!",
     },
 
     DESCRIBE_GENERIC = "Friend?",

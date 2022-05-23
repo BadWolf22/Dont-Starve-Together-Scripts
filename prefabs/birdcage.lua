@@ -226,7 +226,7 @@ end
 local function ShouldSleep(inst)
     --Sleep during night, but not if you're very hungry.
     local bird = GetBird(inst)
-    return bird.components.sleeper and DefaultSleepTest(bird) and GetHunger(bird) >= 0.33
+    return bird and bird.components.sleeper and DefaultSleepTest(bird) and GetHunger(bird) >= 0.33
 end
 
 local function GoToSleep(inst)
@@ -240,7 +240,7 @@ end
 local function ShouldWake(inst)
     --Wake during day or if you're very hungry.
     local bird = GetBird(inst)
-    return DefaultWakeTest(bird) or GetHunger(bird) < 0.33
+    return bird and DefaultWakeTest(bird) or GetHunger(bird) < 0.33
 end
 
 local function WakeUp(inst)
@@ -307,6 +307,10 @@ local function OnWorkFinished(inst, worker)
     end
     inst.components.lootdropper:DropLoot()
     inst.components.inventory:DropEverything(true)
+
+    local fx = SpawnPrefab("collapse_small")
+    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+    fx:SetMaterial("metal")
     inst:Remove()
 end
 

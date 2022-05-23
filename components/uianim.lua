@@ -3,7 +3,12 @@ local easing = require("easing")
 
 local UIAnim = Class(function(self, inst)
     self.inst = inst
+    self.update_while_paused = true
 end)
+
+function UIAnim:UpdateWhilePaused(update_while_paused)
+    self.update_while_paused = update_while_paused
+end
 
 function UIAnim:FinishCurrentTint()
     if not self.inst or not self.inst:IsValid() then
@@ -21,6 +26,14 @@ function UIAnim:FinishCurrentTint()
         self.tint_whendone = nil
         whendone()
     end
+end
+
+function UIAnim:CancelTintTo( run_complete_fn )
+	self.tint_t = nil
+	if run_complete_fn ~= nil and self.tint_whendone then
+		self.tint_whendone()
+    end
+	self.tint_whendone = nil
 end
 
 function UIAnim:TintTo(start, dest, duration, whendone)
@@ -55,6 +68,14 @@ function UIAnim:FinishCurrentScale()
         self.scale_whendone = nil
         whendone()
     end
+end
+
+function UIAnim:CancelScaleTo( run_complete_fn )
+	self.scale_t = nil
+	if run_complete_fn ~= nil and self.scale_whendone then
+		self.scale_whendone()
+    end
+	self.scale_whendone = nil
 end
 
 function UIAnim:ScaleTo(start, dest, duration, whendone)
@@ -129,6 +150,8 @@ function UIAnim:OnWallUpdate(dt)
 		self.inst:StopWallUpdatingComponent(self)
 		return
     end
+
+    if not self.update_while_paused and TheNet:IsServerPaused() then return end
 
     local done = false
 

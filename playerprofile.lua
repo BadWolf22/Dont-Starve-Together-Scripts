@@ -20,7 +20,7 @@ local PlayerProfile = Class(function(self)
         saw_new_host_picker = false,
         install_id = os.time(),
 		play_instance = 0,
-		favorite_mods = {}
+		favorite_mods = {},
         --characterskins = {} --legacy variable, don't use it.
     }
 
@@ -31,11 +31,16 @@ local PlayerProfile = Class(function(self)
         self.persistdata.volume_sfx = 7
         self.persistdata.volume_music = 7
         self.persistdata.HUDSize = 5
+        self.persistdata.CraftingMenuSize = 5
+        self.persistdata.CraftingMenuNumPinPages = 3
+        self.persistdata.craftingmenusensitivity = 12
+        self.persistdata.inventorysensitivity = 16
         self.persistdata.screenflash = 1
         self.persistdata.vibration = true
         self.persistdata.showpassword = false
         self.persistdata.movementprediction = true
         self.persistdata.wathgrithrfont = true
+		self.persistdata.InvertCameraRotation = false
         self.persistdata.screenshake = true
         self.persistdata.warneddifficultyrog = false
         self.persistdata.controller_popup = false
@@ -45,6 +50,13 @@ local PlayerProfile = Class(function(self)
 		self.persistdata.bloom = true
 		self.persistdata.distortion = true
 		self.persistdata.dynamic_tree_shadows = true
+		self.persistdata.autopause = true
+		self.persistdata.consoleautopause = true
+		self.persistdata.loadingtips = 1
+		self.persistdata.hide_pause_underlay = false
+        self.persistdata.profanityfilter_chat = true
+		self.persistdata.usezipfilefornormalsaves = false
+		self.persistdata.defaultcloudsaves = false
     end
 
     self.dirty = true
@@ -67,11 +79,16 @@ function PlayerProfile:Reset()
         self.persistdata.volume_sfx = 7
         self.persistdata.volume_music = 7
         self.persistdata.HUDSize = 5
+        self.persistdata.CraftingMenuSize = 5
+        self.persistdata.CraftingMenuNumPinPages = 3
+        self.persistdata.craftingmenusensitivity = 12
+        self.persistdata.inventorysensitivity = 16
         self.persistdata.screenflash = 1
         self.persistdata.vibration = true
         self.persistdata.showpassword = false
         self.persistdata.movementprediction = true
         self.persistdata.wathgrithrfont = true
+		self.persistdata.InvertCameraRotation = false
         self.persistdata.screenshake = true
         self.persistdata.warneddifficultyrog = false
         self.persistdata.controller_popup = false
@@ -81,6 +98,12 @@ function PlayerProfile:Reset()
 		self.persistdata.bloom = true
 		self.persistdata.distortion = true
 		self.persistdata.dynamic_tree_shadows = true
+		self.persistdata.autopause = true
+		self.persistdata.consoleautopause = true
+		self.persistdata.loadingtips = 1
+		self.persistdata.hide_pause_underlay = false
+		self.persistdata.usezipfilefornormalsaves = false
+		self.persistdata.defaultcloudsaves = true
     end
 
     --self.persistdata.starts = 0 -- save starts?
@@ -105,11 +128,16 @@ function PlayerProfile:SoftReset()
         self.persistdata.volume_sfx = 7
         self.persistdata.volume_music = 7
         self.persistdata.HUDSize = 5
+        self.persistdata.CraftingMenuSize = 5
+        self.persistdata.CraftingMenuNumPinPages = 3
+        self.persistdata.craftingmenusensitivity = 12
+        self.persistdata.inventorysensitivity = 16
         self.persistdata.screenflash = 1
         self.persistdata.vibration = true
         self.persistdata.showpassword = false
         self.persistdata.movementprediction = true
         self.persistdata.wathgrithrfont = true
+		self.persistdata.InvertCameraRotation = false
         self.persistdata.screenshake = true
         self.persistdata.warneddifficultyrog = false
         self.persistdata.controller_popup = false
@@ -517,6 +545,74 @@ function PlayerProfile:GetHUDSize()
 	end
 end
 
+function PlayerProfile:SetCraftingMenuSize(size)
+ 	if USE_SETTINGS_FILE then
+		TheSim:SetSetting("graphics", "CraftingMenuSize", tostring(size))
+	else
+		self:SetValue("CraftingMenuSize", size)
+		self.dirty = true
+	end
+end
+
+function PlayerProfile:GetCraftingMenuSize()
+ 	if USE_SETTINGS_FILE then
+		return TheSim:GetSetting("graphics", "CraftingMenuSize") or 5
+	else
+		return self:GetValue("CraftingMenuSize") or 5
+	end
+end
+
+function PlayerProfile:SetCraftingMenuNumPinPages(size)
+ 	if USE_SETTINGS_FILE then
+		TheSim:SetSetting("misc", "CraftingMenuNumPinPages", tostring(size))
+	else
+		self:SetValue("CraftingMenuNumPinPages", size)
+		self.dirty = true
+	end
+end
+
+function PlayerProfile:GetCraftingNumPinnedPages()
+ 	if USE_SETTINGS_FILE then
+		return tonumber(TheSim:GetSetting("misc", "CraftingMenuNumPinPages") or 3)
+	else
+		return tonumber(self:GetValue("CraftingMenuNumPinPages") or 3)
+	end
+end
+
+function PlayerProfile:SetCraftingMenuSensitivity(sensitivity)
+ 	if USE_SETTINGS_FILE then
+		TheSim:SetSetting("misc", "craftingmenusensitivity", tostring(sensitivity))
+	else
+		self:SetValue("craftingmenusensitivity", sensitivity)
+		self.dirty = true
+	end
+end
+
+function PlayerProfile:GetCraftingMenuSensitivity()
+ 	if USE_SETTINGS_FILE then
+		return tonumber(TheSim:GetSetting("misc", "craftingmenusensitivity") or 12)
+	else
+		return tonumber(self:GetValue("craftingmenusensitivity") or 12)
+	end
+end
+
+function PlayerProfile:SetInventorySensitivity(sensitivity)
+ 	if USE_SETTINGS_FILE then
+		TheSim:SetSetting("misc", "inventorysensitivity", tostring(sensitivity))
+	else
+		self:SetValue("inventorysensitivity", sensitivity)
+		self.dirty = true
+	end
+end
+
+function PlayerProfile:GetInventorySensitivity()
+ 	if USE_SETTINGS_FILE then
+		return tonumber(TheSim:GetSetting("misc", "inventorysensitivity") or 16)
+	else
+		return tonumber(self:GetValue("inventorysensitivity") or 16)
+	end
+end
+
 function PlayerProfile:SetDistortionEnabled(enabled)
  	if USE_SETTINGS_FILE then
 		TheSim:SetSetting("graphics", "distortion", tostring(enabled))
@@ -582,6 +678,24 @@ function PlayerProfile:IsWathgrithrFontEnabled()
 			return true -- Default to true this value hasn't been created yet
 		end
 	end
+end
+
+function PlayerProfile:SetInvertCameraRotation(enabled) -- console only
+ 	if USE_SETTINGS_FILE then
+		TheSim:SetSetting("misc", "InvertCameraRotation", tostring(enabled))
+	else
+		self:SetValue("InvertCameraRotation", enabled)
+		self.dirty = true
+	end
+end
+
+function PlayerProfile:GetInvertCameraRotation() -- console only
+	-- default to false
+    if USE_SETTINGS_FILE then
+		return TheSim:GetSetting("misc", "InvertCameraRotation") == "true"
+    else
+		return self:GetValue("InvertCameraRotation") == true
+    end
 end
 
 function PlayerProfile:SetBoatCameraEnabled(enabled)
@@ -715,6 +829,116 @@ function PlayerProfile:SetDynamicTreeShadowsEnabled(enabled)
     end
 end
 
+function PlayerProfile:SetAutopauseEnabled(enabled)
+    if USE_SETTINGS_FILE then
+        TheSim:SetSetting("misc", "autopause", tostring(enabled))
+    else
+        self:SetValue("autopause", enabled)
+        self.dirty = true
+    end
+end
+
+function PlayerProfile:SetConsoleAutopauseEnabled(enabled)
+    if USE_SETTINGS_FILE then
+        TheSim:SetSetting("misc", "consoleautopause", tostring(enabled))
+    else
+        self:SetValue("consoleautopause", enabled)
+        self.dirty = true
+    end
+end
+
+function PlayerProfile:SetCraftingAutopauseEnabled(enabled)
+    if USE_SETTINGS_FILE then
+        TheSim:SetSetting("misc", "craftingautopause", tostring(enabled))
+    else
+        self:SetValue("craftingautopause", enabled)
+        self.dirty = true
+    end
+end
+
+function PlayerProfile:GetCraftingAutopauseEnabled()
+	-- Default to false if this value hasn't been created yet
+
+    if USE_SETTINGS_FILE then
+		return TheSim:GetSetting("misc", "craftingautopause") == "true"
+    else
+		return self:GetValue("craftingautopause") == true
+    end
+end
+
+function PlayerProfile:SetCraftingMenuBufferedBuildAutoClose(enabled)
+ 	if USE_SETTINGS_FILE then
+		TheSim:SetSetting("misc", "craftingmenu_bufferedbuild_autoclose", tostring(enabled))
+	else
+		self:SetValue("craftingmenu_bufferedbuild_autoclose", enabled)
+		self.dirty = true
+	end
+end
+
+function PlayerProfile:GetCraftingMenuBufferedBuildAutoClose()
+    -- default to true
+    if USE_SETTINGS_FILE then
+        return TheSim:GetSetting("misc", "craftingmenu_bufferedbuild_autoclose") ~= "false" 
+    else
+        return self:GetValue("craftingmenu_bufferedbuild_autoclose") ~= false
+    end
+end
+
+function PlayerProfile:SetCraftingHintAllRecipesEnabled(enabled)
+    if USE_SETTINGS_FILE then
+        TheSim:SetSetting("misc", "craftinghintallrecipes", tostring(enabled))
+    else
+        self:SetValue("craftinghintallrecipes", enabled)
+        self.dirty = true
+    end
+end
+
+function PlayerProfile:GetCraftingHintAllRecipesEnabled()
+	-- Default to false if this value hasn't been created yet
+
+    if USE_SETTINGS_FILE then
+		return TheSim:GetSetting("misc", "craftinghintallrecipes") == "true"
+    else
+		return self:GetValue("craftinghintallrecipes") == true
+    end
+end
+
+function PlayerProfile:SetLoadingTipsOption(setting)
+	if USE_SETTINGS_FILE then
+        TheSim:SetSetting("misc", "loadingtips", tostring(setting))
+    else
+        self:SetValue("loadingtips", setting)
+        self.dirty = true
+    end
+end
+
+function PlayerProfile:SetDefaultCloudSaves(enabled)
+    if USE_SETTINGS_FILE then
+        TheSim:SetSetting("misc", "defaultcloudsaves", tostring(enabled))
+    else
+        self:SetValue("defaultcloudsaves", enabled)
+        self.dirty = true
+    end
+end
+
+function PlayerProfile:SetUseZipFileForNormalSaves(enabled)
+    if USE_SETTINGS_FILE then
+        TheSim:SetSetting("misc", "usezipfilefornormalsaves", tostring(enabled))
+    else
+        self:SetValue("usezipfilefornormalsaves", enabled)
+        self.dirty = true
+    end
+end
+
+function PlayerProfile:SetHidePauseUnderlay(hide)
+    if USE_SETTINGS_FILE then
+        TheSim:SetSetting("misc", "hide_pause_underlay", tostring(hide))
+    else
+        self:SetValue("hide_pause_underlay", hide)
+        self.dirty = true
+    end
+end
+
 function PlayerProfile:GetMovementPredictionEnabled()
     -- an undefined movementprediction is considered to be enabled
     if USE_SETTINGS_FILE then
@@ -739,6 +963,24 @@ function PlayerProfile:GetProfanityFilterServerNamesEnabled()
         return TheSim:GetSetting("misc", "profanityfilterservernames") ~= "false"
     else
         return self:GetValue("profanityfilterservernames") ~= false
+    end
+end
+
+function PlayerProfile:SetProfanityFilterChatEanbled(enabled)
+    if USE_SETTINGS_FILE then
+        TheSim:SetSetting("misc", "profanityfilter_chat", tostring(enabled))
+    else
+        self:SetValue("profanityfilter_chat", enabled)
+        self.dirty = true
+    end
+end
+
+function PlayerProfile:GetProfanityFilterChatEnabled()
+    -- an undefined setting is considered to be enabled
+    if USE_SETTINGS_FILE then
+        return TheSim:GetSetting("misc", "profanityfilter_chat") ~= "false"
+    else
+        return self:GetValue("profanityfilter_chat") ~= false
     end
 end
 
@@ -891,6 +1133,60 @@ function PlayerProfile:GetDynamicTreeShadowsEnabled()
 		return TheSim:GetSetting("misc", "dynamic_tree_shadows") ~= "false"
     else
 		return self:GetValue("dynamic_tree_shadows") ~= false
+    end
+end
+
+function PlayerProfile:GetAutopauseEnabled()
+    if USE_SETTINGS_FILE then
+		return TheSim:GetSetting("misc", "autopause") ~= "false"
+    else
+		return self:GetValue("autopause") ~= false
+    end
+end
+
+function PlayerProfile:GetConsoleAutopauseEnabled()
+    if USE_SETTINGS_FILE then
+		return TheSim:GetSetting("misc", "consoleautopause") ~= "false"
+    else
+		return self:GetValue("consoleautopause") ~= false
+    end
+end
+
+function PlayerProfile:GetLoadingTipsOption()
+	if TheNet:IsDedicated() then
+		return LOADING_SCREEN_TIP_OPTIONS.NONE
+	end
+
+    if USE_SETTINGS_FILE then
+		local option = TheSim:GetSetting("misc", "loadingtips") or 1
+		return tonumber(option)
+    else
+		local option = self:GetValue("loadingtips") or 1
+		return tonumber(option)
+    end
+end
+
+function PlayerProfile:GetUseZipFileForNormalSaves()
+    if USE_SETTINGS_FILE then
+		return TheSim:GetSetting("misc", "usezipfilefornormalsaves") == "true"
+    else
+		return self:GetValue("usezipfilefornormalsaves") == true
+    end
+end
+
+function PlayerProfile:GetDefaultCloudSaves()
+    if USE_SETTINGS_FILE then
+		return TheSim:GetSetting("misc", "defaultcloudsaves") == "true"
+    else
+		return self:GetValue("defaultcloudsaves") == true
+    end
+end
+
+function PlayerProfile:GetHidePauseUnderlay()
+    if USE_SETTINGS_FILE then
+		return TheSim:GetSetting("misc", "hide_pause_underlay") == "true"
+    else
+		return self:GetValue("hide_pause_underlay") == true
     end
 end
 
@@ -1165,6 +1461,10 @@ function PlayerProfile:Set(str, callback, minimal_load)
                 self.persistdata.volume_sfx = 7
                 self.persistdata.volume_music = 7
                 self.persistdata.HUDSize = 5
+                self.persistdata.CraftingMenuSize = 5
+                self.persistdata.CraftingMenuNumPinPages = 3
+				self.persistdata.craftingmenusensitivity = 12
+				self.persistdata.inventorysensitivity = 16
                 self.persistdata.vibration = true
                 self.persistdata.showpassword = false
                 self.persistdata.movementprediction = true
@@ -1460,6 +1760,143 @@ function PlayerProfile:SetCrowGameHighScore(score, score_version)
 end
 
 
+function PlayerProfile:GetKitSize()
+	if self:GetValue("kit_size") ~= nil then
+		return self:GetValue("kit_size")
+	end
+	return 0
+end
+function PlayerProfile:SetKitSize(size)
+	self:SetValue("kit_size", size)
+	self.dirty = true
+    self:Save()
+end
+
+function PlayerProfile:GetKitBuild()
+	if self:GetValue("kit_build") ~= nil then
+		return self:GetValue("kit_build")
+	end
+	return ""
+end
+function PlayerProfile:SetKitBuild(build)
+	self:SetValue("kit_build", build)
+	self.dirty = true
+    self:Save()
+end
+
+function PlayerProfile:GetKitLastTime()
+	if self:GetValue("kit_last_time") ~= nil then
+		return self:GetValue("kit_last_time")
+	end
+	return 0
+end
+function PlayerProfile:SetKitLastTime(last_time)
+	self:SetValue("kit_last_time", last_time)
+	self.dirty = true
+    self:Save()
+end
+
+function PlayerProfile:GetKitHunger()
+	if self:GetValue("kit_hunger") ~= nil then
+		return self:GetValue("kit_hunger")
+	end
+	return 0
+end
+function PlayerProfile:SetKitHunger(hunger)
+	self:SetValue("kit_hunger", hunger)
+	self.dirty = true
+    self:Save()
+end
+
+function PlayerProfile:GetKitHappiness()
+	if self:GetValue("kit_happiness") ~= nil then
+		return self:GetValue("kit_happiness")
+	end
+	return 0
+end
+function PlayerProfile:SetKitHappiness(happiness)
+	self:SetValue("kit_happiness", happiness)
+	self.dirty = true
+    self:Save()
+end
+
+function PlayerProfile:GetKitBirthTime()
+	if self:GetValue("kit_birth") ~= nil then
+		return self:GetValue("kit_birth")
+	end
+	return 0
+end
+function PlayerProfile:SetKitBirthTime(birth_time)
+	self:SetValue("kit_birth", birth_time)
+	self.dirty = true
+    self:Save()
+end
+
+function PlayerProfile:GetKitName()
+	if self:GetValue("kit_name") ~= nil then
+		return self:GetValue("kit_name")
+	end
+	return ""
+end
+function PlayerProfile:SetKitName(name)
+	self:SetValue("kit_name", name)
+	self.dirty = true
+    self:Save()
+end
+
+function PlayerProfile:GetKitPoops()
+	if self:GetValue("kit_poops") ~= nil then
+		return self:GetValue("kit_poops")
+	end
+	return 0
+end
+function PlayerProfile:SetKitPoops(poops)
+	self:SetValue("kit_poops", poops)
+	self.dirty = true
+    self:Save()
+end
+
+function PlayerProfile:GetKitAbandonedMessage()
+	if self:GetValue("kit_abandoned_message") ~= nil then
+		return self:GetValue("kit_abandoned_message")
+	end
+	return false
+end
+function PlayerProfile:SetKitAbandonedMessage(abandoned)
+	self:SetValue("kit_abandoned_message", abandoned)
+	self.dirty = true
+    self:Save()
+end
+
+function PlayerProfile:GetKitIsHibernating()
+	if self:GetValue("kit_hibernating") ~= nil then
+		return self:GetValue("kit_hibernating")
+	end
+	return false
+end
+function PlayerProfile:SetKitIsHibernating(hibernating)
+	self:SetValue("kit_hibernating", hibernating)
+	self.dirty = true
+    self:Save()
+end
+
+function PlayerProfile:GetKitHibernationStart()
+	if self:GetValue("kit_hibernation_start_time") ~= nil then
+		return self:GetValue("kit_hibernation_start_time")
+	end
+	return 0
+end
+function PlayerProfile:SetKitHibernationStart(time)
+	self:SetValue("kit_hibernation_start_time", time)
+	self.dirty = true
+    self:Save()
+end
+
+
+
+
+
+
 function PlayerProfile:GetLanguageID()
 	if self:GetValue("language_id") ~= nil then
 		return self:GetValue("language_id")
@@ -1475,6 +1912,5 @@ function PlayerProfile:SetLanguageID(language_id, cb)
 	self.dirty = true
     self:Save(cb)
 end
-
 
 return PlayerProfile

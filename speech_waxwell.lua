@@ -14,6 +14,7 @@ return{
         {
             MOUNTED = "Even with my long arms, I still can't reach.",
             HASPET = "One pet is enough responsibility.",
+			TICOON = "I've already recruited a ticoon.",
         },
 		SHAVE =
 		{
@@ -58,7 +59,16 @@ return{
 			LOCKED_GATE = "I shall have to find the key.",
             HOSTBUSY = "Apparently he has more pressing matters to attend to.",
             CARNIVAL_HOST_HERE = "I thought I saw that feathered charlatan around here...",
-            NOCARNIVAL = "Finally. It looks like the birds have dispersed."
+            NOCARNIVAL = "Finally. It looks like the birds have dispersed.",
+			EMPTY_CATCOONDEN = "It's vacant.",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDERS = "It seems we are lacking in participants.",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "This environment is not suitable for a fair game.",
+			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "Playtime is over for now.",
+		},
+		OPEN_CRAFTING = 
+		{
+            PROFESSIONALCHEF = "I have more important things to do than that.",
+			SHADOWMAGIC = "unused_by_waxwell",
 		},
         COOK =
         {
@@ -89,7 +99,7 @@ return{
 --fallback to speech_wilson.lua         READ =
 --fallback to speech_wilson.lua         {
 --fallback to speech_wilson.lua             GENERIC = "only_used_by_wickerbottom",
---fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom"
+--fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom",
 --fallback to speech_wilson.lua         },
 
         GIVE =
@@ -121,6 +131,8 @@ return{
 			CARNIVALGAME_INVALID_ITEM = "Hmph. Picky.",
 			CARNIVALGAME_ALREADY_PLAYING = "It seems I'll have to bide my time.",
             SPIDERNOHAT = "Its dapperness would be wasted in my pocket.",
+            TERRARIUM_REFUSE = "Nothing. I wonder how it might respond to the fuel...",
+            TERRARIUM_COOLDOWN = "There's nothing in there to receive our offering. Yet.",
         },
         GIVETOPLAYER =
         {
@@ -161,6 +173,7 @@ return{
         {
             TARGETINCOMBAT = "Perhaps I should take a step back.",
             INUSE = "Once again the seat of power is stolen from me!",
+			SLEEPING = "Get up, you lazy beast.",
         },
         SADDLE =
         {
@@ -324,7 +337,44 @@ return{
         {
 --fallback to speech_wilson.lua             ONCOOLDOWN = "only_used_by_wanda",
         },
+
+        ENTER_GYM =
+        {
+--fallback to speech_wilson.lua             NOWEIGHT = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             UNBALANCED = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             ONFIRE = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             SMOULDER = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             HUNGRY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             FULL = "only_used_by_wolfang",
+        },
+
+        APPLYMODULE =
+        {
+            COOLDOWN = "only_used_by_wx78",
+            NOTENOUGHSLOTS = "only_used_by_wx78",
+        },
+        REMOVEMODULES =
+        {
+            NO_MODULES = "only_used_by_wx78",
+        },
+        CHARGE_FROM =
+        {
+            NOT_ENOUGH_CHARGE = "only_used_by_wx78",
+            CHARGE_FULL = "only_used_by_wx78",
+        },
+
+        HARVEST =
+        {
+            DOER_ISNT_MODULE_OWNER = "Hmph. It's not worth my time.",
+        },
     },
+
+	ANNOUNCE_CANNOT_BUILD =
+	{
+		NO_INGREDIENTS = "I don't have everything I need.",
+		NO_TECH = "Don't look at me, I've never made one before in my life.",
+		NO_STATION = "I can't make that here, pal.",
+	},
 
 	ACTIONFAIL_GENERIC = "That didn't work.",
 	ANNOUNCE_BOAT_LEAK = "We've sprung a leak!",
@@ -343,6 +393,11 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_NORMALTOWIMPY = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_WIMPYTONORMAL = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_MIGHTYTONORMAL = "only_used_by_wolfang",
+    ANNOUNCE_EXITGYM = {
+--fallback to speech_wilson.lua         MIGHTY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         NORMAL = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         WIMPY = "only_used_by_wolfang",
+    },
 
 	ANNOUNCE_BEES = "Killing me won't bring back your honey!",
 	ANNOUNCE_BOOMERANG = "Ow! Blasted... clumsy hands!",
@@ -440,11 +495,11 @@ return{
 	ANNOUNCE_NODAYSLEEP_CAVE = "Sleeping now would mess up my sleep schedule!",
 	ANNOUNCE_NOHUNGERSLEEP = "I'm too hungry. I can't sleep.",
 	ANNOUNCE_NOSLEEPONFIRE = "That might not be the best idea.",
+    ANNOUNCE_NOSLEEPHASPERMANENTLIGHT = "Oh for... would you turn that blasted light off?!",
 	ANNOUNCE_NODANGERSIESTA = "They're hot on my heels!",
 	ANNOUNCE_NONIGHTSIESTA = "It's sleep time, not siesta time.",
 	ANNOUNCE_NONIGHTSIESTA_CAVE = "It's a bit creepy out for that.",
 	ANNOUNCE_NOHUNGERSIESTA = "Traditionally, a siesta comes after eating, not before.",
-	ANNOUNCE_NODANGERAFK = "I must be ever vigilant!",
 	ANNOUNCE_NO_TRAP = "Odd. They forgot to set it.",
 	ANNOUNCE_PECKED = "Have patience!",
 	ANNOUNCE_QUAKE = "That rumbling can't be good.",
@@ -579,6 +634,10 @@ return{
 --fallback to speech_wilson.lua 	{
 --fallback to speech_wilson.lua         "only_used_by_walter",
 --fallback to speech_wilson.lua 	},
+
+    -- wx specific
+    ANNOUNCE_WX_SCANNER_NEW_FOUND = "only_used_by_wx78",
+--fallback to speech_wilson.lua     ANNOUNCE_WX_SCANNER_FOUND_NO_DATA = "only_used_by_wx78",
 
     --quagmire event
     QUAGMIRE_ANNOUNCE_NOTRECIPE = "This combination of food was ill-advised.",
@@ -720,10 +779,42 @@ return{
         "Here I am, chatting it up with the vegetation.",
 	},
 
+	ANNOUNCE_KITCOON_HIDEANDSEEK_START = "I suppose we shall begin this ridiculous game.",
+	ANNOUNCE_KITCOON_HIDEANDSEEK_JOIN = "Of course you need my help.",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND = 
+	{
+		"A-ha! Not sneaky enough!",
+		"Found you!",
+		"You were not clever enough to best the great Maxwell!!",
+		"Your attempt to escape me has been thwarted, child!",
+	},
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_ONE_MORE = "Only one remains.",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE = "A-ha! That was the last one! I win!!!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE_TEAM = "I had seen it already, but {name} got to it first, I suppose.",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TIME_ALMOST_UP = "Where are those blasted kittens!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_LOSEGAME = "Blast it!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR = "I doubt those tiny, pathetic legs would carry them this far.",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR_RETURN = "This seems much more likely an area to find the kitcoons.",
+	ANNOUNCE_KITCOON_FOUND_IN_THE_WILD = "So you're the source of that pathetic mewling. I'll have to apologize to the strongman.",
+
+	ANNOUNCE_TICOON_START_TRACKING	= "Yes, good... lead me to the kitcoons.",
+	ANNOUNCE_TICOON_NOTHING_TO_TRACK = "Nothing??? Useless animal!",
+	ANNOUNCE_TICOON_WAITING_FOR_LEADER = "Even a creature of your stature knows to wait for its superiors.",
+	ANNOUNCE_TICOON_GET_LEADER_ATTENTION = "Can't you see I'm busy, rodent!? ...My apologies. Where were we?",
+	ANNOUNCE_TICOON_NEAR_KITCOON = "Ah, we must be near a kitcoon...",
+	ANNOUNCE_TICOON_LOST_KITCOON = "Drat, someone found this kitcoon before us.",
+	ANNOUNCE_TICOON_ABANDONED = "Fine! Begone! The Great Maxwell doesn't need help for a simple child's game.",
+	ANNOUNCE_TICOON_DEAD = "That foolish creature! This may prove to be a setback...",
+
     -- YOTB
     ANNOUNCE_CALL_BEEF = "And here comes my... er, \"beautiful\" assistant.",
     ANNOUNCE_CANTBUILDHERE_YOTB_POST = "This seems a bit far from the festivities, don't you think?",
     ANNOUNCE_YOTB_LEARN_NEW_PATTERN =  "At last, something new.",
+
+    -- AE4AE
+    ANNOUNCE_EYEOFTERROR_ARRIVE = "Oh, what a magnificent horror.",
+    ANNOUNCE_EYEOFTERROR_FLYBACK = "I've been awaiting your return. Let's end this.",
+    ANNOUNCE_EYEOFTERROR_FLYAWAY = "It'll be back.",
 
 	BATTLECRY =
 	{
@@ -1581,7 +1672,11 @@ return{
         CHESSPIECE_BEEQUEEN = "Does she really need a statue?",
         CHESSPIECE_ANTLION = "Is there a sinkhole I can bury this in?",
         CHESSPIECE_BEEFALO = "At least this version doesn't shed all over my poor suit.",
+		CHESSPIECE_KITCOON = "This is a rather precarious design.",
+		CHESSPIECE_CATCOON = "This animal commands respect through violence.",
         CHESSPIECE_GUARDIANPHASE3 = "How could I not have seen...",
+        CHESSPIECE_EYEOFTERROR = "An eye could never best a master of illusion such as I.",
+        CHESSPIECE_TWINSOFTERROR = "The most troublesome pair I've ever seen.",
 
         CHESSJUNK1 = "There's a reason I never finished that.",
         CHESSJUNK2 = "That one was a jerk.",
@@ -2723,6 +2818,8 @@ return{
 			BURNT = "Dapperness is a state of mind.",
 		},
 		WARG = "The alpha!",
+        WARGLET = "They're smaller than I remember... going soft on us, Charlie?",
+        
 		WASPHIVE = "That looks dangerous.",
 		WATERBALLOON = "Do you have any idea how much this suit cost?",
 		WATERMELON = "It's mostly water. Fibrous, sweet water.",
@@ -3829,7 +3926,7 @@ return{
 			SPOILED = "Ugh, the smell... can we just put it in the ground already?",
 		},
 
-		SOIL_AMENDER_FERMENTED = "It's reached the peak of its power... and it's stench.",
+		SOIL_AMENDER_FERMENTED = "It's reached the peak of its power... and its stench.",
 
         WATERINGCAN =
         {
@@ -4054,6 +4151,47 @@ return{
 
         BEEF_BELL = "It appears to have some kind of hypnotic effect on beefalo.",
 
+		-- YOT Catcoon
+		KITCOONDEN = 
+		{
+			GENERIC = "A house for kitcoons? Can the pitiful little things not climb trees yet?",
+            BURNT = "No place to hide anymore.",
+			PLAYING_HIDEANDSEEK = "They are not here, they are out hiding.",
+			PLAYING_HIDEANDSEEK_TIME_ALMOST_UP = "We are nearly out of time to find all of the rascals.",
+		},
+
+		KITCOONDEN_KIT = "I don't see why I need to build them a house. They need to learn to climb trees like adults.",
+
+		TICOON = 
+		{
+			GENERIC = "This high status catcoon has a talent for finding the kits. I respect him only marginally more.",
+			ABANDONED = "I didn't need his help anyway.",
+			SUCCESS = "Well done, great beast!",
+			LOST_TRACK = "Blasted, we weren't fast enough! Sniff faster, beast!",
+			NEARBY = "A-ha... there's a kitcoon afoot.",
+			TRACKING = "He seems onto something. I shall let him take the lead.",
+			TRACKING_NOT_MINE = "That ticoon is not working for me. Yet.",
+			NOTHING_TO_TRACK = "There's nothing left to find.",
+			TARGET_TOO_FAR_AWAY = "His nose may be good, but I doubt it's good enough to track that far.",
+		},
+		
+		YOT_CATCOONSHRINE =
+        {
+            GENERIC = "I suppose even a thief has its admirers.",
+            EMPTY = "It seems we're supposed to offer it something.",
+            BURNT = "Seems not everyone appreciates the little thieves.",
+        },
+
+		KITCOON_FOREST = "What a pathetic little creature. It's encumbered by excess fur.",
+		KITCOON_SAVANNA = "What a pathetic little creature. It's pretending to be a much more respectable beast.",
+		KITCOON_MARSH = "What a pathetic little creature. It smells of sulphur.",
+		KITCOON_DECIDUOUS = "What a pathetic little creature. It will likely grow up to pick my pockets.",
+		KITCOON_GRASS = "What a pathetic little creature. Just looking at it makes me itch.",
+		KITCOON_ROCKY = "What a pathetic little creature. It doesn't even have the grace of a catcoon.",
+		KITCOON_DESERT = "What a pathetic little creature. Those ears are ridiculous.",
+		KITCOON_MOON = "What a pathetic little creature. It requires dental work.",
+		KITCOON_YOT = "What a pathetic little creature, and in such a gaudy outfit.",
+
         -- Moon Storm
         ALTERGUARDIAN_PHASE1 = {
             GENERIC = "It seems our actions have been noticed.",
@@ -4173,6 +4311,102 @@ return{
         FIGKABAB = "Pleasantly sweet.",
         KOALEFIG_TRUNK = "I hope it was well cleaned before we stuffed the figs inside.",
         FROGNEWTON = "This recipe has legs.",
+
+        -- The Terrorarium
+        TERRARIUM = {
+            GENERIC = "My, this is some strange magic, even for me.",
+            CRIMSON = "The fuel has taken hold.",
+            ENABLED = "Just what manner of magic is this?!",
+			WAITING_FOR_DARK = "It's power is coalescing.",
+			COOLDOWN = "I'd bet it was that insufferable imp who brought it here.",
+			SPAWN_DISABLED = "Let it stay banished.",
+        },
+
+        -- Wolfgang
+        MIGHTY_GYM = 
+        {
+            GENERIC = "Hmph. I suppose some people are impressed by shows of brute strength.",
+            BURNT = "The show's over.",
+        },
+
+        DUMBBELL = "I have no interest in such things.",
+        DUMBBELL_GOLDEN = "It's not that impressive.",
+		DUMBBELL_MARBLE = "It's not that impressive.",
+        DUMBBELL_GEM = "It's not that impressive.",
+        POTATOSACK = "Potatoes are powerful things, not to be underestimated.",
+
+
+        TERRARIUMCHEST = 
+		{
+			GENERIC = "It's just my style.",
+			BURNT = "That seemed unnecessary.",
+			SHIMMER = "How... unusual.",
+		},
+
+		EYEMASKHAT = "How deliciously macabre.",
+
+        EYEOFTERROR = "Don't look at me, it's definitely not one of mine.",
+        EYEOFTERROR_MINI = "We're going to be up to our eyeballs in... eyeballs.",
+        EYEOFTERROR_MINI_GROUNDED = "I should dispose of it before it hatches.",
+
+        FROZENBANANADAIQUIRI = "There are better beverages to make.",
+        BUNNYSTEW = "Good until the last hop.",
+        MILKYWHITES = "Nauseating. It must still contain some evil energy.",
+
+        CRITTER_EYEOFTERROR = "Tell me, what is it you see, little one?",
+
+        SHIELDOFTERROR ="At least dealing with that monstrosity was good for something.",
+        TWINOFTERROR1 = "Ah. Just what we needed, a fresh pair of eyes...",
+        TWINOFTERROR2 = "Ah. Just what we needed, a fresh pair of eyes...",
+
+        -- Year of the Catcoon
+        CATTOY_MOUSE = "The classic game of catcoon and mechnical mouse.",
+        KITCOON_NAMETAG = "I've named so many creatures at this point, the novelty has worn off.",
+
+		KITCOONDECOR1 =
+        {
+            GENERIC = "Those creatures are so feeble of mind they can't tell a real bird from a wooden one.",
+            BURNT = "Whatever will we do without it.",
+        },
+		KITCOONDECOR2 =
+        {
+            GENERIC = "At least it should keep them occupied.",
+            BURNT = "A pity.",
+        },
+
+		KITCOONDECOR1_KIT = "Surely someone else can set it up.",
+		KITCOONDECOR2_KIT = "Physical labor is what underlings are for.",
+
+        -- WX78
+        WX78MODULE_MAXHEALTH = "That robot needs to pull themselves together.",
+        WX78MODULE_MAXSANITY1 = "That robot needs to pull themselves together.",
+        WX78MODULE_MAXSANITY = "That robot needs to pull themselves together.",
+        WX78MODULE_MOVESPEED = "That robot needs to pull themselves together.",
+        WX78MODULE_MOVESPEED2 = "That robot needs to pull themselves together.",
+        WX78MODULE_HEAT = "That robot needs to pull themselves together.",
+        WX78MODULE_NIGHTVISION = "That robot needs to pull themselves together.",
+        WX78MODULE_COLD = "That robot needs to pull themselves together.",
+        WX78MODULE_TASER = "That robot needs to pull themselves together.",
+        WX78MODULE_LIGHT = "That robot needs to pull themselves together.",
+        WX78MODULE_MAXHUNGER1 = "That robot needs to pull themselves together.",
+        WX78MODULE_MAXHUNGER = "That robot needs to pull themselves together.",
+        WX78MODULE_MUSIC = "They wouldn't...",
+        WX78MODULE_BEE = "That robot needs to pull themselves together.",
+        WX78MODULE_MAXHEALTH2 = "That robot needs to pull themselves together.",
+
+        WX78_SCANNER = 
+        {
+            GENERIC ="I feel like it's watching me...",
+            HUNTING = "Where does it think it's going?",
+            SCANNING = "Hmph. Good luck unraveling the mysteries of my creations.",
+        },
+
+        WX78_SCANNER_ITEM = "Something about it is just so temptingly kickable.",
+        WX78_SCANNER_SUCCEEDED = "That constant blinking light is testing my patience.",
+
+        WX78_MODULEREMOVER = "Nerves of steel, that one.",
+
+        SCANDATA = "Well... fine. I suppose that sums it all up, more or less.",
     },
 
     DESCRIBE_GENERIC = "You tell me.",

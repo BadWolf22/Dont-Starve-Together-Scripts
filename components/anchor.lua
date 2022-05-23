@@ -192,7 +192,9 @@ function Anchor:AddAnchorRaiser(doer)
     if not self.raisers[doer] then
         self.numberofraisers = self.numberofraisers +1
     end
-    self.raisers[doer] = 1  -- raise units/second
+
+    self.raisers[doer] = doer.components.expertsailor ~= nil and doer.components.expertsailor:GetAnchorRaisingSpeed() or 1	-- raise units/second
+
     self.currentraiseunits = self.currentraiseunits + self.raisers[doer]
     return true
 end

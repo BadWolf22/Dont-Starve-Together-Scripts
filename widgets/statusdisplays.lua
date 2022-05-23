@@ -7,6 +7,7 @@ local MoistureMeter    = require "widgets/moisturemeter"
 local BoatMeter        = require "widgets/boatmeter"
 local PetHealthBadge   = require "widgets/pethealthbadge"
 local InspirationBadge = require "widgets/inspirationbadge"
+local MightyBadge      = require "widgets/mightybadge"
 local ResurrectButton  = require "widgets/resurrectbutton"
 local UIAnim           = require "widgets/uianim"
 
@@ -42,13 +43,14 @@ local function OnSetPlayerMode(inst, self)
         if my_platform ~= nil and my_platform.components.healthsyncer ~= nil then
             self.boatmeter:Enable(my_platform)
         else
-            self.boatmeter:Disable(my_platform)
+            self.boatmeter:Disable(self.instantboatmeterclose)
         end
+        self.instantboatmeterclose = nil
 
         self.ongotonplatform = function(owner, platform) if platform.components.healthsyncer ~= nil then self.boatmeter:Enable(platform) end end
         self.inst:ListenForEvent("got_on_platform", self.ongotonplatform, self.owner)
 
-        self.ongotoffplatform = function(owner, platform) self.boatmeter:Disable(platform) end
+        self.ongotoffplatform = function(owner, platform) self.boatmeter:Disable() end
         self.inst:ListenForEvent("got_off_platform", self.ongotoffplatform, self.owner)
     end
 
@@ -69,6 +71,12 @@ local function OnSetPlayerMode(inst, self)
 		self:OnInspirationSongChanged(1, (self.owner:GetInspirationSong(1) or {}).NAME)
 		self:OnInspirationSongChanged(2, (self.owner:GetInspirationSong(2) or {}).NAME)
 		self:OnInspirationSongChanged(3, (self.owner:GetInspirationSong(3) or {}).NAME)
+    end
+
+    if self.mightybadge ~= nil and self.onmightinessdelta == nil then
+        self.onmightinessdelta = function(owner, data) self:MightinessDelta(data) end
+        self.inst:ListenForEvent("mightinessdelta", self.onmightinessdelta, self.owner)
+        self:SetMightiness(self.owner:GetMightiness())
     end
 
 	if self.pethealthbadge ~= nil and self.onpethealthdirty == nil then
@@ -131,6 +139,11 @@ local function OnSetGhostMode(inst, self)
         self.oninspirationdelta = nil
     end
 
+    if self.onupgrademodulesenergylevelupdated ~= nil then
+        self.inst:RemoveEventCallback("energylevelupdate", self.onupgrademodulesenergylevelupdated, self.owner)
+        self.onupgrademodulesenergylevelupdated = nil
+    end
+
     if self.onpethealthdirty ~= nil then
         self.inst:RemoveEventCallback("clientpethealthdirty", self.onpethealthdirty, self.owner)
         self.inst:RemoveEventCallback("clientpethealthsymboldirty", self.onpethealthdirty, self.owner)
@@ -164,7 +177,23 @@ end
 
 local StatusDisplays = Class(Widget, function(self, owner)
     Widget._ctor(self, "Status")
+    self:UpdateWhilePaused(false)
     self.owner = owner
+
+    local is_splitscreen = IsSplitScreen()
+    if is_splitscreen and IsGameInstance(Instances.Player1) then
+        self.column1 = 80
+        self.column2 = 40
+        self.column3 = 0
+        self.column4 = -40
+        self.column5 = 120
+    else
+        self.column1 = -80
+        self.column2 = -40
+        self.column3 = 0
+        self.column4 = 40
+        self.column5 = -120
+    end
 
     self.wereness = nil
     self.onwerenessdelta = nil
@@ -173,25 +202,25 @@ local StatusDisplays = Class(Widget, function(self, owner)
 	self.oninspirationdelta = nil
 
     self.brain = self:AddChild(owner.CreateSanityBadge ~= nil and owner.CreateSanityBadge(owner) or SanityBadge(owner))
-    self.brain:SetPosition(0, -40, 0)
+    self.brain:SetPosition(self.column3, -40, 0)
     self.onsanitydelta = nil
 
     self.stomach = self:AddChild(owner.CreateHungerBadge ~= nil and owner.CreateHungerBadge(owner) or HungerBadge(owner))
-    self.stomach:SetPosition(-40, 20, 0)
+    self.stomach:SetPosition(self.column2, 20, 0)
     self.onhungerdelta = nil
 
     self.heart = self:AddChild(owner.CreateHealthBadge ~= nil and owner.CreateHealthBadge(owner) or HealthBadge(owner))
-    self.heart:SetPosition(40, 20, 0)
+    self.heart:SetPosition(self.column4, 20, 0)
     self.heart.effigybreaksound = "dontstarve/creatures/together/lavae/egg_deathcrack"
     self.onhealthdelta = nil
     self.healthpenalty = 0
 
-    self.moisturemeter = self:AddChild(MoistureMeter(owner))
-    self.moisturemeter:SetPosition(0, -115, 0)
+    self.moisturemeter = self:AddChild(owner.CreateMoistureMeter ~= nil and owner.CreateMoistureMeter(owner) or MoistureMeter(owner))
+    self.moisturemeter:SetPosition(self.column3, -115, 0)
     self.onmoisturedelta = nil
 
     self.boatmeter = self:AddChild(BoatMeter(owner))
-    self.boatmeter:SetPosition(-80, -40, 0)
+    self.boatmeter:SetPosition(self.column1, -40, 0)
     self.ongotonplatform = nil
     self.ongotoffplatform = nil
 
@@ -203,6 +232,7 @@ local StatusDisplays = Class(Widget, function(self, owner)
     self.resurrectbuttonfx:SetScale(.75, .75, .75)
     self.resurrectbuttonfx:GetAnimState():SetBank("effigy_break")
     self.resurrectbuttonfx:GetAnimState():SetBuild("effigy_button")
+    self.resurrectbuttonfx:GetAnimState():AnimateWhilePaused(false)
     self.resurrectbuttonfx:Hide()
     self.resurrectbuttonfx.inst:ListenForEvent("animover", function(inst) inst.widget:Hide() end)
 
@@ -238,6 +268,7 @@ local StatusDisplays = Class(Widget, function(self, owner)
     self.rezbuttontask = nil
     self.modetask = nil
     self.isghostmode = true --force the initial SetGhostMode call to be dirty
+    self.instantboatmeterclose = true
     self:SetGhostMode(false)
 
     if owner:HasTag("wereness") then
@@ -247,14 +278,25 @@ local StatusDisplays = Class(Widget, function(self, owner)
 	if owner.components.pethealthbar ~= nil then
 		if owner.prefab == "wendy" then
 			self.pethealthbadge = self:AddChild(PetHealthBadge(owner, { 254 / 255, 253 / 255, 237 / 255, 1 }, "status_abigail"))
-			self.pethealthbadge:SetPosition(40, -100, 0)
+			self.pethealthbadge:SetPosition(self.column4, -100, 0)
 
-		    self.moisturemeter:SetPosition(-40, -100, 0)
+		    self.moisturemeter:SetPosition(self.column2, -100, 0)
 		end
 	end
 
     if owner:HasTag("battlesinger") then
         self:AddInspiration()
+    end
+
+    if owner:HasTag("strongman") then
+        self:AddMightiness()
+    end
+
+    if owner:HasTag("upgrademoduleowner") then
+        -- Not adding the display here, but we need to move some stuff around in single player.
+        if not is_splitscreen then
+            self.moisturemeter:SetPosition(self.column1, -120, 0)
+        end
     end
 end)
 
@@ -350,10 +392,18 @@ end
 function StatusDisplays:AddInspiration()
     if self.inspirationbadge == nil then
         self.inspirationbadge = self:AddChild(InspirationBadge(self.owner, { 151 / 255, 30 / 255, 180 / 255, 1 }))
-        self.inspirationbadge:SetPosition(0, -130, 0)
+        self.inspirationbadge:SetPosition(self.column3, -130, 0)
 		self:SetInspiration(self.owner:GetInspiration(), nil, false)
 
-        self.moisturemeter:SetPosition(-80, -130, 0)
+        self.moisturemeter:SetPosition(self.column1, -130, 0)
+    end
+end
+
+function StatusDisplays:AddMightiness()
+    if self.mightybadge == nil then
+        self.mightybadge = self:AddChild(MightyBadge(self.owner))
+        self.mightybadge:SetPosition(self.column5, 20, 0)
+        self:SetMightiness(self.owner:GetMightiness())
     end
 end
 
@@ -385,6 +435,10 @@ function StatusDisplays:SetGhostMode(ghostmode)
         if self.inspirationbadge ~= nil then
             self.inspirationbadge:Hide()
         end
+
+        if self.mightybadge ~= nil then
+            self.mightybadge:Hide()
+        end
     else
         self.isghostmode = nil
 
@@ -405,6 +459,10 @@ function StatusDisplays:SetGhostMode(ghostmode)
         if self.inspirationbadge ~= nil then
             self.inspirationbadge:Show()
         end
+
+        if self.mightybadge ~= nil then
+            self.mightybadge:Show()
+        end
     end
 
     if self.rezbuttontask ~= nil then
@@ -416,7 +474,7 @@ function StatusDisplays:SetGhostMode(ghostmode)
     if self.modetask ~= nil then
         self.modetask:Cancel()
     end
-    self.modetask = self.inst:DoTaskInTime(0, ghostmode and OnSetGhostMode or OnSetPlayerMode, self)
+    self.modetask = self.inst:DoStaticTaskInTime(0, ghostmode and OnSetGhostMode or OnSetPlayerMode, self)
 end
 
 function StatusDisplays:SetHealthPercent(pct)
@@ -539,6 +597,26 @@ end
 function StatusDisplays:OnInspirationSongChanged(slot_num, song_name)
     self.inspirationbadge:OnBuffChanged(slot_num, song_name)
 end
+
+function StatusDisplays:SetMightiness(percent)
+    self.mightybadge:SetPercent(percent)
+end
+
+function StatusDisplays:MightinessDelta(data)
+    local newpercent = data ~= nil and data.newpercent or 0
+    local oldpercent = data ~= nil and data.oldpercent or 0
+
+    self:SetMightiness(newpercent)
+
+    if newpercent > oldpercent then
+        self.mightybadge:PulseGreen()
+    elseif newpercent < oldpercent and (self.previous_pulse == nil or (self.previous_pulse - oldpercent >= 0.009)) then
+        self.mightybadge:PulseRed()
+        self.previous_pulse = newpercent
+    end
+end
+
+----------------------------------------------------------------------------------------------------------
 
 function StatusDisplays:SetMoisturePercent(pct)
     self.moisturemeter:SetValue(pct, self.owner:GetMaxMoisture(), self.owner:GetMoistureRateScale())

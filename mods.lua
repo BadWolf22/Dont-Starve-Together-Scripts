@@ -27,10 +27,15 @@ AddModReleaseID( "R14_FARMING_REAPWHATYOUSOW" )
 AddModReleaseID( "R15_QOL_WORLDSETTINGS" )
 AddModReleaseID( "R16_ROT_MOONSTORMS" )
 AddModReleaseID( "R17_WATERLOGGED" )
+AddModReleaseID( "R18_QOL_SERVERPAUSING" )
+AddModReleaseID( "R19_REFRESH_WOLFGANG" )
+AddModReleaseID( "R20_QOL_CRAFTING4LIFE" )
+AddModReleaseID( "R21_REFRESH_WX78" )
 
 -----------------------------------------------------------------------------------------------
 
 MOD_AVATAR_LOCATIONS = { Default = "images/avatars/" }
+MOD_CRAFTING_AVATAR_LOCATIONS = { Default = "images/crafting_menu_avatars/" }
 --Add your avatar atlas locations for each prefab if you don't want to use the default mod avatar location
 
 local function VisitModForums()
@@ -168,7 +173,7 @@ local runmodfn = function(fn,mod,modtype)
 		if fn then
 			local status, r = xpcall( function() return fn(unpack(arg)) end, debug.traceback)
 			if not status then
-				print("error calling "..modtype.." in mod "..ModInfoname(mod.modname)..": \n"..r)
+				print("error calling "..modtype.." in mod "..ModInfoname(mod.modname)..": \n"..(r or ""))
 				ModManager:RemoveBadMod(mod.modname,r)
 				ModManager:DisplayBadMods()
 			else
@@ -890,7 +895,7 @@ function ModWrangler:StartVersionChecking()
                 local modinfo = KnownModIndex:GetModInfo(mod_name)
                 if modinfo.all_clients_require_mod then
                     --print("adding mod to verify", mod_name)
-                    table.insert(mods_to_verify, { name = mod_name, version = modinfo.version })
+                    table.insert(mods_to_verify, { name = mod_name, version = modinfo.version, version_compatible = modinfo.version_compatible })
                 end
             end
         end

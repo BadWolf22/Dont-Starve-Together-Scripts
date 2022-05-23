@@ -14,6 +14,7 @@ return{
         {
             MOUNTED = "Hair-cow is too tall. I can't reach.",
             HASPET = "Wolfgang has animal friend already!",
+			TICOON = "Wolfgang already has good furry friend.",
         },
 		SHAVE =
 		{
@@ -58,7 +59,16 @@ return{
 			LOCKED_GATE = "Let Wolfgang in!",
             HOSTBUSY = "He is very busy bird, have carnival to run!",
             CARNIVAL_HOST_HERE = "Where is bird man? Thought he was here...",
-            NOCARNIVAL = "Looks like birds move carnival somewhere else."
+            NOCARNIVAL = "Looks like birds move carnival somewhere else.",
+			EMPTY_CATCOONDEN = "Did Wolfgang's muscles scare tiny kitties away?",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDERS = "Wolfgang plays fair, where is fun in less kitties?",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "Wolfgang plays fair, is nowhere for kitties to hide here!",
+			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "Is enough games for Wolfgang.",
+		},
+		OPEN_CRAFTING = 
+		{
+            PROFESSIONALCHEF = "Warly is very nice to cook. Wolfgang will not get in way.",
+			SHADOWMAGIC = "Wolfgang is glad he cannot read!",
 		},
         COOK =
         {
@@ -89,7 +99,7 @@ return{
 --fallback to speech_wilson.lua         READ =
 --fallback to speech_wilson.lua         {
 --fallback to speech_wilson.lua             GENERIC = "only_used_by_wickerbottom",
---fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom"
+--fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom",
 --fallback to speech_wilson.lua         },
 
         GIVE =
@@ -121,6 +131,8 @@ return{
 			CARNIVALGAME_INVALID_ITEM = "Haha! Wolfgang thought it would be funny to try that!",
 			CARNIVALGAME_ALREADY_PLAYING = "Friends are having good time, Wolfgang can wait.",
             SPIDERNOHAT = "Wolfgang's pockets are too small for both bug and hat!",
+            TERRARIUM_REFUSE = "Tiny triangle is not wanting that.",
+            TERRARIUM_COOLDOWN = "Wolfgang will wait for tiny tree to come back, then give present!",
         },
         GIVETOPLAYER =
         {
@@ -161,6 +173,7 @@ return{
         {
             TARGETINCOMBAT = "I cannot ride it now! Hair-cow is proving itself in battle!",
             INUSE = "Hair-cow is occupied by another.",
+			SLEEPING = "Is time for waking, hair-cow!",
         },
         SADDLE =
         {
@@ -324,7 +337,44 @@ return{
         {
 --fallback to speech_wilson.lua             ONCOOLDOWN = "only_used_by_wanda",
         },
+
+        ENTER_GYM =
+        {
+            NOWEIGHT = "Wolfgang needs to find something to lift!",
+            UNBALANCED = "Wolfgang does not want one arm mightier than other!",
+            ONFIRE = "Is good to feel burn, but not that much.",
+            SMOULDER = "Wolfgang will stomp puny fire out first.",
+            HUNGRY = "Too hungry... can't lift with tummy grumbling...",
+            FULL = "Is Wolfgang's turn for lifting now! Wait...",
+        },
+
+        APPLYMODULE =
+        {
+            COOLDOWN = "only_used_by_wx78",
+            NOTENOUGHSLOTS = "only_used_by_wx78",
+        },
+        REMOVEMODULES =
+        {
+            NO_MODULES = "only_used_by_wx78",
+        },
+        CHARGE_FROM =
+        {
+            NOT_ENOUGH_CHARGE = "only_used_by_wx78",
+            CHARGE_FULL = "only_used_by_wx78",
+        },
+
+        HARVEST =
+        {
+            DOER_ISNT_MODULE_OWNER = "Wolfgang thinks it only speaks robot.",
+        },
     },
+
+	ANNOUNCE_CANNOT_BUILD =
+	{
+		NO_INGREDIENTS = "Is no good, Wolfgang doesn't have enough!",
+		NO_TECH = "Hmm, is tricky. Wolfgang should learn how to make.",
+		NO_STATION = "Wolfgang will need right working-place!",
+	},
 
 	ACTIONFAIL_GENERIC = "I am not mighty enough to do that.",
 	ANNOUNCE_BOAT_LEAK = "Drippy drops is come through boat!",
@@ -342,7 +392,12 @@ return{
     ANNOUNCE_NORMALTOMIGHTY = "I AM MIGHTY!",
     ANNOUNCE_NORMALTOWIMPY = "I am not feeling so good.",
     ANNOUNCE_WIMPYTONORMAL = "Wolfgang is better.",
-    ANNOUNCE_MIGHTYTONORMAL = "I need to fill my mighty belly again!",
+    ANNOUNCE_MIGHTYTONORMAL = "No! Wolfgang must get stronger!",
+    ANNOUNCE_EXITGYM = {
+        MIGHTY = "Hah! Wolfgang feel back to old self!",
+        NORMAL = "Hmm muscles feel better, but could be stronger!",
+        WIMPY = "Wolfgang is just needing... a bit of rest...",
+    },
 
 	ANNOUNCE_BEES = "Bees! Nasty stinging bug men!",
 	ANNOUNCE_BOOMERANG = "Ow! Why did you hurt me, throwy stick?",
@@ -441,11 +496,11 @@ return{
 	ANNOUNCE_NODAYSLEEP_CAVE = "Is creepy in cave.",
 	ANNOUNCE_NOHUNGERSLEEP = "Wolfgang say never sleep with empty stomach.",
 	ANNOUNCE_NOSLEEPONFIRE = "Is too hot for sleeping.",
+    ANNOUNCE_NOSLEEPHASPERMANENTLIGHT = "Wolfgang can't sleep with bright light!",
 	ANNOUNCE_NODANGERSIESTA = "I prefer fighting to napping!",
 	ANNOUNCE_NONIGHTSIESTA = "Wolfgang have principles against siesta at night.",
 	ANNOUNCE_NONIGHTSIESTA_CAVE = "Wolfgang is tense. Too tense to relax.",
 	ANNOUNCE_NOHUNGERSIESTA = "Wolfgang take siesta after eating time.",
-	ANNOUNCE_NODANGERAFK = "Wolfgang will not abandon the fight!",
 	ANNOUNCE_NO_TRAP = "Easy like lift weights.",
 	ANNOUNCE_PECKED = "What I do to deserve this?",
 	ANNOUNCE_QUAKE = "Ground is shake. Wolfgang hate shaking ground.",
@@ -580,6 +635,10 @@ return{
 --fallback to speech_wilson.lua 	{
 --fallback to speech_wilson.lua         "only_used_by_walter",
 --fallback to speech_wilson.lua 	},
+
+    -- wx specific
+    ANNOUNCE_WX_SCANNER_NEW_FOUND = "only_used_by_wx78",
+--fallback to speech_wilson.lua     ANNOUNCE_WX_SCANNER_FOUND_NO_DATA = "only_used_by_wx78",
 
     --quagmire event
     QUAGMIRE_ANNOUNCE_NOTRECIPE = "That was not good recipe!",
@@ -721,10 +780,42 @@ return{
         "Who is mightiest plant of all? You are!",
 	},
 
+	ANNOUNCE_KITCOON_HIDEANDSEEK_START = "Ready or not, here comes mighty Wolfgang!",
+	ANNOUNCE_KITCOON_HIDEANDSEEK_JOIN = "Mighty Wolfgang wants to help find all tiny kitties!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND = 
+	{
+		"Here, Wolfgang found kitty kitty!",
+		"Wolfgang finds tiny kitties too easy!",
+		"Phew, tiny kitty hid very well!",
+		"Ah hah! Tiny Kitty cannot hide from mighty Wolfgang!",
+	},
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_ONE_MORE = "Wolfgang is going to find you, tiny kitty!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE = "Tiny kitties now know Wolfgang is mightiest one!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE_TEAM = "We are mightier together, ha ha!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TIME_ALMOST_UP = "Wolfgang needs to find tiny kitties faster!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_LOSEGAME = "Bah! Tiny kitties bested mighty Wolfgang!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR = "Wolfgang not sure if small kitty paws can walk so far...",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR_RETURN = "Kitties are over here, Wolfgang knows it!",
+	ANNOUNCE_KITCOON_FOUND_IN_THE_WILD = "Why you not hiding like other kitties?",
+
+	ANNOUNCE_TICOON_START_TRACKING	= "Go on, furry friend! Wolfgang trusts you!",
+	ANNOUNCE_TICOON_NOTHING_TO_TRACK = "Oh no, furry friend found nothing!",
+	ANNOUNCE_TICOON_WAITING_FOR_LEADER = "Wolfgang should follow furry friend!",
+	ANNOUNCE_TICOON_GET_LEADER_ATTENTION = "Wolfgang thinks furry friend wants to be followed.",
+	ANNOUNCE_TICOON_NEAR_KITCOON = "Oh ho ho, we're near a kitty kitty!",
+	ANNOUNCE_TICOON_LOST_KITCOON = "Someone found what Wolfgang was looking for!",
+	ANNOUNCE_TICOON_ABANDONED = "Wolfgang will find tiny kitties himself!",
+	ANNOUNCE_TICOON_DEAD = "Furry friend is gone? Who will show Wolfgang where tiny kitties are?",
+
     -- YOTB
     ANNOUNCE_CALL_BEEF = "Come, hair-cow!",
     ANNOUNCE_CANTBUILDHERE_YOTB_POST = "How will judge see Wolfgang's beautiful hair-cow from so far away?",
     ANNOUNCE_YOTB_LEARN_NEW_PATTERN =  "Is new hair-cow costume! Wolfgang will make.",
+
+    -- AE4AE
+    ANNOUNCE_EYEOFTERROR_ARRIVE = "Wolfgang no like the look of that!",
+    ANNOUNCE_EYEOFTERROR_FLYBACK = "Wolfgang stronger and braver now!",
+    ANNOUNCE_EYEOFTERROR_FLYAWAY = "Big scary eye scared of daylight? Ha ha ha!",
 
 	BATTLECRY =
 	{
@@ -1582,7 +1673,11 @@ return{
         CHESSPIECE_BEEQUEEN = "Mighty statue stays mighty still.",
         CHESSPIECE_ANTLION = "Wolfgang will not battle it in staring contest.",
         CHESSPIECE_BEEFALO = "Is look almost like real hair-cow.",
+		CHESSPIECE_KITCOON = "Wolfgang can lift twice as many!",
+		CHESSPIECE_CATCOON = "Ha! Is easy to find this one.",
         CHESSPIECE_GUARDIANPHASE3 = "Wolfgang glad is just statue.",
+        CHESSPIECE_EYEOFTERROR = "No like the way it look at Wolfgang.",
+        CHESSPIECE_TWINSOFTERROR = "Brrr, still sends chill down Wolfgang's spine.",
 
         CHESSJUNK1 = "Metal junk.",
         CHESSJUNK2 = "Metal junk.",
@@ -2724,6 +2819,8 @@ return{
 			BURNT = "Box all gone.",
 		},
 		WARG = "Big puppy!",
+        WARGLET = "Is bad dog!",
+        
 		WASPHIVE = "Mind says no. Muscles say yes!",
 		WATERBALLOON = "Is very squishy-wobbly!",
 		WATERMELON = "So many seeds.",
@@ -3872,7 +3969,7 @@ return{
 
         CARROT_OVERSIZED = "At least is big. Wolfgang can use for weights.",
         CORN_OVERSIZED = "Wolfgang's muscles will get even more mighty lifting giant corn!",
-        PUMPKIN_OVERSIZED = "Is even better than weakling science man's head!",
+        PUMPKIN_OVERSIZED = "Is even bigger than weakling science man's head!",
         EGGPLANT_OVERSIZED = "Wolfgang is getting tired of being fooled by non-egg plant...",
         DURIAN_OVERSIZED = "Is big and spiky fruit.",
         POMEGRANATE_OVERSIZED = "Is big and good for lifting!",
@@ -4055,6 +4152,47 @@ return{
 
         BEEF_BELL = "Ringy ding!",
 
+		-- YOT Catcoon
+		KITCOONDEN = 
+		{
+			GENERIC = "Is tiny home of tiny kitties.",
+            BURNT = "Is tiny kitties safe?",
+			PLAYING_HIDEANDSEEK = "Tiny kitties must be hiding somewhere.",
+			PLAYING_HIDEANDSEEK_TIME_ALMOST_UP = "Tiny kitty game will end soon, ha!",
+		},
+
+		KITCOONDEN_KIT = "Is for making strong home for tiny kitties.",
+
+		TICOON = 
+		{
+			GENERIC = "Is Wolfgang's furry friend.",
+			ABANDONED = "Wolfgang is sorry.",
+			SUCCESS = "Furry friend is doing great job!",
+			LOST_TRACK = "What you looking for, furry friend?",
+			NEARBY = "Wolfgang thinks furry friend found something!",
+			TRACKING = "Go, furry friend, help Wolfgang!",
+			TRACKING_NOT_MINE = "Oh, is wrong kitty!",
+			NOTHING_TO_TRACK = "Furry friend didn't find anything for Wolfgang.",
+			TARGET_TOO_FAR_AWAY = "Tiny kitties too far from us!",
+		},
+		
+		YOT_CATCOONSHRINE =
+        {
+            GENERIC = "Looks like tiny kitty, but shiny.",
+            EMPTY = "Is wanting little feather, Wolfgang will help!",
+            BURNT = "Poor tiny kitty.",
+        },
+
+		KITCOON_FOREST = "Is walking bush. Wait, is tiny kitty!",
+		KITCOON_SAVANNA = "AHH! Wolfgang thought tiny kitty was mean kitty!",
+		KITCOON_MARSH = "Is weird smell coming from tiny kitty?",
+		KITCOON_DECIDUOUS = "Is tiny. Good for hiding, ha ha!",
+		KITCOON_GRASS = "Ouch! Pokes Wolfgang's finger.",
+		KITCOON_ROCKY = "Is tough tiny kitty, learned from Wolfgang.",
+		KITCOON_DESERT = "Can tiny kitty hear Wolfgang from over there?",
+		KITCOON_MOON = "Is tiny kitty made of... cheese?",
+		KITCOON_YOT = "Is year of tiny kitty, yes?",
+
         -- Moon Storm
         ALTERGUARDIAN_PHASE1 = {
             GENERIC = "Ha! Wolfgang's punches are mighty enough to shatter stone!",
@@ -4174,6 +4312,102 @@ return{
         FIGKABAB = "All food should go on stick!",
         KOALEFIG_TRUNK = "Is nose, cooked and stuffed.",
         FROGNEWTON = "Is sweet, but also slimy.",
+
+        -- The Terrorarium
+        TERRARIUM = {
+            GENERIC = "How did tiny tree get inside?",
+            CRIMSON = "Should maybe not have fed scary stuff to weird triangle.",
+            ENABLED = "Tiny tree is shooting rainbow!",
+			WAITING_FOR_DARK = "Wolfgang likes the sparkles.",
+			COOLDOWN = "Tiny tree is now gone! Strange...",
+			SPAWN_DISABLED = "Wolfgang not want to see giant eye again.",
+        },
+
+        -- Wolfgang
+        MIGHTY_GYM = 
+        {
+            GENERIC = "Watch, puny friends! Wolfgang will perform feats of strength!",
+            BURNT = "Wolfgang will hold back mighty tears...",
+        },
+
+        DUMBBELL = "Ha! Wolfgang could lift boulders twice this size!",
+        DUMBBELL_GOLDEN = "Lift! Lift to get strong!",
+		DUMBBELL_MARBLE = "Wolfgang will be strongest!",
+        DUMBBELL_GEM = "Make muscles mighty!",
+        POTATOSACK = "Ha! Lifting and potatoes are three of Wolfgang's favorite things!",
+
+
+        TERRARIUMCHEST = 
+		{
+			GENERIC = "Is looking like normal chest without sparkles.",
+			BURNT = "Is burned away to dust.",
+			SHIMMER = "Wolfgang wants to peek inside!",
+		},
+
+		EYEMASKHAT = "Wolgang not fan of squishy hat.",
+
+        EYEOFTERROR = "Wolfgang not like big scary eye!",
+        EYEOFTERROR_MINI = "Feeling of being watched is bad, but feeling of being bitten is much worse!",
+        EYEOFTERROR_MINI_GROUNDED = "Is weird thing trying to hatch?",
+
+        FROZENBANANADAIQUIRI = "Cold and tasty! ANOTHER!",
+        BUNNYSTEW = "Tiny rabbit makes big food? Wolfgang likes math.",
+        MILKYWHITES = "Looks gross, must be good for Wolfgang!",
+
+        CRITTER_EYEOFTERROR = "Little eye not so scary!",
+
+        SHIELDOFTERROR ="Haha! Now big scary teeth belong to Wolfgang!",
+        TWINOFTERROR1 = "Eep! Big scary metal eyes even worse!",
+        TWINOFTERROR2 = "Eep! Big scary metal eyes even worse!",
+
+        -- Year of the Catcoon
+        CATTOY_MOUSE = "Eep! Oh, is not real.",
+        KITCOON_NAMETAG = "Wolfgang will give tiny kitty good, strong name!",
+
+		KITCOONDECOR1 =
+        {
+            GENERIC = "Wolfgang will punch teasing bird!",
+            BURNT = "This makes Wolfgang sad.",
+        },
+		KITCOONDECOR2 =
+        {
+            GENERIC = "Wait... is not real fish?",
+            BURNT = "This makes Wolfgang sad.",
+        },
+
+		KITCOONDECOR1_KIT = "Is to make tiny kitties happy.",
+		KITCOONDECOR2_KIT = "Is to make tiny kitties happy.",
+
+        -- WX78
+        WX78MODULE_MAXHEALTH = "Is robot snacks, yes?",
+        WX78MODULE_MAXSANITY1 = "Is robot snacks, yes?",
+        WX78MODULE_MAXSANITY = "Is robot snacks, yes?",
+        WX78MODULE_MOVESPEED = "Is robot snacks, yes?",
+        WX78MODULE_MOVESPEED2 = "Is robot snacks, yes?",
+        WX78MODULE_HEAT = "Is robot snacks, yes?",
+        WX78MODULE_NIGHTVISION = "Is robot snacks, yes?",
+        WX78MODULE_COLD = "Is robot snacks, yes?",
+        WX78MODULE_TASER = "Is robot snacks, yes?",
+        WX78MODULE_LIGHT = "Is robot snacks, yes?",
+        WX78MODULE_MAXHUNGER1 = "Is robot snacks, yes?",
+        WX78MODULE_MAXHUNGER = "Is robot snacks, yes?",
+        WX78MODULE_MUSIC = "Is robot snacks, yes?",
+        WX78MODULE_BEE = "Is robot snacks, yes?",
+        WX78MODULE_MAXHEALTH2 = "Is robot snacks, yes?",
+
+        WX78_SCANNER = 
+        {
+            GENERIC ="Wolfgang's muscles too mighty for scanning, would break tiny metal brain!",
+            HUNTING = "Wolfgang's muscles too mighty for scanning, would break tiny metal brain!",
+            SCANNING = "Wolfgang's muscles too mighty for scanning, would break tiny metal brain!",
+        },
+
+        WX78_SCANNER_ITEM = "It sleeps now.",
+        WX78_SCANNER_SUCCEEDED = "Funny machine is winking at Wolfgang?",
+
+        WX78_MODULEREMOVER = "Is funny robot thing.",
+
+        SCANDATA = "Is tiny boring paper.",
     },
 
     DESCRIBE_GENERIC = "What is this thing?",

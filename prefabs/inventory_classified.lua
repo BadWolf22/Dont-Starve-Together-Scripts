@@ -193,7 +193,7 @@ local function Count(item)
     return item.replica.stackable ~= nil and item.replica.stackable:StackSize() or 1
 end
 
-local function Has(inst, prefab, amount)
+local function Has(inst, prefab, amount, checkallcontainers)
     local count =
         inst._activeitem ~= nil and
         inst._activeitem.prefab == prefab and
@@ -219,6 +219,21 @@ local function Has(inst, prefab, amount)
     if overflow ~= nil then
         local overflowhas, overflowcount = overflow:Has(prefab, amount)
         count = count + overflowcount
+    end
+
+    if checkallcontainers then
+        local inventory_replica = inst and inst._parent and inst._parent.replica.inventory
+        local containers = inventory_replica and inventory_replica:GetOpenContainers()
+
+        if containers then
+            for container_inst in pairs(containers) do
+                local container = container_inst.replica.container or container_inst.replica.inventory
+                if container and container ~= overflow and not container.excludefromcrafting then
+                    local containerhas, containercount = container:Has(prefab, amount)
+                    count = count + containercount
+                end
+            end
+        end
     end
 
     return count >= amount, count
@@ -273,7 +288,7 @@ end
 
 local function QueueRefresh(inst, delay)
     if inst._refreshtask == nil then
-        inst._refreshtask = inst:DoTaskInTime(delay, Refresh)
+        inst._refreshtask = inst:DoStaticTaskInTime(delay, Refresh)
         inst._busy = true
     end
 end
@@ -400,27 +415,27 @@ local function RegisterNetListeners(inst)
     --Delay dirty handlers by one frame so that new items have time to replicate locally
 
     inst:ListenForEvent("activedirty", function()
-        QueueSlotTask(inst, inst._active, inst:DoTaskInTime(0, OnActiveDirty, inst._active))
+        QueueSlotTask(inst, inst._active, inst:DoStaticTaskInTime(0, OnActiveDirty, inst._active))
         CancelRefresh(inst)
     end)
 
     for i, v in ipairs(inst._items) do
         inst:ListenForEvent("items["..tostring(i).."]dirty", function()
-            QueueSlotTask(inst, v, inst:DoTaskInTime(0, OnItemsDirty, i, v))
+            QueueSlotTask(inst, v, inst:DoStaticTaskInTime(0, OnItemsDirty, i, v))
             CancelRefresh(inst)
         end)
     end
 
     for k, v in pairs(inst._equips) do
         inst:ListenForEvent("equips["..k.."]dirty", function()
-            QueueSlotTask(inst, v, inst:DoTaskInTime(0, OnEquipsDirty, k, v))
+            QueueSlotTask(inst, v, inst:DoStaticTaskInTime(0, OnEquipsDirty, k, v))
             CancelRefresh(inst)
         end)
     end
 
     inst:ListenForEvent("stackitemdirty", function(world, item)
         if IsHolding(inst, item) then
-            QueueSlotTask(inst, item, inst:DoTaskInTime(0, OnStackItemDirty, item))
+            QueueSlotTask(inst, item, inst:DoStaticTaskInTime(0, OnStackItemDirty, item))
             CancelRefresh(inst)
         end
     end, TheWorld)
@@ -1095,7 +1110,7 @@ local function ReceiveItem(inst, item, count)--, forceslot)
     end
 end
 
-local function ConsumeByName(inst, prefab, amount, overflow)
+local function ConsumeByName(inst, prefab, amount, overflow, containers)
     if amount <= 0 then
         return
     end
@@ -1135,6 +1150,15 @@ local function ConsumeByName(inst, prefab, amount, overflow)
     if overflow ~= nil then
         overflow:ConsumeByName(prefab, amount)
     end
+
+    if containers then
+        for container_inst in pairs(containers) do
+            local container = container_inst.replica.container or container_inst.replica.inventory
+            if container and container.classified and container.classified ~= overflow and not container.excludefromcrafting then
+                container.classified:ConsumeByName(prefab, amount)
+            end
+        end
+    end
 end
 
 local function RemoveIngredients(inst, recipe, ingredientmod)
@@ -1146,9 +1170,13 @@ local function RemoveIngredients(inst, recipe, ingredientmod)
     if overflow ~= nil and overflow:IsBusy() then
         return false
     end
+
+    local inventory_replica = inst and inst._parent and inst._parent.replica.inventory
+    local containers = inventory_replica and inventory_replica:GetOpenContainers()
+
     for i, v in ipairs(recipe.ingredients) do
         local amt = math.max(1, RoundBiasedUp(v.amount * ingredientmod))
-        ConsumeByName(inst, v.type, amt, overflow)
+        ConsumeByName(inst, v.type, amt, overflow, containers)
     end
     return true
 end
@@ -1240,7 +1268,7 @@ local function fn()
         inst.IsBusy = IsBusy
 
         --Delay net listeners until after initial values are deserialized
-        inst:DoTaskInTime(0, RegisterNetListeners)
+        inst:DoStaticTaskInTime(0, RegisterNetListeners)
         return inst
     end
 

@@ -366,6 +366,16 @@ local redpouch_yotb =
     end,
 }
 
+local redpouch_yot_catcoon =
+{
+    master_postinit = function(inst, setupdata)
+        inst.wet_prefix = STRINGS.WET_PREFIX.POUCH
+    end,
+    common_postinit = function(inst, setupdata)
+        inst:SetPrefabNameOverride("redpouch")
+    end,
+}
+
 local hermit_bundle_shell_loots =
 {
     singingshell_octave5 = 2,
@@ -473,29 +483,19 @@ local wetpouch =
 {
     loottable =
     {
-        goggleshat_blueprint = 0,
         deserthat_blueprint = 0,
-        succulent_potted_blueprint = 0,
         antliontrinket = 0,
         trinket_1 = 1, -- marbles
         trinket_3 = 1, -- knot
         trinket_8 = 1, -- plug
         trinket_9 = 1, -- buttons
         trinket_26 = .1, -- potatocup
-        TOOLS_blueprint = .05,
-        LIGHT_blueprint = .05,
-        SURVIVAL_blueprint = .05,
-        FARM_blueprint = .05,
-        SCIENCE_blueprint = .05,
-        REFINE_blueprint = .05,
-        DRESS_blueprint = .05,
+        blueprint = 0.5,
     },
 
     UpdateLootBlueprint = function(loottable, doer)
         local builder = doer ~= nil and doer.components.builder or nil
-        loottable["goggleshat_blueprint"] = (builder ~= nil and not builder:KnowsRecipe("goggleshat")) and 1 or 0.1
-        loottable["deserthat_blueprint"] = (builder ~= nil and not builder:KnowsRecipe("deserthat") and builder:KnowsRecipe("goggleshat")) and 1 or 0.1
-        loottable["succulent_potted_blueprint"] = (builder ~= nil and not builder:KnowsRecipe("succulent_potted")) and 1 or 0.1
+        loottable["deserthat_blueprint"] = (builder ~= nil and not builder:KnowsRecipe("deserthat")) and 1.3 or 0.1
         loottable["antliontrinket"] = (builder ~= nil and builder:KnowsRecipe("deserthat")) and .8 or 0.1
     end,
 
@@ -549,10 +549,11 @@ return MakeContainer("bundle_container", "ui_bundle_2x2"),
     MakeBundle("redpouch_yotp", false, nil, nil, true, redpouch_yotp),
     MakeBundle("redpouch_yotc", false, nil, nil, true, redpouch_yotc),
     MakeBundle("redpouch_yotb", false, nil, nil, true, redpouch_yotb),
+    MakeBundle("redpouch_yot_catcoon", false, nil, nil, true, redpouch_yot_catcoon),
 	MakeBundle("yotc_seedpacket", true, nil, nil, true, yotc_seedpacket),
 	MakeBundle("yotc_seedpacket_rare", true, nil, nil, true, yotc_seedpacket_rare),
 	MakeBundle("carnival_seedpacket", true, nil, nil, true, carnival_seedpacket),
     MakeBundle("hermit_bundle", true, nil, nil, true, hermit_bundle),
     MakeBundle("hermit_bundle_shells", true, nil, nil, true, hermit_bundle_shells, "hermit_bundle","hermit_bundle","hermit_bundle"),
-    MakeBundle("wetpouch", true, nil, JoinArrays(table.invert(wetpouch.loottable), GetAllWinterOrnamentPrefabs()), false, wetpouch)
+    MakeBundle("wetpouch", true, nil, JoinArrays(table.getkeys(wetpouch.loottable), GetAllWinterOrnamentPrefabs()), false, wetpouch)
 

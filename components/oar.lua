@@ -22,7 +22,12 @@ function Oar:Row(doer, pos)
 		row_dir_x, row_dir_z = VecUtil_Normalize(doer_x - boat_x, doer_z - boat_z)
 	end
 
-	boat_physics:ApplyRowForce(row_dir_x, row_dir_z, self.force, self.max_velocity)
+	local character_force_mult = doer.components.expertsailor ~= nil and doer.components.expertsailor:GetRowForceMultiplier() or 1
+	local character_extra_max_velocity = doer.components.expertsailor ~= nil and doer.components.expertsailor:GetRowExtraMaxVelocity() or 0
+
+	boat_physics:ApplyRowForce(row_dir_x, row_dir_z, self.force * character_force_mult, self.max_velocity + character_extra_max_velocity)
+
+	doer:PushEvent("rowing")
 end
 
 function Oar:RowFail(doer)

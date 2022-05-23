@@ -692,6 +692,7 @@ end
 params.pandoraschest = params.treasurechest
 params.skullchest = params.treasurechest
 params.minotaurchest = params.treasurechest
+params.terrariumchest = params.treasurechest
 params.sunkenchest = params.treasurechest
 
 params.quagmire_safe = deepcopy(params.treasurechest)
@@ -754,6 +755,7 @@ params.oceanfishingrod =
     acceptsstacks = false,
     usespecificslotsforitems = true,
     type = "hand_inv",
+    excludefromcrafting = true,
 }
 
 function params.oceanfishingrod.itemtestfn(container, item, slot)
@@ -784,6 +786,7 @@ params.slingshot =
     },
     usespecificslotsforitems = true,
     type = "hand_inv",
+    excludefromcrafting = true,
 }
 
 function params.slingshot.itemtestfn(container, item, slot)
@@ -968,6 +971,7 @@ params.alterguardianhat =
     },
     acceptsstacks = false,
     type = "hand_inv",
+    excludefromcrafting = true,
 }
 
 local AGHAT_SLOTSTART = 95
@@ -998,6 +1002,7 @@ params.pocketwatch =
         side_align_tip = 100,
     },
     type = "hand_inv",
+    excludefromcrafting = true,
 }
 
 for y = 1, 0, -1 do

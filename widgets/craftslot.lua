@@ -49,7 +49,7 @@ function CraftSlot:OnControl(control, down)
             if not self.down then
                 self.down = true
 
-                if self.last_recipe_click and (GetTime() - self.last_recipe_click) < 1 then
+                if self.last_recipe_click and (GetStaticTime() - self.last_recipe_click) < 1 then
                     self.recipe_held = true
                     self.last_recipe_click = nil
                     self:StartUpdating()
@@ -69,7 +69,7 @@ function CraftSlot:OnControl(control, down)
                     end
 
                     self:StartUpdating()
-                    self.last_recipe_click = GetTime()
+                    self.last_recipe_click = GetStaticTime()
                     self.recipe_held = false
                     if not DoRecipeClick(self.owner, self.recipe, skin ) then
                         self:Close()
@@ -123,7 +123,7 @@ function CraftSlot:Open()
     end
     self.open = true
     self:ShowRecipe()
-    TheFocalPoint.SoundEmitter:PlaySound("dontstarve/HUD/click_mouseover")
+    TheFocalPoint.SoundEmitter:PlaySound("dontstarve/HUD/click_mouseover", nil, ClickMouseoverSoundReduction())
 end
 
 function CraftSlot:Close()
@@ -147,18 +147,17 @@ end
 
 function CraftSlot:Refresh(recipename)
 	recipename = recipename or self.recipename
-    local recipe = AllRecipes[recipename]
+    local recipe = GetValidRecipe(recipename)
 
-    local canbuild = self.owner.replica.builder:CanBuild(recipename)
-    local knows = self.owner.replica.builder:KnowsRecipe(recipename)
-    local buffered = self.owner.replica.builder:IsBuildBuffered(recipename)
-
-    local do_pulse = self.recipename == recipename and not self.canbuild and canbuild
     self.recipename = recipename
     self.recipe = recipe
     self.recipe_skins = {}
 
     if self.recipe then
+		local canbuild = self.owner.replica.builder:HasIngredients(recipe)
+		local knows = self.owner.replica.builder:KnowsRecipe(recipe)
+		local buffered = self.owner.replica.builder:IsBuildBuffered(recipename)
+
 		self.recipe_skins = Profile:GetSkinsForPrefab(self.recipe.name)
 
         self.canbuild = canbuild

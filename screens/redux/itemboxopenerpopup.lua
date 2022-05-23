@@ -89,6 +89,12 @@ local ItemBoxOpenerPopup = Class(Screen, function(self, options, open_box_fn, co
     self.current_item_summary = self.bundle_root:AddChild(self:_BuildItemSummary(summary_width))
     self.current_item_summary:SetPosition(420,0)
 
+    self.message = self.center_root:AddChild(Text(HEADERFONT, 35))
+    self.message:SetColour(UICOLOURS.GOLD_SELECTED)
+    self.message:SetString(options.message)
+    self.message:SetPosition(0, 285)
+    self.message:Hide()
+
     -- Actual animation
     self.bundle_bg = self.bundle_root:AddChild(UIAnim())
     self.bundle_bg:SetScale(.7)
@@ -125,6 +131,7 @@ local ItemBoxOpenerPopup = Class(Screen, function(self, options, open_box_fn, co
         self.bundle:GetAnimState():PushAnimation("idle", true)
         self.bundle_bg:GetAnimState():PlayAnimation("activate")
         self.bundle_bg:GetAnimState():PushAnimation("idle_loop", true)
+        self.message:Show()
 
         TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/Together_HUD/collectionscreen/mysterybox/intro")
         TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/Together_HUD/collectionscreen/mysterybox/LP","mysteryboxactive")
@@ -306,43 +313,7 @@ function ItemBoxOpenerPopup:_OpenItemBox()
                 table.insert(item_images, item_widget)
             end
 
-            -- Decide how many columns there should be
-            if #item_types == 1 then
-                columns = 1
-            elseif #item_types == 2 or #item_types == 4 then
-                columns = 2
-            elseif #item_types == 3 or #item_types == 6 then
-                columns = 3
-            elseif #item_types == 7 or #item_types == 8 then
-                columns = 4
-            elseif #item_types == 5 or #item_types == 10 or #item_types == 9 then
-                columns = 5
-            elseif #item_types == 13 then
-                columns = 5
-                self.resize_root = true
-            elseif #item_types == 12 or #item_types == 11 then
-                columns = 6
-            elseif #item_types == 16 or #item_types == 17 or #item_types == 18 then
-                columns = 6
-                self.resize_root = true
-            elseif #item_types == 19 then
-                columns = 7
-                self.resize_root = true
-            elseif #item_types == 22 or #item_types == 24 then
-                columns = 8
-                self.resize_root_small = true
-            elseif #item_types == 35 then
-                columns = 9
-                self.resize_root_small = true
-            elseif #item_types == 38 then
-                columns = 10
-                self.resize_root_small = true
-            elseif #item_types == 41 then
-                columns = 10
-                self.resize_root_small_higher = true
-            else
-                print("Warning: Found an unexpected number of items in a box.", #item_types)
-            end
+            columns, self.resize_root, self.resize_root_small, self.resize_root_small_higher = GetBoxPopupLayoutDetails( #item_types )
 
             self.opened_item_display:FillGrid(columns, COLUMN_WIDTH, COLUMN_HEIGHT, item_images)
             self:_UpdateSwapIcon(1)
@@ -380,7 +351,8 @@ end
 function ItemBoxOpenerPopup:_Close()
     self.ui_state = "OUTRO"
     self.bundle_root:Hide()
-
+    self.message:Hide()
+    
     self.bg.bgplate.image:TintTo(PP_ON_TINT, PP_OFF_TINT, TRANSITION_DURATION, function()
         TheFrontEnd:PopScreen(self)
 		if self.completed_cb ~= nil then

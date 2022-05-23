@@ -63,7 +63,26 @@ local assets =
     Asset("SOUNDPACKAGE", "sound/wanda1.fev"),
     Asset("FILE", "sound/wanda1.fsb"),
 
+    Asset("SOUNDPACKAGE", "sound/terraria1.fev"),
+    Asset("FILE", "sound/terraria1.fsb"),
 
+    Asset("SOUNDPACKAGE", "sound/wolfgang2.fev"),
+    Asset("FILE", "sound/wolfgang2.fsb"),
+
+    Asset("SOUNDPACKAGE", "sound/wolfgang1.fev"),
+    Asset("FILE", "sound/wolfgang1.fsb"),
+    
+    Asset("SOUNDPACKAGE", "sound/yotc_2022_2.fev"),
+    Asset("FILE", "sound/yotc_2022_2.fsb"),
+
+    Asset("SOUNDPACKAGE", "sound/yotc_2022_1.fev"),
+    Asset("FILE", "sound/yotc_2022_1.fsb"),
+
+    Asset("SOUNDPACKAGE", "sound/ancientguardian_rework.fev"),
+    Asset("FILE", "sound/ancientguardian_rework.fsb"),
+
+    Asset("SOUNDPACKAGE", "sound/WX_rework.fev"),
+    Asset("FILE", "sound/WX_rework.fsb"),
     
     Asset("FILE", "sound/wilton.fsb"),         -- Legacy sound that can be used in mods
     Asset("FILE", "sound/winnie.fsb"),         -- Legacy sound that can be used in mods
@@ -173,6 +192,13 @@ local assets =
 
     Asset("ATLAS", "images/plantregistry.xml"),
     Asset("IMAGE", "images/plantregistry.tex"),
+
+    Asset("ATLAS", "images/crafting_menu.xml"),
+    Asset("IMAGE", "images/crafting_menu.tex"),
+    Asset("ATLAS", "images/crafting_menu_icons.xml"),
+    Asset("IMAGE", "images/crafting_menu_icons.tex"),
+    Asset("ATLAS", "images/crafting_menu_avatars.xml"),
+    Asset("IMAGE", "images/crafting_menu_avatars.tex"),
 
     Asset("DYNAMIC_ATLAS", "images/options.xml"),
     Asset("PKGREF", "images/options.tex"),
@@ -351,6 +377,15 @@ local assets =
     Asset("ATLAS", "images/profileflair.xml"),
     Asset("IMAGE", "images/profileflair.tex"),
 
+    Asset("ATLAS", "images/servericons.xml"),
+    Asset("IMAGE", "images/servericons.tex"),
+
+    -- Loading screen
+    Asset("ATLAS", "images/loading_screen.xml"),
+    Asset("IMAGE", "images/loading_screen.tex"),
+    Asset("ATLAS", "images/loading_screen_icons.xml"),
+    Asset("IMAGE", "images/loading_screen_icons.tex"),
+
     --Wardrobe previewing
     Asset("ANIM", "anim/player_ghost_withhat.zip"),
     Asset("ANIM", "anim/werebeaver_basic.zip"),
@@ -360,6 +395,9 @@ local assets =
     Asset("ANIM", "anim/player_idles.zip"),
     Asset("ANIM", "anim/player_idles_walter.zip"),
     Asset("ANIM", "anim/player_idles_ui.zip"),
+    Asset("ANIM", "anim/player_idles_wolfgang.zip"),
+    Asset("ANIM", "anim/player_idles_wolfgang_skinny.zip"),
+    Asset("ANIM", "anim/player_idles_wolfgang_mighty.zip"),
 
     Asset("DYNAMIC_ANIM", "anim/dynamic/body_default1.zip"),
     Asset("DYNAMIC_ANIM", "anim/dynamic/hand_default1.zip"),

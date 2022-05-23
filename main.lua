@@ -7,7 +7,7 @@ math.randomseed(tonumber(tostring(os.time()):reverse():sub(1,6)))
 math.random()
 
 function IsConsole()
-	return (PLATFORM == "PS4") or (PLATFORM == "XBONE")
+	return PLATFORM == "PS4" or PLATFORM == "XBONE" or PLATFORM == "SWITCH"
 end
 
 function IsNotConsole()
@@ -15,11 +15,11 @@ function IsNotConsole()
 end
 
 function IsPS4()
-	return (PLATFORM == "PS4")
+	return PLATFORM == "PS4"
 end
 
 function IsXB1()
-	return (PLATFORM == "XBONE")
+	return PLATFORM == "XBONE"
 end
 
 function IsSteam()
@@ -38,6 +38,9 @@ function IsRail()
 	return PLATFORM == "WIN32_RAIL"
 end
 
+function IsSteamDeck()
+	return IS_STEAM_DECK
+end
 
 --defines
 MAIN = 1
@@ -228,13 +231,17 @@ require("skinsutils")
 require("wxputils")
 require("klump")
 require("popupmanager")
+require("chathistory")
+require("componentutil")
+require("skins_defs_data")
 
 if TheConfig:IsEnabled("force_netbookmode") then
 	TheSim:SetNetbookMode(true)
 end
 
 
-print ("running main.lua\n")
+print("Running main.lua\n")
+
 TheSystemService:SetStalling(true)
 
 VERBOSITY_LEVEL = VERBOSITY.ERROR
@@ -260,6 +267,8 @@ AwakeEnts = {}
 UpdatingEnts = {}
 NewUpdatingEnts = {}
 StopUpdatingEnts = {}
+StaticUpdatingEnts = {}
+NewStaticUpdatingEnts = {}
 
 StopUpdatingComponents = {}
 
@@ -309,8 +318,12 @@ global("TheCookbook")
 TheCookbook = nil
 global("ThePlantRegistry")
 ThePlantRegistry = nil
+global("TheCraftingMenuProfile")
+TheCraftingMenuProfile = nil
 global("Lavaarena_CommunityProgression")
 Lavaarena_CommunityProgression = nil
+global("TheLoadingTips")
+TheLoadingTips = nil
 global("SaveGameIndex")
 SaveGameIndex = nil
 global("ShardGameIndex")
@@ -364,8 +377,15 @@ local function ModSafeStartup()
 	ThePlantRegistry = require("plantregistrydata")()
 	ThePlantRegistry:Load()
 	ThePlantRegistry.save_enabled = true
+	TheCraftingMenuProfile = require("craftingmenuprofile")()
+	TheCraftingMenuProfile:Load()
 	Lavaarena_CommunityProgression = require("lavaarena_communityprogression")()
 	Lavaarena_CommunityProgression:Load()
+
+	if TheLoadingTips == nil then
+		TheLoadingTips = require("loadingtipsdata")()
+		TheLoadingTips:Load()
+	end
 
     local FollowCamera = require("cameras/followcamera")
     TheCamera = FollowCamera()
@@ -421,6 +441,7 @@ SetInstanceParameters(json_settings)
 
 if Settings.reset_action == RESET_ACTION.JOIN_SERVER then
 	Settings.current_asset_set = Settings.last_asset_set
+	ChatHistory:JoinServer()
 end
 
 local load_frontend_reset_action = Settings.reset_action == nil or Settings.reset_action == RESET_ACTION.LOAD_FRONTEND
@@ -430,6 +451,13 @@ if Settings.memoizedFilePaths ~= nil then
 		SetMemoizedFilePaths(Settings.memoizedFilePaths)
 	end
 	Settings.memoizedFilePaths = nil
+end
+
+if Settings.chatHistory ~= nil then
+	if not load_frontend_reset_action then
+		ChatHistory:SetChatHistory(Settings.chatHistory)
+	end
+	Settings.chatHistory = nil
 end
 
 if Settings.loaded_mods ~= nil then

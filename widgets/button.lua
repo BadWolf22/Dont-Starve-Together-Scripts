@@ -23,6 +23,7 @@ local Button = Class(Widget, function(self)
 	self.selected = false
 
 	self.control = CONTROL_ACCEPT
+	self.mouseonly = false
 	self.help_message = STRINGS.UI.HELP.SELECT
 end)
 
@@ -44,20 +45,22 @@ function Button:DebugDraw_AddSection(dbui, panel)
 end
 
 function Button:SetControl(ctrl)
-	if ctrl then
+	if ctrl == CONTROL_PRIMARY then
+		self.control = CONTROL_ACCEPT
+	elseif ctrl then
 		self.control = ctrl
 	end
+	self.mouseonly = ctrl == CONTROL_PRIMARY
 end
 
 function Button:OnControl(control, down)
-
 	if Button._base.OnControl(self, control, down) then return true end
 
 	if not self:IsEnabled() or not self.focus then return false end
 
 	if self:IsSelected() and not self.AllowOnControlWhenSelected then return false end
 
-	if control == self.control then
+	if control == self.control and (not self.mouseonly or TheFrontEnd.isprimary) then
 
 		if down then
 			if not self.down then
@@ -102,7 +105,7 @@ function Button:OnGainFocus()
 
     if self:IsEnabled() and not self.selected and TheFrontEnd:GetFadeLevel() <= 0 then
     	if self.text then self.text:SetColour(self.textfocuscolour) end
-		TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_mouseover")
+		TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_mouseover", nil, ClickMouseoverSoundReduction())
 	end
 
     if self.ongainfocus then

@@ -853,7 +853,6 @@ local states =
                 local players = TheSim:FindEntities(x,y,z, TUNING.HERMITCRAB.DANCE_RANGE, PLAYER_TAGS)
 
                 for i,player in pairs(players)do
-                    print(player.prefab)
                     if player.sg and player.sg:HasStateTag("dancing") then
                         dancing = true
                         break
@@ -2532,7 +2531,6 @@ local states =
 
             if target ~= nil and target:IsValid() then
                 inst:FacePoint(target.Transform:GetWorldPosition())
-                inst.sg.statemem.attacktarget = target
             end
         end,
 
@@ -2582,7 +2580,6 @@ local states =
 
             if target ~= nil and target:IsValid() then
                 inst:FacePoint(target.Transform:GetWorldPosition())
-                inst.sg.statemem.attacktarget = target
             end
         end,
 

@@ -7,11 +7,7 @@ local assets =
 
 local malbatross_assets =
 {
-    -- Asset("ANIM", "anim/boat_mast_malbatross.zip"),
     Asset("ANIM", "anim/boat_mast_malbatross_wip.zip"),
-    -- Asset("ANIM", "anim/boat_mast_malbatross_knots.zip"),
-    -- Asset("ANIM", "anim/boat_mast_malbatross_opens.zip"),
-    -- Asset("ANIM", "anim/boat_mast_malbatross_build.zip"),
     Asset("ANIM", "anim/boat_mast_malbatross_knots_wip.zip"),
     Asset("ANIM", "anim/boat_mast_malbatross_opens_wip.zip"),
     Asset("ANIM", "anim/boat_mast_malbatross_build.zip"),
@@ -108,7 +104,11 @@ local function lamp_turnon(inst)
         inst.components.fueled:StartConsuming()
 
         if inst._lamp == nil then
-            inst._lamp = SpawnPrefab("mastupgrade_lamp")
+            if inst.saved_upgraded_from_item ~= nil and inst.saved_upgraded_from_item.linked_skinname then
+                inst._lamp = SpawnPrefab("mastupgrade_lamp", inst.saved_upgraded_from_item.linked_skinname, inst.saved_upgraded_from_item.skin_id )
+            else
+                inst._lamp = SpawnPrefab("mastupgrade_lamp")
+            end
             inst._lamp._mast = inst
             lamp_fuelupdate(inst)
 
@@ -149,10 +149,20 @@ local function upgrade_lamp(inst, no_built_callback)
 end
 
 local function upgrade_lightningrod(inst, no_built_callback)
-    inst._lightningrod = SpawnPrefab("mastupgrade_lightningrod")
+    if inst.saved_upgraded_from_item ~= nil and inst.saved_upgraded_from_item.linked_skinname then
+        inst._lightningrod = SpawnPrefab("mastupgrade_lightningrod", inst.saved_upgraded_from_item.linked_skinname, inst.saved_upgraded_from_item.skin_id )
+    else
+        inst._lightningrod = SpawnPrefab("mastupgrade_lightningrod")
+    end
+
     inst._lightningrod.entity:SetParent(inst.entity)
 
-    local top = SpawnPrefab("mastupgrade_lightningrod_top")
+    local top = nil
+    if inst.saved_upgraded_from_item ~= nil and inst.saved_upgraded_from_item.linked_skinname then
+        top = SpawnPrefab("mastupgrade_lightningrod_top", inst.saved_upgraded_from_item.linked_skinname .. "_top", inst.saved_upgraded_from_item.skin_id )
+    else
+        top = SpawnPrefab("mastupgrade_lightningrod_top")
+    end
     top.entity:SetParent(inst.entity)
     top.entity:AddFollower():FollowSymbol(inst.GUID, "mastupgrade_lightningrod_top", 0, 0, 0)
 
@@ -168,8 +178,11 @@ local function upgrade_lightningrod(inst, no_built_callback)
     end
 end
 
-local function OnUpgrade(inst)
+local function OnUpgrade(inst, performer, upgraded_from_item)
     local numupgrades = inst.components.upgradeable.numupgrades
+    if upgraded_from_item.linked_skinname ~= nil then
+        inst.saved_upgraded_from_item = { linked_skinname = upgraded_from_item.linked_skinname, skin_id = upgraded_from_item.skin_id }
+    end
     if numupgrades == 1 then
         upgrade_lamp(inst)
     elseif numupgrades == 2 then
@@ -208,10 +221,6 @@ local function onburnt(inst)
         inst._lightningrod:Remove()
         inst._lightningrod = nil
     end
-
-
-
-
 end
 
 local function ondeconstructstructure(inst, caster)
@@ -249,14 +258,16 @@ local function onsave(inst, data)
 
 	if inst.components.mast == nil or inst.components.mast.boat == nil then
 		data.rotation = inst.Transform:GetRotation()
-		data.is_sail_raised = inst.components.mast and inst.components.mast.is_sail_raised or nil
+		data.is_sail_raised = inst.components.mast and inst.components.mast.is_sail_raised or false
     end
 
     if inst._lamp ~= nil then
         data.lamp_fuel = inst.components.fueled.currentfuel
+        data.saved_upgraded_from_item = inst.saved_upgraded_from_item
     elseif inst._lightningrod ~= nil then
         data.lightningrod = true
         data.lightningrod_chargeleft = inst._lightningrod.chargeleft
+        data.saved_upgraded_from_item = inst.saved_upgraded_from_item
     end
 end
 
@@ -269,11 +280,17 @@ local function onload(inst, data)
 		if data.rotation then
 			inst.Transform:SetRotation(data.rotation)
 		end
-		if data.is_sail_raised and inst.components.mast ~= nil then
-			inst.components.mast:SailUnfurled()
+
+		if inst.components.mast ~= nil and (data.is_sail_raised == not inst.components.mast.inverted) then
+			if inst.components.mast.inverted then
+				inst.components.mast:SailFurled()
+			else
+				inst.components.mast:SailUnfurled()
+			end
         end
 
         if data.lamp_fuel ~= nil then
+            inst.saved_upgraded_from_item = data.saved_upgraded_from_item
             upgrade_lamp(inst)
             inst.components.fueled:InitializeFuelLevel(math.max(0, data.lamp_fuel))
             if data.lamp_fuel == 0 then
@@ -282,6 +299,7 @@ local function onload(inst, data)
                 lamp_turnon(inst)
             end
         elseif data.lightningrod ~= nil then
+            inst.saved_upgraded_from_item = data.saved_upgraded_from_item
             upgrade_lightningrod(inst, true)
             if data.lightningrod_chargeleft ~= nil and data.lightningrod_chargeleft > 0 then
                 inst._lightningrod:_setchargedfn(data.lightningrod_chargeleft)

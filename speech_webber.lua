@@ -14,6 +14,7 @@ return{
         {
             MOUNTED = "All our arms can't quite reach from up here.",
             HASPET = "I like the pet we've got.",
+			TICOON = "We're good with just one guide.",
         },
 		SHAVE =
 		{
@@ -35,7 +36,7 @@ return{
             INUSE = "Aw, we don't wanna mess up someone else's stuff.",
             NOTALLOWED = "It doesn't go there.",
             EMPTY = "We need stuff to build with.",
-            MISMATCH = "I don't think these are the right plans.",
+            MISMATCH = "We don't think these are the right plans.",
         },
 		RUMMAGE =
 		{
@@ -58,7 +59,16 @@ return{
 			LOCKED_GATE = "Aww. We want in there.",
             HOSTBUSY = "He looks pretty busy, we can come back later.",
             CARNIVAL_HOST_HERE = "We're pretty sure we saw him over here.",
-            NOCARNIVAL = "Aww, did all the birds leave?"
+            NOCARNIVAL = "Aww, did all the birds leave?",
+			EMPTY_CATCOONDEN = "No one's home...",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDERS = "It'll be more fun with more kitcoons.",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "It's okay, but maybe we can find a place with more hiding spots.",
+			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "That was fun! Can we play again tomorrow?",
+		},
+		OPEN_CRAFTING = 
+		{
+            PROFESSIONALCHEF = "Warly gets upset when we play with his things.",
+			SHADOWMAGIC = "I don't think we should play with that...",
 		},
         COOK =
         {
@@ -89,7 +99,7 @@ return{
 --fallback to speech_wilson.lua         READ =
 --fallback to speech_wilson.lua         {
 --fallback to speech_wilson.lua             GENERIC = "only_used_by_wickerbottom",
---fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom"
+--fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom",
 --fallback to speech_wilson.lua         },
 
         GIVE =
@@ -102,13 +112,13 @@ return{
             GHOSTHEART = "We don't think we even want them to come back.",
             NOTGEM = "It doesn't fit right!",
             WRONGGEM = "We'd rather keep this one for ourselves.",
-            NOTSTAFF = "I think that'd make it angry.",
+            NOTSTAFF = "We think that'd make it angry.",
             MUSHROOMFARM_NEEDSSHROOM = "It needs a mushroom!",
             MUSHROOMFARM_NEEDSLOG = "It needs a special kind of log!",
-            MUSHROOMFARM_NOMOONALLOWED = "I don't think they're going to grow.",
+            MUSHROOMFARM_NOMOONALLOWED = "We don't think they're going to grow.",
             SLOTFULL = "Mom said to always finish my plate before seconds.",
             FOODFULL = "It's still working on the first one.",
-            NOTDISH = "I don't think we should offer that.",
+            NOTDISH = "We don't think we should offer that.",
             DUPLICATE = "We don't need two!",
             NOTSCULPTABLE = "Eight legs isn't nearly enough to sculpt with THAT.",
 --fallback to speech_wilson.lua             NOTATRIUMKEY = "It's not quite the right shape.",
@@ -121,6 +131,8 @@ return{
 			CARNIVALGAME_INVALID_ITEM = "Hmm, it doesn't want that.",
 			CARNIVALGAME_ALREADY_PLAYING = "We're playing next!",
             SPIDERNOHAT = "There's not enough room, we don't want to squish them by accident!",
+            TERRARIUM_REFUSE = "Maybe we can give it something else?",
+            TERRARIUM_COOLDOWN = "Let's wait for the little tree to come back first!",
         },
         GIVETOPLAYER =
         {
@@ -161,6 +173,7 @@ return{
         {
             TARGETINCOMBAT = "It's too angry!",
             INUSE = "We didn't climb into the saddle in time!",
+			SLEEPING = "Oops, were you sleeping?",
         },
         SADDLE =
         {
@@ -324,7 +337,44 @@ return{
         {
 --fallback to speech_wilson.lua             ONCOOLDOWN = "only_used_by_wanda",
         },
+
+        ENTER_GYM =
+        {
+--fallback to speech_wilson.lua             NOWEIGHT = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             UNBALANCED = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             ONFIRE = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             SMOULDER = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             HUNGRY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             FULL = "only_used_by_wolfang",
+        },
+
+        APPLYMODULE =
+        {
+            COOLDOWN = "only_used_by_wx78",
+            NOTENOUGHSLOTS = "only_used_by_wx78",
+        },
+        REMOVEMODULES =
+        {
+            NO_MODULES = "only_used_by_wx78",
+        },
+        CHARGE_FROM =
+        {
+            NOT_ENOUGH_CHARGE = "only_used_by_wx78",
+            CHARGE_FULL = "only_used_by_wx78",
+        },
+
+        HARVEST =
+        {
+            DOER_ISNT_MODULE_OWNER = "We don't think Jimmy wants to play.",
+        },
     },
+
+	ANNOUNCE_CANNOT_BUILD =
+	{
+		NO_INGREDIENTS = "We don't have enough stuff!",
+		NO_TECH = "We're not sure how to make that yet...",
+		NO_STATION = "We can't make that right now.",
+	},
 
 	ACTIONFAIL_GENERIC = "Mom told me never to do that.",
 	ANNOUNCE_BOAT_LEAK = "The boat is crying!",
@@ -343,6 +393,11 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_NORMALTOWIMPY = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_WIMPYTONORMAL = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_MIGHTYTONORMAL = "only_used_by_wolfang",
+    ANNOUNCE_EXITGYM = {
+--fallback to speech_wilson.lua         MIGHTY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         NORMAL = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         WIMPY = "only_used_by_wolfang",
+    },
 
 	ANNOUNCE_BEES = "Flying ouchies!",
 	ANNOUNCE_BOOMERANG = "It hurts us when we don't catch it.",
@@ -440,11 +495,11 @@ return{
 	ANNOUNCE_NODAYSLEEP_CAVE = "We're not ready for bed.",
 	ANNOUNCE_NOHUNGERSLEEP = "Our tummy is rumbling, we can't sleep.",
 	ANNOUNCE_NOSLEEPONFIRE = "Mum always said \"Don't sleep in a burning building.\"",
+    ANNOUNCE_NOSLEEPHASPERMANENTLIGHT = "We can't sleep with such a bright nightlight...",
 	ANNOUNCE_NODANGERSIESTA = "Can't nap with monsters nearby!",
 	ANNOUNCE_NONIGHTSIESTA = "We can't take a nap, it's nighttime!",
 	ANNOUNCE_NONIGHTSIESTA_CAVE = "No naps til daybreak!",
 	ANNOUNCE_NOHUNGERSIESTA = "Won't be able to nap with a rumbling tummy.",
-	ANNOUNCE_NODANGERAFK = "Can't! There's scary-biteys about!",
 	ANNOUNCE_NO_TRAP = "Easy peasy.",
 	ANNOUNCE_PECKED = "Bad bird!",
 	ANNOUNCE_QUAKE = "I don't think that was our tummy.",
@@ -579,6 +634,10 @@ return{
 --fallback to speech_wilson.lua 	{
 --fallback to speech_wilson.lua         "only_used_by_walter",
 --fallback to speech_wilson.lua 	},
+
+    -- wx specific
+    ANNOUNCE_WX_SCANNER_NEW_FOUND = "only_used_by_wx78",
+--fallback to speech_wilson.lua     ANNOUNCE_WX_SCANNER_FOUND_NO_DATA = "only_used_by_wx78",
 
     --quagmire event
     QUAGMIRE_ANNOUNCE_NOTRECIPE = "Oh no! That wasn't a recipe!",
@@ -720,10 +779,42 @@ return{
         "We're always here when you need somebody to talk to!",
 	},
 
+	ANNOUNCE_KITCOON_HIDEANDSEEK_START = "Ready or not, here we come!",
+	ANNOUNCE_KITCOON_HIDEANDSEEK_JOIN = "Let's work together to find those kitcoons!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND = 
+	{
+		"Found you!",
+		"There you are!",
+		"We found you!",
+		"Heehee, gotcha!",
+	},
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_ONE_MORE = "We found one more!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE = "That was the last one, we won!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE_TEAM = "We did it, we found them all!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TIME_ALMOST_UP = "We're almost out of time!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_LOSEGAME = "Aw... olly olly oxenfree!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR = "We don't think the kitcoons would go this far out...",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR_RETURN = "We're back in the kitcoon's playground.",
+	ANNOUNCE_KITCOON_FOUND_IN_THE_WILD = "Hello! Are you lost?",
+
+	ANNOUNCE_TICOON_START_TRACKING	= "Wow! He's leading us right to the kitcoons! ...Is that cheating?",
+	ANNOUNCE_TICOON_NOTHING_TO_TRACK = "Doesn't look like he found any clues here.",
+	ANNOUNCE_TICOON_WAITING_FOR_LEADER = "We should stay close to him.",
+	ANNOUNCE_TICOON_GET_LEADER_ATTENTION = "They want to get back to finding the kitcoons.",
+	ANNOUNCE_TICOON_NEAR_KITCOON = "We must be getting close!",
+	ANNOUNCE_TICOON_LOST_KITCOON = "Either someone else found them, or this one is a lot tinier.",
+	ANNOUNCE_TICOON_ABANDONED = "We felt like using him was a bit like cheating anyway.",
+	ANNOUNCE_TICOON_DEAD = "Oh no... where are we supposed to go now?",
+
     -- YOTB
     ANNOUNCE_CALL_BEEF = "Over here, beefalo! Follow us!",
     ANNOUNCE_CANTBUILDHERE_YOTB_POST = "We should put this where the judge can see it.",
     ANNOUNCE_YOTB_LEARN_NEW_PATTERN =  "We can't wait for our beefalo to try it on!",
+
+    -- AE4AE
+    ANNOUNCE_EYEOFTERROR_ARRIVE = "Why do we feel like we're being watched?",
+    ANNOUNCE_EYEOFTERROR_FLYBACK = "Coming back to play some more?",
+    ANNOUNCE_EYEOFTERROR_FLYAWAY = "It doesn't want to play anymore.",
 
 	BATTLECRY =
 	{
@@ -1581,7 +1672,11 @@ return{
         CHESSPIECE_BEEQUEEN = "Sweet!",
         CHESSPIECE_ANTLION = "It's so life-like the mane looks fluffy!",
         CHESSPIECE_BEEFALO = "Now we want to go for a beefalo ride!",
+		CHESSPIECE_KITCOON = "Whoah! I hope they don't fall over...",
+		CHESSPIECE_CATCOON = "We respect the butterfly hunter.",
         CHESSPIECE_GUARDIANPHASE3 = "It can't still see us... right?",
+        CHESSPIECE_EYEOFTERROR = "We think we could've been friends.",
+        CHESSPIECE_TWINSOFTERROR = "Now they'll always be together.",
 
         CHESSJUNK1 = "A mess of chess.",
         CHESSJUNK2 = "A mess of chess.",
@@ -2723,6 +2818,8 @@ return{
 			BURNT = "We can't hide in there any more.",
 		},
 		WARG = "I don't think that puppy is very happy.",
+        WARGLET = "N-nice puppy...",
+        
 		WASPHIVE = "Sounds like anger!",
 		WATERBALLOON = "We have to be gentle with our claws if we try to hold it!",
 		WATERMELON = "Looks tasty!",
@@ -4054,6 +4151,47 @@ return{
 
         BEEF_BELL = "The beefalo really like this bell, and whoever rings it!",
 
+		-- YOT Catcoon
+		KITCOONDEN = 
+		{
+			GENERIC = "A nice safe place for kitcoons to rest after playing.",
+            BURNT = "We hope it was evacuated...",
+			PLAYING_HIDEANDSEEK = "They're hiding...",
+			PLAYING_HIDEANDSEEK_TIME_ALMOST_UP = "We're almost out of time to find all of the babies...",
+		},
+
+		KITCOONDEN_KIT = "We can use this to build a little house for the kitcoons.",
+
+		TICOON = 
+		{
+			GENERIC = "Your majesty!",
+			ABANDONED = "We'll try our best to find them on our own.",
+			SUCCESS = "Wow! Good work, your highness!",
+			LOST_TRACK = "Aw, we weren't quick enough.",
+			NEARBY = "Is there a kit nearby, our liege?",
+			TRACKING = "He's onto something!",
+			TRACKING_NOT_MINE = "He's helping someone else right now.",
+			NOTHING_TO_TRACK = "It doesn't look like there's anything around here...",
+			TARGET_TOO_FAR_AWAY = "Maybe the kit's out of his sniffing range?",
+		},
+		
+		YOT_CATCOONSHRINE =
+        {
+            GENERIC = "What a nice tribute!",
+            EMPTY = "What could we offer it? Something from a bird?",
+            BURNT = "I guess not everyone likes catcoons...",
+        },
+
+		KITCOON_FOREST = "The minister's kit is an arborous kit!",
+		KITCOON_SAVANNA = "The minister's kit is a beastly kit!",
+		KITCOON_MARSH = "The minister's kit is a comfy kit!",
+		KITCOON_DECIDUOUS = "The minister's kit is a dastardly kit!",
+		KITCOON_GRASS = "The minister's kit is an eager kit!",
+		KITCOON_ROCKY = "The minister's kit is a ferrous kit!",
+		KITCOON_DESERT = "The minister's kit is a golden kit!",
+		KITCOON_MOON = "The minister's kit is a husky kit!",
+		KITCOON_YOT = "The minister's kit is an icy kit!",
+
         -- Moon Storm
         ALTERGUARDIAN_PHASE1 = {
             GENERIC = "Aah! It looks mad!",
@@ -4173,6 +4311,102 @@ return{
         FIGKABAB = "We like to play swords with the stick when we're done.",
         KOALEFIG_TRUNK = "That looks extra filling!",
         FROGNEWTON = "Something we both like!",
+
+        -- The Terrorarium
+        TERRARIUM = {
+            GENERIC = "So pretty! We want to shake it!",
+            CRIMSON = "Uh oh... is the tree sick?",
+            ENABLED = "WE DIDN'T SHAKE IT, WE PROMISE!!",
+			WAITING_FOR_DARK = "We could give it just a little shake, couldn't we?",
+			COOLDOWN = "Oh no! Did we lose the little tree somewhere?",
+			SPAWN_DISABLED = "We think we're done playing with Mr. Eyeball.",
+        },
+
+        -- Wolfgang
+        MIGHTY_GYM = 
+        {
+            GENERIC = "Can we try, Mr. Wolfgang? We've got extra arms to lift with!",
+            BURNT = "Uh oh... Mr. Wolfgang won't be very happy...",
+        },
+
+        DUMBBELL = "It looks so easy when Mr. Wolfgang does it...",
+        DUMBBELL_GOLDEN = "It looks so easy when Mr. Wolfgang does it...",
+		DUMBBELL_MARBLE = "It looks so easy when Mr. Wolfgang does it...",
+        DUMBBELL_GEM = "It looks so easy when Mr. Wolfgang does it...",
+        POTATOSACK = "We peeked inside, some of them looked more like rocks than potatoes...",
+
+
+        TERRARIUMCHEST = 
+		{
+			GENERIC = "We didn't find any toys inside.",
+			BURNT = "Aww, it was such a pretty chest.",
+			SHIMMER = "We bet there are plenty of toys inside!",
+		},
+
+		EYEMASKHAT = "We have even MORE eyes and teeth!",
+
+        EYEOFTERROR = "We don't like the look of that...",
+        EYEOFTERROR_MINI = "We're not usually so bothered by a few extra eyes.",
+        EYEOFTERROR_MINI_GROUNDED = "A baby eye is about to be born.",
+
+        FROZENBANANADAIQUIRI = "We can pretend it's a milkshake!",
+        BUNNYSTEW = "We were told we can't lick it clean...",
+        MILKYWHITES = "Poor friend. Looks yummy, though.",
+
+        CRITTER_EYEOFTERROR = "They're really good at hide and seek!",
+
+        SHIELDOFTERROR ="Ms. Wickerbottom says we shouldn't bite.",
+        TWINOFTERROR1 = "Aww, they brought a friend!",
+        TWINOFTERROR2 = "Aww, they brought a friend!",
+
+        -- Year of the Catcoon
+        CATTOY_MOUSE = "Run little mouse, run!",
+        KITCOON_NAMETAG = "We always wanted a pet!",
+
+		KITCOONDECOR1 =
+        {
+            GENERIC = "We hope the kitcoons like it!",
+            BURNT = "Oh no!",
+        },
+		KITCOONDECOR2 =
+        {
+            GENERIC = "We like watching the kitcoons play with it!",
+            BURNT = "Aww...",
+        },
+
+		KITCOONDECOR1_KIT = "We'll have it done right away!",
+		KITCOONDECOR2_KIT = "Where should we put it?",
+
+        -- WX78
+        WX78MODULE_MAXHEALTH = "Huh. Is that what robot insides look like?",
+        WX78MODULE_MAXSANITY1 = "Huh. Is that what robot insides look like?",
+        WX78MODULE_MAXSANITY = "Huh. Is that what robot insides look like?",
+        WX78MODULE_MOVESPEED = "Huh. Is that what robot insides look like?",
+        WX78MODULE_MOVESPEED2 = "Huh. Is that what robot insides look like?",
+        WX78MODULE_HEAT = "Huh. Is that what robot insides look like?",
+        WX78MODULE_NIGHTVISION = "Huh. Is that what robot insides look like?",
+        WX78MODULE_COLD = "Huh. Is that what robot insides look like?",
+        WX78MODULE_TASER = "Huh. Is that what robot insides look like?",
+        WX78MODULE_LIGHT = "Huh. Is that what robot insides look like?",
+        WX78MODULE_MAXHUNGER1 = "Huh. Is that what robot insides look like?",
+        WX78MODULE_MAXHUNGER = "Huh. Is that what robot insides look like?",
+        WX78MODULE_MUSIC = "Huh. Is that what robot insides look like?",
+        WX78MODULE_BEE = "Huh. Is that what robot insides look like?",
+        WX78MODULE_MAXHEALTH2 = "Huh. Is that what robot insides look like?",
+
+        WX78_SCANNER = 
+        {
+            GENERIC ="Watch out for our webs when you're flying!",
+            HUNTING = "Watch out for our webs when you're flying!",
+            SCANNING = "Watch out for our webs when you're flying!",
+        },
+
+        WX78_SCANNER_ITEM = "Is your name really Jimmy?",
+        WX78_SCANNER_SUCCEEDED = "WX! We think Jimmy's trying to get your attention!",
+
+        WX78_MODULEREMOVER = "We're not sure that's safe...",
+
+        SCANDATA = "Wow, it learned all that just by looking really hard?",
     },
 
     DESCRIBE_GENERIC = "Can we play with it?",

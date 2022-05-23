@@ -54,9 +54,6 @@ local assets =
     -- Asset("ATLAS", "images/bg_color.xml"), -- Not currently used, but likely to come back
     -- Asset("IMAGE", "images/bg_color.tex"), -- Not currently used, but likely to come back
 
-    Asset("ATLAS", "images/servericons.xml"),
-    Asset("IMAGE", "images/servericons.tex"),
-
     Asset("ATLAS", "images/server_intentions.xml"),
     Asset("IMAGE", "images/server_intentions.tex"),
 
@@ -134,6 +131,7 @@ local assets =
     Asset("ANIM", "anim/player_idles_wes.zip"),
     Asset("ANIM", "anim/player_idles_webber.zip"),
     Asset("ANIM", "anim/player_idles_wanda.zip"),
+    Asset("ANIM", "anim/player_idles_wx.zip"),
     Asset("ANIM", "anim/bernie_build.zip"),
     Asset("ANIM", "anim/swap_lucy_axe.zip"),
 
@@ -251,6 +249,27 @@ local assets =
     Asset("PKGREF", "anim/dynamic/oddment_pumpkinpie.dyn"),
     Asset("DYNAMIC_ATLAS", "images/maze.xml"),
     Asset("ASSET_PKGREF", "images/maze.tex"),
+    
+    Asset("ANIM", "anim/kitcoon_nametag.zip"),   
+    Asset("ANIM", "anim/kitcoon_forest_build.zip"),
+    Asset("ANIM", "anim/kitcoon_savanna_build.zip"),
+    Asset("ANIM", "anim/kitcoon_deciduous_build.zip"),
+    Asset("ANIM", "anim/kitcoon_marsh_build.zip"),
+    Asset("ANIM", "anim/kitcoon_grass_build.zip"),
+    Asset("ANIM", "anim/kitcoon_rocky_build.zip"),
+    Asset("ANIM", "anim/kitcoon_desert_build.zip"),
+    Asset("ANIM", "anim/kitcoon_moon_build.zip"),
+    Asset("ANIM", "anim/kitcoon_yot_build.zip"), 
+    Asset("ANIM", "anim/kitcoon_basic.zip"),
+    Asset("ANIM", "anim/kitcoon_emotes.zip"),
+    Asset("ANIM", "anim/kitcoon_traits.zip"),
+    Asset("ANIM", "anim/kitcoon_jump.zip"),
+    Asset("ANIM", "anim/kitcoon_poop.zip"),
+    Asset("ANIM", "anim/kitcoon_food.zip"),
+    Asset("ANIM", "anim/kitcoon_pouch.zip"),
+    Asset("ANIM", "anim/kitcoon_bg.zip"),
+    Asset("IMAGE", "images/colour_cubes/day05_cc.tex"),
+    Asset("IMAGE", "images/colour_cubes/dusk03_cc.tex"),
 }
 
 --Including these here as well as global to ensure the exporter's resizing dependency works
@@ -274,18 +293,32 @@ if IsConsole() then
 	    table.insert(assets, Asset("ATLAS", "images/ui_ps4.xml"))
 	    table.insert(assets, Asset("IMAGE", "images/ui_ps4.tex"))
 	end
-end
 
-if IsPS4() then
-    table.insert(assets, Asset("ATLAS", "images/ps4.xml"))
-    table.insert(assets, Asset("IMAGE", "images/ps4.tex"))
-    table.insert(assets, Asset("ATLAS", "images/ps4_controllers.xml"))
-    table.insert(assets, Asset("IMAGE", "images/ps4_controllers.tex"))
-elseif IsXB1() then
-    table.insert(assets, Asset("ATLAS", "images/xb1_controllers.xml"))
-    table.insert(assets, Asset("IMAGE", "images/xb1_controllers.tex"))
-    table.insert(assets, Asset("ATLAS", "images/blit.xml"))
-    table.insert(assets, Asset("IMAGE", "images/blit.tex"))
+	if IsPS4() then
+		table.insert(assets, Asset("ATLAS", "images/ps4.xml"))
+		table.insert(assets, Asset("IMAGE", "images/ps4.tex"))
+		table.insert(assets, Asset("ATLAS", "images/ps4_controllers.xml"))
+		table.insert(assets, Asset("IMAGE", "images/ps4_controllers.tex"))
+	elseif IsXB1() then
+		table.insert(assets, Asset("ATLAS", "images/xb1_controllers.xml"))
+		table.insert(assets, Asset("IMAGE", "images/xb1_controllers.tex"))
+		table.insert(assets, Asset("ATLAS", "images/blit.xml"))
+		table.insert(assets, Asset("IMAGE", "images/blit.tex"))
+	elseif IsSWITCH() then
+		table.insert(assets, Asset("ATLAS", "images/nx_controllers.xml"))
+		table.insert(assets, Asset("IMAGE", "images/nx_controllers.tex"))
+		table.insert(assets, Asset("ATLAS", "images/nx.xml"))
+		table.insert(assets, Asset("IMAGE", "images/nx.tex"))
+	else
+		assert(0) -- Add platform
+	end
+elseif BRANCH == "dev" then
+	table.insert(assets, Asset("ATLAS", "images/ps4_controllers.xml"))
+	table.insert(assets, Asset("IMAGE", "images/ps4_controllers.tex"))
+	table.insert(assets, Asset("ATLAS", "images/xb1_controllers.xml"))
+	table.insert(assets, Asset("IMAGE", "images/xb1_controllers.tex"))
+	--table.insert(assets, Asset("ATLAS", "images/nx_controllers.xml"))
+	--table.insert(assets, Asset("IMAGE", "images/nx_controllers.tex"))
 end
 
 if PLATFORM == "WIN32_RAIL" then

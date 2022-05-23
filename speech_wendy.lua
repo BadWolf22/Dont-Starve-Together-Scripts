@@ -14,6 +14,7 @@ return{
         {
             MOUNTED = "I can't place that from this lofty position.",
             HASPET = "I can only have one...",
+			TICOON = "The more friends you have, the shallower they are.",
         },
 		SHAVE =
 		{
@@ -58,7 +59,16 @@ return{
 			LOCKED_GATE = "I can't open it without a key.",
             HOSTBUSY = "I suppose he has more important things to do.",
             CARNIVAL_HOST_HERE = "Mr. Raven? Are you here?",
-            NOCARNIVAL = "The ravens have deserted this place... I think I'll miss them."
+            NOCARNIVAL = "The ravens have deserted this place... I think I'll miss them.",
+			EMPTY_CATCOONDEN = "Abandoned. Left to the flies.",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDERS = "If we play now, they will stand no chance at winning.",
+			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "If we play now, they won't find a place to hide.",
+			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "If we play more, Abigail will get tired.",
+		},
+		OPEN_CRAFTING = 
+		{
+            PROFESSIONALCHEF = "That belongs to Warly.",
+			SHADOWMAGIC = "Do you want me to read you a story, Abigail?",
 		},
         COOK =
         {
@@ -89,7 +99,7 @@ return{
 --fallback to speech_wilson.lua         READ =
 --fallback to speech_wilson.lua         {
 --fallback to speech_wilson.lua             GENERIC = "only_used_by_wickerbottom",
---fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom"
+--fallback to speech_wilson.lua             NOBIRDS = "only_used_by_wickerbottom",
 --fallback to speech_wilson.lua         },
 
         GIVE =
@@ -121,6 +131,8 @@ return{
 			CARNIVALGAME_INVALID_ITEM = "That's not what it wants.",
 			CARNIVALGAME_ALREADY_PLAYING = "They already started without me...",
             SPIDERNOHAT = "I have a feeling the spider would get it all rumpled in my pocket.",
+            TERRARIUM_REFUSE = "It refused my gift...",
+            TERRARIUM_COOLDOWN = "I suppose it needs more time to recover from all it has been through.",
         },
         GIVETOPLAYER =
         {
@@ -161,6 +173,7 @@ return{
         {
             TARGETINCOMBAT = "I'll wait for it to calm down...",
             INUSE = "I'll have to be quicker to the saddle next time.",
+			SLEEPING = "It feels so cruel to wake it from its dreams...",
         },
         SADDLE =
         {
@@ -324,7 +337,44 @@ return{
         {
 --fallback to speech_wilson.lua             ONCOOLDOWN = "only_used_by_wanda",
         },
+
+        ENTER_GYM =
+        {
+--fallback to speech_wilson.lua             NOWEIGHT = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             UNBALANCED = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             ONFIRE = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             SMOULDER = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             HUNGRY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             FULL = "only_used_by_wolfang",
+        },
+
+        APPLYMODULE =
+        {
+            COOLDOWN = "only_used_by_wx78",
+            NOTENOUGHSLOTS = "only_used_by_wx78",
+        },
+        REMOVEMODULES =
+        {
+            NO_MODULES = "only_used_by_wx78",
+        },
+        CHARGE_FROM =
+        {
+            NOT_ENOUGH_CHARGE = "only_used_by_wx78",
+            CHARGE_FULL = "only_used_by_wx78",
+        },
+
+        HARVEST =
+        {
+            DOER_ISNT_MODULE_OWNER = "It won't pay any attention to me...",
+        },
     },
+
+	ANNOUNCE_CANNOT_BUILD =
+	{
+		NO_INGREDIENTS = "I'm always lacking something, aren't I...",
+		NO_TECH = "I don't know how. I'm sorry.",
+		NO_STATION = "I can't.",
+	},
 
 	ACTIONFAIL_GENERIC = "I can't do anything right.",
 	ANNOUNCE_BOAT_LEAK = "Our boat weeps salty tears.",
@@ -343,6 +393,11 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_NORMALTOWIMPY = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_WIMPYTONORMAL = "only_used_by_wolfang",
 --fallback to speech_wilson.lua     ANNOUNCE_MIGHTYTONORMAL = "only_used_by_wolfang",
+    ANNOUNCE_EXITGYM = {
+--fallback to speech_wilson.lua         MIGHTY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         NORMAL = "only_used_by_wolfang",
+--fallback to speech_wilson.lua         WIMPY = "only_used_by_wolfang",
+    },
 
 	ANNOUNCE_BEES = "Bees! Maybe I'm allergic!",
 	ANNOUNCE_BOOMERANG = "Ow! That was karma.",
@@ -440,11 +495,11 @@ return{
 	ANNOUNCE_NODAYSLEEP_CAVE = "I'm not tired yet.",
 	ANNOUNCE_NOHUNGERSLEEP = "My stomach is as empty as my heart. I can't sleep now.",
 	ANNOUNCE_NOSLEEPONFIRE = "That'd be quite the way to go out.",
+    ANNOUNCE_NOSLEEPHASPERMANENTLIGHT = "I can't sleep if I'm not surrounded by darkness.",
 	ANNOUNCE_NODANGERSIESTA = "I couldn't possibly nap. Death is nigh.",
 	ANNOUNCE_NONIGHTSIESTA = "I'd really rather be in a tent.",
 	ANNOUNCE_NONIGHTSIESTA_CAVE = "I'd really rather be in a tent.",
 	ANNOUNCE_NOHUNGERSIESTA = "My stomach is as empty as my heart. I can't nap now.",
-	ANNOUNCE_NODANGERAFK = "I can't let my guard down right now...",
 	ANNOUNCE_NO_TRAP = "I was expecting great difficulty.",
 	ANNOUNCE_PECKED = "You try my patience.",
 	ANNOUNCE_QUAKE = "The ground shakes. Will it swallow me whole?",
@@ -579,6 +634,10 @@ return{
 --fallback to speech_wilson.lua 	{
 --fallback to speech_wilson.lua         "only_used_by_walter",
 --fallback to speech_wilson.lua 	},
+
+    -- wx specific
+    ANNOUNCE_WX_SCANNER_NEW_FOUND = "only_used_by_wx78",
+--fallback to speech_wilson.lua     ANNOUNCE_WX_SCANNER_FOUND_NO_DATA = "only_used_by_wx78",
 
     --quagmire event
     QUAGMIRE_ANNOUNCE_NOTRECIPE = "Those foods weren't meant to be together.",
@@ -724,10 +783,42 @@ return{
         "Shall I stay and talk with you for a while?",
 	},
 
+	ANNOUNCE_KITCOON_HIDEANDSEEK_START = "Let the games begin.",
+	ANNOUNCE_KITCOON_HIDEANDSEEK_JOIN = "Abigail, they're playing hide and seek. Let's go!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND = 
+	{
+		"A lost soul, now found.",
+		"We found them, Abigail!",
+		"Much like death, I'll always find you.",
+		"You only have yourself to blame. And your tail.",
+	},
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_ONE_MORE = "Do you think we'll win this, Abigail?",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE = "We found them all, heeheehee!",
+	ANNOUNCE_KITCOON_HIDANDSEEK_FOUND_LAST_ONE_TEAM = "And just like that, the game is over.",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TIME_ALMOST_UP = "Tick tock, goes the clock.",
+	ANNOUNCE_KITCOON_HIDANDSEEK_LOSEGAME = "I wasted time, and now doth time waste me",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR = "No, they wouldn't have come this far...",
+	ANNOUNCE_KITCOON_HIDANDSEEK_TOOFAR_RETURN = "I return from life's edge.",
+	ANNOUNCE_KITCOON_FOUND_IN_THE_WILD = "They've lost their way. Poor thing.",
+
+	ANNOUNCE_TICOON_START_TRACKING	= "He knows where they are, we should follow.",
+	ANNOUNCE_TICOON_NOTHING_TO_TRACK = "Their scent lingers here no longer.",
+	ANNOUNCE_TICOON_WAITING_FOR_LEADER = "He waits in gloom for me, I should return.",
+	ANNOUNCE_TICOON_GET_LEADER_ATTENTION = "He would like me to follow, so I shall.",
+	ANNOUNCE_TICOON_NEAR_KITCOON = "I don't think we're alone here.",
+	ANNOUNCE_TICOON_LOST_KITCOON = "I've arrived a moment too late. Sigh...",
+	ANNOUNCE_TICOON_ABANDONED = "This must be where we part ways. Goodbye.",
+	ANNOUNCE_TICOON_DEAD = "No, don't leave me...!",
+
     -- YOTB
     ANNOUNCE_CALL_BEEF = "Come now dear creature, don't be afraid.",
     ANNOUNCE_CANTBUILDHERE_YOTB_POST = "Closer to the judge would be best.",
     ANNOUNCE_YOTB_LEARN_NEW_PATTERN =  "Oh. Maybe I could try making this new costume...",
+
+    -- AE4AE
+    ANNOUNCE_EYEOFTERROR_ARRIVE = "The abyss gazes into me!",
+    ANNOUNCE_EYEOFTERROR_FLYBACK = "There is never an end to the madness.",
+    ANNOUNCE_EYEOFTERROR_FLYAWAY = "It's gone. And alas, I'm still here.",
 
 	BATTLECRY =
 	{
@@ -1585,7 +1676,11 @@ return{
         CHESSPIECE_BEEQUEEN = "She once had a sweet life.",
         CHESSPIECE_ANTLION = "Still and lifeless.",
         CHESSPIECE_BEEFALO = "Merely a cold, lifeless copy.",
+		CHESSPIECE_KITCOON = "Hubris, undoubtedly.",
+		CHESSPIECE_CATCOON = "A reminder of brighter days.",
         CHESSPIECE_GUARDIANPHASE3 = "It won't be looking down on us anymore.",
+        CHESSPIECE_EYEOFTERROR = "Its stony gaze will glare for eternity.",
+        CHESSPIECE_TWINSOFTERROR = "I still remember watching the light leave their eyes.",
 
         CHESSJUNK1 = "Cold, dead artificial life.",
         CHESSJUNK2 = "Cold, dead artificial life.",
@@ -2727,6 +2822,8 @@ return{
 			BURNT = "Now it doesn't remind me of anything.",
 		},
 		WARG = "A true bastion of evil.",
+        WARGLET = "A beast of gnashing teeth and fury.",
+        
 		WASPHIVE = "They hide in their fortress of hate.",
 		WATERBALLOON = "At any moment it could pop and spill its guts.",
 		WATERMELON = "It's mostly water. What's the big deal?",
@@ -4058,6 +4155,47 @@ return{
 
         BEEF_BELL = "Alas, not a death knell.",
 
+		-- YOT Catcoon
+		KITCOONDEN = 
+		{
+			GENERIC = "Where the wild beasts go.",
+            BURNT = "Everything ends.",
+			PLAYING_HIDEANDSEEK = "They've left me behind...",
+			PLAYING_HIDEANDSEEK_TIME_ALMOST_UP = "The sands of time are unforgiving.",
+		},
+
+		KITCOONDEN_KIT = "Oh, to be young and free of life's worries.",
+
+		TICOON = 
+		{
+			GENERIC = "He is the light I must follow.",
+			ABANDONED = "That's how it always ends. I'm alone.",
+			SUCCESS = "No one can hide from their fate forever.",
+			LOST_TRACK = "We have lost our way.",
+			NEARBY = "So close, and yet, so far.",
+			TRACKING = "May you find what you are looking for.",
+			TRACKING_NOT_MINE = "He leads me to a treasure I cannot obtain.",
+			NOTHING_TO_TRACK = "Nothing left to find but dust.",
+			TARGET_TOO_FAR_AWAY = "What we're looking for is well beyond our reach.",
+		},
+		
+		YOT_CATCOONSHRINE =
+        {
+            GENERIC = "How do you know I'm mad?",
+            EMPTY = "What shall I let go to please it?",
+            BURNT = "No more.",
+        },
+
+		KITCOON_FOREST = "Small and innocent. Like I once was...",
+		KITCOON_SAVANNA = "Small and innocent. Like I once was...",
+		KITCOON_MARSH = "Small and innocent. Like I once was...",
+		KITCOON_DECIDUOUS = "Small and innocent. Like I once was...",
+		KITCOON_GRASS = "Small and innocent. Like I once was...",
+		KITCOON_ROCKY = "Small and innocent. Like I once was...",
+		KITCOON_DESERT = "Small and innocent. Like I once was...",
+		KITCOON_MOON = "Small and innocent. Like I once was...",
+		KITCOON_YOT = "Small and innocent. Like I once was...",
+
         -- Moon Storm
         ALTERGUARDIAN_PHASE1 = {
             GENERIC = "We've brought on our own demise.",
@@ -4177,6 +4315,102 @@ return{
         FIGKABAB = "The fig pieces look like little pierced hearts.",
         KOALEFIG_TRUNK = "How terrible.",
         FROGNEWTON = "Sweet and only a little slimy.",
+
+        -- The Terrorarium
+        TERRARIUM = {
+            GENERIC = "So much beauty contained inside, will it ever escape?",
+            CRIMSON = "The darkness of this world has corrupted it.",
+            ENABLED = "Ah... so it has escaped.",
+			WAITING_FOR_DARK = "Abigail, are you doing that?",
+			COOLDOWN = "All beauty fades with time.",
+			SPAWN_DISABLED = "Let it be sealed away forever.",
+        },
+
+        -- Wolfgang
+        MIGHTY_GYM = 
+        {
+            GENERIC = "It seems strength can only be found through suffering.",
+            BURNT = "It's nothing but ashes and memories.",
+        },
+
+        DUMBBELL = "Oh. It's very heavy.",
+        DUMBBELL_GOLDEN = "It's almost as heavy as my heart.",
+		DUMBBELL_MARBLE = "We all carry a great weight. His seems... a bit more literal, though.",
+        DUMBBELL_GEM = "Who would choose to carry such a burden...",
+        POTATOSACK = "Large enough to hold a corpse... or a few dozen potatoes.",
+
+
+        TERRARIUMCHEST = 
+		{
+			GENERIC = "What terrible things hide within?",
+			BURNT = "It didn't belong in this world.",
+			SHIMMER = "I feel its strange light drawing me in, like a moth to the flame.",
+		},
+
+		EYEMASKHAT = "I am the beholder of the eye.",
+
+        EYEOFTERROR = "Beware the evil eye.",
+        EYEOFTERROR_MINI = "I can feel the sting of their sharp gaze...",
+        EYEOFTERROR_MINI_GROUNDED = "One more blight will be brought into this world.",
+
+        FROZENBANANADAIQUIRI = "This won't be of help to my cold, cold heart.",
+        BUNNYSTEW = "You were fast, little rabbit, but death is faster.",
+        MILKYWHITES = "Ashes to ashes, dust to... this.",
+
+        CRITTER_EYEOFTERROR = "May we gaze into the abyss... together.",
+
+        SHIELDOFTERROR ="Nothing can truly shield you from the horrors of this cruel world.",
+        TWINOFTERROR1 = "Don't worry... Abby and I will make sure you leave this world together.",
+        TWINOFTERROR2 = "Don't worry... Abby and I will make sure you leave this world together.",
+
+        -- Year of the Catcoon
+        CATTOY_MOUSE = "The wheel is come full circle.",
+        KITCOON_NAMETAG = "It's too painful to grow attached to things.",
+
+		KITCOONDECOR1 =
+        {
+            GENERIC = "This is not real poultry.",
+            BURNT = "No more enjoyment to be had.",
+        },
+		KITCOONDECOR2 =
+        {
+            GENERIC = "It tricks them with the promise of sustenance.",
+            BURNT = "Happiness is ephemeral.",
+        },
+
+		KITCOONDECOR1_KIT = "It will only build a temporary distraction.",
+		KITCOONDECOR2_KIT = "It will only build a temporary distraction.",
+
+        -- WX78
+        WX78MODULE_MAXHEALTH = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_MAXSANITY1 = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_MAXSANITY = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_MOVESPEED = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_MOVESPEED2 = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_HEAT = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_NIGHTVISION = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_COLD = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_TASER = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_LIGHT = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_MAXHUNGER1 = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_MAXHUNGER = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_MUSIC = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_BEE = "It looks so fragile... hopefully no tragic accidents befall it.",
+        WX78MODULE_MAXHEALTH2 = "It looks so fragile... hopefully no tragic accidents befall it.",
+
+        WX78_SCANNER = 
+        {
+            GENERIC ="Oh. Hello.",
+            HUNTING = "It's too busy to bother with me.",
+            SCANNING = "It's too busy to bother with me.",
+        },
+
+        WX78_SCANNER_ITEM = "Dead to the world.",
+        WX78_SCANNER_SUCCEEDED = "Poor little machine. Is nobody paying attention to you?",
+
+        WX78_MODULEREMOVER = "What must it be like, to lose a piece of oneself and feel nothing?",
+
+        SCANDATA = "If I'm lucky, it might just bore me to death.",
     },
 
     DESCRIBE_GENERIC = "Sigh... I don't know.",

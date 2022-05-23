@@ -28,14 +28,12 @@ end
 function Dest:__tostring()
     return (self.inst ~= nil and ("Going to Entity: "..tostring(self.inst)))
         or (self.pt ~= nil and ("Going to Point: "..tostring(self.pt)))
-        or (self.buffered_action ~= nil and ("Going to Point: "..tostring(self.buffered_action.pos)))
+        or (self.buffered_action ~= nil and ("Going to buffered action point: "..tostring(self.buffered_action.pos)))
         or "No Dest"
 end
 
 function Dest:GetPoint()
-    if self.inst ~= nil and self.inst.components.inventoryitem ~= nil and self.inst.components.inventoryitem.owner ~= nil then
-        return self.inst.components.inventoryitem.owner.Transform:GetWorldPosition()
-    elseif self.inst ~= nil then
+    if self.inst ~= nil and self.inst:IsValid() then
         return self.inst.Transform:GetWorldPosition()
     elseif self.pt then
         return self.pt:Get()
@@ -150,9 +148,15 @@ local function ServerGetSpeedMultiplier(self)
                 mult = mult * saddle.components.saddler:GetBonusSpeedMult()
             end
         else
+			local is_mighty = self.inst.components.mightiness ~= nil and self.inst.components.mightiness:GetState() == "mighty"
             for k, v in pairs(self.inst.components.inventory.equipslots) do
                 if v.components.equippable ~= nil then
-                    mult = mult * v.components.equippable:GetWalkSpeedMult()
+					local item_speed_mult = v.components.equippable:GetWalkSpeedMult()
+                    if is_mighty and item_speed_mult < 1 then
+						item_speed_mult = 1
+					end
+
+                    mult = mult * item_speed_mult
                 end
             end
         end
@@ -172,10 +176,16 @@ local function ClientGetSpeedMultiplier(self)
                 mult = mult * inventoryitem:GetWalkSpeedMult()
             end
         else
+			local is_mighty = self.inst:HasTag("mightiness_mighty")
             for k, v in pairs(inventory:GetEquips()) do
                 local inventoryitem = v.replica.inventoryitem
                 if inventoryitem ~= nil then
-                    mult = mult * inventoryitem:GetWalkSpeedMult()
+					local item_speed_mult = inventoryitem:GetWalkSpeedMult()
+                    if is_mighty and item_speed_mult < 1 then
+						item_speed_mult = 1
+					end
+
+                    mult = mult * item_speed_mult
                 end
             end
         end
@@ -846,8 +856,8 @@ function LocoMotor:WaitingForPathSearch()
     return self.path and self.path.handle
 end
 
-function LocoMotor:UpdateHopping(dt)
-    self.inst.Physics:Stop()
+function LocoMotor:UpdateHopping(dt) -- deprecated
+    --self.inst.Physics:Stop()
 end
 
 function LocoMotor:FinishHopping()
@@ -995,7 +1005,7 @@ end
 
 function LocoMotor:OnUpdate(dt)
     if self.hopping then
-        self:UpdateHopping(dt)
+        --self:UpdateHopping(dt)
         return
     end
 
@@ -1031,7 +1041,7 @@ function LocoMotor:OnUpdate(dt)
         local destpos_x, destpos_y, destpos_z = self.dest:GetPoint()
         local mypos_x, mypos_y, mypos_z = self.inst.Transform:GetWorldPosition()
 
-        local reached_dest, invalid
+        local reached_dest, invalid, in_cooldown = nil, nil, false
         if self.bufferedaction ~= nil and
             self.bufferedaction.action == ACTIONS.ATTACK and
             self.inst.replica.combat ~= nil then
@@ -1040,7 +1050,7 @@ function LocoMotor:OnUpdate(dt)
             local run_dist = self:GetRunSpeed() * dt * .5
             reached_dest = dsq <= math.max(run_dist * run_dist, self.arrive_dist * self.arrive_dist)
 
-            reached_dest, invalid = self.inst.replica.combat:LocomotorCanAttack(reached_dest, self.bufferedaction.target)
+            reached_dest, invalid, in_cooldown = self.inst.replica.combat:LocomotorCanAttack(reached_dest, self.bufferedaction.target)
         elseif self.bufferedaction ~= nil
             and self.bufferedaction.action.customarrivecheck ~= nil then
             reached_dest, invalid = self.bufferedaction.action.customarrivecheck(self.inst, self.dest)
@@ -1054,6 +1064,8 @@ function LocoMotor:OnUpdate(dt)
             self:Stop()
             self:Clear()
         elseif reached_dest then
+        	--I think this is fine? we might need to make OnUpdateFinish() function that we can run to finish up the OnUpdate so we don't duplicate code
+            if in_cooldown then return end
             --Print(VERBOSITY.DEBUG, "REACH DEST")
             self.inst:PushEvent("onreachdestination", { target = self.dest.inst, pos = Point(destpos_x, destpos_y, destpos_z) })
             if self.atdestfn ~= nil then
@@ -1131,10 +1143,17 @@ function LocoMotor:OnUpdate(dt)
                     --Print(VERBOSITY.DEBUG, string.format("CURRENT STEP %d/%d - %s", self.path.currentstep, #self.path.steps, tostring(steppos)))
 
                     local step_distsq = distsq(mypos_x, mypos_z, steppos_x, steppos_z)
+
+                    local maxsteps = #self.path.steps
+                    if self.path.currentstep < maxsteps then -- Add tolerance to step points that aren't the final destination.
+                        local physdiameter = self.inst:GetPhysicsRadius(0)*2
+                        step_distsq = step_distsq - physdiameter * physdiameter
+                    end
+
                     if step_distsq <= (self.arrive_step_dist)*(self.arrive_step_dist) then
                         self.path.currentstep = self.path.currentstep + 1
 
-                        if self.path.currentstep < #self.path.steps then
+                        if self.path.currentstep < maxsteps then
                             step = self.path.steps[self.path.currentstep]
                             steppos_x, steppos_y, steppos_z = step.x, step.y, step.z
 
@@ -1181,52 +1200,34 @@ function LocoMotor:OnUpdate(dt)
 
     local cur_speed = self.inst.Physics:GetMotorSpeed()
     if cur_speed > 0 then
-
         if self.allow_platform_hopping and (self.bufferedaction == nil or not self.bufferedaction.action.disable_platform_hopping) then
-
             local mypos_x, mypos_y, mypos_z = self.inst.Transform:GetWorldPosition()
-
-            local destpos_x, destpos_y, destpos_z
 
             local rotation = self.inst.Transform:GetRotation() * DEGREES
             local forward_x, forward_z = math.cos(rotation), -math.sin(rotation)
 
-            local dest_dot_forward = 0
-
-            local map = TheWorld.Map
-            local my_platform = self.inst:GetCurrentPlatform()
-
-            if self.dest and self.dest:IsValid() then
-                destpos_x, destpos_y, destpos_z = self.dest:GetPoint()
-                local dest_dir_x, dest_dir_z = VecUtil_Normalize(destpos_x - mypos_x, destpos_z - mypos_z)
-                dest_dot_forward = VecUtil_Dot(dest_dir_x, dest_dir_z, forward_x, forward_z)
-                local dist = VecUtil_Length(destpos_x - mypos_x, destpos_z - mypos_z)
-                if dist <= 1.5 then
-                    local other_platform = self.dest:GetPlatform()
-                    if my_platform == other_platform then
-                        dest_dot_forward = 1
-                    end
-                end
-
-            end
-
 			local hop_distance = self:GetHopDistance(self:GetSpeedMultiplier())
 
-            local forward_angle_span = 0.1
-            if dest_dot_forward <= 1 - forward_angle_span then
+            local my_platform = self.inst:GetCurrentPlatform()
+            local other_platform = nil
+            local destpos_x, destpos_y, destpos_z
+            if self.dest and self.dest:IsValid() then
+				if my_platform == self.dest:GetPlatform() then
+				    destpos_x, destpos_y, destpos_z = self.dest:GetPoint()
+					other_platform = my_platform
+				end
+			end
+			if other_platform == nil then
                 destpos_x, destpos_z = forward_x * hop_distance + mypos_x, forward_z * hop_distance + mypos_z
-            end
-
-            local other_platform = map:GetPlatformAtPoint(destpos_x, destpos_z)
+				other_platform = TheWorld.Map:GetPlatformAtPoint(destpos_x, destpos_z)
+			end
 
             local can_hop = false
             local hop_x, hop_z, target_platform, blocked
             local too_early_top_hop = self.time_before_next_hop_is_allowed > 0
             if my_platform ~= other_platform and not too_early_top_hop then
-
                 can_hop, hop_x, hop_z, target_platform, blocked = self:ScanForPlatform(my_platform, destpos_x, destpos_z, hop_distance)
             end
-
             if not blocked then
                 if can_hop then
                     self.last_platform_visited = my_platform
@@ -1254,7 +1255,6 @@ function LocoMotor:OnUpdate(dt)
             if (not can_hop and my_platform == nil and target_platform == nil and not self.inst.sg:HasStateTag("jumping")) and self.inst.components.drownable ~= nil and self.inst.components.drownable:ShouldDrown() then
                 self.inst:PushEvent("onsink")
             end
-
         else
             local speed_mult = self:GetSpeedMultiplier()
             local desired_speed = self.isrunning and self:RunSpeed() or self.walkspeed

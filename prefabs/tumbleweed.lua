@@ -43,16 +43,7 @@ local prefabs =
     "fireflies",
     "beardhair",
     "berries",
-    "TOOLS_blueprint",
-    "LIGHT_blueprint",
-    "SURVIVAL_blueprint",
-    "FARM_blueprint",
-    "SCIENCE_blueprint",
-    "WARTAB_blueprint",
-    "TOWN_blueprint",
-    "REFINE_blueprint",
-    "MAGIC_blueprint",
-    "DRESS_blueprint",
+    "blueprint",
     "petals_evil",
     "trinket_8",
     "houndstooth",
@@ -139,7 +130,7 @@ local function onpickup(inst, picker)
     end
 
     SpawnPrefab("tumbleweedbreakfx").Transform:SetPosition(x, y, z)
-    inst:Remove()
+
     return true --This makes the inventoryitem component not actually give the tumbleweed to the player
 end
 
@@ -177,16 +168,7 @@ local function MakeLoot(inst)
         {chance = 1,    item = "butterflywings"},
         {chance = .02,  item = "beardhair"},
         {chance = 1,    item = "berries"},
-        {chance = 0.1,    item = "TOOLS_blueprint"},
-        {chance = 0.1,    item = "LIGHT_blueprint"},
-        {chance = 0.1,    item = "SURVIVAL_blueprint"},
-        {chance = 0.1,    item = "FARM_blueprint"},
-        {chance = 0.1,    item = "SCIENCE_blueprint"},
-        {chance = 0.1,    item = "WARTAB_blueprint"},
-        {chance = 0.1,    item = "TOWN_blueprint"},
-        {chance = 0.1,    item = "REFINE_blueprint"},
-        {chance = 0.1,    item = "MAGIC_blueprint"},
-        {chance = 0.1,    item = "DRESS_blueprint"},
+        {chance = 1,    item = "blueprint"},
         {chance = 1,    item = "petals_evil"},
         {chance = 1,    item = "trinket_8"},
         {chance = 1,    item = "houndstooth"},
@@ -470,6 +452,7 @@ local function fn()
     inst:AddComponent("pickable")
     inst.components.pickable.picksound = "dontstarve/wilson/harvest_sticks"
     inst.components.pickable.onpickedfn = onpickup
+	inst.components.pickable.remove_when_picked = true
     inst.components.pickable.canbepicked = true
 
     inst:ListenForEvent("startlongaction", OnLongAction)
@@ -495,7 +478,7 @@ local function fn()
     inst.components.hauntable:SetOnHauntFn(function(inst, haunter)
         if math.random() <= TUNING.HAUNT_CHANCE_OCCASIONAL then
             onpickup(inst, nil)
-            inst.components.hauntable.hauntvalue = TUNING.HAUNT_MEDIUM
+			inst:Remove()
         end
         return true
     end)

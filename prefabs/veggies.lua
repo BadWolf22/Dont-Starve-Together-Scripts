@@ -189,11 +189,8 @@ local function oversized_calcweightcoefficient(name)
 end
 
 local function oversized_onequip(inst, owner)
-    if PLANT_DEFS[inst._base_name].build ~= nil then
-        owner.AnimState:OverrideSymbol("swap_body", PLANT_DEFS[inst._base_name].build, "swap_body")
-    else
-        owner.AnimState:OverrideSymbol("swap_body", "farm_plant_"..inst._base_name, "swap_body")
-    end
+	local swap = inst.components.symbolswapdata
+    owner.AnimState:OverrideSymbol("swap_body", swap.build, swap.symbol)
 end
 
 local function oversized_onunequip(inst, owner)
@@ -217,7 +214,12 @@ local function oversized_makeloots(inst, name)
 end
 
 local function oversized_onperish(inst)
-    if inst.components.inventoryitem:GetGrandOwner() ~= nil then
+    -- vars for rotting on a gym
+    local gym = nil
+    local rot = nil
+    local slot = nil
+
+    if inst.components.inventoryitem:GetGrandOwner() ~= nil and not inst.components.inventoryitem:GetGrandOwner():HasTag("gym") then
         local loots = {}
         for i=1, #inst.components.lootdropper.loot do
             table.insert(loots, "spoiled_food")
@@ -225,10 +227,19 @@ local function oversized_onperish(inst)
         inst.components.lootdropper:SetLoot(loots)
         inst.components.lootdropper:DropLoot()
     else
-        SpawnPrefab(inst.prefab.."_rotten").Transform:SetPosition(inst.Transform:GetWorldPosition())
+        rot = SpawnPrefab(inst.prefab.."_rotten")
+        rot.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        if inst.components.inventoryitem:GetGrandOwner() and inst.components.inventoryitem:GetGrandOwner():HasTag("gym") then
+            gym = inst.components.inventoryitem:GetGrandOwner()
+            slot = gym.components.inventory:GetItemSlot(inst)
+        end
     end
 
     inst:Remove()
+
+    if gym and rot then
+        gym.components.mightygym:LoadWeight(rot, slot)
+    end
 end
 
 local function Seed_GetDisplayName(inst)
@@ -298,6 +309,9 @@ local function MakeVeggie(name, has_seeds)
 	if VEGGIES[name].lure_data ~= nil then
 		table.insert(assets, Asset("ANIM", "anim/"..VEGGIES[name].lure_data.build..".zip"))
 	end
+
+    table.insert(assets,Asset("INV_IMAGE", name.."_oversized_rot"))
+
 	if has_seeds then
 		table.insert(assets, Asset("ANIM", "anim/oceanfishing_lure_mis.zip"))
 	end
@@ -680,7 +694,9 @@ local function MakeVeggie(name, has_seeds)
 
         inst:AddTag("heavy")
         inst:AddTag("waxable")
+        inst:AddTag("oversized_veggie")
 	    inst:AddTag("show_spoilage")
+        inst.gymweight = 4
 
         MakeHeavyObstaclePhysics(inst, OVERSIZED_PHYSICS_RADIUS)
         inst:SetPhysicsRadiusOverride(OVERSIZED_PHYSICS_RADIUS)
@@ -765,6 +781,9 @@ local function MakeVeggie(name, has_seeds)
         inst.AnimState:PlayAnimation("idle_oversized")
 
         inst:AddTag("heavy")
+        inst:AddTag("oversized_veggie")
+        
+        inst.gymweight = 4
 
         inst.displayadjectivefn = displayadjectivefn
         inst:SetPrefabNameOverride(name.."_oversized")
@@ -830,17 +849,21 @@ local function MakeVeggie(name, has_seeds)
         inst.entity:AddAnimState()
         inst.entity:AddNetwork()
 
-        MakeObstaclePhysics(inst, OVERSIZED_PHYSICS_RADIUS)
-
         local plant_def = PLANT_DEFS[name]
 
         inst.AnimState:SetBank(plant_def.bank)
         inst.AnimState:SetBuild(plant_def.build)
         inst.AnimState:PlayAnimation("idle_rot_oversized")
 
+        inst:AddTag("heavy")
         inst:AddTag("farm_plant_killjoy")
         inst:AddTag("pickable_harvest_str")
 		inst:AddTag("pickable")
+        inst:AddTag("oversized_veggie")
+        inst.gymweight = 3
+
+        MakeHeavyObstaclePhysics(inst, OVERSIZED_PHYSICS_RADIUS)
+        inst:SetPhysicsRadiusOverride(OVERSIZED_PHYSICS_RADIUS)
 
 		inst._base_name = name
 
@@ -849,6 +872,9 @@ local function MakeVeggie(name, has_seeds)
         if not TheWorld.ismastersim then
             return inst
         end
+
+        inst:AddComponent("heavyobstaclephysics")
+        inst.components.heavyobstaclephysics:SetRadius(OVERSIZED_PHYSICS_RADIUS)
 
         inst:AddComponent("inspectable")
 		inst.components.inspectable.nameoverride = "VEGGIE_OVERSIZED_ROTTEN"
@@ -859,18 +885,30 @@ local function MakeVeggie(name, has_seeds)
         inst.components.workable:SetWorkLeft(OVERSIZED_MAXWORK)
 
         inst:AddComponent("pickable")
-        inst.components.pickable.onpickedfn = inst.Remove
+		inst.components.pickable.remove_when_picked = true
 	    inst.components.pickable:SetUp(nil)
 		inst.components.pickable.use_lootdropper_for_product = true
 	    inst.components.pickable.picksound = "dontstarve/wilson/harvest_berries"
 
         inst:AddComponent("inventoryitem")
         inst.components.inventoryitem.cangoincontainer = false
-		inst.components.inventoryitem.canbepickedup = false
+		--inst.components.inventoryitem.canbepickedup = false
         inst.components.inventoryitem:SetSinks(true)
+        
+        inst:AddComponent("equippable")
+        inst.components.equippable.equipslot = EQUIPSLOTS.BODY
+        inst.components.equippable:SetOnEquip(oversized_onequip)
+        inst.components.equippable:SetOnUnequip(oversized_onunequip)
+        inst.components.equippable.walkspeedmult = TUNING.HEAVY_SPEED_MULT
+
+        inst:AddComponent("submersible")
+        inst:AddComponent("symbolswapdata")
+        inst.components.symbolswapdata:SetData(plant_def.build, "swap_body_rotten")
 
         inst:AddComponent("lootdropper")
         inst.components.lootdropper:SetLoot(plant_def.loot_oversized_rot)
+
+        inst.components.inventoryitem:ChangeImageName( name.."_oversized_rot" )
 
         MakeMediumBurnable(inst)
         inst.components.burnable:SetOnBurntFn(oversized_onburnt)

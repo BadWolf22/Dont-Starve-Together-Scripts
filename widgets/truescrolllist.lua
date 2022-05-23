@@ -1,5 +1,6 @@
 local Widget = require "widgets/widget"
 local Image = require "widgets/image"
+local Text = require "widgets/text"
 local ImageButton = require "widgets/imagebutton"
 
 local DEBUG_MODE = BRANCH == "dev"
@@ -30,6 +31,10 @@ local TrueScrollList = Class(Widget, function(self, context, create_widgets_fn, 
 
 	self.scroll_per_click = scroll_per_click or 1
 
+	self.control_up = CONTROL_SCROLLBACK
+	self.control_down = CONTROL_SCROLLFWD
+	self.control_scroll_repeat_time = nil -- disabled state
+
     -- Scroll-region-sized spanning image to ensure we don't lose focus
     -- due to gaps between widgets.
     self.bg = self:AddChild(Image("images/ui.xml", "blank.tex"))
@@ -54,6 +59,10 @@ local TrueScrollList = Class(Widget, function(self, context, create_widgets_fn, 
 	self.update_fn = update_fn
 
 	self.items_per_view = #self.widgets_to_update
+
+	for i = 1, #self.widgets_to_update do
+		 self.widgets_to_update[i].IsFullyInView = function() return self:IsItemFullyVisible(i) end
+	end
 
    	--self.repeat_time = (TheInput:ControllerAttached() and SCROLL_REPEAT_TIME) or MOUSE_SCROLL_REPEAT_TIME
 
@@ -154,8 +163,8 @@ function TrueScrollList:BuildScrollBar()
     self.up_button:SetPosition(0, self.scrollbar_height/2 + nudge_y/2)
     self.up_button:SetScale(0.3)
     self.up_button:SetWhileDown( function()
-        if not self.last_up_button_time or GetTime() - self.last_up_button_time > button_repeat_time then
-            self.last_up_button_time = GetTime()
+        if not self.last_up_button_time or GetStaticTime() - self.last_up_button_time > button_repeat_time then
+            self.last_up_button_time = GetStaticTime()
             self:Scroll(-self.scroll_per_click)
         end
     end)
@@ -167,14 +176,22 @@ function TrueScrollList:BuildScrollBar()
     self.down_button:SetPosition(0, -self.scrollbar_height/2 - nudge_y/2)
     self.down_button:SetScale(0.3)
     self.down_button:SetWhileDown( function()
-        if not self.last_down_button_time or GetTime() - self.last_down_button_time > button_repeat_time then
-            self.last_down_button_time = GetTime()
+        if not self.last_down_button_time or GetStaticTime() - self.last_down_button_time > button_repeat_time then
+            self.last_down_button_time = GetStaticTime()
             self:Scroll(self.scroll_per_click)
         end
     end)
     self.down_button:SetOnClick( function()
         self.last_down_button_time = nil
     end)
+
+	self.up_button_controllerhint = self.scroll_bar_container:AddChild(Text(UIFONT, 20))
+    self.up_button_controllerhint:SetPosition(0, self.scrollbar_height/2 + nudge_y/2)
+	self.up_button_controllerhint:Hide()
+
+	self.down_button_controllerhint = self.scroll_bar_container:AddChild(Text(UIFONT, 20))
+    self.down_button_controllerhint:SetPosition(0, -self.scrollbar_height/2 - nudge_y/2)
+	self.down_button_controllerhint:Hide()
 
     local line_height = self.scrollbar_height - arrow_button_size/2
     self.scroll_bar_line = self.scroll_bar_container:AddChild(Image("images/global_redux.xml", "scrollbar_bar.tex"))
@@ -263,7 +280,7 @@ function TrueScrollList:SetItemsData(items)
 	if self.end_pos < 1 then self.end_pos = 1 end --clamp a tiny item set to be at the start position
 
     local focused_item_index = self.focused_widget_index + self.displayed_start_index
-    if #self.items > 0 and not self.items[focused_item_index] then
+    if self.focus and #self.items > 0 and not self.items[focused_item_index] then
         --print("We filtered out the selected icon, so we need to move the focus back to the start otherwise controller input will be stuck")
         self.widgets_to_update[1]:SetFocus()
     end
@@ -271,7 +288,42 @@ function TrueScrollList:SetItemsData(items)
  	self:RefreshView()
 end
 
+local SCROLL_REPEAT_TIME = .05
+local MOUSE_SCROLL_REPEAT_TIME = 0
+
 function TrueScrollList:OnUpdate(dt)
+	if self.control_scroll_repeat_time ~= nil then
+        --Scroll repeat
+        if not (TheInput:IsControlPressed(self.control_up) or
+                TheInput:IsControlPressed(self.control_down)) then
+            self.control_scroll_repeat_time = -1
+        elseif self.control_scroll_repeat_time > dt then
+            self.control_scroll_repeat_time = self.control_scroll_repeat_time - dt
+        elseif TheInput:IsControlPressed(self.control_up) then
+            local repeat_time =
+                TheInput:GetControlIsMouseWheel(self.control_up) and
+                MOUSE_SCROLL_REPEAT_TIME or
+                SCROLL_REPEAT_TIME
+            if self.control_scroll_repeat_time < 0 then
+                self.control_scroll_repeat_time = repeat_time > dt and repeat_time - dt or 0
+            else
+                self.control_scroll_repeat_time = repeat_time
+                self:OnControl(self.control_up, true)
+            end
+        else--if TheInput:IsControlPressed(self.control_down) then
+            local repeat_time =
+                TheInput:GetControlIsMouseWheel(self.control_down) and
+                MOUSE_SCROLL_REPEAT_TIME or
+                SCROLL_REPEAT_TIME
+            if self.control_scroll_repeat_time < 0 then
+                self.control_scroll_repeat_time = repeat_time > dt and repeat_time - dt or 0
+            else
+                self.control_scroll_repeat_time = repeat_time
+                self:OnControl(self.control_down, true)
+            end
+        end
+	end
+	
     local last_scroll_pos = self.current_scroll_pos
 	self.current_scroll_pos = math.abs(self.current_scroll_pos - self.target_scroll_pos) > 0.01 and Lerp(self.current_scroll_pos, self.target_scroll_pos, 0.25) or self.target_scroll_pos
 
@@ -304,16 +356,21 @@ function TrueScrollList:Scroll(scroll_step)
 	self.target_scroll_pos = self.target_scroll_pos + scroll_step
 end
 
--- Snaps scroll to put the item with input index at the top of the
--- view (if possible).
--- If self.end_offset < 1, the last set of items will have a partially-visible
--- item above the input index. (Search allow_bottom_empty_row.)
+-- Snaps scroll to put the item with input index at the top of the view (if possible).
 function TrueScrollList:ScrollToDataIndex(index)
-	local target = index
-    self.current_scroll_pos = target
-    self.target_scroll_pos = target
+   	local target_row = Clamp(math.ceil(index/self.widgets_per_row) - self.visible_rows + 1, 1, self.end_pos)
+
+    self.current_scroll_pos = target_row
+    self.target_scroll_pos = target_row
     self:RefreshView()
 end
+
+function TrueScrollList:ScrollToScrollPos(target_row)
+    self.current_scroll_pos = target_row
+    self.target_scroll_pos = target_row
+    self:RefreshView()
+end
+
 
 -- Scrolls so the input widget is at the top of the list (if possible).
 -- Maintains the current amount of offset (so if the top widget is half
@@ -325,6 +382,17 @@ function TrueScrollList:ScrollToWidgetIndex(index)
     self.current_scroll_pos = target
 	self.target_scroll_pos = target
     self:RefreshView()
+end
+
+function TrueScrollList:FindDataIndex(target_data)
+	if target_data ~= nil then
+		for i = 1, #self.items do
+			if self.items[i] == target_data then
+				return i
+			end
+		end
+	end
+	return nil
 end
 
 function TrueScrollList:OnWidgetFocus(focused_widget)
@@ -382,7 +450,10 @@ function TrueScrollList:RefreshView()
 	for i = 1,self.items_per_view do
         self.update_fn(self.context, self.widgets_to_update[i], self.items[start_index + i], start_index + i)
         if self.itemfocus and self.itemfocus == start_index + i then
-            self.widgets_to_update[i]:SetFocus()
+            --Check if we're on an active screen. Something could be on the stack in front of us and we don't want to steal focus back
+            if self:GetParentScreen() == TheFrontEnd:GetActiveScreen() then
+                self.widgets_to_update[i]:SetFocus()
+            end
         end
         --self.widgets_to_update[i]:Show()
 	end
@@ -410,6 +481,13 @@ function TrueScrollList:ForceItemFocus(itemindex)
         self:SetFocus()
     end
     self.itemfocus = itemindex
+end
+
+function TrueScrollList:IsItemFullyVisible(itemindex)
+	local item_row = math.ceil(itemindex / self.widgets_per_row)
+    local first_fully_visible_row = math.ceil(self.target_scroll_pos - math.floor(self.target_scroll_pos)) + 1
+
+	return item_row >= first_fully_visible_row and item_row <= (first_fully_visible_row + self.visible_rows - 1)
 end
 
 function TrueScrollList:GetNextWidget(dir)
@@ -478,26 +556,55 @@ function TrueScrollList:OnFocusMove(dir, down)
     return did_parent_move
 end
 
+function TrueScrollList:OverrideControllerButtons(control_up, control_down, hints_enabled)
+	self.control_up = control_up or self.control_up
+	self.control_down = control_down or self.control_down
+	self.control_scroll_repeat_time = -1
+
+	if hints_enabled then
+		self.up_button_controllerhint:SetString(TheInput:GetLocalizedControl(TheInput:GetControllerID(), self.control_up))
+		self.down_button_controllerhint:SetString(TheInput:GetLocalizedControl(TheInput:GetControllerID(), self.control_down))
+
+		self.up_button_controllerhint:Show()
+		self.down_button_controllerhint:Show()
+
+		self.up_button:Hide()
+		self.down_button:Hide()
+	end
+end
+
+function TrueScrollList:ClearOverrideControllerButtons()
+	self.control_up = CONTROL_SCROLLBACK
+	self.control_down = CONTROL_SCROLLFWD
+	self.control_scroll_repeat_time = nil -- disabled state
+
+	self.up_button:Show()
+	self.down_button:Show()
+
+	self.up_button_controllerhint:Hide()
+	self.down_button_controllerhint:Hide()
+end
+
 function TrueScrollList:OnControl(control, down)
 	if TrueScrollList._base.OnControl(self, control, down) then return true end
 
-    if down and (self.focus and self.scroll_bar:IsVisible()) then
-        if control == CONTROL_SCROLLBACK then
+    if down and (self.focus or FunctionOrValue(self.custom_focus_check)) and self.scroll_bar:IsVisible() then
+        if control == self.control_up then
             local scroll_amt = -self.scroll_per_click
             if TheInput:ControllerAttached() then
                 scroll_amt = scroll_amt / 2
             end
             if self:Scroll(scroll_amt) then
-                TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_mouseover")
+                TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_mouseover", nil, ClickMouseoverSoundReduction())
             end
             return true
-        elseif control == CONTROL_SCROLLFWD then
+        elseif control == self.control_down then
             local scroll_amt = self.scroll_per_click
             if TheInput:ControllerAttached() then
                 scroll_amt = scroll_amt / 2
             end
             if self:Scroll(scroll_amt) then
-                TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_mouseover")
+                TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_mouseover", nil, ClickMouseoverSoundReduction())
             end
             return true
         end
@@ -509,7 +616,7 @@ function TrueScrollList:GetHelpText()
 
 	local t = {}
 	if self:CanScroll() then
-	    table.insert(t, TheInput:GetLocalizedControl(controller_id, CONTROL_SCROLLBACK) .. "/" .. TheInput:GetLocalizedControl(controller_id, CONTROL_SCROLLFWD) .. " " .. STRINGS.UI.HELP.SCROLL)
+	    table.insert(t, TheInput:GetLocalizedControl(controller_id, self.control_up) .. "/" .. TheInput:GetLocalizedControl(controller_id, self.control_down) .. " " .. STRINGS.UI.HELP.SCROLL)
 	end
 
 	return table.concat(t, "  ")

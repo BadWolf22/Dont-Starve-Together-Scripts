@@ -18,8 +18,8 @@ local function SpawnFx(target)
 end
 
 local function owner_stop_buff_fn(owner)
-	if owner:IsValid() and owner.components.debuffable ~= nil then
-		owner.components.debuffable:RemoveDebuff("spawnprotectionbuff")
+	if owner:IsValid() then
+		owner:RemoveDebuff("spawnprotectionbuff")
 	end
 end
 
@@ -70,6 +70,9 @@ local function buff_OnAttached(inst, target)
 
     inst:ListenForEvent("buildstructure", owner_stop_buff_fn, target)
     inst:ListenForEvent("builditem", owner_stop_buff_fn, target)
+
+    inst:ListenForEvent("on_enter_might_gym", owner_stop_buff_fn, target)
+	
 end
 
 local function buff_OnDetached(inst, target)

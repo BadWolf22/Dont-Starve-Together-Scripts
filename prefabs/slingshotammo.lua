@@ -7,7 +7,7 @@ local assets =
 -- temp aggro system for the slingshots
 local function no_aggro(attacker, target)
 	local targets_target = target.components.combat ~= nil and target.components.combat.target or nil
-	return targets_target ~= nil and targets_target:IsValid() and targets_target ~= attacker and attacker:IsValid()
+	return targets_target ~= nil and targets_target:IsValid() and targets_target ~= attacker and attacker ~= nil and attacker:IsValid()
 			and (GetTime() - target.components.combat.lastwasattackedbytargettime) < 4
 			and (targets_target.components.health ~= nil and not targets_target.components.health:IsDead())
 end
@@ -33,7 +33,9 @@ local function OnAttack(inst, attacker, target)
 end
 
 local function OnPreHit(inst, attacker, target)
-	target.components.combat.temp_disable_aggro = no_aggro(attacker, target)
+    if target ~= nil and target:IsValid() and target.components.combat ~= nil then
+		target.components.combat.temp_disable_aggro = no_aggro(attacker, target)
+	end
 end
 
 local function OnHit(inst, attacker, target)
