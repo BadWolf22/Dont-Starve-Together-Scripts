@@ -13,6 +13,8 @@ TILE_SCALE = 4
 RESOLUTION_X = 1280
 RESOLUTION_Y = 720
 
+PLAYER_REVEAL_RADIUS = 30.0 -- NOTES(JBK): Keep in sync with MiniMapRenderer.cpp!
+
 MAX_FE_SCALE = 3 --Default if you don't call SetMaxPropUpscale
 MAX_HUD_SCALE = 1.25
 
@@ -363,12 +365,18 @@ DST_CHARACTERLIST =
     "webber",
     "winona",
     "warly",
-    --DLC chars:
     "wortox",
     "wormwood",
     "wurt",
     "walter",
     "wanda",
+    "wonkey", --hidden internal char
+}
+
+-- This is used for seamless swap characters only and can not spawn in as these characters.
+SEAMLESSSWAP_CHARACTERLIST =
+{
+    "wonkey",
 }
 
 CHARACTER_VIDEOS =
@@ -378,7 +386,7 @@ CHARACTER_VIDEOS =
 	wendy = {"https://bit.ly/3fI3PbR"},
 	wolfgang = {"https://klei.gg/33A9mNx"},
 	wx78 = {"https://klei.gg/3F9qqc1"},
---	wickerbottom = {},
+	wickerbottom = {"https://klei.gg/3bCaOTL"},
 	wes = {"https://bit.ly/2QLFpn4"},
 	waxwell = {"https://bit.ly/3rF0UD0"},
 	woodie = {"https://bit.ly/3sHhUK1"},
@@ -393,6 +401,14 @@ CHARACTER_VIDEOS =
 	wanda = {"https://klei.gg/dst-wanda-short"},
 }
 
+PLAYER_SWAP_TRANSITIONS = 
+{
+	wonkey = 
+	{
+		transfrom_state = "changetomonkey_pst",
+		restore_state = "changefrommonkey_pst",
+	},
+}
 
 require("prefabskins")
 require("clothing")
@@ -570,13 +586,11 @@ OCEAN_DEPTH =
     VERY_DEEP = 4,
 }
 
--- See map_painter.h
--- PUBLIC USE SPACE FOR MODS is 70 to 89 -- Mods using values outside of this range may find themselfs conflicting with future official content
+--this table is deprecated, nothing should add into this table, or reference this table at all.
 GROUND =
 {
-	INVALID = 255,
+	INVALID = 65535,
     IMPASSABLE = 1,
-
     ROAD = 2,
     ROCKY = 3,
     DIRT = 4,
@@ -588,8 +602,6 @@ GROUND =
 	WOODFLOOR = 10,
 	CARPET = 11,
 	CHECKER = 12,
-
-	-- CAVES
 	CAVE = 13,
 	FUNGUS = 14,
 	SINKHOLE = 15,
@@ -603,34 +615,23 @@ GROUND =
     TRIM_GLOW = 23,
 	FUNGUSRED = 24,
 	FUNGUSGREEN = 25,
-
-	--EXPANDED FLOOR TILES
 	DECIDUOUS = 30,
 	DESERT_DIRT = 31,
 	SCALE = 32,
-
 	LAVAARENA_FLOOR = 33,
 	LAVAARENA_TRIM = 34,
-
 	QUAGMIRE_PEATFOREST = 35,
 	QUAGMIRE_PARKFIELD = 36,
 	QUAGMIRE_PARKSTONE = 37,
 	QUAGMIRE_GATEWAY = 38,
 	QUAGMIRE_SOIL = 39,
 	QUAGMIRE_CITYSTONE = 41,
-
 	PEBBLEBEACH = 42,
 	METEOR = 43,
     SHELLBEACH = 44,
-
     ARCHIVE = 45,
     FUNGUSMOON = 46,
-
     FARMING_SOIL = 47,
-
-	-- PUBLIC USE SPACE FOR MODS is 70 to 109 --
-
-    --NOISE -- from 110 to 127 -- TODO: move noise tile range to > 255
 	FUNGUSMOON_NOISE = 120,
 	METEORMINE_NOISE = 121,
 	METEORCOAST_NOISE = 122,
@@ -639,9 +640,7 @@ GROUND =
 	GROUND_NOISE = 125,
 	CAVE_NOISE = 126,
 	FUNGUS_NOISE = 127,
-
-	UNDERGROUND = 128, -- todo: incrase this to OCEAN_START once WALL_X have been removed
-
+	UNDERGROUND = 128,
 	WALL_ROCKY = 151,
 	WALL_DIRT = 152,
 	WALL_MARSH = 153,
@@ -655,13 +654,8 @@ GROUND =
 	WALL_HUNESTONE_GLOW = 161,
 	WALL_STONEEYE = 162,
 	WALL_STONEEYE_GLOW = 163,
-
-	FAKE_GROUND = 200, -- todo: change to 254 and retrofit maps
-
-	-- OCEAN TILES [201, 247]
-	OCEAN_START = 201, -- enum for checking if tile is ocean water
-
-	-- KLEI OCEAN TILES [201, 230]
+	FAKE_GROUND = 200,
+	OCEAN_START = 201,
 	OCEAN_COASTAL = 201,
 	OCEAN_COASTAL_SHORE = 202,
 	OCEAN_SWELL = 203,
@@ -669,23 +663,77 @@ GROUND =
 	OCEAN_BRINEPOOL = 205,
 	OCEAN_BRINEPOOL_SHORE = 206,
 	OCEAN_HAZARDOUS = 207,
-    OCEAN_WATERLOG = 208, 
-
-	-- MODS OCEAN TILES [231, 247]  <--PUBLIC USE SPACE FOR MODS --
-
-	OCEAN_END = 247, -- enum for checking if tile is ocean water
-
---	STILL_WATER_SHALLOW = 130,
---	STILL_WATER_DEEP = 131,
---	MOVING_WATER_SHALLOW = 132,
---	MOVING_WATER_DEEP = 133,
---	SALT_WATER_SHALLOW = 134,
---	SALT_WATER_DEEP = 135,
+    OCEAN_WATERLOG = 208,
+	OCEAN_END = 247,
 }
-
--- deprecated ground types
 GROUND.OCEAN_REEF = GROUND.OCEAN_BRINEPOOL
 GROUND.OCEAN_REEF_SHORE = GROUND.OCEAN_BRINEPOOL_SHORE
+
+--these are filled in via AddTile
+GROUND_NAMES = {}
+TERRAFORM_IMMUNE = {}
+GROUND_FLOORING = {} --These tiles are flooring (stuff shouldn't grow on them)
+GROUND_HARD = {} --not plantable
+
+FALLOFF_IDS = {
+    FALLOFF = 1,
+    DOCK_FALLOFF = 2,
+}
+
+GROUND_CREEP_IDS = {
+    WEBCREEP = 1,
+}
+
+INVERTED_WORLD_TILES = {
+    [65535] = "INVALID"
+}
+WORLD_TILES = {
+    INVALID = 65535,
+}
+
+function GetWorldTileMap()
+    local world_tile_map = {}
+    for name, id in pairs(WORLD_TILES) do
+        world_tile_map[name] = id
+    end
+    for name, id in pairs(GROUND) do
+        if not WORLD_TILES[name] and not INVERTED_WORLD_TILES[id] then
+            world_tile_map[name] = id
+        end
+    end
+    return world_tile_map
+end
+
+LEGACY_WORLD_TILES_LAND_START = 2
+LEGACY_WORLD_TILES_LAND_END = 127
+
+LEGACY_WORLD_TILES_NOISE_START = 110
+LEGACY_WORLD_TILES_NOISE_END = 127
+
+WORLD_TILES_LAND_START = 256
+WORLD_TILES_LAND_SIZE = 8192
+
+WORLD_TILES_LAND_ONLY_END = WORLD_TILES_LAND_START + WORLD_TILES_LAND_SIZE
+
+WORLD_TILES_NOISE_START = WORLD_TILES_LAND_ONLY_END + 1
+WORLD_TILES_NOISE_SIZE = 2048
+WORLD_TILES_NOISE_END = WORLD_TILES_NOISE_START + WORLD_TILES_NOISE_SIZE
+
+WORLD_TILES_LAND_END = WORLD_TILES_NOISE_END
+
+LEGACY_WORLD_TILES_OCEAN_START = 201
+LEGACY_WORLD_TILES_OCEAN_END = 247
+
+WORLD_TILES_OCEAN_START = WORLD_TILES_LAND_END + 1
+WORLD_TILES_OCEAN_SIZE = 4096
+WORLD_TILES_OCEAN_END = WORLD_TILES_OCEAN_START + WORLD_TILES_OCEAN_SIZE
+
+LEGACY_WORLD_TILES_IMPASSABLE_START = 128
+LEGACY_WORLD_TILES_IMPASSABLE_END = 200
+
+WORLD_TILES_IMPASSABLE_START = WORLD_TILES_OCEAN_END + 1
+WORLD_TILES_IMPASSABLE_SIZE = 4096
+WORLD_TILES_IMPASSABLE_END = WORLD_TILES_IMPASSABLE_START + WORLD_TILES_IMPASSABLE_SIZE
 
 ---------------------------------------------------------
 SPECIAL_EVENTS =
@@ -987,12 +1035,15 @@ end
 FE_MUSIC =
     (FESTIVAL_EVENT_MUSIC[WORLD_FESTIVAL_EVENT] ~= nil and FESTIVAL_EVENT_MUSIC[WORLD_FESTIVAL_EVENT].sound) or
     (SPECIAL_EVENT_MUSIC[WORLD_SPECIAL_EVENT] ~= nil and SPECIAL_EVENT_MUSIC[WORLD_SPECIAL_EVENT].sound) or
+    "dontstarve/music/music_FE_wickerbottom"
     --"dontstarve/music/music_FE"
-    "dontstarve/music/music_FE_WX"
-    --"dontstarve/music/music_moonstorm_FE"
-    --"dontstarve/music/music_FE_webber"
+    --"dontstarve/music/music_FE_pirates"
+    --"dontstarve/music/music_FE_WX"
+    --"dontstarve/music/music__moonstorm_FE"
+    --"dontstarve/music/musicFE_webber"
     --"dontstarve/music/music_FE_wanda"
     --"terraria1/common/music_main_eot"
+
 
 ---------------------------------------------------------
 NUM_HALLOWEENCANDY = 14
@@ -1075,6 +1126,7 @@ TECH =
     SPIDERCRAFT_ONE = { SPIDERCRAFT = 1 },
 
     ROBOTMODULECRAFT_ONE = { ROBOTMODULECRAFT = 1 },
+    BOOKCRAFT_ONE = { BOOKCRAFT = 1 },
 }
 
 -- See cell_data.h
@@ -1365,7 +1417,8 @@ ANIM_SORT_ORDER =
 	OCEAN_UNDERWATER = 0,
 	OCEAN_WAVES = 1,
 	OCEAN_BOAT = 2,
-	OCEAN_SKYSHADOWS = 3,
+    OCEAN_BOAT_BUMPERS = 3,
+	OCEAN_SKYSHADOWS = 4,
 }
 
 ANIM_SORT_ORDER_BELOW_GROUND =
@@ -1611,6 +1664,8 @@ UniformVariables = {}
 SamplerEffects = {}
 PostProcessorEffects = {}
 
+TileGroups = {}
+
 RESET_ACTION =
 {
 	LOAD_FRONTEND = 0,
@@ -1675,6 +1730,8 @@ MATERIALS =
     SCULPTURE = "sculpture",
     FOSSIL = "fossil",
     MOON_ALTAR = "moon_altar",
+    KELP = "kelp",
+    SHELL = "shell",
 }
 
 UPGRADETYPES =
@@ -2261,8 +2318,9 @@ INVENTORY_PROGRESS =
 	CHECK_EVENT = 2,
 	CHECK_DLC = 3,
 	CHECK_DAILY_GIFT = 4,
-	CHECK_KEYVALUESTORES = 5,
-	CHECK_INVENTORY = 6,
+	CHECK_PENDINGKEYVALUESTORES = 5,
+	CHECK_KEYVALUESTORES = 6,
+	CHECK_INVENTORY = 7,
 }
 
 CURRENT_BETA = 1 -- set to 0 if there is no beta. Note: release builds wont use this so only staging and dev really care
@@ -2370,7 +2428,7 @@ STORM_TYPES =
     MOONSTORM = 2,
 }
 
-LOADING_SCREEN_TIP_OPTIONS = 
+LOADING_SCREEN_TIP_OPTIONS =
 {
     ALL = 1,
     TIPS_ONLY = 2,

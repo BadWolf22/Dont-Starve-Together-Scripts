@@ -396,6 +396,9 @@ function Combat:CanBeAttacked(attacker)
                 attacker:HasTag("birchnut")) then
             --Birchnut check
             return false
+        elseif self.inst:HasTag("noplayertarget") and attacker:HasTag("player") then
+            --Can't be attacked by players
+            return false
         elseif attacker ~= self.inst and self.inst:HasTag("player") then
             --Player target check
             if not TheNet:GetPVPEnabled() and attacker:HasTag("player") then

@@ -64,6 +64,7 @@ STRINGS =
         wurt = "Wurt",
         walter = "Walter",
         wanda = "Wanda",
+        wonkey = "Wonkey",
         unknown = "The Unknown",
         random = "Random",
     },
@@ -89,6 +90,7 @@ STRINGS =
         wurt = "\"Mermfolk known for hos-per-tality, florp.\"",
         walter = "\"A Pinetree Pioneer is always prepared!\"",
         wanda = "\"Time! I just need more time!\"",
+        wonkey = "\"Ook OOK!\"",
         random = "Anybody could be under that hat.",
     },
 
@@ -112,6 +114,7 @@ STRINGS =
         wurt = "The Half-Pint",
         walter = "The Fearless",
         wanda = "The Timekeeper",
+        wonkey = "The Accursed",
     },
 
     -- Use GetCharacterDescription from stringutil -- it handles variants!
@@ -137,6 +140,7 @@ STRINGS =
         wurt = "*At home in the swamp \n*Has big plans for Merm-kind \n*Is a vegetarian",
         walter = "*Not afraid of anything, except getting hurt \n*Good with a slingshot \n*Has a four-legged friend \n*Allergic to bees \n*Has no interest in fashion",
         wanda = "*Has excellent time management skills \n*Only as old as she feels \n*In a constant race against the clock",
+        wonkey = "*Whoever they were, they're a monkey now",
         random = "Anybody could be under that hat",
     },
 
@@ -162,6 +166,7 @@ STRINGS =
         wurt = "*PLACEHOLDER\n\n\n\nExpertise:\nPLACEHOLDER",
         walter = "*PLACEHOLDER\n\n\n\nExpertise:\nPLACEHOLDER",
         wanda = "*PLACEHOLDER\n\n\n\nExpertise:\nPLACEHOLDER",
+        wonkey = "PLACEHOLDER\n\n\n\nExpertise:\nPLACEHOLDER",
         random = "\nSelect a random survivor",
     },
 
@@ -187,6 +192,7 @@ STRINGS =
         wurt = "*PLACEHOLDER\n\n\n\nExpertise:\nPLACEHOLDER",
         walter = "*PLACEHOLDER\n\n\n\nExpertise:\nPLACEHOLDER",
         wanda = "*PLACEHOLDER\n\n\n\nExpertise:\nPLACEHOLDER",
+        wonkey = "PLACEHOLDER\n\n\n\nExpertise:\nPLACEHOLDER",
         random = "\nSelect a random survivor",
     },
 
@@ -210,6 +216,7 @@ STRINGS =
         wurt = "Wurt is a curious young Merm trying to expand her horizons... as long as those horizons don't extend into Pig territory.",
         walter = "Walter is an odd but cheerful boy, whose ability to assess danger leaves something to be desired.",
         wanda = "Wanda is a skilled clockmaker who will stop at nothing to outrun her future.",
+        wonkey = "This poor soul has fallen victim to the curse of the dreaded Moon Quay pirates.",
     },
 
 	CHARACTER_BIOS =
@@ -255,7 +262,7 @@ STRINGS =
 		{
             { title = "Birthday", desc = "December 6" },
             { title = "Favorite Food", desc = "Surf 'n' Turf" },
-			{ title = "Her Past...", desc = "Is yet to be revealed." },
+			{ title = "One For the Books", desc = "When people meet Ms. Wickerbottom, most assume that what you see is what you get. She certainly looks every bit the typical librarian that she claims to be, as at home amongst the bookstacks as any creature in their native habitat. Nobody would raise an eyebrow at such a person being well-versed in a wide range of subjects. Who would spare a second thought if, upon further inquiry, her knowledge rivaled that of experts? And obviously, no one would think of questioning what a librarian might be involved in after hours, when the library doors are closed to the public..." },
 		},
         wes =
 		{
@@ -323,6 +330,10 @@ STRINGS =
             { title = "Favorite Food", desc = "Taffy" },
             { title = "Long Shadows", desc = "An enigmatic woman of... well, fluctuating age, Wanda was torn from the world she knew after accidentally creating a fracture in time and space, pulling her from her own timeline into the land of the Constant. Though she avoids divulging many details of her past with the other Survivors, she seems to have an odd familiarity with them, as though she's run into them before... or perhaps, later?" },
 		},
+        wonkey =
+		{
+		    { title = "Favorite Food", desc = "Bananas" },
+     	},
 	},
 
 	CHARACTER_DETAILS =
@@ -356,6 +367,7 @@ STRINGS =
         wurt = "Slim",
         walter = "Slim",
         wanda = "Grim",
+        wonkey = "Unknown",
         random = "Unknown",
         default = "Unknown",
     },
@@ -567,6 +579,8 @@ STRINGS =
 			RANSACK = "Ransack",
 			HIDEANDSEEK = "Play Hide and Seek",
             DEACTIVATE = "Deactivate",
+			BUTTON = "Press",
+			WHEELSPIN_STOP = "Press",
         },
 
 		OPEN_CRAFTING =
@@ -581,6 +595,7 @@ STRINGS =
 			CRITTERS = "Look in",
 			SCULPTING = "Sculpt at",
 			CARTOGRAPHY = "Draw at",
+            STUDY = "Study at"
 		},
 
         JUMPIN =
@@ -650,6 +665,11 @@ STRINGS =
         {
             GENERIC = "Telepoof",
             SOUL = "Soul Hop",
+            FREESOUL = "Soul Echo",
+        },
+        BLINK_MAP =
+        {
+            SOUL = "Soul Hop({souls})",
         },
         COMBINESTACK = "Combine Stack",
         BURY = "Bury",
@@ -902,6 +922,29 @@ STRINGS =
         APPLYMODULE = "Plug In",
         REMOVEMODULES = "Unplug",
         CHARGE_FROM = "Charge At",
+
+        -- Pirates
+        ROTATE_BOAT_CLOCKWISE = "Rotate Starboard",
+        ROTATE_BOAT_COUNTERCLOCKWISE = "Rotate Port",
+        ROTATE_BOAT_STOP = "Stop Rotating",
+
+        BOAT_MAGNET_ACTIVATE = "Pair",
+        BOAT_MAGNET_DEACTIVATE = "Unpair",
+        BOAT_MAGNET_BEACON_TURN_ON = "Turn On",
+        BOAT_MAGNET_BEACON_TURN_OFF = "Turn Off",
+
+        BOAT_CANNON_LOAD_AMMO = "Load Ammo",
+        BOAT_CANNON_SHOOT = "Shoot",
+        BOAT_CANNON_START_AIMING = "Aim",
+        BOAT_CANNON_STOP_AIMING = "Stop Aiming",
+
+        OCEAN_TRAWLER_LOWER = "Lower",
+        OCEAN_TRAWLER_RAISE = "Raise",
+        OCEAN_TRAWLER_FIX = "Fix",
+
+        EMPTY_CONTAINER = "Empty",
+
+        ROTATE_FENCE = "Rotate",
 	},
 
     -- PC controls get hex ranges EE90xx to EE9Fxx
@@ -939,6 +982,9 @@ STRINGS =
         NONE = "Nothing",
 
         LUCY = "Lucy the Axe",
+
+        BOOKSTATION = "Bookcase",
+
         BOOK_BIRDS = "Birds of the World",
         BOOK_TENTACLES = "On Tentacles",
         BOOK_GARDENING = "Applied Horticulture",
@@ -946,6 +992,21 @@ STRINGS =
 		BOOK_HORTICULTURE = "Horticulture, Abridged",
         BOOK_SLEEP = "Sleepytime Stories",
         BOOK_BRIMSTONE = "The End is Nigh!",
+
+        BOOK_FISH = "The Angler's Survival Guide",
+        BOOK_FIRE = "Pyrokinetics Explained",
+        BOOK_WEB = "Overcoming Arachnophobia",
+        BOOK_TEMPERATURE = "Tempering Temperatures",
+        BOOK_LIGHT = "Lux Aeterna",
+        BOOK_RAIN = "Practical Rain Rituals",
+        BOOK_MOON = "Lunar Grimoire",
+        BOOK_BEES = "Apicultural Notes",
+
+        BOOK_HORTICULTURE_UPGRADED = "Horticulture, Expanded",
+        BOOK_RESEARCH_STATION = "The Everything Encyclopedia",
+        BOOK_LIGHT_UPGRADED = "Lux Aeterna Redux",
+
+        FIREPEN = "Fiery Pen",
 
         ANCIENT_ALTAR ="Ancient Pseudoscience Station",
         ANCIENT_ALTAR_BROKEN ="Broken Ancient Pseudoscience Station",
@@ -1186,6 +1247,7 @@ STRINGS =
         TURF_MUD = "Mud Turf",
         TURF_DESERTDIRT = "Sandy Turf",
         TURF_DECIDUOUS = "Deciduous Turf",
+        TURF_MONKEY_GROUND = "Moon Quay Beach Turf",
 
         COOKPOT = "Crock Pot",
         DUG_GRASS = "Grass Tuft",
@@ -1348,6 +1410,7 @@ STRINGS =
         WURT = "Wurt",
         WALTER = "Walter",
         WANDA = "Wanda",
+        WONKEY = "Wonkey",
 
         PIGKING = "Pig King",
         STRAWHAT = "Straw Hat",
@@ -1434,6 +1497,7 @@ STRINGS =
         FOSSIL_PIECE = "Fossil Fragments",
         FOSSIL_STALKER = "Odd Skeleton",
         FOSSILSPIKE = "Fossil Cage",
+        FOSSILSPIKE2 = "Fossil Spike",
         STALKER = "Reanimated Skeleton",
         STALKER_ATRIUM = "Ancient Fuelweaver",
         STALKER_MINION = "Woven Shadow",
@@ -1773,7 +1837,7 @@ STRINGS =
         CAVE_FERN = "Fern",
         FOLIAGE = "Foliage",
         CAVE_BANANA_TREE = "Cave Banana Tree",
-        CAVE_BANANA = "Cave Banana",
+        CAVE_BANANA = "Banana",
         CAVE_BANANA_COOKED = "Cooked Banana",
         ROCKY = "Rock Lobster",
         MONKEY = "Splumonkey",
@@ -2218,19 +2282,34 @@ STRINGS =
 		CARNIVALGAME_HERDING_KIT = "Egg Scramble Kit",
 		CARNIVALGAME_HERDING_STATION = "Egg Scramble",
 		CARNIVALGAME_HERDING_CHICK = "Scrambling Egg",
+        CARNIVALGAME_SHOOTING_KIT = "Nest Defender Kit",
+		CARNIVALGAME_SHOOTING_STATION = "Nest Defender",
+        CARNIVALGAME_SHOOTING_BUTTON = "Button",
+        CARNIVALGAME_SHOOTING_BUTTON_OFF = "Nest Defender",
+		CARNIVALGAME_SHOOTING_TARGET = "Target",
+		CARNIVALGAME_SHOOTING_TARGET_OFF = "Trapdoor",
+		CARNIVALGAME_WHEELSPIN_KIT = "Cuckoo Spinwheel Kit",
+		CARNIVALGAME_WHEELSPIN_STATION = "Cuckoo Spinwheel",
+		CARNIVALGAME_PUCKDROP_KIT = "Birdhouse Ball Drop Kit",
+		CARNIVALGAME_PUCKDROP_STATION = "Birdhouse Ball Drop",
 
 		CARNIVALDECOR_PLANT = "Miniature Tree",
 		CARNIVALDECOR_PLANT_KIT = "Miniature Tree Kit",
+		CARNIVALDECOR_BANNER = "Light Catcher",
+		CARNIVALDECOR_BANNER_KIT = "Light Catcher Kit",
 		CARNIVALDECOR_FIGURE_RARE = "Rare Cawnival Statuette",
 		CARNIVALDECOR_FIGURE_UNCOMMON = "Uncommon Cawnival Statuette",
 		CARNIVALDECOR_FIGURE_COMMON = "Common Cawnival Statuette",
-		CARNIVALDECOR_FIGURE_KIT = "Mystery Box",
+		CARNIVALDECOR_FIGURE_KIT = "Green Mystery Box",
+		CARNIVALDECOR_FIGURE_KIT_SEASON2 = "Gold Mystery Box",
 		CARNIVALDECOR_EGGRIDE1 = "Mini Ferris Wheel",
 		CARNIVALDECOR_EGGRIDE1_KIT = "Mini Ferris Wheel Kit",
 		CARNIVALDECOR_EGGRIDE2 = "Mini Swing Carousel",
 		CARNIVALDECOR_EGGRIDE2_KIT = "Mini Swing Carousel Kit",
 		CARNIVALDECOR_EGGRIDE3 = "Mini Pendulum Ride",
 		CARNIVALDECOR_EGGRIDE3_KIT = "Mini Pendulum Ride Kit",
+		CARNIVALDECOR_EGGRIDE4 = "Mini Tower Drop",
+		CARNIVALDECOR_EGGRIDE4_KIT = "Mini Tower Drop Kit",
 		CARNIVALDECOR_LAMP = "Midsummer Night Light",
 		CARNIVALDECOR_LAMP_KIT = "Midsummer Night Light Kit",
 		CARNIVALCANNON_CONFETTI = "Confetti Cannon",
@@ -2724,7 +2803,10 @@ STRINGS =
 
 		-- new content
         BOAT = "Boat",
+        BOAT_GRASS = "Grass Raft",
+        BOAT_PIRATE = "Pirate Sloop",
         BOAT_ITEM = "Boat Kit",
+        BOAT_GRASS_ITEM = "Grass Raft Kit",
         BOATFRAGMENT03 = "Boat Fragment",
         BOATFRAGMENT04 = "Boat Fragment",
         BOATFRAGMENT05 = "Boat Fragment",
@@ -2745,6 +2827,7 @@ STRINGS =
         STEERINGWHEEL_ITEM = "Steering Wheel Kit",
         ANCHOR = "Anchor",
         WALKINGPLANK = "Plank",
+        WALKINGPLANK_GRASS = "Plank",
         ANCHOR_ITEM = "Anchor Kit",
         BOATPATCH = "Boat Patch",
         DRIFTWOOD_TREE = "Driftwood",
@@ -2810,6 +2893,7 @@ STRINGS =
         ICEBERG_MELTED = "Melted Iceberg",
 
         MINIFLARE = "Flare",
+        MEGAFLARE = "Hostile Flare",
 
 		GESTALT = "Gestalt",
 		GESTALT_GUARD = "Greater Gestalt",
@@ -3300,7 +3384,7 @@ STRINGS =
         MUTATOR_WATER = "Strider Switcherdoodle",
         OCEANVINE_COCOON = "Sea Strider Nest",
         OCEANVINE_COCOON_BURNT = "Sea Strider Nest",
-        
+
         TREEGROWTHSOLUTION = "Tree Jam",
 
         FIGATONI = "Figatoni",
@@ -3362,6 +3446,63 @@ STRINGS =
         WX78_SCANNER_ITEM = "Bio Scanalyzer",
         WX78_SCANNER_SUCCEEDED = "Bio Scanalyzer",
         WX78_MODULEREMOVER = "Circuit Extractor",
+
+        -- Pirates
+        BOAT_ROTATOR = "Rudder",
+        BOAT_ROTATOR_KIT = "Rudder Kit",
+        BOAT_MAGNET = "Nautopilot",
+        BOAT_MAGNET_KIT = "Nautopilot Kit",
+        BOAT_MAGNET_BEACON = "Nautopilot Beacon",
+        BOAT_BUMPER_KELP = "Kelp Bumper",
+        BOAT_BUMPER_KELP_KIT = "Kelp Bumper Kit",
+        BOAT_BUMPER_SHELL = "Shell Bumper",
+        BOAT_BUMPER_SHELL_KIT = "Shell Bumper Kit",
+        BOAT_CANNON = "Cannon",
+        BOAT_CANNON_KIT = "Cannon Kit",
+        CANNONBALL_ROCK = "Cannonball",
+        CANNONBALL_ROCK_ITEM = "Cannonball",
+
+        OCEAN_TRAWLER = "Ocean Trawler",
+        OCEAN_TRAWLER_KIT = "Ocean Trawler Kit",
+
+        DOCK_KIT = "Dock Kit",
+        DOCK_WOODPOSTS = "Dock Piling",
+        DOCK_WOODPOSTS_ITEM = "Dock Piling",
+
+        MONKEYHUT = "Monkey Hut",
+        POWDER_MONKEY = "Powder Monkey",
+        PRIME_MATE = "Prime Mate",
+		LIGHTCRAB = "Crustashine",
+        CUTLESS = "Cutless",
+        CURSED_MONKEY_TOKEN = "Accursed Trinket",
+        OAR_MONKEY = "Battle Paddle",
+        BANANABUSH = "Banana Bush",
+        DUG_BANANABUSH = "Banana Bush",
+        PALMCONETREE = "Palmcone Tree",
+        PALMCONE_SEED = "Palmcone Sprout",
+        PALMCONE_SAPLING = "Palmcone Sapling",
+        PALMCONE_SCALE = "Palmcone Scale",
+        MONKEYTAIL = "Monkeytails",
+        DUG_MONKEYTAIL = "Monkeytails",
+
+        MONKEY_MEDIUMHAT = "Captain's Tricorn",
+        MONKEY_SMALLHAT = "Pirate's Bandana",
+        POLLY_ROGERSHAT = "Polly Roger's Hat",
+        POLLY_ROGERS = "Polly Roger",
+
+        MONKEYISLAND_PORTAL = "Unnatural Portal",
+        MONKEYISLAND_PORTAL_DEBRIS = "Broken Machinery",
+        MONKEYQUEEN = "Queen of Moon Quay",
+        MONKEYPILLAR = "Monkey Bar",
+        PIRATE_FLAG_POLE = "Moon Quay Pirate Banner",
+
+        BLACKFLAG = "Black Flag",
+        PIRATE_STASH = "X",
+        STASH_MAP = "Pirate Map",
+
+        BANANAJUICE = "Banana Shake",
+
+        FENCE_ROTATOR = "Fencing Sword",
 	},
 
     NAME_DETAIL_EXTENTION =
@@ -3406,6 +3547,8 @@ STRINGS =
 
     RECIPE_DESC =
     {
+        BOOKSTATION = "All books must be arranged using the Dewey Decimal System.",
+
         BOOK_BIRDS = "1000 species: habits, habitats, and calls.",
         BOOK_TENTACLES = "Let's learn about our subterranean friends!",
         BOOK_GARDENING = "On the care and feeding of plants.",
@@ -3413,6 +3556,21 @@ STRINGS =
 		BOOK_HORTICULTURE = "On the care and feeding of crops.",
         BOOK_SLEEP = "Soothing tales to send you off to dreamland.",
         BOOK_BRIMSTONE = "The world will end in fire and tribulation!",
+
+        BOOK_FISH = "Fishing, made easy!",
+        BOOK_FIRE = "Use these simple techniques to defuse any fiery situation.",
+        BOOK_WEB = "You don't know someone until you walk a mile in their webs.",
+        BOOK_TEMPERATURE = "Keep your personal climate under control with these easy steps.",
+        BOOK_LIGHT = "An illuminating read.",
+        BOOK_RAIN = "Save it for a rainy day, whenever you decide that will be.",
+        BOOK_MOON = "Summon the power of the moon.",
+        BOOK_BEES = "Learn the ABC's of beekeeping.",
+
+        BOOK_HORTICULTURE_UPGRADED = "Expert analysis on advanced crop care.",
+        BOOK_RESEARCH_STATION = "A complete guide to everything from A to Z.",
+        BOOK_LIGHT_UPGRADED = "This complete edition far outshines its predecessor.",
+
+        FIREPEN = "Keep those rambunctious flames penned in.",
 
         CARTOGRAPHYDESK = "Show everyone exactly where you've been.",
         COMPASS = "Points the way north.",
@@ -3467,7 +3625,7 @@ STRINGS =
         BUNDLEWRAP = "Part and parcel to bundling your stuff.",
         BACKPACK = "Carry more stuff.",
         PIGGYBACK = "Carries a lot, but slows you down.",
-        ICEPACK = "Small capacity, but keeps stuff fresh.",
+        ICEPACK = "Keeps stuff fresh.",
         UMBRELLA = "Keep the sun and rain at bay!",
         RESEARCHLAB2 = "Unlock even more crafting recipes!",
         RESEARCHLAB3 = "Is this even science anymore?",
@@ -3712,6 +3870,7 @@ STRINGS =
         MOON_SKETCH = "Look upon the face of the moon.",
 
         MINIFLARE = "Light the way for your trusted friends.",
+        MEGAFLARE = "Light a beacon for your enemies.",
 
 		SEAFARING_PROTOTYPER = "Science at sea.",
 
@@ -3784,13 +3943,19 @@ STRINGS =
 		CARNIVALGAME_FEEDCHICKS_KIT = "Let them eat grubs!",
 		CARNIVALGAME_MEMORY_KIT = "Count your eggs before they hatch.",
 		CARNIVALGAME_HERDING_KIT = "Whisk back runaway eggs.",
+        CARNIVALGAME_SHOOTING_KIT = "Keep pests from bugging the nest.",
+		CARNIVALGAME_WHEELSPIN_KIT = "Spinning and winning in equal measure.",
+		CARNIVALGAME_PUCKDROP_KIT = "Bounce the ball safely to its nest.",
 
 		CARNIVALDECOR_PLANT_KIT = "A little piece of the Cawnival.",
+		CARNIVALDECOR_BANNER_KIT = "Take a shine to some bauble-strung branches.",
 		CARNIVALDECOR_EGGRIDE1_KIT = "A cracking addition to your decor.",
 		CARNIVALDECOR_EGGRIDE2_KIT = "Pint-sized eggcitement!",
 		CARNIVALDECOR_EGGRIDE3_KIT = "Get in the swing of summer fun!",
+		CARNIVALDECOR_EGGRIDE4_KIT = "The new height of Cawnival decor.",
 		CARNIVALDECOR_LAMP_KIT = "A dreamy light for summer nights.",
-		CARNIVALDECOR_FIGURE_KIT = "What could be inside?",
+		CARNIVALDECOR_FIGURE_KIT = "What could be inside this mysterious green box?",
+		CARNIVALDECOR_FIGURE_KIT_SEASON2 = "What could be inside this mysterious gold box?",
 		CARNIVALCANNON_CONFETTI_KIT = "Start things off with a bang!",
 		CARNIVALCANNON_SPARKLE_KIT = "Add some sparkle to your surroundings.",
 		CARNIVALCANNON_STREAMER_KIT = "Create an explosion... of fun!",
@@ -3904,6 +4069,7 @@ STRINGS =
         ANCHOR = "Boat brakes.",
         STEERINGWHEEL = "It's wheely important to have one.",
         BOAT_ITEM = "Let the seas be your domain.",
+        BOAT_GRASS_ITEM = "Fun for a quick weekend getaway.",
         MAST = "Sail away, sail away.",
         ANCHOR_ITEM = "Boat brakes.", -- DEPRECATED, keeping for posterity's sake
         STEERINGWHEEL_ITEM = "It's wheely important to have one.", -- DEPRECATED, keeping for posterity's sake
@@ -4039,6 +4205,8 @@ STRINGS =
         TURF_SINKHOLE = "A chunk of wet, muddy grass.",
         TURF_MUD = "A patch of muddy ground.",
 
+        TURF_MONKEY_GROUND = "A patch of sand, with a faint scent of bananas.",
+
 		-- FARMING
 		FARM_PLOW_ITEM = "Plow a plot for your plants.",
 		FARM_HOE = "Till soil for crop seeds.",
@@ -4077,7 +4245,7 @@ STRINGS =
         MUTATOR_MOON = "Its recipient will be over the moon!",
         MUTATOR_HEALER = "Extra grainy, so it has to be healthy!",
         SPIDER_WHISTLE = "Call your creepy crawly friends.",
-        SPIDERDEN_BEDAZZLER = "A nice home makes for a nice disposition.",        
+        SPIDERDEN_BEDAZZLER = "A nice home makes for a nice disposition.",
         SPIDER_REPELLENT = "Let your friends know you need some space.",
         SPIDER_HEALER_ITEM = "Gross, gooey, and good for you!",
 
@@ -4087,7 +4255,7 @@ STRINGS =
 
 		-- Terraria
         CRITTER_EYEOFTERROR_BUILDER = "Summon a friendly ocular companion.",
-        
+
         -- WOLFGANG
         MIGHTY_GYM = "Bring on the brawn!",
         DUMBBELL = "Sticks and stones make muscles honed.",
@@ -4114,6 +4282,22 @@ STRINGS =
         WX78MODULE_MUSIC = "Every machine needs a tune-up now and then.",
         WX78MODULE_BEE = "Get your brain and body buzzing with powerful potential!",
         WX78MODULE_MAXHEALTH2 = "Make your robotic body much more robust.",
+
+        -- Pirates
+        POLLY_ROGERSHAT = "This hat comes with a feathered friend.",
+        PIRATE_FLAG_POLE = "Ape the monkey marauders with a pirate flag of your own.",
+        DOCK_KIT = "Get ready for your pier review.",
+        DOCK_WOODPOSTS_ITEM = "Nothing says \"structurally sound\" like adding some posts as an afterthought.",
+        BOAT_ROTATOR_KIT = "Row, row, rotate your boat.",
+        BOAT_MAGNET_KIT = "Your personality isn't the only thing that's magnetic.",
+        BOAT_MAGNET_BEACON = "Draw in any comically oversized magnets that might be nearby.",
+        BOAT_BUMPER_KELP_KIT = "Protect your boat - with kelp!",
+        BOAT_BUMPER_SHELL_KIT = "Protect your boat - with shells!",
+        BOAT_CANNON_KIT = "It blows the competition out of the water.",
+        CANNONBALL_ROCK_ITEM = "It's sure to make a splash.",
+        OCEAN_TRAWLER_KIT = "There's plenty of fish in the sea.",
+
+        FENCE_ROTATOR = "A sword, used for fencing.",
 
     },    -- MAXWELL_TEST = {"Say pal, you don't look so good.", "You better find something to eat before night comes!"},
 
@@ -4277,7 +4461,7 @@ STRINGS =
     --ITEM DESCRIPTIONS
     DESCRIBE_NULL = "MISSING DESCRIPTION STRING",
 
-    --NOTE: Limit to 7 strings per table! (Using net_tinybyte for NPC chatter)
+    --NOTE: Limit to 63 strings per table! (Using net_smallbyte for NPC chatter)
     MERM_TALK_FOLLOWWILSON   = {{"Will come with you.", "Flort glut."}, {"Make Mermfolk strong!", "Blut gloppy Glurtsu!"}, {"You help Mermfolk!", "Glut Glurtsu flopt!"}, {"You okay.", "Florpy flort."}},
     MERM_TALK_HELP_CHOP_WOOD = {{"Will come with you.", "Flort glut."}, {"Make Mermfolk strong!", "Blut gloppy Glurtsu!"}, {"Chop, choppy, chop!", "Grop, groppy, grop!"}, {"Work hard, florp!", "Glort blut, florp!"}},
     MERM_TALK_HELP_MINE_ROCK = {{"Will come with you.", "Flort glut."}, {"Make Mermfolk strong!", "Blut gloppy Glurtsu!"}, {"Break rock, easy!", "Wult wop, florty flort!"}, {"Work hard, florp!", "Glort blut, florp!"}},
@@ -4596,7 +4780,7 @@ STRINGS =
     HERMITCRAB_WANT_HOUSE = {"I could really use some help fixing up my house..."},
     HERMITCRAB_GIVE_PEARL = {"If you find my sweetie on your travels...","Could you... give him that pearl?","He'll recognize it."},
 
-    --NOTE: Limit to 7 strings per table! (Using net_tinybyte for NPC chatter)
+    --NOTE: Limit to 63 strings per table! (Using net_smallbyte for NPC chatter)
     PIG_TALK_FOLLOWWILSON = { "YOU FRIEND", "I LOVE FRIEND", "YOU IS GOOD", "I FOLLOW!" },
     PIG_TALK_FIND_LIGHT = { "SCARY", "NO LIKE DARK", "WHERE IS SUN?", "STAY NEAR FIRE", "FIRE IS GOOD" },
     PIG_TALK_LOOKATWILSON = { "WHO ARE YOU?", "YOU NOT PIG", "YOU HAS MEAT?" },
@@ -4659,7 +4843,7 @@ STRINGS =
     PIG_TALK_CONTEST_OOOH = {"OOOH","WOW","IS BEAUTY"},
     PIG_TALK_CONTEST_PANIC = {"MUST CHOOSE!","CHOICE HARD!"},
 
-    --NOTE: Limit to 7 strings per table! (Using net_tinybyte for NPC chatter)
+    --NOTE: Limit to 63 strings per table! (Using net_smallbyte for NPC chatter)
     RABBIT_BATTLECRY = { "HOP!", "KILL!", "DIE!" },
     RABBIT_MEAT_BATTLECRY = { "MEAT!", "UNCLEAN!", "MURDERER!", "REVENGE!", "MONSTER!" },
     RABBIT_GIVEUP = { "DONE.", "LATER." },
@@ -4670,25 +4854,34 @@ STRINGS =
     RABBIT_PANICHAUNT = { "SCARED!", "AAAH!!", "OHH!", "GHOST!" },
     RABBIT_PANICBOSS = { "RUN!", "AHHH!", "IT MAD", "EHHH!" },
 
-    --NOTE: Limit to 7 strings per table! (Using net_tinybyte for NPC chatter)
+    --NOTE: Limit to 63 strings per table! (Using net_smallbyte for NPC chatter)
     STALKER_BATTLECRY = { "Huurgh...", "...(growl)...", "...gruuuugh...", "Hrrgh...", "...grraaugh...", "...(rumble)...", "...gruh..." },
     STALKER_PLAYER_BATTLECRY = { "Huurgh...", "...gruuuugh...", "...grraaugh...", "...(gurgle)...", "...(crunch)...", "...Y-yy...", "...W-wwh..." },
 
 	CARNIVAL_CROWKID_DECOR_AMBIENT_NONE = {"They must still be setting up.", "Where's the party?", "Most boring Midsummer Cawnival ever.", "More like Caw-no-val.", "Looks like I got here too early...", "I'm gonna tell my friends to wait until there's more set up."},
-	CARNIVAL_CROWKID_DECOR_AMBIENT_SOME = {"Nicely set up.", "There is never enough flair.", "I've seen better Cawnivals.", "The party is just getting started!"},
+	CARNIVAL_CROWKID_DECOR_AMBIENT_SOME = {"Nicely set up.", "It's alright... but it could use some flair.", "I've seen better Cawnivals.", "The party is just getting started!"},
 	CARNIVAL_CROWKID_DECOR_AMBIENT_LOTS = {"Wow! It's so festive!", "Best Cawnival ever!", "Last year's Cawnival was not this fancy.", "I wanna watch the games!", "Have you checked out the Prize Booth yet?"},
 	CARNIVAL_CROWKID_DECOR_PLAYER_NONE = {"You should decorate more.", "Where are the decorations?", "It's not a Cawnival without decorations around the Tree!", "This must be your first Cawnival."},
 	CARNIVAL_CROWKID_DECOR_PLAYER_SOME = {"You're doing a pretty good job.", "I wish there were more decorations around the Cawnival Tree...", "I've seen better Cawnivals. Just saying.", "Gotta say, last year's Cawnival was better..."},
 	CARNIVAL_CROWKID_DECOR_PLAYER_LOTS = {"Wow! It's so festive!", "Nicely done.", "You must be good at these games.", "Have you tried Egg Scramble? It's my favorite game!", "I watched someone play Hubbub for Grub, and now I'm hungry...", "Have you won any prizes yet?"},
+	CARNIVAL_CROWKID_DECOR_AMBIENT_NONE_SNACK = {"All this Cawnival fun is making me peckish.", "Those snacks look so good...\nI'm sure they wouldn't mind if I snuck a bite...", "I'm starving after that long trip."},
+	CARNIVAL_CROWKID_DECOR_AMBIENT_SOME_SNACK = {"What a fun place, nobody chases us away!", "Who was that, with the red fur? He seemed kinda familiar.", "I hope we can have the Cawnival here again next year."},
+	CARNIVAL_CROWKID_DECOR_AMBIENT_LOTS_SNACK = {"If I eat anymore, I'm gonna pop.\nHmm, pop... popcorn... mmmmm...", "Do you think they're trying to fatten us up and eat us?\nNaw... they don't look that clever.", "We're lucky that Corvus found this place."},
+	CARNIVAL_CROWKID_DECOR_PLAYER_NONE_SNACK = {"Hey, mind sharing your snacks?", "Where are we from? Oh you know, here and there...", "You stay here all year?\nWow, not having wings must be tough."},
+	CARNIVAL_CROWKID_DECOR_PLAYER_SOME_SNACK = {"So where do YOU come from? Just curious!", "I can't believe you'd never seen a Cawnival before we came!\nYou sure were missing out.", "You're pretty weird. Has anyone told you that?"},
+	CARNIVAL_CROWKID_DECOR_PLAYER_LOTS_SNACK = {"It's nice to rest our wings a little.\nWe usually can't stay in one place too long.", "Have you seen the lady that watches the Cawnival at night?\nSquawck about creepy.", "Are you having fun? I sure am!"},
+	CARNIVAL_CROWKID_CAMPFIRE = {"Did you hear that?\nYou don't think we were followed, do you?", "This sure is cozy.", "It's nice to warm your talons by the fire.", "There's been a mysterious murder here...\nAnd with any luck, we'll be back again next year! Cah-cah-cah!", "I wonder why the featherfree creatures are so scared of the dark?", "Does anyone have some corn?"},
 	CARNIVAL_CROWKID_SCARED = {"Caaah!", "Time to take off!", "The feathers are flying!", "No thanks!", "I'm outta here!", "Scatter!!"},
 	CARNIVAL_CROWKID_GAME_GOTO = {"Ooooh someone's playing!", "Let's watch the featherfree creature play!", "Look, someone's about to play!", "I love watching these games!", "Oooh, that game's my favorite!"},
-	CARNIVAL_CROWKID_OTHERGAME_GOTO = {"What kind of game is that?", "Are the featherless creatures fighting? I want to watch!"},
-
+	CARNIVAL_CROWKID_OTHERGAME_GOTO = {"What kind of game is that?", "Are the featherfree creatures fighting? I want to watch!"},
+	CARNIVAL_CROWKID_ACCEPTGIFT = {"You're just giving this to me? Thanks!", "Wow, I didn't even have to steal it- I mean, thanks!", "They just give you stuff around here? Neat!"},
+	CARNIVAL_CROWKID_REFUSEGIFT = {"Oh... wow... um, that's okay, you keep it.", "Aw, wouldn't ya know it, I'm actually allergic to that exact thing.", "No thanks, I don't want it."},
+	CARNIVAL_CROWKID_HASGIFT = {"What's with all the presents? This is starting to feel suspicious...", "Thanks, but I've already got something!", "Sorry, busy. Maybe try someone else."},
 
 	CARNIVAL_HOST_SELL_PLAZA = {"Yes, yes! The centerpiece must be set!", "The Cawnival cannot begin until the Tree is planted!"},
-	CARNIVAL_HOST_ANNOUNCE_CARNIVAL = {"Yes, yes! This place will do nicely!", "A perfect spot for my famous, fantabulous, (fiscally fruitful) Cawnival!", "You there! How would you like to be a part of something spectacular?!", "It is I, a merry wanderer with feathers black as night!", "I've been known by many names, but you may call me Corvus Goodfeather!", "\"Not yet mid-summer\", you say? Well my friend, the early bird gets the worm!"},
+	CARNIVAL_HOST_ANNOUNCE_CARNIVAL = {"Yes, yes! It's that most wonderful time of year again!", "I, the great Goodfeather, have graciously decided to return with my wondrous Cawnival!", "You there! How would you like to be a part of something spectacular?!", "It is I, a merry wanderer with feathers black as night!", "I've been known by many names, but you may call me Corvus Goodfeather!", "\"Not yet mid-summer\", you say? Well my friend, the early bird gets the worm!", "Oh lucky, lucky you, to be a stop on our flight of fancy!", "Be merry, for good old Goodfeather has returned with his spectacular Cawnival!", "Last year was so profitable- er, FUN, that we just couldn't stay away!"},
 
-	CARNIVAL_HOST_SELL_GENERIC = {"Look here, I have such wonderful games for you to play!", "A Cawnival is not complete without some fun and games."},
+	CARNIVAL_HOST_SELL_GENERIC = {"Look here, I have such wonderful games for you to play!", "A Cawnival is not complete without some fun and games.",},
 	CARNIVAL_HOST_ANNOUNCE_GENERIC = {"The Cawnival is underway!", "Welcome, welcome, one and all!", "Buy your tokens here!", "Enjoy the Cawnival!", "Why not purchase a lovely miniature to set under the Tree?", "The games look fun, don't they? Why not purchase a token or twelve?", "Win tickets, trade tickets for fabulous prizes!", "Take a glance at the Prize Booth, friends! We have spectacular trinkets from far and wide!", "\"Not yet mid-summer\", you say? Well my friend, the early bird gets the worm!"},
 	CARNIVAL_HOST_GAME_CHEER = {"Yes, yes! You're a natural!", "You've got a good grasp of the game, I see!", "Such an excellent performance! I do hope you purchase more tokens to show us again!"},
 	CARNIVAL_HOST_GAME_BORED = {"Oh, I think you nearly scored a point that time!", "Have you never played a Cawnival game before?", "Better luck next time, perhaps?"},
@@ -4696,7 +4889,7 @@ STRINGS =
 	CARNIVAL_HOST_GAME_END_BORED = {"Too bad. Better luck next time!", "I have plenty more tokens to sell if you'd like to try again!"},
 	CARNIVAL_HOST_OTHERGAME_TALK = {"What is this game?", "What an odd game. Not nearly as fun as the ones we have at the Cawnival!", "I'm not familiar with the rules..."},
 
-    --NOTE: Limit to 7 strings per table! (Using net_tinybyte for NPC chatter)
+    --NOTE: Limit to 63 strings per table! (Using net_smallbyte for NPC chatter)
     STALKER_ATRIUM_BATTLECRY =
     {
         "A pity.",
@@ -5118,7 +5311,7 @@ STRINGS =
     },
 
     -- gameplay done
-    --NOTE: Limit to 7 strings per table! (Using net_tinybyte for NPC chatter)
+    --NOTE: Limit to 63 strings per table! (Using net_smallbyte for NPC chatter)
     SWAMPIG_TALK_TO_WILSON =
     {
         "KIND ELDER SICK. NEED REST",
@@ -5677,6 +5870,33 @@ STRINGS =
 
     TWINS_COMING = "This is going to be a terrible night...",
     TWINS_TARGET = "The Twins turn their gaze toward {player_name}",
+
+    -- PIRATES
+    MONKEY_TALK_ABANDON = {"INTO THE BLUE.","CURSES!","CANNON BALL!", "ABANDON SHIP!"},
+    MONKEY_TALK_ATTACK = {"HAND IT OVER!","AVAST YE, LAND LUBBER!","SCURVY DOG!"},
+    MONKEY_TALK_STEAL = {"ME BOOTY!","ARRR!","LOOT!"},
+    MONKEY_TALK_RETREAT = {"WE GO!","MAKE HASTE!","ANCHOR AWEIGH!"},
+    MONKEY_TALK_FIRECANNON = {"AVAST YE!","FEED THE FISH!","FIRE ON DECK!","SCUTTLE YE SELF!","TO THE DEPTHS WITH YE!"},
+
+    MONKEY_MONKEY_BATTLECRY = {"MUTINY!","AVAST, BILGE RAT!","KEELHAUL YA!"},
+    MONKEY_STUFF_BATTLECRY = {"HAND IT OVER!","GIVE UP THE GOODS!","ARRR, THAT LOOT'S MINE!"},
+    MONKEY_BATTLECRY = {"LAND LUBBER!","SCURVY DOG!","FEED THE FISH!","GET YER FLOGGIN'!"},
+    MONKEY_BATTLECRY_VICTORY = {"YAR! BENT GOLD!", "VICTORY TASTES SWEET!"},
+    MONKEY_BATTLECRY_VICTORY_CHEER = {"YO HO!"},
+    MONKEY_BATTLECRY_TIME_UP = {"TIME UP!","PARLAY OVER!"},
+
+    MONKEY_COMMAND = {"TO ARMS!","HANG 'EM FROM THE YARD ARM!","AVAST, ME SEA MONKEYS!","PIRATES OF MOON QUAY, TO BATTLE!"},
+
+    MONKEY_QUEEN_BANANAS = {"OOH, BENT GOLD.", "FABULOUS QUALITY.", "YOU'VE DONE WELL.",},
+    MONKEY_QUEEN_REMOVE_CURSE = {"YOU WOULD RETURN SUCH A GIFT? SUIT YOURSELF.", "YOU WISH TO RETURN TO THAT HIDEOUS FORM? VERY WELL.", "I CAN'T FATHOM WHY YOU'D GIVE IT UP, BUT I'LL HONOR OUR ACCORD."},
+    MONKEY_QUEEN_HAPPY = {"YOUR OFFERING PLEASES ME.", "THE GREAT SKY BANANA SMILES THIS DAY."},
+    MONKEY_QUEEN_WAKE = {"WHAT'S ALL THE FUSS NOW?", "SPEAK. BUT MAKE IT QUICK."},
+
+    GIBERISH_PRE = {"buhrg","grog","krog","gruhrd","blorg","glog","snurg","dulg"},
+    GIBERISH_PST = {"le","lor","ed","end"},
+
+    MONKEY_SPEECH_PRE = {"Ooo","Eee","Oee"},
+    MONKEY_SPEECH_PST = {"ki","k"},
 }
 
 STRINGS.BUNNYMANNAMES =
@@ -6155,6 +6375,7 @@ STRINGS.UI =
         NEEDSHERMITCRABSHOP_L3 = "Find someone friendly enough to make this trade!",
         NEEDSHERMITCRABSHOP_L4 = "Find someone friendly enough to make this trade!",
         NEEDSCREATURESCANNING = "Scan living creatures to collect data!",
+        NEEDSBOOKSTATION = "Build a bookcase to craft your books.",
 
 		NEEDSYOTG = "Available during Year of the Gobbler!",
 		NEEDSYOTV = "Available during Year of the Varg!",
@@ -6666,7 +6887,7 @@ STRINGS.UI =
         CANT_LOAD_ROG = "Reign of Giants is not installed. Unable to load.",
 
 		MAINBANNER_ROT_BETA_TITLE = "Beta Build", --unused now.
-		MAINBANNER_BETA_TITLE = "WX-78 Refresh\nBeta Build",
+		MAINBANNER_BETA_TITLE = "Wickerbottom\nBeta Build",
 
         CONSOLE_EDITION_TEXT = "Console Edition",
 
@@ -6898,6 +7119,7 @@ STRINGS.UI =
 
 		PERISH_RATE_TITLE = "Spoils",
 		PERISH_NEVER = "Never",
+        PERISH_VERY_QUICKLY = "Very Quickly",
 		PERISH_QUICKLY = "Quickly",
 		PERISH_AVERAGE = "Average",
 		PERISH_SLOWLY = "Slowly",
@@ -7173,12 +7395,12 @@ STRINGS.UI =
 		ARMOUR = "Armour",
 		CLOTHING = "Clothing",
 		RESTORATION = "Healing",
-		MAGIC = "Shadow Magic",	
+		MAGIC = "Shadow Magic",
 		DECOR = "Decorations",
 		STRUCTURES = "Structures",
 		CONTAINERS = "Storage Solutions",
 		COOKING = "Cooking",
-		GARDENING = "Food & Gardening",	
+		GARDENING = "Food & Gardening",
 		FISHING = "Fishing",
 		SEAFARING = "Seafaring",
 		RIDING = "Beefalo Riding",
@@ -7188,7 +7410,7 @@ STRINGS.UI =
 		EVERYTHING = "Everything",
 	},
 
-	CRAFTING_STATION_FILTERS = 
+	CRAFTING_STATION_FILTERS =
 	{
         ANCIENT = "Ancient Pseudoscience",
         ORPHANAGE = "Critters",
@@ -7308,6 +7530,7 @@ STRINGS.UI =
         GRAPHICS = "Graphics",
         SETTINGS = "Settings",
         ADVANCED = "Advanced",
+		HUD = "HUD",
         CONTROLS = "Controls",
         LANGUAGES = "Languages",
         LANG_TITLE = "Language Options",
@@ -7358,6 +7581,8 @@ STRINGS.UI =
 		CRAFTINGMENUNUMPINPAGES = "Crafting Pin Pages:",
 		CRAFTINGMENUSENSITIVITY = "Crafting Sensitivity:",
 		INVENTORYSENSITIVITY = "Inventory Sensitivity:",
+        MINIMAPZOOMSENSITIVITY = "Zoom Sensitivity:",
+        MINIMAPZOOMCURSOR = "Zoom Cursor Focus:",
         VIBRATION = "Vibration:",
         WATHGRITHRFONT = "Wigfrid's Umlauts:",
         WALTERCAMERA = "Campfire Camera:",
@@ -7424,6 +7649,7 @@ STRINGS.UI =
             GRAPHICS = "Modify the graphics settings",
             SETTINGS = "Modify features of the game and user interface",
             ADVANCED = "Modify advanced features of the game and user interface",
+			HUD = "Modify features of the user interface",
             CONTROLS = "Rebind which input does which in-game action",
             LANGUAGES = "Select display language",
             CONTROLS_CONSOLE = "Check which control does which in-game action",
@@ -7441,6 +7667,8 @@ STRINGS.UI =
 			CRAFTINGMENUNUMPINPAGES = "Set how many pages of pinned recipes you would like to cycle through.",
 			CRAFTINGMENUSENSITIVITY = "Adjust the input sensitivity while navigating through the crafting menu.",
 			INVENTORYSENSITIVITY = "Adjust the input sensitivity while navigating through the inventory.",
+            MINIMAPZOOMSENSITIVITY = "Adjust the input sensitivity while zooming in and out on the minimap.",
+            MINIMAPZOOMCURSOR = "Zooming on the minimap will focus where the cursor is located.",
             AUTOLOGIN = "Log into your Klei account automatically when booting up Don't Starve Together.",
             SHOWPASSWORD = "Show or hide your passwords.",
             BOATCAMERA = "Allows the camera to focus on your boat while sailing.",
@@ -7480,7 +7708,7 @@ STRINGS.UI =
             ANIMATED_HEADS = "Animates the survivor's heads in the menus.",
             CONSOLEAUTOPAUSE = "Allows the server to auto-pause while the console screen is open.",
             DEFAULTCLOUDSAVES = "Chooses whether new saves will be stored in the cloud or not by default."
-        },
+    },
 
     },
 
@@ -7556,7 +7784,7 @@ STRINGS.UI =
         TIP_GARDENEERHAT = "\"I've finally perfected my design for an ingenious (if I do say so myself) device that stores important garden-based knowledge. Certain naysayers might point out that it looks like nothing more than an overturned flowerpot worn on the head... some people simply don't have an eye for science.\" -W",
         TIP_COOKBOOK = "\"Once I've perfected a recipe, I find it helpful to write it down. Luckily, I've been able to cobble together a rough cookbook for just such a thing out of some spare pieces of parchment. Now my mind is free to worry about more immediate things...\" -W",
         TIP_NEWRECIPES = "\"Recipes are useful, but a true chef knows the importance of experimenting with new ingredients and flavors, and this world certainly provides an abundance of unusual things to choose from.\" -W",
-        TIP_REPLANTING = "\"The bushes I replanted by the camp are looking sickly... I suspect they'll require some extra care before they can produce any berries again.\" -W",
+        TIP_REPLANTING = "\"The bushes I replanted by the camp are looking malnourished... I suspect they'll require some extra care before they can produce any berries again.\" -W",
         TIP_NAUGHTINESS = "\"We shouldn't hurt things that don't hurt us. If we're mean, bad old Mr. Krampus will come...\" -W",
         TIP_BERRYLURE = "\"Last time I baited my hook with berries I caught more fish than I could carry, but when I tried today? Barely a nibble! Guess the berry trick only works on some of 'em.\" -W",
         TIP_OCEANEXPLORATION = "\"What strange new islands and creatures might I encounter if I journey out to sea? I shudder to think... but curiosity has a tendency to get the better of me...\" -W",
@@ -7894,9 +8122,13 @@ STRINGS.UI =
         SELFPAUSED_TEXT = "You have paused the game.",
     },
 
-	WORDPREDICTIONWIDET =
+	WORDPREDICTIONWIDGET =
 	{
 		DISMISS = "Dismiss",
+        PREV = "Scroll Left",
+        NEXT = "Scroll Right",
+        MINIMIZE = "Minimize",
+        EXPAND = "Expand",
 	},
 
     PLAYERSTATUSSCREEN =
@@ -8452,7 +8684,7 @@ STRINGS.UI =
         FERN = "Cave Ferns",
         FLOWER_CAVE = "Light Flowers",
         WORMLIGHTS = "Glow Berries",
-        BANANA = "Cave Bananas",
+        BANANA = "Bananas",
         LICHEN = "Lichen",
         EARTHQUAKES = "Earthquakes",
         CAVELIGHT = "Sinkhole Lights",
@@ -8511,6 +8743,8 @@ STRINGS.UI =
         MOON_TREE_REGROWTH = "Lune Trees",
         MUSHTREE_MOON_REGROWTH = "Lunar Mushtrees",
         CARROTS_REGROWTH = "Carrots",
+        REEDS_REGROWTH = "Reeds",
+        CACTUS_REGROWTH = "Cacti",
         FLOWERS_REGROWTH = "Flowers",
         FLOWER_CAVE_REGROWTH = "Light Flower",
         LIGHTFLIER_FLOWER_REGROWTH = "Lightbug Flower",
@@ -8536,6 +8770,17 @@ STRINGS.UI =
 
 		EYEOFTERROR = "Eye of Terror",
 		TERRARIUMCHEST = "Terrarium",
+
+        PALMCONETREE = "Palmcone Tree",
+        PALMCONETREE_REGROWTH = "Palmcone Tree",
+        PIRATERAIDS = "Moon Quay Pirates",
+
+        PORTAL_SPAWNRATE = "Portal Activity",
+        BANANABUSH_PORTALRATE = "Banana Bushes",
+        LIGHTCRAB_PORTALRATE = "Crustashines",
+        MONKEYTAIL_PORTALRATE = "Monkeytails",
+        PALMCONE_SEED_PORTALRATE = "Palmcone Sprouts",
+        POWDER_MONKEY_PORTALRATE = "Powder Monkeys",
 
 		-- End of world customization strings
     },
@@ -8824,6 +9069,8 @@ STRINGS.UI =
         OFFLINEMODETITLE = "Offline Mode",
         OFFLINEMODEBODYCREATE = "Are you sure you want to create an offline world? This is a limited mode where only players on your Local Area Network can join. Players will not be able to receive or use Collection Items in this world.",
         OFFLINEMODEBODYRESUME = "You are resuming an offline world. Only users on your Local Area Network will be able to join this world. Players will not be able to receive or use Collection Items in this world.",
+        OFFLINEMODEBODYCREATE_CANSKIN = "Are you sure you want to create an offline world? This is a limited mode where only players on your Local Area Network can join.",
+        OFFLINEMODEBODYRESUME_CANSKIN = "You are resuming an offline world. Only users on your Local Area Network will be able to join this world.",
         FULLSLOTSTITLE = "No Slots Available",
         FULLSLOTSBODY = "All of your server slots are currently full. You must either select a slot to load from, or delete a slot and start a new world.",
         OK = "OK",
@@ -9007,6 +9254,7 @@ STRINGS.UI =
 
         UNOWNED_CHARACTER_TITLE = "Character Not Owned",
         UNOWNED_CHARACTER_BODY = "You have not yet unlocked {character}.\nTo play this character, you must either weave them using Spools, or purchase them from the Shop.",
+        UNOWNED_CHARACTER_BODY_OFFLINE = "You have not yet unlocked {character}.\nYou must be online to unlock this character.",
         VISIT_SHOP = "Visit Shop",
 
         SERVER_SHUTDOWN_TITLE = "Server is Shutting Down",
@@ -9017,7 +9265,7 @@ STRINGS.UI =
     {
         TITLE = "Clothing Presets",
     },
-    
+
     ITEM_SKIN_DEFAULTS =
     {
         TITLE = "Curios for Starting Items",
@@ -9081,6 +9329,7 @@ STRINGS.UI =
         OK = "OK",
 		NOW_OFFLINE_TITLE = "Network Connection Lost",
 		NOW_OFFLINE_BODY = "You are now in offline mode.\nYour item collection is not available in offline mode.\nPlease check your connection and log in again.",
+        NOW_OFFLINE_BODY_CANSKIN = "You are now in offline mode.\nPlease check your connection and log in again.",
     },
 
     FESTIVALEVENTSCREEN =
@@ -10144,6 +10393,15 @@ STRINGS.UI =
         FAILED_INVENTORY_NO = "No",
 
         GET_INVENTORY = "Downloading Item Collection",
+
+        FAILED_NOLOGIN_TITLE = "Authentication Required",
+        FAILED_NOLOGIN_BODY = "Unfortunately you will need to login to continue viewing this panel, would you like to try to login again?",
+        FAILED_NOLOGIN_YES = "Yes",
+        FAILED_NOLOGIN_NO = "No",
+
+        FAILED_NOPERMISSIONS_TITLE = "Permissions Required",
+        FAILED_NOPERMISSIONS_BODY = "Unfortunately you will need to login to continue viewing this panel, but you do not allow data collection which is required to login.\n\nData Collection settings can be modified in the Options menu.",
+        FAILED_NOPERMISSIONS_NOCHOICE = "I understand",
     },
 
     BEARDSCREEN =
@@ -10280,7 +10538,7 @@ STRINGS.UI =
         PURCHASE_WARNING_DESC = "You already own all the items in this chest. Would you like to purchase it anyway?",
         PURCHASE_WARNING_OK = "Continue Purchase",
         PURCHASE_WARNING_CANCEL = "Never mind!",
-        
+
         GO_TO_SALES = "View Sales!",
 
         PACK_SAVINGS = "-{savings}%",
@@ -10437,6 +10695,8 @@ STRINGS.UI =
         WARNING = "You won't be able to wear an item if you give your last one away! Do you really want to trade these items?",
         SERVER_ERROR_TITLE = "Error Trading Items",
         SERVER_ERROR_BODY = "There was an error trading your items. Please login again to refresh your account inventory.",
+        SORRY = "Sorry",
+        OFFLINE = "The Trade Inn is not available in offline mode.",
         OK = "OK",
         SPECIALS_TITLE = "Specials",
         SPECIALS = "Specials",
@@ -10622,7 +10882,7 @@ STRINGS.UI =
             FEED = "Feed {name}",
             CLEAR_POOP = "Clear Poop",
             PICKUP_NAMETAG = "Pick up Kit Collar",
-            
+
             ABANDONED_TITLE = "{name} has abandoned you.",
             ABANDONED_BODY = "Sadly, {name} was feeling neglected. They went looking for the affection, food and tidier home that they felt they deserved.",
 
@@ -11619,6 +11879,7 @@ STRINGS.UI =
         CHOICEGIANTS = "Giants",
 
         WORLDSETTINGS_RESOURCEREGROWTH = "Resource Regrowth",
+        WORLDSETTINGS_PORTALRESOURCES = "Unnatural Portal Resources",
         WORLDSETTINGS_ANIMALS = "Creatures",
         WORLDSETTINGS_HOSTILE_CREATURES = "Hostile Creatures",
 
@@ -12477,7 +12738,7 @@ STRINGS.KITCOON_NAMING =
 		"Boots",
 		"Chewie",
 		"Turnip",
-		"Lando", 
+		"Lando",
 		"Marlo",
 		"Andre",
 		"Mandy",
@@ -12500,6 +12761,8 @@ STRINGS.KITCOON_NAMING =
 		"Cherry",
 		"Siumai",
 		"Kira",
+        "Finch",
+        "Mango",
     },
 }
 

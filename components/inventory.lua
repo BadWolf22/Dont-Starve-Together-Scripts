@@ -100,12 +100,34 @@ function Inventory:TransferInventory(receiver)
 
     local inv = receiver.components.inventory
 
+    -- NOTES(JBK): Weapons that are given to specific entities to use have the "nosteal" tag but also do not persist.
+    --             The tag can not be used because of Wanda watches for this TransferInventory function to work.
+    --             The restriction that specific entities that have these unique weapons must also make them not persist.
     for k,v in pairs(self.itemslots) do
-        inv:GiveItem(self:RemoveItemBySlot(k))
+        local item = self:RemoveItemBySlot(k)
+        if item and item.persists then
+            inv:GiveItem(item)
+        end
     end
 
     for k,v in pairs(self.equipslots) do
-       inv:GiveItem(self:Unequip(k)) 
+        local equip = self:Unequip(k)
+        if equip and equip.persists then
+            if inv.equipslots ~= nil then
+                if equip.components.equippable and equip.components.equippable:IsRestricted(receiver) then
+                    inv:GiveItem(equip) 
+                else
+                    inv:Equip(equip)
+                end
+            else
+                inv:GiveItem(equip) 
+            end
+        end
+    end
+
+    local activeitem = self:GetActiveItem()
+    if activeitem and activeitem.persists then
+        receiver.components.inventory:GiveActiveItem(activeitem)
     end
 end
 
@@ -532,6 +554,10 @@ function Inventory:DropItem(item, wholestack, randomdir, pos)
         dropped.prevcontainer = nil
         dropped.prevslot = nil
 
+        if dropped:HasTag("personal_possession") then
+            dropped:RemoveTag("personal_possession")
+        end
+
         self.inst:PushEvent("dropitem", { item = dropped })
     end
 
@@ -554,6 +580,16 @@ end
 
 function Inventory:GetItemInSlot(slot)
     return self.itemslots[slot]
+end
+
+function Inventory:GetFirstItemInAnySlot()
+    for k = 1, self.maxslots do
+        local item = self.itemslots[k]
+        if item then
+            return item
+        end
+    end
+    return nil
 end
 
 function Inventory:IsFull()
@@ -838,24 +874,39 @@ function Inventory:GiveItem(inst, slot, src_pos)
         return false
     end
 
-    if not (self.isloading or self.silentfull) and self.maxslots > 0 then
-        self.inst:PushEvent("inventoryfull", { item = inst })
-    end
-
     --can't hold it!
+    local returnvalue = false
+    local shouldwisecrack = true
     if self.activeitem == nil and
         self.maxslots > 0 and
         not inst.components.inventoryitem.canonlygoinpocket and
         not (self.inst.components.playercontroller ~= nil and
             self.inst.components.playercontroller.isclientcontrollerattached) then
+
         inst.components.inventoryitem:OnPutInInventory(self.inst)
         self:SetActiveItem(inst)
-        return true
+        returnvalue = true
     elseif self.HandleLeftoversFn ~= nil then
 		self.HandleLeftoversFn(self.inst, inst)
 	else
-        self:DropItem(inst, true, true)
+        if self.activeitem and self.activeitem ~= inst and
+            self.activeitem.components.stackable and
+            inst.components.stackable and
+            self.activeitem.prefab == inst.prefab and
+            not self.activeitem.components.stackable:IsFull()
+            then
+            self.activeitem.components.stackable:Put(inst, Vector3(self.inst.Transform:GetWorldPosition()))
+            self.inst:PushEvent("gotnewitem", { item = inst, toactiveitem = true, })
+            returnvalue = true
+            shouldwisecrack = false
+        else
+            self:DropItem(inst, true, true)
+        end
     end
+    if shouldwisecrack and not (self.isloading or self.silentfull) and self.maxslots > 0 then
+        self.inst:PushEvent("inventoryfull", { item = inst })
+    end
+    return returnvalue
 end
 
 function Inventory:Unequip(equipslot, slip)
@@ -1137,6 +1188,29 @@ function Inventory:HasItemWithTag(tag, amount)
     return num_found >= amount, num_found
 end
 
+function Inventory:GetItemsWithTag(tag)
+    local items = {}
+    for k, v in pairs(self.itemslots) do
+        if v and v:HasTag(tag) then
+            table.insert(items, v)
+        end
+    end
+
+    if self.activeitem and self.activeitem:HasTag(tag) then
+        table.insert(items, self.active_item)
+    end
+
+    local overflow = self:GetOverflowContainer()
+    if overflow ~= nil then
+        local overflow_items = overflow:GetItemsWithTag(tag)
+        for _, item in ipairs(overflow_items) do
+            table.insert(items, item)
+        end
+    end
+
+    return items
+end
+
 function Inventory:GetItemByName(item, amount, checkallcontainers) --Note(Peter): We don't care about v.skinname for inventory GetItemByName requests.
     local total_num_found = 0
     local items = {}
@@ -1347,6 +1421,10 @@ function Inventory:DropEverythingWithTag(tag)
 end
 
 function Inventory:DropEverything(ondeath, keepequip)
+    if self.inst:HasTag("player") and not GetGameModeProperty("ghost_enabled") and not GetGameModeProperty("revivable_corpse") then
+        -- NOTES(JBK): This is for items like Wanda's watches that normally stick inside the inventory but Wilderness mode will force the player to reroll so drop everything.
+        ondeath = false
+    end
     if self.activeitem ~= nil and not (ondeath and self.activeitem.components.inventoryitem.keepondeath) then
         self:DropItem(self.activeitem)
         self:SetActiveItem(nil)
@@ -1354,7 +1432,7 @@ function Inventory:DropEverything(ondeath, keepequip)
 
     for k = 1, self.maxslots do
         local v = self.itemslots[k]
-        if v ~= nil and not (ondeath and v.components.inventoryitem.keepondeath) then
+        if v ~= nil and not (ondeath and v.components.inventoryitem.keepondeath) and not v.components.curseditem then
             self:DropItem(v, true, true)
         end
     end
@@ -1953,6 +2031,10 @@ end
 
 function Inventory:IsWaterproof()
     return self:GetWaterproofness() >= 1
+end
+
+function Inventory:TransferComponent(newinst)
+    self:TransferInventory(newinst)
 end
 
 return Inventory

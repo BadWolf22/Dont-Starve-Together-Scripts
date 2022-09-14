@@ -31,6 +31,8 @@ AddModReleaseID( "R18_QOL_SERVERPAUSING" )
 AddModReleaseID( "R19_REFRESH_WOLFGANG" )
 AddModReleaseID( "R20_QOL_CRAFTING4LIFE" )
 AddModReleaseID( "R21_REFRESH_WX78" )
+AddModReleaseID( "R22_PIRATEMONKEYS" )
+AddModReleaseID( "R23_REFRESH_WICKERBOTTOM" )
 
 -----------------------------------------------------------------------------------------------
 
@@ -298,6 +300,7 @@ function CreateEnvironment(modname, isworldgen, isfrontend)
         -- worldgen
 		LEVELCATEGORY = LEVELCATEGORY,
         GROUND = GROUND,
+		WORLD_TILES = WORLD_TILES,
         LOCKS = LOCKS,
         KEYS = KEYS,
         LEVELTYPE = LEVELTYPE,

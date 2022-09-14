@@ -233,7 +233,7 @@ local function OnEntityReplicated(inst)
                 inst._parent.replica[v]:AttachClassified(inst)
             end
         end
-        for i, v in ipairs({ "playercontroller", "playervoter" }) do
+        for i, v in ipairs({ "playercontroller", "playervoter", "boatcannonuser" }) do
             if inst._parent.components[v] ~= nil then
                 inst._parent.components[v]:AttachClassified(inst)
             end
@@ -463,6 +463,14 @@ fns.OnUpgradeModulesListDirty = function(inst)
     end
 end
 
+-- Wortox free soulhops ------------------------------------------------------
+
+fns.OnFreeSoulhopsDirty = function(inst)
+    if inst._parent ~= nil then
+        inst._parent:PushEvent("freesoulhopschanged", {current = inst.freesoulhops:value()})
+    end
+end
+
 ------------------------------------------------------------------------------
 
 local function OnMoistureDirty(inst)
@@ -512,7 +520,10 @@ end
 
 local function OnTechTreesDirty(inst)
     for i, v in ipairs(TechTree.AVAILABLE_TECH) do
-        inst.techtrees[v] = inst[string.lower(v).."level"]:value()
+        local level = inst[string.lower(v).."level"]:value()
+        local bonus = inst[string.lower(v).."tempbonus"]
+        inst.techtrees[v] = level
+        inst.techtrees_no_temp[v] = math.max(0, level - (bonus ~= nil and bonus:value() or 0))
     end
     if inst._parent ~= nil then
         inst._parent:PushEvent("techtreechange", { level = inst.techtrees })
@@ -629,6 +640,12 @@ end
 local function OnAttunedResurrectorDirty(inst)
     if inst._parent ~= nil then
         inst._parent:PushEvent("attunedresurrector", inst.attunedresurrector:value())
+    end
+end
+
+fns.OnCannonDirty = function(inst)
+    if inst._parent ~= nil then
+        inst._parent:PushEvent("aimingcannonchanged", inst.cannon:value())
     end
 end
 
@@ -965,6 +982,7 @@ local function RegisterNetListeners(inst)
         inst:ListenForEvent("upgrademoduleenergyupdate", fns.OnEnergyLevelDirty)
         inst:ListenForEvent("upgrademoduleslistdirty", fns.OnUpgradeModulesListDirty)
         inst:ListenForEvent("uirobotsparksevent", fns.OnUIRobotSparks)
+        inst:ListenForEvent("freesoulhopsdirty", fns.OnFreeSoulhopsDirty)
         inst:ListenForEvent("temperaturedirty", OnTemperatureDirty)
         inst:ListenForEvent("moisturedirty", OnMoistureDirty)
         inst:ListenForEvent("techtreesdirty", OnTechTreesDirty)
@@ -979,22 +997,7 @@ local function RegisterNetListeners(inst)
         inst:ListenForEvent("playercamerashake", OnPlayerCameraShake)
         inst:ListenForEvent("playerscreenflashdirty", OnPlayerScreenFlashDirty)
         inst:ListenForEvent("attunedresurrectordirty", OnAttunedResurrectorDirty)
-        
-        
-
-        OnIsTakingFireDamageDirty(inst)
-        OnTemperatureDirty(inst)
-        OnTechTreesDirty(inst)
-        if inst._parent ~= nil then
-            inst._oldhealthpercent = inst.maxhealth:value() > 0 and inst.currenthealth:value() / inst.maxhealth:value() or 0
-            inst._oldhungerpercent = inst.maxhunger:value() > 0 and inst.currenthunger:value() / inst.maxhunger:value() or 0
-            inst._oldsanitypercent = inst.maxsanity:value() > 0 and inst.currentsanity:value() / inst.maxsanity:value() or 0
-            inst._oldwerenesspercent = inst.currentwereness:value() * .01
-            inst._oldinspirationpercent = inst.currentinspiration:value() * .01
-            inst._oldmightinesspercent = inst.currentmightiness:value() * .01
-            inst._oldmoisture = inst.moisture:value()
-            UpdateAnimOverrideSanity(inst._parent)
-        end
+        inst:ListenForEvent("cannondirty", fns.OnCannonDirty)
     end
 
     inst:ListenForEvent("gym_bell_start", fns.OnGymBellStart)
@@ -1023,6 +1026,32 @@ local function RegisterNetListeners(inst)
 	inst:ListenForEvent("startfarmingmusicevent", fns.StartFarmingMusicEvent)
     inst:ListenForEvent("ingredientmoddirty", fns.RefreshCrafting)
 
+    fns.OnInitialDirtyStates(inst)
+
+    if inst._parent.isseamlessswaptarget then
+        --finishseamlessplayerswap will be able to retrigger all the instant events if the initialization happened in the "wrong"" order.
+        inst:ListenForEvent("finishseamlessplayerswap", fns.FinishSeamlessPlayerSwap, inst._parent)
+        --Fade is initialized by OnPlayerActivated in gamelogic.lua
+    end
+end
+
+function fns.OnInitialDirtyStates(inst)
+    if not TheWorld.ismastersim then
+        OnIsTakingFireDamageDirty(inst)
+        OnTemperatureDirty(inst)
+        OnTechTreesDirty(inst)
+        if inst._parent ~= nil then
+            inst._oldhealthpercent = inst.maxhealth:value() > 0 and inst.currenthealth:value() / inst.maxhealth:value() or 0
+            inst._oldhungerpercent = inst.maxhunger:value() > 0 and inst.currenthunger:value() / inst.maxhunger:value() or 0
+            inst._oldsanitypercent = inst.maxsanity:value() > 0 and inst.currentsanity:value() / inst.maxsanity:value() or 0
+            inst._oldwerenesspercent = inst.currentwereness:value() * .01
+            inst._oldinspirationpercent = inst.currentinspiration:value() * .01
+            inst._oldmightinesspercent = inst.currentmightiness:value() * .01
+            inst._oldmoisture = inst.moisture:value()
+            UpdateAnimOverrideSanity(inst._parent)
+        end
+    end
+
     OnStormLevelDirty(inst)
     OnGiftsDirty(inst)
     fns.OnYotbSkinDirty(inst)
@@ -1030,8 +1059,12 @@ local function RegisterNetListeners(inst)
     OnGhostModeDirty(inst)
     OnPlayerHUDDirty(inst)
     OnPlayerCameraDirty(inst)
+end
 
-    --Fade is initialized by OnPlayerActivated in gamelogic.lua
+fns.FinishSeamlessPlayerSwap = function(parent)
+    local inst = parent.player_classified
+    inst:RemoveEventCallback("finishseamlessplayerswap", fns.FinishSeamlessPlayerSwap, parent)
+    fns.OnInitialDirtyStates(inst)
 end
 
 --------------------------------------------------------------------------
@@ -1127,6 +1160,10 @@ local function fn()
         net_smallbyte(inst.GUID, "upgrademodules.mods6", "upgrademoduleslistdirty"),
     }
 
+    -- Wortox Soulhop free counter
+    inst.freesoulhops = net_tinybyte(inst.GUID, "freesoulhops", "freesoulhopsdirty")
+    inst.freesoulhops:set(0)
+
 	-- oldager
     inst.oldager_yearpercent = net_float(inst.GUID, "oldager.yearpercent")
     inst.oldager_rate = net_smallbyte(inst.GUID, "oldager.rate") -- use the Get and Set functions because this value is a signed value incoded into an unsigned net_var
@@ -1196,10 +1233,13 @@ local function fn()
     inst.builderdamagedevent = net_event(inst.GUID, "builder.damaged")
     inst.learnrecipeevent = net_event(inst.GUID, "builder.learnrecipe")
     inst.techtrees = deepcopy(TECH.NONE)
+    inst.techtrees_no_temp = deepcopy(inst.techtrees)
     inst.ingredientmod = net_tinybyte(inst.GUID, "builder.ingredientmod", "ingredientmoddirty")
     for i, v in ipairs(TechTree.BONUS_TECH) do
         local bonus = net_tinybyte(inst.GUID, "builder."..string.lower(v).."bonus")
 		inst[string.lower(v).."bonus"] = bonus
+		local tempbonus = net_tinybyte(inst.GUID, "builder."..string.lower(v).."tempbonus", "techtreesdirty")
+		inst[string.lower(v).."tempbonus"] = tempbonus
     end
     for i, v in ipairs(TechTree.AVAILABLE_TECH) do
         local level = net_tinybyte(inst.GUID, "builder.accessible_tech_trees."..v, "techtreesdirty")
@@ -1278,6 +1318,9 @@ local function fn()
 
     --CarefulWalking variables
     inst.iscarefulwalking = net_bool(inst.GUID, "carefulwalking.careful", "iscarefulwalkingdirty")
+
+    --BoatCannonUser variables
+    inst.cannon = net_entity(inst.GUID, "boatcannonuser.cannon", "cannondirty")
 
     --Morgue variables
     inst.isdeathbypk = net_bool(inst.GUID, "morgue.isdeathbypk", "morguedirty")

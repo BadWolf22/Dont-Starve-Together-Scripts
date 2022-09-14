@@ -61,7 +61,9 @@ local function EncodeCookbookEntry(entry)
 end
 
 function CookbookData:ApplyOnlineProfileData()
-	if not self.synced and not (TheFrontEnd ~= nil and TheFrontEnd:GetIsOfflineMode() or not TheNet:IsOnlineMode()) and TheInventory:HasDownloadedInventory() then
+	if not self.synced and
+		(TheInventory:HasSupportForOfflineSkins() or not (TheFrontEnd ~= nil and TheFrontEnd:GetIsOfflineMode() or not TheNet:IsOnlineMode())) and
+		TheInventory:HasDownloadedInventory() then
 		self.preparedfoods = self.preparedfoods or {}
 		for k, v in pairs(TheInventory:GetLocalCookBook()) do
 			self.preparedfoods[k] = DecodeCookbookEntry(v)
@@ -99,6 +101,15 @@ function CookbookData:IsUnlocked(product)
 	return self.preparedfoods[product]
 end
 
+function CookbookData:IsValidEntry(product)
+	for cooker, recipes in pairs(cooking.cookbook_recipes) do
+		if recipes[product] ~= nil then
+			return true
+		end
+	end
+	return false
+end
+
 local function UnlockPreparedFood(self, product)
 	if self.preparedfoods[product] == nil then
 		self.preparedfoods[product] = {}
@@ -107,6 +118,14 @@ local function UnlockPreparedFood(self, product)
 end
 
 function CookbookData:LearnFoodStats(product)
+	if product == nil then
+		print("Invalid cookbook recipe:", product)
+		return
+	elseif not self:IsValidEntry(product) then
+		--silent fail
+		return false
+	end
+
 	local updated = false
 	local preparedfood = UnlockPreparedFood(self, product)
 	if not preparedfood.has_eaten then
@@ -146,6 +165,9 @@ function CookbookData:AddRecipe(product, ingredients)
 	if product == nil or ingredients == nil then
 		print("Invalid cookbook recipe:", product, unpack(ingredients or {"(empty)"}))
 		return
+	elseif not self:IsValidEntry(product) then
+		--silent fail
+		return false
 	end
 
 	ingredients = self:RemoveCookedFromName(ingredients)

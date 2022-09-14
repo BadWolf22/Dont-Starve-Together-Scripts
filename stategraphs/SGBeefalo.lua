@@ -851,17 +851,11 @@ local states=
 
     State{
         name = "despawn",
-        tags = {"busy", "notinterupt"},
+        tags = {"busy", "nointerrupt"},
 
         onenter = function(inst, pushanim)
             inst.components.locomotor:StopMoving()
             inst.AnimState:PlayAnimation("idle_loop", true)
-			if inst.components.rideable == nil then
-				inst.components.rideable.canride = false
-			end
-			if inst.components.health == nil then
-				inst.components.health:SetInvincible(true)
-			end
         end,
 
         onexit = function(inst)

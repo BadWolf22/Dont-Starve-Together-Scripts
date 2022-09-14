@@ -26,17 +26,30 @@ local prefabs =
 }
 prefabs = FlattenTree({ prefabs, start_inv }, true)
 
+local THREATS_CANT = { "bedazzled", "INLIMBO", "FX", "NOCLICK", "DECOR" }
+local THREATS_MUSTONE = { "epic", "monster" }
+local THREATS_PVP = nil
+
 local function GetThreatCount(inst)
+    local pvpon = TheNet:GetPVPEnabled()
+    if pvpon ~= THREATS_PVP then
+        if pvpon then
+            table.removearrayvalue(THREATS_CANT, "player")
+        else
+            table.insert(THREATS_CANT, "player")
+        end
+        THREATS_PVP = pvpon
+    end
     local monster_count = 0
     local epic_count = 0
 
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, y, z, TUNING.WOLFGANG_SANITY_RANGE, nil, { "bedazzled", "INLIMBO", "FX", "NOCLICK", "DECOR" }, { "monster", "epic" })
+    local ents = TheSim:FindEntities(x, y, z, TUNING.WOLFGANG_SANITY_RANGE, nil, THREATS_CANT, THREATS_MUSTONE)
 
     for k, v in pairs(ents) do
         if v:HasTag("epic") then
             epic_count = epic_count + 1
-        elseif v:HasTag("monster") then
+        else -- elseif v:HasTag("monster") then -- NOTES(JBK): Use commented one if THREATS_MUSTONE has more and remove this note.
             monster_count = monster_count + 1
         end
     end
@@ -46,17 +59,14 @@ end
 
 local function CheckForPlayers(inst)
     local monster_count, epic_count = GetThreatCount(inst)
-    
-    local x, y, z = inst.Transform:GetWorldPosition()
-    local players = FindPlayersInRange(x, y, z, TUNING.WOLFGANG_SANITY_RANGE, true)
-    
-    local player_count = #players
-    player_count = player_count - 1 -- Subtract Wolfgang himself
-    
-    local PVP_enabled = TheNet:GetPVPEnabled()
 
     local follower_count = inst.components.leader:CountFollowers()
-    if not PVP_enabled then
+    local player_count = 0
+    if not THREATS_PVP then
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local players = FindPlayersInRange(x, y, z, TUNING.WOLFGANG_SANITY_RANGE, true)
+        player_count = #players - 1 -- Subtract Wolfgang himself
+
         for k, v in pairs(players) do
             if v ~= inst then
                 follower_count = follower_count + v.components.leader:CountFollowers()
@@ -210,9 +220,8 @@ end
 local function GetCurrentMightinessState(inst)
     if inst.components.mightiness ~= nil then
         return inst.components.mightiness:GetState()
-    else
+    elseif inst.player_classified ~= nil then
         local value = inst.player_classified.currentmightiness:value()
-
         if value >= TUNING.MIGHTY_THRESHOLD then
             return "mighty"
         elseif value >= TUNING.WIMPY_THRESHOLD then
@@ -220,6 +229,8 @@ local function GetCurrentMightinessState(inst)
         else
             return "wimpy"
         end
+    else
+        return "wimpy"
     end
 end
 
@@ -365,25 +376,78 @@ local function actionbuttonoverride(inst, force_target)
 	end
 end
 
+local function CreateDing()
+	local inst = CreateEntity()
+
+	inst.entity:AddTransform()
+	inst.entity:AddAnimState()
+
+	--[[Non-networked entity]]
+	inst:AddTag("NOCLICK")
+	inst:AddTag("FX")
+
+	inst.AnimState:SetBank("mighty_gym")
+	inst.AnimState:SetBuild("mighty_gym")
+	inst.AnimState:PlayAnimation("gym_bell_fx")
+	inst.AnimState:SetFinalOffset(1)
+
+	inst.persists = false
+	inst:ListenForEvent("onremove", inst.Remove)
+
+	return inst
+end
+
+local function ding(inst, success)
+	local fx = CreateDing()
+	fx.Transform:SetPosition(inst.AnimState:GetSymbolPosition("meter", 0, 0, 0))
+	if success == "fail" then
+		fx.AnimState:SetMultColour(1, 0, 0, 1)
+	elseif success == "succeed" then
+		fx.AnimState:SetMultColour(1, 1, 0, 1)
+	end
+	--"perfect" leave as (1, 1, 1, 1)
+end
+
+local function CreateMightyGymBell()
+	local inst = CreateEntity()
+
+	inst.entity:AddTransform()
+	inst.entity:AddAnimState()
+
+	--[[Non-networked entity]]
+	inst:AddTag("CLASSIFIED")
+	inst:AddTag("NOCLICK")
+	inst:AddTag("FX")
+
+	inst.AnimState:SetBank("mighty_gym")
+	inst.AnimState:SetBuild("mighty_gym")
+	inst.AnimState:PlayAnimation("meter_move")
+	inst.AnimState:SetPercent("meter_move", 0)
+	inst.AnimState:SetFinalOffset(2)
+
+	inst.persists = false
+
+	inst.ding = ding
+
+	return inst
+end
+
 local function OnGymCheck(inst, data)
     if data.ingym > 1 then
-        if not inst.bell and not TheNet:IsDedicated() then
-            inst.bell = SpawnPrefab("mighty_gym_bell")
-            inst:AddChild(inst.bell)
-            inst.AnimState:Hide("bell")
+		if inst == ThePlayer and inst.bell == nil then
+			inst.bell = CreateMightyGymBell()
+			inst.bell.entity:SetParent(inst.entity)
         end
 
         inst.components.playeractionpicker.leftclickoverride = LeftClickPicker
         inst.components.playeractionpicker.rightclickoverride = RightClickPicker
         inst.components.playeractionpicker.pointspecialactionsfn = PointSpecialActions
         inst.components.playercontroller.actionbuttonoverride = actionbuttonoverride
-		
     else
         inst:Stopbell()
-        if inst.bell then
+        if inst.bell ~= nil then
             inst.bell:Remove()
-            inst.bell = nil  
-            inst.AnimState:Show("bell")
+            inst.bell = nil
         end
 
         inst.components.playeractionpicker.leftclickoverride = nil

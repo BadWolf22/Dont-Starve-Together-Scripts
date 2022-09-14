@@ -40,7 +40,10 @@ local assets =
 
     Asset("SOUNDPACKAGE", "sound/summerevent.fev"),
     Asset("FILE", "sound/summerevent.fsb"),
+    Asset("SOUNDPACKAGE", "sound/summerevent2022.fev"),
+    Asset("FILE", "sound/summerevent2022.fsb"),
     Asset("FILE", "sound/summerevent_music.fsb"),
+
 
     Asset("SOUNDPACKAGE", "sound/webber2.fev"),
     Asset("FILE", "sound/webber2.fsb"),
@@ -83,6 +86,15 @@ local assets =
 
     Asset("SOUNDPACKAGE", "sound/WX_rework.fev"),
     Asset("FILE", "sound/WX_rework.fsb"),
+
+    Asset("SOUNDPACKAGE", "sound/monkeyisland.fev"),
+    Asset("FILE", "sound/monkeyisland.fsb"),
+    Asset("FILE", "sound/monkeyisland_music.fsb"),
+    Asset("FILE", "sound/monkeyisland_amb.fsb"),
+
+    Asset("SOUNDPACKAGE", "sound/wickerbottom_rework.fev"),
+    Asset("FILE", "sound/wickerbottom_rework.fsb"),
+    --Asset("FILE", "sound/wickerbottom_rework_music.fsb"),
     
     Asset("FILE", "sound/wilton.fsb"),         -- Legacy sound that can be used in mods
     Asset("FILE", "sound/winnie.fsb"),         -- Legacy sound that can be used in mods
@@ -356,6 +368,8 @@ local assets =
     Asset("IMAGE", "images/inventoryimages1.tex"),
     Asset("ATLAS", "images/inventoryimages2.xml"),
     Asset("IMAGE", "images/inventoryimages2.tex"),
+    Asset("ATLAS", "images/inventoryimages3.xml"),
+    Asset("IMAGE", "images/inventoryimages3.tex"),
 
     Asset("ATLAS", "images/hud.xml"),
     Asset("IMAGE", "images/hud.tex"),
@@ -398,6 +412,7 @@ local assets =
     Asset("ANIM", "anim/player_idles_wolfgang.zip"),
     Asset("ANIM", "anim/player_idles_wolfgang_skinny.zip"),
     Asset("ANIM", "anim/player_idles_wolfgang_mighty.zip"),
+    Asset("ANIM", "anim/player_idles_wickerbottom.zip"),
 
     Asset("DYNAMIC_ANIM", "anim/dynamic/body_default1.zip"),
     Asset("DYNAMIC_ANIM", "anim/dynamic/hand_default1.zip"),
@@ -436,10 +451,7 @@ for i, font in ipairs( FONTS ) do
     table.insert( assets, Asset( "FONT", font.filename ) )
 end
 
--- Add all the characters by name
--- GetOfficialCharacterList doesn't exist in the pipeline.
-local official_characters = GetOfficialCharacterList and GetOfficialCharacterList() or DST_CHARACTERLIST
-for _,char in ipairs(official_characters) do
+for _,char in ipairs(DST_CHARACTERLIST) do
     table.insert(assets, Asset("DYNAMIC_ATLAS", "bigportraits/"..char..".xml"))
     table.insert(assets, Asset("PKGREF", "bigportraits/"..char..".tex"))
 
@@ -451,10 +463,6 @@ for _,char in ipairs(official_characters) do
 
     table.insert(assets, Asset("DYNAMIC_ATLAS", "images/names_gold_cn_"..char..".xml"))
     table.insert(assets, Asset("PKGREF", "images/names_gold_cn_"..char..".tex"))
-
-
-    --table.insert(assets, Asset("IMAGE", "images/selectscreen_portraits/"..char..".tex")) -- Not currently used, but likely to come back
-    --table.insert(assets, Asset("IMAGE", "images/selectscreen_portraits/"..char.."_silho.tex")) -- Not currently used, but likely to come back
 end
 
 --Skin assets

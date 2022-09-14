@@ -850,7 +850,7 @@ function FrontEnd:Update(dt)
 			self.imgui_is_running = false
 
     	end
-    	
+
         --self.widget_editor:Update(dt)
         --self.entity_editor:Update(dt)
     end
@@ -980,6 +980,10 @@ end
 
 function FrontEnd:HideConsoleLog()
 	self.consoletext:Hide()
+end
+
+function FrontEnd:SetConsoleLogPosition(x, y, z)
+    self.consoletext:SetPosition(x, y, z)
 end
 
 function FrontEnd:DoFadeIn(time_to_take)
@@ -1420,6 +1424,33 @@ function FrontEnd:ToggleImgui(node)
         end
     else
         print("IsImguiEnabled is disabled due to threaded renderer being enabled")
+    end
+end
+
+
+function FrontEnd:IsDebugPanelOpen( nodename )
+	if not CAN_USE_DBUI then
+		return false
+	end
+
+    for i, panel in ipairs(self.debug_panels) do
+        if panel:GetNode().NodeName == nodename then
+            return true
+        end
+    end
+    return false
+end
+
+function FrontEnd:CloseDebugPanel( nodename )
+	if not CAN_USE_DBUI then
+		return
+	end
+
+    for i, panel in ipairs(self.debug_panels) do
+        if panel:GetNode().NodeName == nodename then
+            panel:OnClose()
+            table.remove( self.debug_panels, i )
+        end
     end
 end
 

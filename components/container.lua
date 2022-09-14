@@ -4,6 +4,14 @@ local function oncanbeopened(self, canbeopened)
     self.inst.replica.container:SetCanBeOpened(canbeopened)
 end
 
+local function onskipopensnd(self, skipopensnd)
+    self.inst.replica.container:SetSkipOpenSnd(skipopensnd)
+end
+
+local function onskipclosesnd(self, skipclosesnd)
+    self.inst.replica.container:SetSkipCloseSnd(skipclosesnd)
+end
+
 local function OnOwnerDespawned(inst)
     local container = inst.components.container
     if container ~= nil then
@@ -21,6 +29,8 @@ local Container = Class(function(self, inst)
     self.slots = {}
     self.numslots = 0
     self.canbeopened = true
+    self.skipopensnd = false
+    self.skipclosesnd = false
     self.acceptsstacks = true
     self.usespecificslotsforitems = false
     self.issidewidget = false
@@ -46,6 +56,8 @@ end,
 nil,
 {
     canbeopened = oncanbeopened,
+    skipopensnd = onskipopensnd,
+    skipclosesnd = onskipclosesnd,
 })
 
 local widgetprops =
@@ -354,7 +366,7 @@ function Container:GetAllItems()
     return collected_items
 end
 
-function Container:Open(doer)
+function Container:Open(doer, open_sfx_override)
     if doer ~= nil and self.openlist[doer] == nil then
         self.inst:StartUpdatingComponent(self)
 
@@ -375,11 +387,12 @@ function Container:Open(doer)
 
         if doer.HUD ~= nil then
             doer.HUD:OpenContainer(self.inst, self:IsSideWidget())
+            doer:PushEvent("refreshcrafting")
             if self:IsSideWidget() then
-                TheFocalPoint.SoundEmitter:PlaySound(self.inst.open_skin_sound or "dontstarve/wilson/backpack_open")
+                TheFocalPoint.SoundEmitter:PlaySound(SKIN_SOUND_FX[self.inst.AnimState:GetSkinBuild()] or "dontstarve/wilson/backpack_open")
             else
-                if not self.skipopensnd then
-                    TheFocalPoint.SoundEmitter:PlaySound("dontstarve/HUD/Together_HUD/container_open")
+                if not self.inst.replica.container:ShouldSkipOpenSnd() then
+                    TheFocalPoint.SoundEmitter:PlaySound(open_sfx_override or "dontstarve/HUD/Together_HUD/container_open")
                 end
             end
         elseif self.widget ~= nil
@@ -418,10 +431,11 @@ function Container:Close(doer)
 
         if doer.HUD ~= nil then
             doer.HUD:CloseContainer(self.inst, self:IsSideWidget())
+            doer:PushEvent("refreshcrafting")
             if self:IsSideWidget() then
                 TheFocalPoint.SoundEmitter:PlaySound("dontstarve/wilson/backpack_close")
             else
-                if not self.skipclosesnd then
+                if not self.inst.replica.container:ShouldSkipCloseSnd() then
                     TheFocalPoint.SoundEmitter:PlaySound("dontstarve/HUD/Together_HUD/container_close")
                 end
             end
@@ -539,6 +553,17 @@ function Container:HasItemWithTag(tag, amount)
     end
 
     return num_found >= amount, num_found
+end
+
+function Container:GetItemsWithTag(tag)
+    local items = {}
+    for k,v in pairs(self.slots) do
+        if v and v:HasTag(tag) then
+            table.insert(items, v)
+        end
+    end
+
+    return items
 end
 
 function Container:GetItemByName(item, amount)

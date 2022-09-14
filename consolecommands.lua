@@ -91,6 +91,21 @@ function c_mermthrone()
     c_spawn("merm")
 end
 
+function c_allbooks()
+    local books = 
+    {
+        "book_birds", "book_horticulture", "book_silviculture", "book_sleep", 
+        "book_brimstone", "book_tentacles", "book_fish", "book_fire", "book_web", 
+        "book_temperature", "book_light", "book_rain", "book_moon", "book_bees", 
+        "book_research_station", "book_horticulture_upgraded", 
+        "book_light_upgraded"
+    }
+
+
+    for _,v in ipairs(books) do
+        c_give(v)
+    end
+end
 -- * Roll back *count* number of saves (default 1)
 -- * c_rollback() or c_rollback(1) will roll back to the
 --   last save file, if it's been longer than 30 seconds
@@ -301,9 +316,9 @@ function c_tile()
     s = s..string.format("world[%f,%f,%f] tile[%d,%d] ", mx,my,mz, tx,ty)
 
     local tile = map:GetTileAtPoint(ConsoleWorldPosition():Get())
-    for k,v in pairs(GROUND) do
+    for k, v in pairs(WORLD_TILES) do
         if v == tile then
-            s = s..string.format("ground[%s] ", k)
+            s = s..string.format("world_tiles[%s] ", k)
             break
         end
     end
@@ -545,6 +560,7 @@ function c_goto(dest, inst)
             else
                 inst.Transform:SetPosition(dest.Transform:GetWorldPosition())
             end
+            inst:SnapCamera()
             SuUsed("c_goto", true)
             return dest
         end
@@ -1111,12 +1127,12 @@ end
 
 function c_emptyworld()
     for k,ent in pairs(Ents) do
-        if ent.widget == nil 
-			and not ent.isplayer 
+        if ent.widget == nil
+			and not ent.isplayer
 			and ent.entity:GetParent() == nil
 			and ent.Network ~= nil
-			and not ent:HasTag("CLASSIFIED") 
-			and not ent:HasTag("INLIMBO") 
+			and not ent:HasTag("CLASSIFIED")
+			and not ent:HasTag("INLIMBO")
 			then
 
             ent:Remove()
@@ -1138,11 +1154,15 @@ function c_remove(entity)
 
     if TheWorld == nil or mouseentity == nil then
         return
-    end    
+    end
 
     if mouseentity ~= ConsoleCommandPlayer() then
         if mouseentity.components.health then
-            mouseentity.components.health:Kill()
+            if mouseentity.components.health.currenthealth > 0 then
+                mouseentity.components.health:Kill()
+            else
+                mouseentity:Remove()
+            end
         elseif mouseentity.Remove then
             mouseentity:Remove()
         end
@@ -1362,6 +1382,8 @@ function c_makeboat()
 	inst.Transform:SetPosition(x, y, z)
 	inst = SpawnPrefab("steeringwheel")
 	inst.Transform:SetPosition(x + 3.25, y, z)
+    inst = SpawnPrefab("boat_rotator")
+	inst.Transform:SetPosition(x - 2.25, y, z)
 	inst = SpawnPrefab("anchor")
 	inst.Transform:SetPosition(x + 2.25, y, z + 2.25)
 
@@ -1383,6 +1405,21 @@ function c_makeboat()
 	inst = SpawnPrefab("oceanfishingrod")
 	inst.Transform:SetPosition(x - 3.25, y, z + 1.25)
 
+    inst = SpawnPrefab("boat_bumper_kelp_kit")
+    inst.Transform:SetPosition(x - 1, y, z - 3)
+	inst.components.stackable:SetStackSize(8)
+    inst = SpawnPrefab("boat_bumper_shell_kit")
+    inst.Transform:SetPosition(x - 1, y, z - 1.5)
+	inst.components.stackable:SetStackSize(8)
+
+    inst = SpawnPrefab("mastupgrade_lamp_item")
+    inst.Transform:SetPosition(x - 2, y, z - 1.5)
+
+    inst = SpawnPrefab("boat_cannon_kit")
+    inst.Transform:SetPosition(x - 1, y, z + 3)
+    inst = SpawnPrefab("cannonball_rock_item")
+    inst.Transform:SetPosition(x, y, z + 3)
+	inst.components.stackable:SetStackSize(20)
 end
 
 function c_makecrabboat()
@@ -1498,6 +1535,23 @@ function c_makeboatspiral()
 			end
 		end
     end
+end
+
+function c_boatcollision()
+    -- Debug boat collision only works when the player is standing on it
+    if ThePlayer ~= nil then
+        local boat = ThePlayer:GetCurrentPlatform()
+        if boat ~= nil and boat.components.boatring ~= nil then
+            local x, y, z = ConsoleWorldPosition():Get()
+            local collidedbumper = boat.components.boatring:GetBumperAtPoint(x, z)
+            if collidedbumper ~= nil then
+                collidedbumper.components.health:DoDelta(-TUNING.BOAT.MAX_HULL_HEALTH_DAMAGE)
+                collidedbumper:PushEvent("boatcollision")
+                return
+            end
+        end
+    end
+
 end
 
 function c_autoteleportplayers()
@@ -1822,6 +1876,38 @@ function c_guitartab(songdata, overrides, dont_spawn_shells)
 	end
 
 	return ret
+end
+
+function c_setrotation(angle)
+    local mouseentity = TheInput:GetWorldEntityUnderMouse() or c_sel()
+
+    if TheWorld == nil or mouseentity == nil then
+        return
+    end
+
+    mouseentity.Transform:SetRotation(angle or 0)
+end
+
+function c_rotatecw(delta)
+    local mouseentity = TheInput:GetWorldEntityUnderMouse() or c_sel()
+
+    if TheWorld == nil or mouseentity == nil then
+        return
+    end
+
+    local angle = mouseentity.Transform:GetRotation()
+    mouseentity.Transform:SetRotation(angle + (delta or 45))
+end
+
+function c_rotateccw(delta)
+    local mouseentity = TheInput:GetWorldEntityUnderMouse() or c_sel()
+
+    if TheWorld == nil or mouseentity == nil then
+        return
+    end
+
+    local angle = mouseentity.Transform:GetRotation()
+    mouseentity.Transform:SetRotation(angle - (delta or 45))
 end
 
 -- ========================================

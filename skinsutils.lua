@@ -1449,6 +1449,9 @@ function ValidateItemsLocal(currentcharacter, selected_skins)
 end
 
 function ValidateItemsInProfile(user_profile)
+	if TheInventory:HasSupportForOfflineSkins() and not TheInventory:HasDownloadedInventory() then
+		TheInventory:ForceLoadOfflineCache() -- This can set HasDownloadedInventory and only does things if TheInventory:HasSupportForOfflineSkins() returns true.
+	end
     if TheInventory:HasDownloadedInventory() then
         -- We know whether they own something.
         for i,item_type in ipairs(user_profile:GetStoredCustomizationItemTypes()) do
@@ -1685,28 +1688,80 @@ end
 
 function DisplayCharacterUnownedPopup(character, skins_subscreener)
 	local PopupDialogScreen = require "screens/redux/popupdialog"
-	local body_str = subfmt(STRINGS.UI.LOBBYSCREEN.UNOWNED_CHARACTER_BODY, {character = STRINGS.CHARACTER_NAMES[character] })
-    local unowned_popup = PopupDialogScreen(STRINGS.UI.LOBBYSCREEN.UNOWNED_CHARACTER_TITLE, body_str,
-    {
-        --Note(Peter): this is atrocious, but I don't see a better way to talk to the screen panel way down. Maybe implement a UI event system?
-        {text=STRINGS.UI.BARTERSCREEN.COMMERCE_BUY, cb = function()
-            TheFrontEnd:PopScreen()
-            skins_subscreener.sub_screens["base"].picker:DoCommerceForDefaultItem(character.."_none")
-        end},
-        {text=STRINGS.UI.LOBBYSCREEN.VISIT_SHOP, cb = function()
-            TheFrontEnd:PopScreen()
-            skins_subscreener.sub_screens["base"].picker:DoShopForDefaultItem(character.."_none")
-        end},
-        {text=STRINGS.UI.POPUPDIALOG.OK, cb = function()
-            TheFrontEnd:PopScreen()
-        end},
-    })
+	
+	local can_buy_character = TheItems:GetBarterBuyPrice(character.."_none") ~= 0 --Note(Peter): yuck, assume we can't buy a character if we don't know their weave price
+
+	local body_str_fmt = STRINGS.UI.LOBBYSCREEN.UNOWNED_CHARACTER_BODY
+	if not can_buy_character then
+		body_str_fmt = STRINGS.UI.LOBBYSCREEN.UNOWNED_CHARACTER_BODY_OFFLINE
+	end
+	local body_str = subfmt(body_str_fmt, {character = STRINGS.CHARACTER_NAMES[character] })
+
+	local buttons = {}
+	if can_buy_character then
+		table.insert( buttons, {text=STRINGS.UI.BARTERSCREEN.COMMERCE_BUY, cb = function()
+			TheFrontEnd:PopScreen()
+			skins_subscreener.sub_screens["base"].picker:DoCommerceForDefaultItem(character.."_none") --Note(Peter): this is atrocious, but I don't see a better way to talk to the screen panel way down. Maybe implement a UI event system?
+		end})
+
+		table.insert( buttons, {text=STRINGS.UI.LOBBYSCREEN.VISIT_SHOP, cb = function()
+			TheFrontEnd:PopScreen()
+			skins_subscreener.sub_screens["base"].picker:DoShopForDefaultItem(character.."_none")
+		end})
+	end
+	table.insert( buttons, {text=STRINGS.UI.POPUPDIALOG.OK, cb = function()
+		TheFrontEnd:PopScreen()
+	end})
+
+    local unowned_popup = PopupDialogScreen(STRINGS.UI.LOBBYSCREEN.UNOWNED_CHARACTER_TITLE, body_str, buttons)
     TheFrontEnd:PushScreen(unowned_popup)
 end
 
 function DisplayInventoryFailedPopup( screen )
 	if not screen.leave_from_fail and not TheInventory:HasDownloadedInventory() then
+		local function doleavefromfail()
+			screen.leave_from_fail = true
+			TheFrontEnd:PopScreen()
+			screen:Close()
+		end
+
 		local PopupDialogScreen = require "screens/redux/popupdialog"
+
+		-- NOTES(JBK): With offline skin support, the user may also not have an authentication token here.
+		--             The user must be logged in to access this panel in order to try to obtain the client's inventory from Klei services.
+		if not TheInventory:HasDownloadedInventory() and not TheFrontEnd:GetAccountManager():HasAuthToken() then
+			-- The user does not have a token and must have a token to proceed with trying to get items cache.
+			-- But check with user wishes for GDPR first before offering this as a thing to do to reduce DoRestart calls.
+			local notoken_popup
+			if TheSim:GetDataCollectionSetting() == false then
+				-- No authorization for data, bail with info.
+				notoken_popup = PopupDialogScreen(STRINGS.UI.PLAYERSUMMARYSCREEN.FAILED_NOPERMISSIONS_TITLE, STRINGS.UI.PLAYERSUMMARYSCREEN.FAILED_NOPERMISSIONS_BODY, 
+				{
+					{
+						text = STRINGS.UI.PLAYERSUMMARYSCREEN.FAILED_NOPERMISSIONS_NOCHOICE,
+						cb = doleavefromfail,
+					},
+				}, nil, "big", "dark_wide")
+			else
+				-- Authorized to get data, ask to restart.
+				notoken_popup = PopupDialogScreen(STRINGS.UI.PLAYERSUMMARYSCREEN.FAILED_NOLOGIN_TITLE, STRINGS.UI.PLAYERSUMMARYSCREEN.FAILED_NOLOGIN_BODY,
+				{
+					{
+						text = STRINGS.UI.PLAYERSUMMARYSCREEN.FAILED_NOLOGIN_YES,
+						cb = function()
+							DoRestart(true) -- Do a full restart in case this function gets used deeper in the game instance to handle networking.
+						end,
+					},
+					{
+						text = STRINGS.UI.PLAYERSUMMARYSCREEN.FAILED_NOLOGIN_NO,
+						cb = doleavefromfail,
+					},
+				})
+			end
+			TheFrontEnd:PushScreen(notoken_popup)
+			return
+		end
+
 		local GenericWaitingPopup = require "screens/redux/genericwaitingpopup"
 
 		local unowned_popup = PopupDialogScreen(STRINGS.UI.PLAYERSUMMARYSCREEN.FAILED_INVENTORY_TITLE, STRINGS.UI.PLAYERSUMMARYSCREEN.FAILED_INVENTORY_BODY,
@@ -1733,13 +1788,7 @@ function DisplayInventoryFailedPopup( screen )
                 screen.leave_from_fail = false
 
 			end},
-			{text=STRINGS.UI.PLAYERSUMMARYSCREEN.FAILED_INVENTORY_NO, cb = function()
-
-                screen.leave_from_fail = true
-                TheFrontEnd:PopScreen()
-				screen:Close()
-
-			end},
+			{text=STRINGS.UI.PLAYERSUMMARYSCREEN.FAILED_INVENTORY_NO, cb = doleavefromfail},
 		})
 		TheFrontEnd:PushScreen(unowned_popup)
     end
