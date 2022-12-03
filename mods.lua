@@ -34,6 +34,7 @@ AddModReleaseID( "R21_REFRESH_WX78" )
 AddModReleaseID( "R22_PIRATEMONKEYS" )
 AddModReleaseID( "R23_REFRESH_WICKERBOTTOM" )
 AddModReleaseID( "R24_STS_ALITTLEDRAMA" )
+AddModReleaseID( "R25_REFRESH_WAXWELL" )
 
 -----------------------------------------------------------------------------------------------
 
@@ -204,7 +205,7 @@ end
 
 function ModWrangler:GetEnabledServerModTags()
 	local tags = {}
-	for k,mod_name in pairs(self.GetEnabledServerModNames()) do
+	for k,mod_name in pairs(self:GetEnabledServerModNames()) do
 		local modinfo = KnownModIndex:GetModInfo(mod_name)
 			if modinfo ~= nil and modinfo.server_filter_tags ~= nil then
 				for i,tag in pairs(modinfo.server_filter_tags) do

@@ -1,8 +1,8 @@
 require "behaviours/standstill"
 require "behaviours/runaway"
 require "behaviours/doaction"
-require "behaviours/panic"
 require "behaviours/chaseandram"
+local BrainCommon = require("brains/braincommon")
 
 local START_FACE_DIST = 14
 local KEEP_FACE_DIST = 16
@@ -105,39 +105,39 @@ local function shouldjumpattack(inst)
 
     if inst.components.timer:TimerExists("stunned") then
         return false
-    end        
-
-    if inst.components.combat.target then
-        local target = inst.components.combat.target
-        if target then
-            if target:IsValid() then
-                local x,y,z = inst.Transform:GetWorldPosition()
-                local ents = TheSim:FindEntities(x,y,z,  MAX_JUMP_ATTACK_RANGE, PILLAR_HASTAG)
-                
-                local targetdist = inst:GetDistanceSqToInst(target)
-
-                if #ents > 0 then
-                    for i,ent in ipairs(ents)do
-                        local dist = inst:GetDistanceSqToInst(ent)
-                        local p1 = Vector3(ent.Transform:GetWorldPosition())
-                        local p2 = Vector3(target.Transform:GetWorldPosition())
-                        if dist < targetdist then
-                            local diff = anglediff(inst:GetAngleToPoint(p1), inst:GetAngleToPoint(p2) )
-                            if diff < 90 then
-                                return false
-                            end
-                        end
-                    end
-                end
-
-                local combatrange = inst.components.combat:CalcAttackRangeSq(target)
-                
-                if targetdist > combatrange and targetdist < MAX_JUMP_ATTACK_RANGE * MAX_JUMP_ATTACK_RANGE then
-                    return true
-                end
-            end
-        end
     end
+
+	local target = inst.components.combat.target
+	if target ~= nil and target:IsValid() then
+		local x, y, z = inst.Transform:GetWorldPosition()
+		local targx, targy, targz = target.Transform:GetWorldPosition()
+		local targetdist = distsq(x, z, targx, targz)
+		if targetdist >= MAX_JUMP_ATTACK_RANGE * MAX_JUMP_ATTACK_RANGE then
+			return false
+		end
+
+		if inst.components.timer:TimerExists("leapattack_cooldown") and
+			targetdist < inst.components.combat:CalcAttackRangeSq(target) then
+			--when it's on cooldown, can only use if target is out of attack range
+			return false
+		end
+
+		local ents = TheSim:FindEntities(x, y, z, MAX_JUMP_ATTACK_RANGE, PILLAR_HASTAG)
+		if #ents > 0 then
+			local p1 = Vector3()
+			local p2 = Vector3(targx, targy, targz)
+			for i, ent in ipairs(ents) do
+				p1.x, p1.y, p1.z = ent.Transform:GetWorldPosition()
+				if distsq(x, z, p1.x, p1.z) < targetdist and
+					math.abs(anglediff(inst:GetAngleToPoint(p1), inst:GetAngleToPoint(p2))) < 90
+					then
+					--there's a pillar between me and target?
+					return false
+				end
+			end
+		end
+		return true
+	end
     return false
 end
 
@@ -165,8 +165,7 @@ function MinotaurBrain:OnStart()
 
                 WhileNode(function() return self.inst.components.combat.target ~= nil and self.inst.components.combat:InCooldown() end, "Rest",
                     StandStill(self.inst)),
-                WhileNode(function() return self.inst.components.hauntable ~= nil and self.inst.components.hauntable.panic end, "PanicHaunted", Panic(self.inst)),
-                WhileNode(function() return self.inst.components.health.takingfiredamage end, "OnFire", Panic(self.inst)),
+				BrainCommon.PanicTrigger(self.inst),
                 WhileNode(function() return ShouldGoHome(self.inst) end, "ShouldGoHome",
                     DoAction(self.inst, GoHomeAction, "Go Home", false)),
                 FaceEntity(self.inst, GetFaceTargetFn, KeepFaceTargetFn),

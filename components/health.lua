@@ -137,7 +137,7 @@ function Health:OnLoad(data)
 	end
 
     local haspenalty = data.penalty ~= nil and data.penalty > 0 and data.penalty < 1
-    if haspenalty and self.penalty_enabled then
+    if haspenalty then
         self:SetPenalty(data.penalty)
     end
 
@@ -272,6 +272,7 @@ function Health:StopRegen()
 end
 
 function Health:SetPenalty(penalty)
+    print("Health:SetPenalty", self.disable_penalty)
 	if not self.disable_penalty then
 		--Penalty should never be less than 0% or ever above 75%.
 		self.penalty = math.clamp(penalty, 0, TUNING.MAXIMUM_HEALTH_PENALTY)
@@ -321,6 +322,13 @@ function Health:SetMinHealth(amount)
     self.minhealth = amount
 end
 
+function Health:SetMaxDamageTakenPerHit(maxdamagetakenperhit)
+    if maxdamagetakenperhit ~= nil and maxdamagetakenperhit > 0 then
+        maxdamagetakenperhit = -maxdamagetakenperhit
+    end
+    self.maxdamagetakenperhit = maxdamagetakenperhit
+end
+
 function Health:IsHurt()
     return self.currenthealth < self:GetMaxWithPenalty()
 end
@@ -331,7 +339,10 @@ end
 
 function Health:Kill()
     if self.currenthealth > 0 then
+		--V2C: didn't want to change external interface of DoDelta for this one internal use case
+		self._ignore_maxdamagetakenperhit = true
         self:DoDelta(-self.currenthealth, nil, nil, nil, nil, true)
+		self._ignore_maxdamagetakenperhit = nil
     end
 end
 
@@ -401,6 +412,11 @@ function Health:DoDelta(amount, overtime, cause, ignore_invincible, afflicter, i
     elseif amount < 0 and not ignore_absorb then
         amount = amount * math.clamp(1 - (self.playerabsorb ~= 0 and afflicter ~= nil and afflicter:HasTag("player") and self.playerabsorb + self.absorb or self.absorb), 0, 1) * math.max(1 - self.externalabsorbmodifiers:Get(), 0)
     end
+
+    if self.maxdamagetakenperhit ~= nil and amount < self.maxdamagetakenperhit and not self._ignore_maxdamagetakenperhit then
+        amount = self.maxdamagetakenperhit
+    end
+
     self:SetVal(self.currenthealth + amount, cause, afflicter)
 
     self.inst:PushEvent("healthdelta", { oldpercent = old_percent, newpercent = self:GetPercent(), overtime = overtime, cause = cause, afflicter = afflicter, amount = amount })

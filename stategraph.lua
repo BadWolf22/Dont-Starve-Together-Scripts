@@ -322,7 +322,7 @@ function StateGraphInstance:RenderDebugUI(ui, panel)
 	-- Don't have a specific stategraph debugger for DebugNodeName, but viewing
 	-- our History is pretty useful.
 	if ui:Button("Open History for: ".. tostring(self.inst)) then
-		local DebugNodes = require "dbui_no_package.debug_nodes"
+		local DebugNodes = require "dbui_no_package/debug_nodes"
 		SetDebugEntity(self.inst)
 		panel:PushNode(DebugNodes.DebugHistory())
 	end
@@ -409,6 +409,7 @@ function StateGraphInstance:StartAction(bufferedaction)
                 if handler.deststate then
                     local state = handler.deststate(self.inst, bufferedaction)
                     if state then
+						self.statemem.is_going_to_action_state = true
                         self:GoToState(state)
                     else
                         return

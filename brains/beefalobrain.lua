@@ -1,7 +1,6 @@
 require "behaviours/wander"
 require "behaviours/faceentity"
 require "behaviours/chaseandattack"
-require "behaviours/panic"
 require "behaviours/follow"
 require "behaviours/attackwall"
 --require "behaviours/runaway"
@@ -194,9 +193,7 @@ end)
 function BeefaloBrain:OnStart()
     local root = PriorityNode(
     {
-        WhileNode(function() return self.inst.components.hauntable ~= nil and self.inst.components.hauntable.panic end, "PanicHaunted", Panic(self.inst)),
-        WhileNode(function() return self.inst.components.health.takingfiredamage end, "OnFire",
-            Panic(self.inst)),
+		BrainCommon.PanicTrigger(self.inst),
         IfNode(function() return self.inst.components.combat.target ~= nil end, "hastarget",
             AttackWall(self.inst)),
         ChaseAndAttack(self.inst, MAX_CHASE_TIME),
@@ -213,7 +210,7 @@ function BeefaloBrain:OnStart()
 
         Follow(self.inst, function()
                 local bell_owner = self.inst:GetBeefBellOwner() or self.inst.components.follower:GetLeader()
-                return (bell_owner ~= nil and bell_owner:IsOnValidGround() and bell_owner)
+                return (bell_owner ~= nil and bell_owner:IsOnValidGround() and not bell_owner:HasTag("pocketdimension_container") and bell_owner)
                         or nil
             end, MIN_BUDDY_DIST, TARGET_BUDDY_DIST, MAX_BUDDY_DIST, true),
         Follow(self.inst, function()
