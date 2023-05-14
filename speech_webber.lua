@@ -65,6 +65,7 @@ return{
 			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "It's okay, but maybe we can find a place with more hiding spots.",
 			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "That was fun! Can we play again tomorrow?",
             MANNEQUIN_EQUIPSWAPFAILED = "Actually, maybe we'll just keep it instead.",
+            PILLOWFIGHT_NO_HANDPILLOW = "We need a pillow first!",
 		},
 		OPEN_CRAFTING =
 		{
@@ -387,12 +388,12 @@ return{
 
 		CAST_SPELLBOOK =
 		{
---fallback to speech_wilson.lua			NO_TOPHAT = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 			NO_TOPHAT = "only_used_by_waxwell",
 		},
 
 		CASTAOE =
 		{
---fallback to speech_wilson.lua			NO_MAX_SANITY = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 			NO_MAX_SANITY = "only_used_by_waxwell",
 		},
     },
 
@@ -417,11 +418,11 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_NOWATERNEARBY = "only_used_by_waxwell_and_wicker",
 
 	--waxwell specific
---fallback to speech_wilson.lua		ANNOUNCE_SHADOWLEVEL_ITEM = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T1 = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T2 = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T3 = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T4 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_SHADOWLEVEL_ITEM = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T1 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T2 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T3 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T4 = "only_used_by_waxwell",
 
     --wolfgang specific
 --fallback to speech_wilson.lua     ANNOUNCE_NORMALTOMIGHTY = "only_used_by_wolfang",
@@ -744,6 +745,8 @@ return{
 --fallback to speech_wilson.lua         BOOK_TEMPERATURE = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_LIGHT = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_RAIN = "only_used_by_wurt",
+--fallback to speech_wilson.lua         BOOK_MOON = "only_used_by_wurt",
+--fallback to speech_wilson.lua         BOOK_BEES = "only_used_by_wurt",
 
 --fallback to speech_wilson.lua         BOOK_HORTICULTURE_UPGRADED = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_RESEARCH_STATION = "only_used_by_wurt",
@@ -876,6 +879,13 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_BOOK_MOON_DAYTIME = "only_used_by_waxwell_and_wicker",
 
     ANNOUNCE_OFF_SCRIPT = "Is that how the play is supposed to go?",
+
+    ANNOUNCE_COZY_SLEEP = "We had such a good sleep!",
+
+	--
+	ANNOUNCE_TOOL_TOOWEAK = "We don't think this tool's strong enough!",
+
+    ANNOUNCE_LUNAR_RIFT_MAX = "We can see something glowing waaay over there!",
 
 	BATTLECRY =
 	{
@@ -1481,6 +1491,8 @@ return{
         TURF_MOSAIC_RED = "Some ground that we dug up.",
         TURF_MOSAIC_BLUE = "Some ground that we dug up.",
 
+        TURF_BEARD_RUG = "It tickles!",
+
 		POWCAKE = "Mum never let me have these.",
         CAVE_ENTRANCE = "It's plugged up.",
         CAVE_ENTRANCE_RUINS = "It's plugged up.",
@@ -1784,6 +1796,7 @@ return{
         CHESSPIECE_BEEFALO = "Now we want to go for a beefalo ride!",
 		CHESSPIECE_KITCOON = "Whoah! I hope they don't fall over...",
 		CHESSPIECE_CATCOON = "We respect the butterfly hunter.",
+        CHESSPIECE_MANRABBIT = "It's our most huggable statue.",
         CHESSPIECE_GUARDIANPHASE3 = "It can't still see us... right?",
         CHESSPIECE_EYEOFTERROR = "We think we could've been friends.",
         CHESSPIECE_TWINSOFTERROR = "Now they'll always be together.",
@@ -2879,6 +2892,34 @@ return{
         },
         BEEFALO_GROOMER_ITEM = "We'd better get it set up.",
 
+        YOTR_RABBITSHRINE =
+        {
+            GENERIC = "Do you have any fun things for us to play with?",
+            EMPTY = "Please don't bite us, we'll find something tastier for you to eat!",
+            BURNT = "Oh no!",
+        },
+
+        NIGHTCAPHAT = "Father used to wear a nightcap just like that.",
+
+        YOTR_FOOD1 = "It looks like cake, but it smells like veggies...",
+        YOTR_FOOD2 = "Mmm, the moon is tasty!",
+        YOTR_FOOD3 = "We kinda want to poke it.",
+        YOTR_FOOD4 = "We can eat one puff, and share the rest with our friends!",
+
+        YOTR_TOKEN = "We shouldn't start fights... but do pillow fights count?",
+
+        COZY_BUNNYMAN = "Can we join your slumber party?",
+
+        HANDPILLOW_BEEFALOWOOL = "A fluffy puffy pillow!",
+        HANDPILLOW_KELP = "Is that pillow... dripping?",
+        HANDPILLOW_PETALS = "It's the nicest pillow we've ever smelled!",
+        HANDPILLOW_STEELWOOL = "Ah! This one's really scratchy...",
+
+        BODYPILLOW_BEEFALOWOOL = "A fluffy puffy pillow!",
+        BODYPILLOW_KELP = "Is that pillow... dripping?",
+        BODYPILLOW_PETALS = "It's the nicest pillow we've ever smelled!",
+        BODYPILLOW_STEELWOOL = "Ah! This one's really scratchy...",
+
 		BISHOP_CHARGE_HIT = "Owie!",
 		TRUNKVEST_SUMMER = "It's so puffy!",
 		TRUNKVEST_WINTER = "You're always supposed to wear a jacket!",
@@ -2939,7 +2980,7 @@ return{
 		WAXWELLJOURNAL =
 		{
 			GENERIC = "I don't think we should play with that...",
---fallback to speech_wilson.lua			NEEDSFUEL = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 			NEEDSFUEL = "only_used_by_waxwell",
 		},
 		WETGOOP = "Experimenting is fun!",
         WHIP = "Oooh, it makes so much noise!",
@@ -4573,7 +4614,7 @@ return{
         BOAT_ROTATOR_KIT = "We're good at spinning things!",
         BOAT_BUMPER_KELP = "It keeps the boat from getting hurt.",
         BOAT_BUMPER_KELP_KIT = "Now we can play bumper boats!",
-        BOAT_BUMPER_SHELL = "It keeps the boat from getting hurt.",
+		BOAT_BUMPER_SHELL = "It keeps the boat from getting hurt.",
         BOAT_BUMPER_SHELL_KIT = "Now we can play bumper boats!",
         BOAT_CANNON = {
             GENERIC = "Ms. Wickerbottom said we could play with it as long as there's no cannonballs inside.",
@@ -4688,6 +4729,68 @@ return{
 		-- Waxwell
 		MAGICIAN_CHEST = "Could we borrow it for hide-and-seek?",
 		TOPHAT_MAGICIAN = "Not quite like father used to wear.",
+
+        -- Year of the Rabbit
+        YOTR_FIGHTRING_KIT = "It's okay Ms. Wickerbottom, we'll only be fighting with pillows!",
+        YOTR_FIGHTRING_BELL =
+        {
+            GENERIC = "Let's start a pillow fight!",
+            PLAYING = "We want to play too!",
+        },
+
+        YOTR_DECOR_1 = {
+            GENERAL = "It makes us feel safe and cozy.",
+            OUT = "We still like it, even without the light!",
+        },
+        YOTR_DECOR_2 = {
+            GENERAL = "It makes us feel safe and cozy.",
+            OUT = "We still like it, even without the light!",
+        },
+
+        HAREBALL = "Yuck! What a mean dare!",
+        YOTR_DECOR_1_ITEM = "It'd be a good night light.",
+        YOTR_DECOR_2_ITEM = "It'd be a good night light.",
+
+		--
+		DREADSTONE = "We're not sure if we like that rock.",
+		HORRORFUEL = "It makes our spider skin crawl.",
+		DAYWALKER =
+		{
+			GENERIC = "Hey! We were just trying to help!!",
+			IMPRISONED = "He doesn't look like a normal pig. Or even a normal werepig.",
+		},
+		DAYWALKER_PILLAR =
+		{
+			GENERIC = "We feel bad just leaving him like that...",
+			EXPOSED = "We can't break through it!",
+		},
+		ARMORDREADSTONE = "It's kinda scary, but it keeps us safe!",
+		DREADSTONEHAT = "A pointy helmet to match our pointy teeth!",
+
+        -- Rifts 1
+        LUNARRIFT_PORTAL = "Aww, it won't let us in.",
+        LUNARRIFT_CRYSTAL = "They look like candy, but they're just rocks.",
+
+        LUNARTHRALL_PLANT = "That plant's kinda spooky...",
+        LUNARTHRALL_PLANT_VINE_END = "Hey, leave us alone!",
+
+		LUNAR_GRAZER = "It's trying to make us take a nap!",
+
+        PUREBRILLIANCE = "It's blinding our poor spider eyes!",
+        LUNARPLANT_HUSK = "That was one mean plant. We're glad it's gone!",
+
+		LUNAR_FORGE = "Can we use it to make crafts?",
+		LUNAR_FORGE_KIT = "We can build it, we have lots of free hands to spare!",
+
+		ARMOR_LUNARPLANT = "We're gonna look so tough!",
+		LUNARPLANTHAT = "We're gonna be a spider knight!",
+		BOMB_LUNARPLANT = "Catch!",
+		STAFF_LUNARPLANT = "We can hit things far away.",
+		SWORD_LUNARPLANT = "It's a magic sword!",
+		PICKAXE_LUNARPLANT = "We're coming to get you, rocks!",
+		SHOVEL_LUNARPLANT = "Two things in one, just like us!",
+
+        PUNCHINGBAG = "Wigfrid's teaching us how to spar with it!",
     },
 
     DESCRIBE_GENERIC = "Can we play with it?",

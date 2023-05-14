@@ -262,8 +262,18 @@ yellowamulet_clear_fn = function(inst)
     inst.skin_equip_sound = nil
 end
 
-book_brimstone_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "books" ) end
-book_brimstone_clear_fn = function(inst) basic_clear_fn(inst, "books" ) end
+book_brimstone_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "books") end
+book_brimstone_clear_fn = function(inst) basic_clear_fn(inst, "books") end
+book_temperature_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "books") end
+book_temperature_clear_fn = function(inst) basic_clear_fn(inst, "books") end
+book_research_station_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "books") end
+book_research_station_clear_fn = function(inst) basic_clear_fn(inst, "books") end
+book_silviculture_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "books") end
+book_silviculture_clear_fn = function(inst) basic_clear_fn(inst, "books") end
+book_sleep_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "books") end
+book_sleep_clear_fn = function(inst) basic_clear_fn(inst, "books") end
+book_web_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "books") end
+book_web_clear_fn = function(inst) basic_clear_fn(inst, "books") end
 
 bedroll_furry_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "swap_bedroll_furry" ) end
 bedroll_furry_clear_fn = function(inst) basic_clear_fn(inst, "swap_bedroll_furry" ) end
@@ -291,6 +301,12 @@ armor_sanity_clear_fn = function(inst) basic_clear_fn(inst, "armor_sanity" ) end
 
 armorskeleton_init_fn =  function(inst, build_name) basic_init_fn( inst, build_name, "armor_skeleton" ) end
 armorskeleton_clear_fn = function(inst) basic_clear_fn(inst, "armor_skeleton" ) end
+
+armordreadstone_init_fn =  function(inst, build_name) basic_init_fn( inst, build_name, "armor_dreadstone" ) end
+armordreadstone_clear_fn = function(inst) basic_clear_fn(inst, "armor_dreadstone" ) end
+
+beargervest_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "torso_bearger" ) end
+beargervest_clear_fn = function(inst) basic_clear_fn(inst, "torso_bearger" ) end
 
 reflectivevest_init_fn =  function(inst, build_name) basic_init_fn( inst, build_name, "torso_reflective" ) end
 reflectivevest_clear_fn = function(inst) basic_clear_fn(inst, "torso_reflective" ) end
@@ -371,6 +387,9 @@ alterguardianhat_clear_fn = function(inst) basic_clear_fn(inst, "hat_alterguardi
 
 skeletonhat_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "hat_skeleton" ) end
 skeletonhat_clear_fn = function(inst) basic_clear_fn(inst, "hat_skeleton" ) end
+
+dreadstonehat_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "hat_dreadstone" ) end
+dreadstonehat_clear_fn = function(inst) basic_clear_fn(inst, "hat_dreadstone" ) end
 
 researchlab3_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "researchlab3" ) end
 researchlab3_clear_fn = function(inst) basic_clear_fn(inst, "researchlab3" ) end
@@ -744,7 +763,7 @@ wathgrithrhat_init_fn = function(inst, build_name, opentop)
 
     if opentop then
         inst:AddTag("open_top_hat")
-        inst.components.equippable:SetOnEquip(inst._opentop_onequip)
+        inst.components.equippable:SetOnEquip(inst._skinfns.opentop_onequip)
     end
     
     if not TheWorld.ismastersim then
@@ -756,7 +775,7 @@ wathgrithrhat_clear_fn = function(inst)
     basic_clear_fn(inst, "hat_wathgrithr" )
 
     inst:RemoveTag("open_top_hat")
-    inst.components.equippable:SetOnEquip(inst._onequip)
+    inst.components.equippable:SetOnEquip(inst._skinfns.simple_onequip)
 
     inst.skin_equip_sound = nil
 end
@@ -2169,7 +2188,7 @@ local function researchlab2_flash(inst, intensity, frames)
     researchlab2_applyflash(inst, intensity * .5)
 end
 
-local function researchlab2_checkflashing(inst, anim, offset)
+local function researchlab2_checkflashing(inst, anim)
     if inst.checkanimtask ~= nil then
         inst.checkanimtask:Cancel()
         inst.checkanimtask = nil
@@ -2185,7 +2204,7 @@ end
 local function researchlab2_checkanim(inst)
     if inst.AnimState:IsCurrentAnimation("proximity_loop") or inst.AnimState:IsCurrentAnimation("proximity_gift_loop") then
         inst.checkanimtask = nil
-        researchlab2_checkflashing(inst, "proximity_loop", inst.AnimState:GetCurrentAnimationTime())
+        researchlab2_checkflashing(inst, "proximity_loop")
     else
         inst.checkanimtask = inst:DoTaskInTime(inst.AnimState:GetCurrentAnimationLength() - inst.AnimState:GetCurrentAnimationTime() + FRAMES, researchlab2_checkanim)
     end
@@ -2194,7 +2213,7 @@ end
 local function researchlab2_playanimation(inst, anim, loop)
     inst.AnimState:PlayAnimation(anim, loop)
     inst.highlightchildren[1].AnimState:PlayAnimation(anim, loop)
-    researchlab2_checkflashing(inst, anim, 0)
+    researchlab2_checkflashing(inst, anim)
 end
 
 local function researchlab2_pushanimation(inst, anim, loop)
@@ -2204,7 +2223,7 @@ local function researchlab2_pushanimation(inst, anim, loop)
         inst.highlightchildren[1].AnimState:PushAnimation(anim, loop)
     end
     if not wasplaying and inst.AnimState:IsCurrentAnimation(anim) then
-        researchlab2_checkflashing(inst, anim, 0)
+        researchlab2_checkflashing(inst, anim)
     elseif (anim == "proximity_gift_loop" or anim == "proximity_loop") and inst.checkanimtask == nil then
         inst.checkanimtask = inst:DoTaskInTime(inst.AnimState:GetCurrentAnimationLength() - inst.AnimState:GetCurrentAnimationTime() + FRAMES, researchlab2_checkanim)
     end
@@ -2363,8 +2382,82 @@ function gemsocket_clear_fn(inst)
     inst.AnimState:SetBuild("staff_purple_base")
 end
 
+-- Unsorted.
 
---------------------------------------------------------------------------
+function molehat_init_fn(inst, build_name, opentop)
+    basic_init_fn(inst, build_name, "hat_mole")
+    if opentop then
+        inst:AddTag("open_top_hat")
+        inst.components.equippable:SetOnEquip(inst._skinfns.opentop_onequip)
+    end
+end
+function molehat_clear_fn(inst)
+    basic_clear_fn(inst, "hat_mole")
+    inst:RemoveTag("open_top_hat")
+    inst.components.equippable:SetOnEquip(inst._skinfns.simple_onequip)
+end
+
+function premiumwateringcan_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "premiumwateringcan")
+end
+function premiumwateringcan_clear_fn(inst)
+    basic_clear_fn(inst, "premiumwateringcan")
+end
+
+function mushroom_farm_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "mushroom_farm")
+end
+function mushroom_farm_clear_fn(inst)
+    basic_clear_fn(inst, "mushroom_farm")
+end
+
+function dock_woodposts_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "dock_woodposts")
+    inst.AnimState:PlayAnimation("idle" .. (inst._post_id or tostring(math.random(1, 3))))
+end
+function dock_woodposts_clear_fn(inst)
+    basic_clear_fn(inst, "dock_woodposts")
+    inst.AnimState:PlayAnimation("idle" .. (inst._post_id or tostring(math.random(1, 3))))
+end
+
+function dock_woodposts_item_init_fn(inst, build_name, anim_bank)
+    inst.linked_skinname = build_name --hack that relies on the build name to match the linked skinname
+    inst.AnimState:SetSkin(build_name, "dock_woodposts") --same hack is used here by the deployable code in player controller
+    if anim_bank ~= nil then
+        inst.AnimState:SetBank(anim_bank)
+    end
+    inst.components.inventoryitem:ChangeImageName(inst:GetSkinName())
+end
+function dock_woodposts_item_clear_fn(inst)
+    inst.linked_skinname = nil
+    inst.AnimState:SetBuild("dock_woodposts")
+    inst.AnimState:SetBank("dock_woodposts")
+    inst.components.inventoryitem:ChangeImageName()
+end
+
+
+function trophyscale_fish_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "scale_o_matic")
+end
+function trophyscale_fish_clear_fn(inst)
+    basic_clear_fn(inst, "scale_o_matic")
+end
+
+function trophyscale_oversizedveggies_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "trophyscale_oversizedveggies")
+end
+function trophyscale_oversizedveggies_clear_fn(inst)
+    basic_clear_fn(inst, "trophyscale_oversizedveggies")
+end
+
+function resurrectionstatue_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "wilsonstatue")
+end
+function resurrectionstatue_clear_fn(inst)
+    basic_clear_fn(inst, "wilsonstatue")
+end
+
+
 
 function CreatePrefabSkin(name, info)
     local prefab_skin = Prefab(name, nil, info.assets, info.prefabs)
@@ -2454,4 +2547,9 @@ function CreatePrefabSkin(name, info)
     end
 
     return prefab_skin
+end
+
+-- Testing and viewing skins on a more close level.
+if CAN_USE_DBUI then
+    require("dbui_no_package/debug_skins_data/hooks").Hooks("prefabskin")
 end

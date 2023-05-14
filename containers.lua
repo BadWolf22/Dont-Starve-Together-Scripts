@@ -26,7 +26,8 @@ params.backpack =
         slotpos = {},
         animbank = "ui_backpack_2x4",
         animbuild = "ui_backpack_2x4",
-        pos = Vector3(-5, -70, 0),
+        --pos = Vector3(-5, -70, 0),
+        pos = Vector3(-5, -80, 0),        
     },
     issidewidget = true,
     type = "pack",
@@ -468,6 +469,7 @@ end
 
 params.winter_twiggytree = params.winter_tree
 params.winter_deciduoustree = params.winter_tree
+params.winter_palmconetree = params.winter_tree
 
 --------------------------------------------------------------------------
 --[[ sisturn ]]
@@ -604,7 +606,8 @@ params.krampus_sack =
         slotpos = {},
         animbank = "ui_krampusbag_2x8",
         animbuild = "ui_krampusbag_2x8",
-        pos = Vector3(-5, -120, 0),
+        --pos = Vector3(-5, -120, 0),
+        pos = Vector3(-5, -130, 0),
     },
     issidewidget = true,
     type = "pack",
@@ -627,7 +630,8 @@ params.piggyback =
         slotpos = {},
         animbank = "ui_piggyback_2x6",
         animbuild = "ui_piggyback_2x6",
-        pos = Vector3(-5, -50, 0),
+--        pos = Vector3(-5, -50, 0),
+        pos = Vector3(-5, -90, 0),
     },
     issidewidget = true,
     type = "pack",
@@ -776,7 +780,6 @@ end
 
 params.oceanfishingrod =
 {
-
     widget =
     {
         slotpos =
@@ -803,6 +806,114 @@ function params.oceanfishingrod.itemtestfn(container, item, slot)
 	return (slot == nil and (item:HasTag("oceanfishing_bobber") or item:HasTag("oceanfishing_lure")))
 		or (slot == 1 and item:HasTag("oceanfishing_bobber"))
 		or (slot == 2 and item:HasTag("oceanfishing_lure"))
+end
+
+
+--------------------------------------------------------------------------
+--[[ beard ]]
+--------------------------------------------------------------------------
+
+params.beard_sack_1 =
+{
+    widget =
+    {
+        slotpos =
+        {
+            Vector3(0, 0, 0),
+        },
+        slotbg =
+        {
+            { image = "inv_slot_morsel.tex" },
+        },
+        animbank = "ui_beard_1x1",
+        animbuild = "ui_beard_1x1",
+        pos = Vector3(-82, 89, 0),
+        bottom_align_tip = -100,
+    },
+    type = "side_inv_behind",
+    acceptsstacks = true,
+    lowpriorityselection = true,
+   -- excludefromcrafting = false,
+}
+
+function params.beard_sack_1.itemtestfn(container, item, slot)
+    --Edible
+    for k, v in pairs(FOODGROUP.OMNI.types) do
+        if item:HasTag("edible_"..v) then
+            return true
+        end
+    end
+      
+end
+
+params.beard_sack_2 =
+{
+    widget =
+    {
+        slotpos =
+        {
+            Vector3(-(64 + 12)/2, 0, 0),
+            Vector3( (64 + 12)/2, 0, 0),
+        },
+        slotbg =
+        {
+            { image = "inv_slot_morsel.tex" },
+            { image = "inv_slot_morsel.tex" },
+        },
+        animbank = "ui_beard_2x1",
+        animbuild = "ui_beard_2x1",
+        pos = Vector3(-82, 89, 0),
+        bottom_align_tip = -100,
+    },
+    type = "side_inv_behind",
+    acceptsstacks = true,
+    lowpriorityselection = true,
+   -- excludefromcrafting = false,
+}
+
+function params.beard_sack_2.itemtestfn(container, item, slot)
+    --Edible
+    for k, v in pairs(FOODGROUP.OMNI.types) do
+        if item:HasTag("edible_"..v) then
+            return true
+        end
+    end
+end
+
+params.beard_sack_3 =
+{
+    widget =
+    {
+        slotpos =
+        {
+            Vector3(-(64 + 12), 0, 0),
+            Vector3(0, 0, 0),
+            Vector3(64 + 12, 0, 0),
+        },
+        slotbg =
+        {
+            { image = "inv_slot_morsel.tex" },
+            { image = "inv_slot_morsel.tex" },
+            { image = "inv_slot_morsel.tex" },
+        },
+        animbank = "ui_beard_3x1",
+        animbuild = "ui_beard_3x1",
+        pos = Vector3(-82, 89, 0),
+        bottom_align_tip = -100,
+    },
+    type = "side_inv_behind",
+    acceptsstacks = true,
+    lowpriorityselection = true,
+   -- excludefromcrafting = false,
+}
+
+function params.beard_sack_3.itemtestfn(container, item, slot)
+    --Edible
+    for k, v in pairs(FOODGROUP.OMNI.types) do
+        if item:HasTag("edible_"..v) then
+            return true
+        end
+    end
 end
 
 --------------------------------------------------------------------------
@@ -922,7 +1033,7 @@ params.seedpouch =
         slotpos = {},
         animbank = "ui_krampusbag_2x8",
         animbuild = "ui_krampusbag_2x8",
-        pos = Vector3(-5, -120, 0),
+        pos = Vector3(-5, -130, 0),
     },
     issidewidget = true,
     type = "pack",
@@ -951,7 +1062,7 @@ params.candybag =
         slotpos = {},
         animbank = "ui_krampusbag_2x8",
         animbuild = "ui_krampusbag_2x8",
-        pos = Vector3(-5, -120, 0),
+        pos = Vector3(-5, -130, 0),
     },
     issidewidget = true,
     type = "pack",

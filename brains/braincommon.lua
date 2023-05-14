@@ -157,9 +157,9 @@ BrainCommon.PanicWhenScared = PanicWhenScared
 -- Actions: MINE, CHOP
 
 local MINE_TAGS = { "MINE_workable" }
-local MINE_CANT_TAGS = { "carnivalgame_part" }
+local MINE_CANT_TAGS = { "carnivalgame_part", "event_trigger" }
 local CHOP_TAGS = { "CHOP_workable" }
-local CHOP_CANT_TAGS = { "carnivalgame_part" }
+local CHOP_CANT_TAGS = { "carnivalgame_part", "event_trigger" }
 
 local function IsDeciduousTreeMonster(guy)
     return guy.monster and guy.prefab == "deciduoustree"
@@ -230,7 +230,7 @@ local AssistLeaderDefaults = {
 -- Mod support access.
 BrainCommon.AssistLeaderDefaults = AssistLeaderDefaults
 
---NOTES(JBK): This helps followers do a task once they see the leader is doing an act.
+-- NOTES(JBK): This helps followers do a task once they see the leader is doing an act.
 --            Since actions are very context sensitive, there are defaults above to help clarify context.
 local function NodeAssistLeaderDoAction(self, parameters)
     local action = parameters.action
@@ -265,7 +265,7 @@ end
 BrainCommon.NodeAssistLeaderDoAction = NodeAssistLeaderDoAction
 
 --------------------------------------------------------------------------
---NOTES(JBK): This helps followers pickup items for a PLAYER leader.
+-- NOTES(JBK): This helps followers pickup items for a PLAYER leader.
 --            They pickup if they are able to, then give them to their leader, or drop them onto the ground if unable to.
 
 local function Unignore(inst, sometarget, ignorethese)

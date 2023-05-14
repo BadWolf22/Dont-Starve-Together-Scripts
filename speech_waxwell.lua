@@ -65,6 +65,7 @@ return{
 			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "This environment is not suitable for a fair game.",
 			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "Playtime is over for now.",
             MANNEQUIN_EQUIPSWAPFAILED = "No, that would be ridiculous.",
+            PILLOWFIGHT_NO_HANDPILLOW = "If I'm going to humiliate myself, I can at least do it properly.",
 		},
 		OPEN_CRAFTING =
 		{
@@ -744,6 +745,8 @@ return{
 --fallback to speech_wilson.lua         BOOK_TEMPERATURE = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_LIGHT = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_RAIN = "only_used_by_wurt",
+--fallback to speech_wilson.lua         BOOK_MOON = "only_used_by_wurt",
+--fallback to speech_wilson.lua         BOOK_BEES = "only_used_by_wurt",
 
 --fallback to speech_wilson.lua         BOOK_HORTICULTURE_UPGRADED = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_RESEARCH_STATION = "only_used_by_wurt",
@@ -876,6 +879,13 @@ return{
     ANNOUNCE_BOOK_MOON_DAYTIME = "We'll know if it worked once night falls.",
 
     ANNOUNCE_OFF_SCRIPT = "She won't like that.",
+
+    ANNOUNCE_COZY_SLEEP = "That was a marginally more restful sleep than usual.",
+
+	--
+	ANNOUNCE_TOOL_TOOWEAK = "I'll need a more powerful tool.",
+
+    ANNOUNCE_LUNAR_RIFT_MAX = "Something has changed...",
 
 	BATTLECRY =
 	{
@@ -1481,6 +1491,8 @@ return{
         TURF_MOSAIC_RED = "A stone floor.",
         TURF_MOSAIC_BLUE = "A stone floor.",
 
+        TURF_BEARD_RUG = "Really, Higgsbury?",
+
 		POWCAKE = "What foul manifestation of evil is this?",
         CAVE_ENTRANCE = "I plugged it a long time ago.",
         CAVE_ENTRANCE_RUINS = "Probably shouldn't venture any deeper.",
@@ -1784,6 +1796,7 @@ return{
         CHESSPIECE_BEEFALO = "At least this version doesn't shed all over my poor suit.",
 		CHESSPIECE_KITCOON = "This is a rather precarious design.",
 		CHESSPIECE_CATCOON = "This animal commands respect through violence.",
+        CHESSPIECE_MANRABBIT = "Who put this ridiculous thing here?",
         CHESSPIECE_GUARDIANPHASE3 = "How could I not have seen...",
         CHESSPIECE_EYEOFTERROR = "An eye could never best a master of illusion such as I.",
         CHESSPIECE_TWINSOFTERROR = "The most troublesome pair I've ever seen.",
@@ -2879,6 +2892,34 @@ return{
         },
         BEEFALO_GROOMER_ITEM = "Do I look like a common construction worker? Oh very well...",
 
+        YOTR_RABBITSHRINE =
+        {
+            GENERIC = "What do you have in store for me?",
+            EMPTY = "It requires an offering.",
+            BURNT = "A pity.",
+        },
+
+        NIGHTCAPHAT = "I can't remember the last time I slept well.",
+
+        YOTR_FOOD1 = "Cake shaped like a rabbit, how novel.",
+        YOTR_FOOD2 = "What a mysterious flavor.",
+        YOTR_FOOD3 = "A small piece of fruit, imprisoned in gelatin.",
+        YOTR_FOOD4 = "Far too sticky for my liking.",
+
+        YOTR_TOKEN = "Care for a gentleman's duel?",
+
+        COZY_BUNNYMAN = "I could have sworn I left you all underground.",
+
+        HANDPILLOW_BEEFALOWOOL = "What is the thread count on this?",
+        HANDPILLOW_KELP = "Looking at it is making me seasick.",
+        HANDPILLOW_PETALS = "Can you rightfully call a sack of potpourri a pillow?",
+        HANDPILLOW_STEELWOOL = "At least it will make a satisfying thwack.",
+
+        BODYPILLOW_BEEFALOWOOL = "What is the thread count on this?",
+        BODYPILLOW_KELP = "Looking at it is making me seasick.",
+        BODYPILLOW_PETALS = "Can you rightfully call a sack of potpourri a pillow?",
+        BODYPILLOW_STEELWOOL = "It will either protect me or cut me to ribbons.",
+
 		BISHOP_CHARGE_HIT = "How DARE you!",
 		TRUNKVEST_SUMMER = "It's more of a fall vest.",
 		TRUNKVEST_WINTER = "It's so hard to look fashionable in the winter.",
@@ -3937,7 +3978,7 @@ return{
         -- GROTTO
 
 		MOLEBAT = "Indecent.",
-        MOLEBATHILL = "Do I even want anything I find in there, knowing its spent time in a rodent's nostrils?",
+        MOLEBATHILL = "Do I even want anything I find in there, knowing it spent time in a rodent's nostrils?",
 
         BATNOSE = "It smells.",
         BATNOSE_COOKED = "The things I must do to survive...",
@@ -4573,7 +4614,7 @@ return{
         BOAT_ROTATOR_KIT = "Do I look like a common shipwright? Oh, very well...",
         BOAT_BUMPER_KELP = "I don't know if the smell is worth the protection it offers.",
         BOAT_BUMPER_KELP_KIT = "Ugh. These menial tasks do not suit me.",
-        BOAT_BUMPER_SHELL = "Seashells. The sturdiest building material known to man.",
+		BOAT_BUMPER_SHELL = "Seashells. The sturdiest building material known to man.",
         BOAT_BUMPER_SHELL_KIT = "Ugh. These menial tasks do not suit me.",
         BOAT_CANNON = {
             GENERIC = "It's useless if it isn't loaded.",
@@ -4688,6 +4729,68 @@ return{
 		-- Waxwell
 		MAGICIAN_CHEST = "If you're worried about getting stuck inside, don't rummage through my things.",
 		TOPHAT_MAGICIAN = "Tall, dark and dapper.",
+
+        -- Year of the Rabbit
+        YOTR_FIGHTRING_KIT = "Surely that's a job for someone else?",
+        YOTR_FIGHTRING_BELL =
+        {
+            GENERIC = "Absolutely not.",
+            PLAYING = "I do enjoy watching people make fools of themselves.",
+        },
+
+        YOTR_DECOR_1 = {
+            GENERAL = "Such unrefined decor.",
+            OUT = "Now it's not even useful.",
+        },
+        YOTR_DECOR_2 = {
+            GENERAL = "Such unrefined decor.",
+            OUT = "Now it's not even useful.",
+        },
+
+        HAREBALL = "You must be joking.",
+        YOTR_DECOR_1_ITEM = "Someone should set that up.",
+        YOTR_DECOR_2_ITEM = "Someone should set that up.",
+
+		--
+		DREADSTONE = "Petrified nightmares.",
+		HORRORFUEL = "That's the good stuff.",
+		DAYWALKER =
+		{
+			GENERIC = "Say pal, why don't we talk this out?",
+			IMPRISONED = "You went nosing around places you shouldn't have, didn't you?",
+		},
+		DAYWALKER_PILLAR =
+		{
+			GENERIC = "I can just make out something dark within.",
+			EXPOSED = "That stone would be useful, if only it could be broken.",
+		},
+		ARMORDREADSTONE = "Black never goes out of style.",
+		DREADSTONEHAT = "Darkness is never far from my mind.",
+
+        -- Rifts 1
+        LUNARRIFT_PORTAL = "I don't like the look of this.",
+        LUNARRIFT_CRYSTAL = "Crystals? How very Bohemian.",
+
+        LUNARTHRALL_PLANT = "I don't think it's from around here.",
+        LUNARTHRALL_PLANT_VINE_END = "Some aggressive pruning might be in order.",
+
+		LUNAR_GRAZER = "I have a feeling this pest won't be dispatched so easily.",
+
+        PUREBRILLIANCE = "I wonder if she knows about this...",
+        LUNARPLANT_HUSK = "The blasted thing is finally dead.",
+
+		LUNAR_FORGE = "To work, then.",
+		LUNAR_FORGE_KIT = "There's more to be done.",
+
+		ARMOR_LUNARPLANT = "Does no one else find this armor oddly itchy?",
+		LUNARPLANTHAT = "It looks wonderfully ominous.",
+		BOMB_LUNARPLANT = "Someone's about to have a very bad day.",
+		STAFF_LUNARPLANT = "More magic to add to the arsenal.",
+		SWORD_LUNARPLANT = "Such power!",
+		PICKAXE_LUNARPLANT = "It works surprisingly well.",
+		SHOVEL_LUNARPLANT = "I'd rather let someone else do my dirty work.",
+
+        PUNCHINGBAG = "A crude test of my weapons' power.",
     },
 
     DESCRIBE_GENERIC = "You tell me.",

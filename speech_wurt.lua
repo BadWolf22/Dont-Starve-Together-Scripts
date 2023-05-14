@@ -65,6 +65,7 @@ return{
 			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "Hmm, no good hidey spots here.",
 			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "Glurgh. Bored of this game.",
             MANNEQUIN_EQUIPSWAPFAILED = "Not supposed to put that there.",
+            PILLOWFIGHT_NO_HANDPILLOW = "WAIT!! Forgot pillow!",
 		},
 		OPEN_CRAFTING =
 		{
@@ -387,12 +388,12 @@ return{
 
 		CAST_SPELLBOOK =
 		{
---fallback to speech_wilson.lua			NO_TOPHAT = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 			NO_TOPHAT = "only_used_by_waxwell",
 		},
 
 		CASTAOE =
 		{
---fallback to speech_wilson.lua			NO_MAX_SANITY = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 			NO_MAX_SANITY = "only_used_by_waxwell",
 		},
     },
 
@@ -417,11 +418,11 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_NOWATERNEARBY = "only_used_by_waxwell_and_wicker",
 
 	--waxwell specific
---fallback to speech_wilson.lua		ANNOUNCE_SHADOWLEVEL_ITEM = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T1 = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T2 = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T3 = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T4 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_SHADOWLEVEL_ITEM = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T1 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T2 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T3 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T4 = "only_used_by_waxwell",
 
     --wolfgang specific
 --fallback to speech_wilson.lua     ANNOUNCE_NORMALTOMIGHTY = "only_used_by_wolfang",
@@ -878,6 +879,13 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_BOOK_MOON_DAYTIME = "only_used_by_waxwell_and_wicker",
 
     ANNOUNCE_OFF_SCRIPT = "Hee-hee, you messed up play!",
+
+    ANNOUNCE_COZY_SLEEP = "Aww, was having such good dream...",
+
+	--
+	ANNOUNCE_TOOL_TOOWEAK = "Grrr... need something stronger, florp!",
+
+    ANNOUNCE_LUNAR_RIFT_MAX = "Grrr! Who make that light?",
 
 	BATTLECRY =
 	{
@@ -1483,6 +1491,8 @@ return{
         TURF_MOSAIC_RED = "Ground bit.",
         TURF_MOSAIC_BLUE = "Ground bit.",
 
+        TURF_BEARD_RUG = "Soft!",
+
 		POWCAKE = "Gives tummy-ache, but... smell so good...",
         CAVE_ENTRANCE = "There rocks in the way.",
         CAVE_ENTRANCE_RUINS = "What down there?",
@@ -1786,6 +1796,7 @@ return{
         CHESSPIECE_BEEFALO = "It just rock, real thing better.",
 		CHESSPIECE_KITCOON = "Aww, they having a nap.",
 		CHESSPIECE_CATCOON = "It pretty good statue, has dead butterfly!",
+        CHESSPIECE_MANRABBIT = "Glurgh. Bunnyman get statue before Mermfolk?!",
         CHESSPIECE_GUARDIANPHASE3 = "Glorp! Oh, it not real.",
         CHESSPIECE_EYEOFTERROR = "Oh no... got dried out, glorp...",
         CHESSPIECE_TWINSOFTERROR = "Ha ha, they just rocks now!",
@@ -2881,6 +2892,34 @@ return{
         },
         BEEFALO_GROOMER_ITEM = "Buildy pieces.",
 
+        YOTR_RABBITSHRINE =
+        {
+            GENERIC = "Gimme stuff, big rabbit head!",
+            EMPTY = "Rabbit want carrot?",
+            BURNT = "Uh oh...",
+        },
+
+        NIGHTCAPHAT = "Sleepy-time hat.",
+
+        YOTR_FOOD1 = "Grrr, will gobble you up, rabbit! Hee-hee.",
+        YOTR_FOOD2 = "Yummy!",
+        YOTR_FOOD3 = "That really okay for eating?",
+        YOTR_FOOD4 = "Not sharing!",
+
+        YOTR_TOKEN = "Hee-hee-hee... SMACK!",
+
+        COZY_BUNNYMAN = "Hey! What they doing up here?",
+
+        HANDPILLOW_BEEFALOWOOL = "Blegh, it full of hair!",
+        HANDPILLOW_KELP = "Ahh, slimy and nice!",
+        HANDPILLOW_PETALS = "Stinky ugly pillow!",
+        HANDPILLOW_STEELWOOL = "It good fighting pillow, nice and scratchy!",
+
+        BODYPILLOW_BEEFALOWOOL = "Blegh, it full of hair!",
+        BODYPILLOW_KELP = "Ahh, slimy and nice!",
+        BODYPILLOW_PETALS = "Stinky ugly pillow!",
+        BODYPILLOW_STEELWOOL = "Glurgh! Itchy!!",
+
 		BISHOP_CHARGE_HIT = "GLOP!",
 		TRUNKVEST_SUMMER = "Wearing a nose!",
 		TRUNKVEST_WINTER = "Cozy...",
@@ -2941,7 +2980,7 @@ return{
 		WAXWELLJOURNAL =
 		{
 			GENERIC = "...Don't like stories in that book.",
---fallback to speech_wilson.lua			NEEDSFUEL = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 			NEEDSFUEL = "only_used_by_waxwell",
 		},
 		WETGOOP = "Usually like wet goopy things...",
         WHIP = "Whi-chaaa!!",
@@ -4575,7 +4614,7 @@ return{
         BOAT_ROTATOR_KIT = "It boat stuff.",
         BOAT_BUMPER_KELP = "Pretty decorations!",
         BOAT_BUMPER_KELP_KIT = "Gonna decorate boat, florp.",
-        BOAT_BUMPER_SHELL = "Pretty decorations!",
+		BOAT_BUMPER_SHELL = "Pretty decorations!",
         BOAT_BUMPER_SHELL_KIT = "Gonna decorate boat, florp.",
         BOAT_CANNON = {
             GENERIC = "It not ready yet!",
@@ -4690,6 +4729,68 @@ return{
 		-- Waxwell
 		MAGICIAN_CHEST = "Magic hidey-place.",
 		TOPHAT_MAGICIAN = "Glurgh, fancy hat got all gloopy.",
+
+        -- Year of the Rabbit
+        YOTR_FIGHTRING_KIT = "We allowed to hit things? Yay!!",
+        YOTR_FIGHTRING_BELL =
+        {
+            GENERIC = "Hee-hee! Who wanna fight!?",
+            PLAYING = "Me next, me next!!",
+        },
+
+        YOTR_DECOR_1 = {
+            GENERAL = "Ugly light statue.",
+            OUT = "Where light? Bunnyman not doing job!",
+        },
+        YOTR_DECOR_2 = {
+            GENERAL = "Ugly light statue.",
+            OUT = "Where light? Bunnyman not doing job!",
+        },
+
+        HAREBALL = "Glurgh, Bunnyman spit-up!",
+        YOTR_DECOR_1_ITEM = "Mermfolk light would be better.",
+        YOTR_DECOR_2_ITEM = "Mermfolk light would be better.",
+
+		--
+		DREADSTONE = "Pretty rocks!",
+		HORRORFUEL = "I-is just goop! Not scared!",
+		DAYWALKER =
+		{
+			GENERIC = "Grrr! You just big stinky pig!",
+			IMPRISONED = "Nyeeeeehhh!!",
+		},
+		DAYWALKER_PILLAR =
+		{
+			GENERIC = "Heehee, stinky pig all locked up!",
+			EXPOSED = "Rock too hard for breaking, florp.",
+		},
+		ARMORDREADSTONE = "So pretty... it mine!",
+		DREADSTONEHAT = "It real good for headbutting, flort!",
+
+        -- Rifts 1
+        LUNARRIFT_PORTAL = "Who broke sky?!",
+        LUNARRIFT_CRYSTAL = "Blegh, it not ice!",
+
+        LUNARTHRALL_PLANT = "Hey, it not sharing! Wicker-lady say we have to share!",
+        LUNARTHRALL_PLANT_VINE_END = "Glurgh, quit hitting!!",
+
+		LUNAR_GRAZER = "Hee-hee, it funny!",
+
+        PUREBRILLIANCE = "Glurgh, too bright!",
+        LUNARPLANT_HUSK = "Hee-hee, it dead!",
+
+		LUNAR_FORGE = "Make shiny things.",
+		LUNAR_FORGE_KIT = "Look easy to build, florp.",
+
+		ARMOR_LUNARPLANT = "Tough and glowy!",
+		LUNARPLANTHAT = "Cage for head, florp?",
+		BOMB_LUNARPLANT = "Hee-hee-hee... boom!!",
+		STAFF_LUNARPLANT = "Magic hitting stick.",
+		SWORD_LUNARPLANT = "It mine!! Me want glowy sword!",
+		PICKAXE_LUNARPLANT = "It real good at breaking stuff.",
+		SHOVEL_LUNARPLANT = "Good scooper-upper, florp.",
+
+        PUNCHINGBAG = "Allowed to hit it? Yay!!",
     },
 
     DESCRIBE_GENERIC = "What that?",

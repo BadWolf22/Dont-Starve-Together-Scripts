@@ -65,6 +65,7 @@ return{
 			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "This is not a worthy stage for our players!",
 			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "Let us reprise another time.",
             MANNEQUIN_EQUIPSWAPFAILED = "It is not trained to carry such things.",
+            PILLOWFIGHT_NO_HANDPILLOW = "Thou wouldst send me into the fray unarmed?",
 		},
 		OPEN_CRAFTING =
 		{
@@ -387,12 +388,12 @@ return{
 
 		CAST_SPELLBOOK =
 		{
---fallback to speech_wilson.lua			NO_TOPHAT = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 			NO_TOPHAT = "only_used_by_waxwell",
 		},
 
 		CASTAOE =
 		{
---fallback to speech_wilson.lua			NO_MAX_SANITY = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 			NO_MAX_SANITY = "only_used_by_waxwell",
 		},
     },
 
@@ -417,11 +418,11 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_NOWATERNEARBY = "only_used_by_waxwell_and_wicker",
 
 	--waxwell specific
---fallback to speech_wilson.lua		ANNOUNCE_SHADOWLEVEL_ITEM = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T1 = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T2 = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T3 = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T4 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_SHADOWLEVEL_ITEM = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T1 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T2 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T3 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T4 = "only_used_by_waxwell",
 
     --wolfgang specific
 --fallback to speech_wilson.lua     ANNOUNCE_NORMALTOMIGHTY = "only_used_by_wolfang",
@@ -744,6 +745,8 @@ return{
 --fallback to speech_wilson.lua         BOOK_TEMPERATURE = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_LIGHT = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_RAIN = "only_used_by_wurt",
+--fallback to speech_wilson.lua         BOOK_MOON = "only_used_by_wurt",
+--fallback to speech_wilson.lua         BOOK_BEES = "only_used_by_wurt",
 
 --fallback to speech_wilson.lua         BOOK_HORTICULTURE_UPGRADED = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_RESEARCH_STATION = "only_used_by_wurt",
@@ -876,6 +879,13 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_BOOK_MOON_DAYTIME = "only_used_by_waxwell_and_wicker",
 
     ANNOUNCE_OFF_SCRIPT = "How unprofessional!",
+
+    ANNOUNCE_COZY_SLEEP = "A well-rested warrior am I!",
+
+	--
+	ANNOUNCE_TOOL_TOOWEAK = "This meager tool hath not the strength to break it.",
+
+    ANNOUNCE_LUNAR_RIFT_MAX = "Something doth shine like a beacon in the distance.",
 
 	BATTLECRY =
 	{
@@ -1481,6 +1491,8 @@ return{
         TURF_MOSAIC_RED = "A piece of the battlefield.",
         TURF_MOSAIC_BLUE = "A piece of the battlefield.",
 
+        TURF_BEARD_RUG = "I shan't ask any questions.",
+
 		POWCAKE = "What in the name of the unicorn is this?",
         CAVE_ENTRANCE = "What treasures lie beneath?",
         CAVE_ENTRANCE_RUINS = "What treasures lie beneath?",
@@ -1784,6 +1796,7 @@ return{
         CHESSPIECE_BEEFALO = "A stone tribute to my faithful steed.",
 		CHESSPIECE_KITCOON = "A mighty pillar for a mighty family!",
 		CHESSPIECE_CATCOON = "You have my respect, fellow hunter.",
+        CHESSPIECE_MANRABBIT = "Their weapons were strange, but they possessed a warrior's spirit.",
         CHESSPIECE_GUARDIANPHASE3 = "You fought well, Champion of Mani.",
         CHESSPIECE_EYEOFTERROR = "I shall feast my eyes upon this trophy!",
         CHESSPIECE_TWINSOFTERROR = "A battle I shan't soon forget.",
@@ -2879,6 +2892,34 @@ return{
         },
         BEEFALO_GROOMER_ITEM = "I must prepare!",
 
+        YOTR_RABBITSHRINE =
+        {
+            GENERIC = "The rabbit seems pleased with my offering.",
+            EMPTY = "What should be sacrificed to the beast's maw?",
+            BURNT = "It must have displeased the gods.",
+        },
+
+        NIGHTCAPHAT = "Prepare for slumber!",
+
+        YOTR_FOOD1 = "Bah! 'Tis naught but a meat-shaped veggie cake!",
+        YOTR_FOOD2 = "I do not trust whatever lies within.",
+        YOTR_FOOD3 = "A delicious sight indeed!",
+        YOTR_FOOD4 = "A trio of tasty morsels.",
+
+        YOTR_TOKEN = "Who dares to face me in the ring?",
+
+        COZY_BUNNYMAN = "I am not fooled by their cozy exterior.",
+
+        HANDPILLOW_BEEFALOWOOL = "It is filled with the hair of the woolen beasties.",
+        HANDPILLOW_KELP = "'Tis a pillow from Njoror's domain.",
+        HANDPILLOW_PETALS = "As good a use as any for flimsy petals.",
+        HANDPILLOW_STEELWOOL = "Only the strong-willed could sleep on such a thing.",
+
+        BODYPILLOW_BEEFALOWOOL = "It is filled with the hair of the woolen beasties.",
+        BODYPILLOW_KELP = "'Tis a pillow from Njoror's domain.",
+        BODYPILLOW_PETALS = "As good a use as any for flimsy petals.",
+        BODYPILLOW_STEELWOOL = "Only the strong-willed could sleep on such a thing.",
+
 		BISHOP_CHARGE_HIT = "Rrraugh!",
 		TRUNKVEST_SUMMER = "It will not suffice in the frozen wastes.",
 		TRUNKVEST_WINTER = "The warm pelt of a bested creature. A fine garment.",
@@ -2939,7 +2980,7 @@ return{
 		WAXWELLJOURNAL =
 		{
 			GENERIC = "A tragic tale of woe and misery!",
---fallback to speech_wilson.lua			NEEDSFUEL = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 			NEEDSFUEL = "only_used_by_waxwell",
 		},
 		WETGOOP = "Slop.",
         WHIP = "Loud and powerful!",
@@ -4573,7 +4614,7 @@ return{
         BOAT_ROTATOR_KIT = "It shall be done, with haste!",
         BOAT_BUMPER_KELP = "My vessel is well defended.",
         BOAT_BUMPER_KELP_KIT = "It shall shield my vessel from harm.",
-        BOAT_BUMPER_SHELL = "My vessel is well defended.",
+		BOAT_BUMPER_SHELL = "My vessel is well defended.",
         BOAT_BUMPER_SHELL_KIT = "It shall shield my vessel from harm.",
         BOAT_CANNON = {
             GENERIC = "Load the cannons!",
@@ -4688,6 +4729,68 @@ return{
 		-- Waxwell
 		MAGICIAN_CHEST = "'Tis a wicked looking thing.",
 		TOPHAT_MAGICIAN = "It hath been touched by dark magic.",
+
+        -- Year of the Rabbit
+        YOTR_FIGHTRING_KIT = "A test of might and bravery!",
+        YOTR_FIGHTRING_BELL =
+        {
+            GENERIC = "Who will face me in the field of battle?",
+            PLAYING = "There art a battle underway!",
+        },
+
+        YOTR_DECOR_1 = {
+            GENERAL = "Let us feast by the rabbit's torchlight!",
+            OUT = "Its light burns no more.",
+        },
+        YOTR_DECOR_2 = {
+            GENERAL = "Let us feast by the rabbit's torchlight!",
+            OUT = "Its light burns no more.",
+        },
+
+        HAREBALL = "Ha! I am no coward, pass it this way!",
+        YOTR_DECOR_1_ITEM = "Let us set the rabbit torch alight!",
+        YOTR_DECOR_2_ITEM = "Let us set the rabbit torch alight!",
+
+		--
+		DREADSTONE = "A stone of ill omen.",
+		HORRORFUEL = "The sight of it chills even my courageous Viking heart.",
+		DAYWALKER =
+		{
+			GENERIC = "You leave me no choice, beast! To arms!",
+			IMPRISONED = "The beast hath been consumed by foul magic.",
+		},
+		DAYWALKER_PILLAR =
+		{
+			GENERIC = "The pillar is weakened... mayhaps it could be broken.",
+			EXPOSED = "Only something of great might could crack that foul stone.",
+		},
+		ARMORDREADSTONE = "It will serve me well, despite its origins.",
+		DREADSTONEHAT = "Ready to bear the brunt of battle!",
+
+        -- Rifts 1
+        LUNARRIFT_PORTAL = "An opening, yet I cannot pass through.",
+        LUNARRIFT_CRYSTAL = "How strange... and beautiful.",
+
+        LUNARTHRALL_PLANT = "Vicious plant, I shall honor thee with a swift death!",
+        LUNARTHRALL_PLANT_VINE_END = "Ha! You shall have to do better than that!",
+
+		LUNAR_GRAZER = "I will not fall prey to your tricks, spirit!",
+
+        PUREBRILLIANCE = "Like staring up into the spotlights...",
+        LUNARPLANT_HUSK = "It hath a formidible hide, for a non-meat.",
+
+		LUNAR_FORGE = "I shall forge weapons to rival the gods themselves!",
+		LUNAR_FORGE_KIT = "The forge must be built, forthwith!",
+
+		ARMOR_LUNARPLANT = "Armor crafted from a fallen foe.",
+		LUNARPLANTHAT = "A formidable helm, burning with an unearthly flame!",
+		BOMB_LUNARPLANT = "I have made the plant's power my own.",
+		STAFF_LUNARPLANT = "To attack from afar is not my preferred way of combat.",
+		SWORD_LUNARPLANT = "Am I worthy of wielding a weapon of such brilliance?",
+		PICKAXE_LUNARPLANT = "Neither stone nor structure shall stand in my way!",
+		SHOVEL_LUNARPLANT = "The ground stands no chance against me.",
+
+        PUNCHINGBAG = "Alas, 'tis not a very lively sparring partner.",
     },
 
     DESCRIBE_GENERIC = "It is an artifact of this realm.",

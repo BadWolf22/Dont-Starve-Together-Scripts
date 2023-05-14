@@ -127,6 +127,13 @@ local function MakeHat(name)
         end
     end
 
+    local _skinfns = { -- NOTES(JBK): These are useful for skins to have access to them instead of sometimes storing a reference to a hat.
+        simple_onequip = fns.simple_onequip,
+        simple_onunequip = fns.simple_onunequip,
+        opentop_onequip = fns.opentop_onequip,
+        simple_onequiptomodel = fns.simple_onequiptomodel,
+    }
+
     local function simple(custom_init)
         local inst = CreateEntity()
 
@@ -154,6 +161,8 @@ local function MakeHat(name)
         if not TheWorld.ismastersim then
             return inst
         end
+
+        inst._skinfns = _skinfns
 
         inst:AddComponent("inventoryitem")
 
@@ -951,6 +960,24 @@ local function MakeHat(name)
         return inst
     end
 
+
+    local function nightcap_custom_init(inst)
+        inst:AddTag("good_sleep_aid")
+    end
+
+    fns.nightcap = function()
+        local inst = simple(nightcap_custom_init)
+
+        inst.components.floater:SetSize("med")
+        inst.components.floater:SetScale(0.65)
+
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        return inst
+    end
+
     local function stopusingbush(inst, data)
         local hat = inst.components.inventory ~= nil and inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD) or nil
         if hat ~= nil and data.statename ~= "hide" then
@@ -1287,10 +1314,6 @@ local function MakeHat(name)
         if not TheWorld.ismastersim then
             return inst
         end
-
-        --Saved so we can re-assign with skins
-        inst._opentop_onequip = fns.opentop_onequip
-        inst._onequip = fns.simple_onequip
 
         inst:AddComponent("armor")
         inst.components.armor:InitCondition(TUNING.ARMOR_WATHGRITHRHAT, TUNING.ARMOR_WATHGRITHRHAT_ABSORPTION)
@@ -1998,8 +2021,8 @@ local function MakeHat(name)
 
     local function antlion_onequip(inst, owner)
         fns.simple_onequip(inst, owner)
-        
-        if inst.components.autoterraformer ~= nil then
+
+		if inst.components.autoterraformer ~= nil and owner.components.locomotor ~= nil then
             inst.components.autoterraformer:StartTerraforming()
         end
 
@@ -2376,6 +2399,7 @@ local function MakeHat(name)
         end
 
         inst.components.equippable.dapperness = TUNING.CRAZINESS_MED
+        inst.components.equippable.is_magic_dapperness = true
         inst.components.equippable:SetOnEquip(skeleton_onequip)
         inst.components.equippable:SetOnUnequip(skeleton_onunequip)
 
@@ -2876,6 +2900,225 @@ local function MakeHat(name)
         return inst
     end
 
+	local function dreadstone_getsetbonusequip(inst, owner)
+		local body = owner.components.inventory ~= nil and owner.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY) or nil
+		return body ~= nil and body.prefab == "armordreadstone" and body or nil
+	end
+
+	local function dreadstone_doregen(inst, owner)
+		if owner.components.sanity ~= nil and owner.components.sanity:IsInsanityMode() then
+			local setbonus = dreadstone_getsetbonusequip(inst, owner) ~= nil and TUNING.ARMOR_DREADSTONE_REGEN_SETBONUS or 1
+			local rate = 1 / Lerp(1 / TUNING.ARMOR_DREADSTONE_REGEN_MAXRATE, 1 / TUNING.ARMOR_DREADSTONE_REGEN_MINRATE, owner.components.sanity:GetPercent())
+			inst.components.armor:Repair(inst.components.armor.maxcondition * rate * setbonus)
+		end
+		if not inst.components.armor:IsDamaged() then
+			inst.regentask:Cancel()
+			inst.regentask = nil
+		end
+	end
+
+	local function dreadstone_startregen(inst, owner)
+		if inst.regentask == nil then
+			inst.regentask = inst:DoPeriodicTask(TUNING.ARMOR_DREADSTONE_REGEN_PERIOD, dreadstone_doregen, nil, owner)
+		end
+	end
+
+	local function dreadstone_stopregen(inst)
+		if inst.regentask ~= nil then
+			inst.regentask:Cancel()
+			inst.regentask = nil
+		end
+	end
+
+	local function dreadstone_onequip(inst, owner)
+		_onequip(inst, owner)
+
+		if owner.components.sanity ~= nil and inst.components.armor:IsDamaged() then
+			dreadstone_startregen(inst, owner)
+		else
+			dreadstone_stopregen(inst)
+		end
+	end
+
+	local function dreadstone_onunequip(inst, owner)
+		_onunequip(inst, owner)
+		dreadstone_stopregen(inst)
+	end
+
+	local function dreadstone_ontakedamage(inst, amount)
+		if inst.regentask == nil and inst.components.equippable:IsEquipped() then
+			local owner = inst.components.inventoryitem.owner
+			if owner ~= nil and owner.components.sanity ~= nil then
+				dreadstone_startregen(inst, owner)
+			end
+		end
+	end
+
+	local function dreadstone_calcdapperness(inst, owner)
+		local insanity = owner.components.sanity ~= nil and owner.components.sanity:IsInsanityMode()
+		local other = dreadstone_getsetbonusequip(inst, owner)
+		if other ~= nil then
+			return (insanity and (inst.regentask ~= nil or other.regentask ~= nil) and TUNING.CRAZINESS_MED or TUNING.CRAZINESS_SMALL) * 0.5
+		end
+		return insanity and inst.regentask ~= nil and TUNING.CRAZINESS_MED or TUNING.CRAZINESS_SMALL
+	end
+
+	local function dreadstone_custom_init(inst)
+		inst:AddTag("dreadstone")
+		inst:AddTag("shadow_item")
+
+		--waterproofer (from waterproofer component) added to pristine state for optimization
+		inst:AddTag("waterproofer")
+
+		--shadowlevel (from shadowlevel component) added to pristine state for optimization
+		inst:AddTag("shadowlevel")
+	end
+
+	fns.dreadstone = function()
+		local inst = simple(dreadstone_custom_init)
+
+		if not TheWorld.ismastersim then
+			return inst
+		end
+
+		inst:AddComponent("armor")
+		inst.components.armor:InitCondition(TUNING.ARMOR_DREADSTONEHAT, TUNING.ARMOR_DREADSTONEHAT_ABSORPTION)
+		inst.components.armor.ontakedamage = dreadstone_ontakedamage
+
+		inst.components.equippable.dapperfn = dreadstone_calcdapperness
+		inst.components.equippable.is_magic_dapperness = true
+		inst.components.equippable:SetOnEquip(dreadstone_onequip)
+		inst.components.equippable:SetOnUnequip(dreadstone_onunequip)
+
+		inst:AddComponent("planardefense")
+		inst.components.planardefense:SetBaseDefense(TUNING.ARMOR_DREADSTONEHAT_PLANAR_DEF)
+
+		inst:AddComponent("waterproofer")
+		inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)
+
+		inst:AddComponent("damagetyperesist")
+		inst.components.damagetyperesist:AddResist("shadow_aligned", inst, TUNING.ARMOR_DREADSTONEHAT_SHADOW_RESIST)
+
+		inst:AddComponent("shadowlevel")
+		inst.components.shadowlevel:SetDefaultLevel(TUNING.DREADSTONEHAT_SHADOW_LEVEL)
+
+		MakeHauntableLaunch(inst)
+
+		return inst
+	end
+
+	local function lunarplant_getsetbonusequip(inst, owner)
+		if owner.components.inventory ~= nil then
+			local body = owner.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY)
+			local weapon = owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+			return body ~= nil and body.prefab == "armor_lunarplant" and body or nil,
+				weapon ~= nil and weapon.lunarplantweapon and weapon or nil
+		end
+	end
+
+	local function lunarplant_onequip(inst, owner)
+		_onequip(inst, owner)
+		local body, weapon = lunarplant_getsetbonusequip(inst, owner)
+		if body ~= nil then
+			inst.components.damagetyperesist:AddResist("lunar_aligned", inst, TUNING.ARMOR_LUNARPLANT_SETBONUS_LUNAR_RESIST, "setbonus")
+			body.components.damagetyperesist:AddResist("lunar_aligned", body, TUNING.ARMOR_LUNARPLANT_SETBONUS_LUNAR_RESIST, "setbonus")
+			if weapon ~= nil then
+				if weapon.base_damage ~= nil then
+					weapon.components.weapon:SetDamage(weapon.base_damage * TUNING.WEAPONS_LUNARPLANT_SETBONUS_DAMAGE_MULT)
+					weapon.components.planardamage:AddBonus(weapon, TUNING.WEAPONS_LUNARPLANT_SETBONUS_PLANAR_DAMAGE, "setbonus")
+				end
+				if weapon.max_bounces ~= nil then
+					weapon.max_bounces = TUNING.STAFF_LUNARPLANT_SETBONUS_BOUNCES
+				end
+			end
+		end
+
+		if inst.fx == nil then
+			inst.fx = {}
+			for i = 1, 3 do
+				local fx = SpawnPrefab("lunarplanthat_fx")
+				if i > 1 then
+					fx.AnimState:PlayAnimation("idle"..tostring(i), true)
+				end
+				table.insert(inst.fx, fx)
+			end
+		end
+		local frame = math.random(inst.fx[1].AnimState:GetCurrentAnimationNumFrames()) - 1
+		for i, v in ipairs(inst.fx) do
+			v.entity:SetParent(owner.entity)
+			v.Follower:FollowSymbol(owner.GUID, "swap_hat", nil, nil, nil, true, nil, i - 1)
+			v.AnimState:SetFrame(frame)
+			v.components.highlightchild:SetOwner(owner)
+		end
+		owner.AnimState:SetSymbolLightOverride("swap_hat", .1)
+	end
+
+	local function lunarplant_onunequip(inst, owner)
+		_onunequip(inst, owner)
+		local body, weapon = lunarplant_getsetbonusequip(inst, owner)
+		if body ~= nil then
+			body.components.damagetyperesist:RemoveResist("lunar_aligned", body, "setbonus")
+		end
+		inst.components.damagetyperesist:RemoveResist("lunar_aligned", inst, "setbonus")
+		if weapon ~= nil then
+			if weapon.base_damage ~= nil then
+				weapon.components.weapon:SetDamage(weapon.base_damage)
+				weapon.components.planardamage:RemoveBonus(weapon, "setbonus")
+			end
+			if weapon.max_bounces ~= nil then
+				weapon.max_bounces = TUNING.STAFF_LUNARPLANT_BOUNCES
+			end
+		end
+
+		if inst.fx ~= nil then
+			for i, v in ipairs(inst.fx) do
+				v:Remove()
+			end
+			inst.fx = nil
+		end
+		owner.AnimState:SetSymbolLightOverride("swap_hat", 0)
+	end
+
+	local function lunarplant_custom_init(inst)
+		inst:AddTag("lunarplant")
+		inst:AddTag("gestaltprotection")
+		inst:AddTag("goggles")
+
+		--waterproofer (from waterproofer component) added to pristine state for optimization
+		inst:AddTag("waterproofer")
+	end
+
+	fns.lunarplant = function()
+		local inst = simple(lunarplant_custom_init)
+
+		inst.components.floater:SetSize("med")
+		inst.components.floater:SetVerticalOffset(0.25)
+		inst.components.floater:SetScale(.75)
+
+		if not TheWorld.ismastersim then
+			return inst
+		end
+
+		inst:AddComponent("armor")
+		inst.components.armor:InitCondition(TUNING.ARMOR_LUNARPLANT_HAT, TUNING.ARMOR_LUNARPLANT_HAT_ABSORPTION)
+
+		inst.components.equippable:SetOnEquip(lunarplant_onequip)
+		inst.components.equippable:SetOnUnequip(lunarplant_onunequip)
+
+		inst:AddComponent("planardefense")
+		inst.components.planardefense:SetBaseDefense(TUNING.ARMOR_LUNARPLANT_HAT_PLANAR_DEF)
+
+		inst:AddComponent("waterproofer")
+		inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALLMED)
+
+		inst:AddComponent("damagetyperesist")
+		inst.components.damagetyperesist:AddResist("lunar_aligned", inst, TUNING.ARMOR_LUNARPLANT_LUNAR_RESIST)
+
+		MakeHauntableLaunch(inst)
+
+		return inst
+	end
+
     local fn = nil
     local assets = { Asset("ANIM", "anim/"..fname..".zip") }
     local prefabs = nil
@@ -3017,6 +3260,13 @@ local function MakeHat(name)
         fn = fns.mask
     elseif name == "mask_fool" then
         fn = fns.mask        
+    elseif name == "nightcap" then
+        fn = fns.nightcap
+    elseif name == "dreadstone" then
+    	fn = fns.dreadstone
+    elseif name == "lunarplant" then
+    	prefabs = { "lunarplanthat_fx" }
+    	fn = fns.lunarplant
     end
 
     table.insert(ALL_HAT_PREFAB_NAMES, prefabname)
@@ -3071,6 +3321,39 @@ local function alterguardianhatlightfn()
     inst.persists = false
 
     return inst
+end
+
+local function lunarplanthatfxfn()
+	local inst = CreateEntity()
+
+	inst.entity:AddTransform()
+	inst.entity:AddAnimState()
+	inst.entity:AddFollower()
+	inst.entity:AddNetwork()
+
+	inst:AddTag("FX")
+
+	inst.AnimState:SetBank("lunarplanthat")
+	inst.AnimState:SetBuild("hat_lunarplant")
+	inst.AnimState:PlayAnimation("idle1", true)
+	inst.AnimState:SetSymbolBloom("glow01")
+	inst.AnimState:SetSymbolBloom("float_top")
+	inst.AnimState:SetSymbolLightOverride("glow01", .5)
+	inst.AnimState:SetSymbolLightOverride("float_top", .5)
+	inst.AnimState:SetSymbolMultColour("float_top", 1, 1, 1, .6)
+	inst.AnimState:SetLightOverride(.1)
+
+	inst:AddComponent("highlightchild")
+
+	inst.entity:SetPristine()
+
+	if not TheWorld.ismastersim then
+		return inst
+	end
+
+	inst.persists = false
+
+	return inst
 end
 
 local function tophatcontainerfn()
@@ -3155,7 +3438,13 @@ return  MakeHat("straw"),
         MakeHat("monkey_small"),
         MakeHat("polly_rogers"),
 
+        MakeHat("nightcap"),
+
+		MakeHat("dreadstone"),
+		MakeHat("lunarplant"),
+
         Prefab("minerhatlight", minerhatlightfn),
         Prefab("alterguardianhatlight", alterguardianhatlightfn),
+        Prefab("lunarplanthat_fx", lunarplanthatfxfn, { Asset("ANIM", "anim/hat_lunarplant.zip") }),
 
 		Prefab("tophat_container", tophatcontainerfn)

@@ -1275,6 +1275,12 @@ local fx =
         anim = "unwrap",
     },
     {
+        name = "redpouch_yotr_unwrap",
+        bank = "redpouch_yotr",
+        build = "redpouch_yotr",
+        anim = "unwrap",
+    },    
+    {
         name = "yotc_seedpacket_unwrap",
         bank = "bundle",
         build = "bundle",
@@ -2696,6 +2702,54 @@ local fx =
         build = "turf_smoke_fx",
         anim = "fx",
     },
+    {
+        name = "pillowfight_confetti_fx",
+        bank = "pillowfight_confetti",
+        build = "pillowfight_confetti",
+        anim = "out",
+        fn = FinalOffsetNegative1,
+        sound = "summerevent/cannon/fire1",
+    },
+
+    {
+        name = "mining_crystal_fx",
+        bank = "mining_crystal_fx",
+        build = "mining_crystal_fx",
+        anim = "anim",
+    },
+	{
+		name = "planar_resist_fx",
+		bank = "planar_resist_fx",
+		build = "planar_resist_fx",
+		anim = "deflect",
+		sound = "rifts/fx/planar_resist_fx",
+		fn = function(inst)
+			local scale = .8 + math.random() * .4
+			inst.AnimState:SetScale(math.random() < .5 and scale or -scale, scale)
+		end,
+	},
+	{
+		name = "planar_hit_fx",
+		bank = "planar_damage_fx",
+		build = "planar_damage_fx",
+		anim = "damage2",
+		fn = function(inst)
+			local scale = 1.2 + math.random() * .2
+			inst.AnimState:SetScale(math.random() < .5 and scale or -scale, scale)
+			inst.AnimState:SetFinalOffset(7)
+		end,
+	},
+	{
+		name = "fire_fail_fx",
+		bank = "fire_fail_fx",
+		build = "fire_fail_fx",
+		anim = "fx",
+		sound = "dontstarve/common/fireOut",
+		fn = function(inst)
+			inst.AnimState:SetSymbolBloom("flame01")
+			inst.AnimState:SetSymbolLightOverride("flame01", 1)
+		end,
+	},
 }
 
 for cratersteamindex = 1, 4 do

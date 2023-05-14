@@ -108,6 +108,12 @@ local function update_hit_recovery_delay(inst)
 end
 
 CommonHandlers.UpdateHitRecoveryDelay = update_hit_recovery_delay
+
+CommonHandlers.ResetHitRecoveryDelay = function(inst)
+	inst._last_hitreact_time = nil
+	inst._last_hitreact_count = nil
+end
+
 local function onattacked(inst, data, hitreact_cooldown, max_hitreacts, skip_cooldown_fn)
     if inst.components.health ~= nil and not inst.components.health:IsDead()
 		and not hit_recovery_delay(inst, hitreact_cooldown, max_hitreacts, skip_cooldown_fn)
@@ -352,7 +358,9 @@ CommonStates.AddRunStates = function(states, timelines, anims, softstop, delayst
 			if fns ~= nil and fns.startonenter ~= nil then
 				fns.startonenter(inst)
 			end
-			if not delaystart then
+			if delaystart then
+				inst.components.locomotor:StopMoving()
+			else
 	            inst.components.locomotor:RunForward()
 			end
             inst.AnimState:PlayAnimation(get_loco_anim(inst, anims ~= nil and anims.startrun or nil, "run_pre"))
@@ -453,7 +461,9 @@ CommonStates.AddWalkStates = function(states, timelines, anims, softstop, delays
 			if fns ~= nil and fns.startonenter ~= nil then -- this has to run before WalkForward so that startonenter has a chance to update the walk speed
 				fns.startonenter(inst)
 			end
-			if not delaystart then
+			if delaystart then
+				inst.components.locomotor:StopMoving()
+			else
 	            inst.components.locomotor:WalkForward()
 			end
             inst.AnimState:PlayAnimation(get_loco_anim(inst, anims ~= nil and anims.startwalk or nil, "walk_pre"))
@@ -984,6 +994,7 @@ local function onunfreeze(inst)
 end
 
 local function onthaw(inst)
+	inst.sg.statemem.thawing = true
     inst.sg:GoToState("thaw")
 end
 
@@ -1016,7 +1027,9 @@ local function onenterfrozen(inst)
 end
 
 local function onexitfrozen(inst)
-    inst.AnimState:ClearOverrideSymbol("swap_frozen")
+	if not inst.sg.statemem.thawing then
+		inst.AnimState:ClearOverrideSymbol("swap_frozen")
+	end
 end
 
 local function onenterthawpre(inst)
@@ -1871,6 +1884,8 @@ CommonStates.AddSinkAndWashAsoreStates = function(states, anims, timelines, fns)
         end,
 	})
 end
+
+CommonStates.AddSinkAndWashAshoreStates = CommonStates.AddSinkAndWashAsoreStates
 
 --------------------------------------------------------------------------
 

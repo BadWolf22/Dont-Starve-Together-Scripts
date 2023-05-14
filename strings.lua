@@ -403,6 +403,7 @@ STRINGS =
             READY    = "Sacrifice",
             SOCKET   = "Socket",
             CELESTIAL = "Offer",
+            SHOW = "Show",
 			APPLY    = "Apply {item}",
             QUAGMIRE_POT_HANGER = "Hang {item}",
             QUAGMIRE_OVEN       = "Place {item}",
@@ -583,6 +584,7 @@ STRINGS =
 			WHEELSPIN_STOP = "Press",
             PICK_FLOWER = "Pick Flower From",
             EQUIPMENTSWAP = "Swap Clothes",
+            SPIN = "Spin",
         },
 
 		OPEN_CRAFTING =
@@ -597,7 +599,8 @@ STRINGS =
 			CRITTERS = "Look in",
 			SCULPTING = "Sculpt at",
 			CARTOGRAPHY = "Draw at",
-            STUDY = "Study at"
+			STUDY = "Study at",
+			FORGE = "Forge at",
 		},
 
         JUMPIN =
@@ -1275,6 +1278,8 @@ STRINGS =
         TURF_MOSAIC_GREY = "Grey Mosaic Flooring",
         TURF_MOSAIC_BLUE = "Blue Mosaic Flooring",
         TURF_MOSAIC_RED = "Red Mosaic Flooring",
+
+        TURF_BEARD_RUG = "Beard Hair Rug",
 
         COOKPOT = "Crock Pot",
         DUG_GRASS = "Grass Tuft",
@@ -2190,6 +2195,7 @@ STRINGS =
         CHESSPIECE_BEEFALO = "Beefalo Figure",
         CHESSPIECE_KITCOON = "Kitcoon Figure",
         CHESSPIECE_CATCOON = "Catcoon Figure",
+        CHESSPIECE_MANRABBIT = "Bunnyman Figure",
         CHESSPIECE_MALBATROSS = "Malbatross Figure",
         CHESSPIECE_CRABKING = "Crab King Figure",
         CHESSPIECE_TOADSTOOL = "Toadstool Figure",
@@ -2223,6 +2229,7 @@ STRINGS =
         CHESSPIECE_BEEFALO_BUILDER = "Beefalo Figure",
         CHESSPIECE_KITCOON_BUILDER = "Kitcoon Figure",
         CHESSPIECE_CATCOON_BUILDER = "Catcoon Figure",
+        CHESSPIECE_MANRABBIT_BUILDER = "Bunnyman Figure",
         CHESSPIECE_MALBATROSS_BUILDER = "Malbatross Figure",
         CHESSPIECE_CRABKING_BUILDER = "Crab King Figure",
         CHESSPIECE_TOADSTOOL_BUILDER = "Toadstool Figure",
@@ -2245,6 +2252,7 @@ STRINGS =
         CHESSPIECE_MALBATROSS_SKETCH = "Malbatross Figure Sketch",
         CHESSPIECE_CRABKING_SKETCH = "Crab King Figure Sketch",
         CHESSPIECE_GUARDIANPHASE3_SKETCH = "Celestial Champion Figure Sketch",
+        CHESSPIECE_MANRABBIT_SKETCH = "Bunnyman Figure Sketch",
 
         SHADOW_ROOK = "Shadow Rook",
         SHADOW_KNIGHT = "Shadow Knight",
@@ -2478,6 +2486,25 @@ STRINGS =
 
         TICOON = "Ticoon",
         TICOON_BUILDER = "Ticoon",
+
+        YOTR_RABBITSHRINE = "Bunnyman Shrine",
+        COZY_BUNNYMAN = "Cozy Bunnyman",
+
+        HANDPILLOW_BEEFALOWOOL = "Beefalo Wool Pillow",
+        HANDPILLOW_KELP = "Kelp-Stuffed Pillow",
+        HANDPILLOW_PETALS = "Flowery Pillow",
+        HANDPILLOW_STEELWOOL = "Steel Wool Pillow",
+
+        BODYPILLOW_BEEFALOWOOL = "Beefalo Pillow Armor",
+        BODYPILLOW_KELP = "Kelpy Pillow Armor",
+        BODYPILLOW_PETALS = "Flowery Pillow Armor",
+        BODYPILLOW_STEELWOOL = "Steel Wool Pillow Armor",
+
+        YOTR_FOOD1 = "Bunny Roll",
+        YOTR_FOOD2 = "Moon Cake",
+        YOTR_FOOD3 = "Moon Jelly",
+        YOTR_FOOD4 = "Skewered Puffs",
+        YOTR_TOKEN = "Glove of Challenge",
 
         --Arena Event
         LAVAARENA_BOARLORD = "Battlemaster Pugna",
@@ -3373,7 +3400,7 @@ STRINGS =
         MOONSTORM_STATIC_ITEM = "Restrained Static",
 
         ALTERGUARDIANHAT = "Enlightened Crown",
-        ALTERGUARDIANHATSHARD = "Enlightened Crown Shard",
+        ALTERGUARDIANHATSHARD = "Enlightened Shard",
 
         MOONSTORM_GOGGLESHAT = "Astroggles",
 
@@ -3573,6 +3600,58 @@ STRINGS =
 
         PLAYBILL_THE_DOLL = "The Enchanted Doll\nA Stage Play",
         STATUEHARP_HEDGESPAWNER = "Overgrown Statue",
+
+        -- Year of the Rabbit
+        YOTR_FIGHTRING = "Pillow Fight Pit",
+        YOTR_FIGHTRING_KIT = "Pillow Fight Pit Kit",
+        YOTR_FIGHTRING_TORCH = "Bunnyman Torch",
+        YOTR_FIGHTRING_BELL = "Pillow Fight Bell",
+        NIGHTCAPHAT = "Nightcap",
+
+        YOTR_DECOR_1 = "Short Rabbit Lamp",
+        YOTR_DECOR_2 = "Tall Rabbit Lamp",
+
+        YOTR_DECOR_1_ITEM = "Short Rabbit Lamp",
+        YOTR_DECOR_2_ITEM = "Tall Rabbit Lamp",
+        HAREBALL = "Hare Ball",
+
+		--
+		DREADSTONE = "Dreadstone",
+		HORRORFUEL = "Pure Horror",
+		DAYWALKER = "Nightmare Werepig",
+		DAYWALKER_PILLAR = "Cracked Pillar",
+		SHADOW_LEECH = "Parasitic Shadeling",
+		ARMORDREADSTONE = "Dreadstone Armor",
+		DREADSTONEHAT = "Dreadstone Helm",
+
+        -- Rifts 1
+        LUNARRIFT_PORTAL = "Rift",
+        LUNARRIFT_CRYSTAL_BIG = "Ryftstal",
+        LUNARRIFT_CRYSTAL_SMALL = "Ryftstal",
+        LUNARRIFT_TERRAFORMER_EXPLOSION = "Lunaform Burst", -- For player death messages.
+
+		LUNAR_GRAZER = "Grazer",
+        LUNARTHRALL_PLANT = "Deadly Brightshade",
+        LUNARTHRALL_PLANT_GESTALT = "Brightshade Gestalt",
+        LUNARTHRALL_PLANT_VINE_END = "Tunneling Vine",
+
+        PUREBRILLIANCE = "Pure Brilliance",
+        LUNARPLANT_HUSK = "Brightshade Husk",
+
+		LUNAR_FORGE = "Brightsmithy",
+		LUNAR_FORGE_KIT = "Brightsmithy Kit",
+
+		ARMOR_LUNARPLANT = "Brightshade Armor",
+		LUNARPLANTHAT = "Brightshade Helm",
+		BOMB_LUNARPLANT = "Brightshade Bomb",
+		STAFF_LUNARPLANT = "Brightshade Staff",
+		SWORD_LUNARPLANT = "Brightshade Sword",
+		PICKAXE_LUNARPLANT = "Brightshade Smasher",
+		SHOVEL_LUNARPLANT = "Brightshade Shoevel",
+
+        PUNCHINGBAG = "Punching Bag",
+        PUNCHINGBAG_LUNAR = "Bright Boxer",
+        PUNCHINGBAG_SHADOW = "Shadow Boxer",
 	},
 
     NAME_DETAIL_EXTENTION =
@@ -3890,6 +3969,7 @@ STRINGS =
         DRAGONBODYHAT = "The middle bit of a beast costume.",
         DRAGONTAILHAT = "The caboose of a beast costume.",
         PERDSHRINE = "Make offerings to the majestic Gobbler.",
+        YOTR_RABBITSHRINE = "Make offerings to the cozy Bunnyman.",
         REDLANTERN = "A fortuitous lantern to light your way.",
         FIRECRACKERS = "Celebrate with a BANG!",
         PERDFAN = "Extra lucky, extra large.",
@@ -3985,6 +4065,7 @@ STRINGS =
         CHESSPIECE_BEEFALO_BUILDER = "A beauteous beefalo bust.",
 		CHESSPIECE_KITCOON_BUILDER = "One's true wealth is measured by their friends.",
         CHESSPIECE_CATCOON_BUILDER = "A curious statue for a curious creature.",
+        CHESSPIECE_MANRABBIT_BUILDER = "A fluffy friend, made of rock.",
         CHESSPIECE_MALBATROSS_BUILDER = "A sculpted scourge of the seas.",
         CHESSPIECE_CRABKING_BUILDER = "It looks even crabbier than you remember it.",
 		CHESSPIECE_TOADSTOOL_BUILDER = "A toad-ally authentic reproduction of the original.",
@@ -4005,6 +4086,7 @@ STRINGS =
         CHESSPIECE_CATCOON_SKETCH = "A sculpture sketch of a playful catcoon.",
         CHESSPIECE_MALBATROSS_SKETCH = "A sculpture sketch of the mighty Malbatross.",
         CHESSPIECE_CRABKING_SKETCH = "A sculpture sketch of the Crab King",
+        CHESSPIECE_MANRABBIT_SKETCH = "A sculpture sketch of a playful Bunnyman.",
 
         CRITTER_GLOMLING_BUILDER = "Befriend a bouncy Glomglom.",
         CRITTER_DRAGONLING_BUILDER = "Befriend a noble Broodling.",
@@ -4295,6 +4377,7 @@ STRINGS =
         TURF_MUD = "A patch of muddy ground.",
 
         TURF_MONKEY_GROUND = "A patch of sand, with a faint scent of bananas.",
+        TURF_BEARD_RUG = "Some people just like to do art.",
 
 		-- FARMING
 		FARM_PLOW_ITEM = "Plow a plot for your plants.",
@@ -4391,7 +4474,83 @@ STRINGS =
         --
         SEWING_MANNEQUIN = "A model for all the latest equippable looks.",
 
+        -- 
+        NIGHTCAPHAT = "A cap for your sleepy head.",
+
+        YOTR_FOOD1 = "No bunnies were harmed in the making of this cake.",
+        YOTR_FOOD2 = "It's \"blue\" flavored!",
+        YOTR_FOOD3 = "This dessert looks almost too good to eat.",
+        YOTR_FOOD4 = "Puffy balls of chewy goodness.",
+        YOTR_TOKEN = "Tell a Bunnyman you'd like to try your hand at a pillow battle.",
+
+        HANDPILLOW_BEEFALOWOOL = "It packs a woolly wallop!",
+        HANDPILLOW_KELP = "Nobody likes a wet blanket. Wet pillows aren't much better.",
+        HANDPILLOW_PETALS = "A pillow packed with flower power.",
+        HANDPILLOW_STEELWOOL = "For folks who take their pillow fighting seriously.",
+
+        BODYPILLOW_BEEFALOWOOL = "Beef up your pillow defenses.",
+        BODYPILLOW_KELP = "A soggy suit of pillow armor.",
+        BODYPILLOW_PETALS = "It offers minimal protection, but hopefully you'll still come out smelling like a rose.",
+        BODYPILLOW_STEELWOOL = "A wearable pillow that is as effective as it is unpleasant.",
+
+        YOTR_DECOR_1_ITEM = "This lovable light makes any cave cozier.",
+        YOTR_DECOR_2_ITEM = "A rabbit statue with a real fire in its belly!",
+
+        --
+        ARMORDREADSTONE = "Have no fear, the darkness will protect you.",
+        DREADSTONEHAT = "A sturdy helmet of blackest stone.",
+
+        TRANSMUTE_LOG = "Transmute Twigs into a Log.",
+        TRANSMUTE_TWIGS = "Transmute a Log into Twigs.",
+        TRANSMUTE_FLINT = "Transmute Rocks into Flint.",
+        TRANSMUTE_ROCKS = "Transmute Flint into Rocks.",
+
+        TRANSMUTE_BLUEGEM = "Transmute Red Gems into Blue Gems.",
+        TRANSMUTE_REDGEM = "Transmute Blue Gems into Red Gems.",
+        TRANSMUTE_PURPLEGEM = "Transmute Blue and Red Gems into Purple Gems.",
+        TRANSMUTE_ORANGEGEM = "Transmute Purple Gems into Orange Gems.",
+        TRANSMUTE_YELLOWGEM = "Transmute Orange Gems into Yellow Gems.",
+        TRANSMUTE_GREENGEM = "Transmute Yellow Gems into Green Gems.",
+        TRANSMUTE_OPALPRECIOUSGEM = "Transmute Many Gems into an Iridescent Gem.",
+
+        TRANSMUTE_MEAT = "Transmute Morsels into Meat.",
+        TRANSMUTE_SMALLMEAT = "Transmute Meat into Morsels.",
+        TRANSMUTE_GOLDNUGGET = "Transmute Nitre into Gold Nuggets.",
+        TRANSMUTE_NITRE = "Transmute Gold Nugget into a Nitre.",
+        TRANSMUTE_MARBLE = "Transmute Cut Stone into Marble.",
+        TRANSMUTE_CUTSTONE = "Transmute Marble into Cut Stone.",
+        TRANSMUTE_MOONROCKNUGGET = "Transmute Marble into Moon Rock.",
+
+        TRANSMUTE_POOP = "Transmute Rot into Manure.",
+        TRANSMUTE_BEARDHAIR = "Transmute Beefalo Wool into Beard Hair.",
+        TRANSMUTE_BEEFALOWOOL = "Transmute Beard Hair into Beefalo Wool.",
+        TRANSMUTE_BONESHARD = "Transmute a Hound's Tooth into Bone Shards.",
+        TRANSMUTE_HOUNDSTOOTH = "Transmute Bone Shards into a Hounds Tooth.",
+
+        TRANSMUTE_HORRORFUEL = "Transmute Dreadstone into Pure Horror.",
+        TRANSMUTE_DREADSTONE = "Transmute Pure Horror into Dreadstone.",
+        TRANSMUTE_NIGHTMAREFUEL = "Transmute Pure Horror into Nightmare Fuel.",
+
+        TRANSMUTE_PUREBRILLIANCE = "Transmute Infused Moon Shards into Pure Brilliance.",
+        TRANSMUTE_MOONGLASS_CHARGED = "Transmute Pure Brilliance into Infused Moon Shards.",        
+
+        -- Rifts 1
+		LUNAR_FORGE_KIT = "Forge otherworldly items.",
+
+		ARMOR_LUNARPLANT = "Surround yourself in formidable lunar leaves.",
+		LUNARPLANTHAT = "Luminescent protection for your precious cranium.",
+		BOMB_LUNARPLANT = "Use unstable lunar energy for explosive results.",
+		STAFF_LUNARPLANT = "Stay rooted to the spot and attack from afar.",
+		SWORD_LUNARPLANT = "A sword of lunar light.",
+		PICKAXE_LUNARPLANT = "Mine and demolish to your heart's content.",
+		SHOVEL_LUNARPLANT = "The groundbreaking results of cross-pollination between a shovel and a garden hoe.",
+
+        PUNCHINGBAG = "Test the strength of your weapons. And have fun!",
+        PUNCHINGBAG_LUNAR = "Test how well your weapons fare against lunar foes.",
+        PUNCHINGBAG_SHADOW = "Test how well your weapons fare against shadowy foes.",
     },    -- MAXWELL_TEST = {"Say pal, you don't look so good.", "You better find something to eat before night comes!"},
+
+    -- MAXWELL_TEST = {"Say pal, you don't look so good.", "You better find something to eat before night comes!"},
 
 	COOKINGRECIPECARD_DESC = 
 	{
@@ -4952,6 +5111,23 @@ STRINGS =
     RABBIT_PANICHOUSEFIRE = { "HOME!", "FIRE!", "BURNING!" },
     RABBIT_PANICHAUNT = { "SCARED!", "AAAH!!", "OHH!", "GHOST!" },
     RABBIT_PANICBOSS = { "RUN!", "AHHH!", "IT MAD", "EHHH!" },
+
+    COZY_RABBIT_PANICHIT = { "HIDE!", "FLEE!", "CRIME!", "SCATTER!"},
+    COZY_RABBIT_PLANTPILLOW = {"COZY","NEST","FRIENDS"},
+    COZY_RABBIT_CHEER = {"MOON!","SKY!","LIGHT!","CELEBRATE!","PARTY!","SLEEPOVER!"},
+    COZY_RABBIT_QUESTION_DANGER = {"SAFE?","DANGER?","GONE?"},
+    COZY_RABBIT_GREET = {"PLAY?","SNACK?","HUG?"},
+    COZY_RABBIT_SPIN = {"SPIN!"},
+    COZY_RABBIT_GETTOKEN = {"GAME!","SERVED!","MATCH!"},
+    COZY_RABBIT_REJECTTOKEN = {"BOOKED","HAVE","BUSY"},
+    COZY_RABBIT_NOARENA = {"ARENA?"},
+    COZY_RABBIT_SPINGAMESTART = {"PLAY!","SPIN!","CARROT!"},
+    COZY_RABBIT_YAY = {"YAY!","WOOP!"},
+    COZY_RABBIT_SPOILSPORT = {"SPOILSPORT"},
+    COZY_RABBIT_YUM = {"YUM!","YUMMY!"},
+    COZY_RABBIT_WINNER = {"EAT!","{winner}","{winner}"},
+    COZY_RABBIT_MOON = {"MOON!","SUBLIME!","GLOW!","EYE!"},
+    COZY_RABBIT_ARENANOTEMPTY = {"CRAMPED!","PACKED!"},
 
     --NOTE: Limit to 63 strings per table! (Using net_smallbyte for NPC chatter)
     STALKER_BATTLECRY = { "Huurgh...", "...(growl)...", "...gruuuugh...", "Hrrgh...", "...grraaugh...", "...(rumble)...", "...gruh..." },
@@ -5575,6 +5751,7 @@ STRINGS =
         ANCIENT = "Ancient",
         CELESTIAL = "Celestial",
 		MOON_ALTAR = "Celestial",
+		LUNARFORGING = "Brightsmithy",
         SHADOW = "Shadow",
         ENGINEERING = "Engineering",
 		ELIXIRBREWING = "Ectoherbology",
@@ -5957,7 +6134,26 @@ STRINGS =
 
     WAGSTAFF_NPC_CAPTURESTART = "Excellent! My little experiment was a resounding success!",
     WAGSTAFF_NPC_CAPTURESTOP = "Thank you for all your hard work.",
+    WAGSTAFF_NPC_CAPTURESTOP1 = "This will increase the power output exponentially!",
     WAGSTAFF_NPC_CAPTURESTOP2 = "Now if you'll excuse me, I have much to do.",
+    WAGSTAFF_NPC_CAPTURESTOP3 = "you and I are about to change the world",
+
+    WAGSTAFF_NPC_REQUEST = {"Incredible! It's just as I surmised!",
+                            "If I could just push its output a bit further...",
+                            "Oh yes, this could really be something, with one small addition...",
+                            "A small crystalline structure might just do the trick.",
+                            "Yes, I'm positive a shard of crystal would work...",
+                            "If it had the right translucency...",
+                            "And the correct shape...",
+                            "And lunar origin...",
+                            -- These next ones will be randomly chosen from here on.
+                            "Hmmm...",
+                            "If I could just locate one...",
+                            "A crystalline shard, with the correct properties..."},
+
+    WAGSTAFF_NPC_NOTTHAT = "Don't waste my time.",
+    WAGSTAFF_NPC_YES_THAT1 = "This is... yes, this will propel my experiments to the next level!",
+    WAGSTAFF_NPC_YES_THAT2 = "Quickly, hand it over.",
 
     WAGSTAFF_GOTTAGO1 = "Aha! This selenological anomaly can only mean one thing!",
     WAGSTAFF_GOTTAGO2 = "Now is my chance!",
@@ -5996,6 +6192,89 @@ STRINGS =
 
     MONKEY_SPEECH_PRE = {"Ooo","Eee","Oee"},
     MONKEY_SPEECH_PST = {"ki","k"},
+
+	--
+	DAYWALKER_IMPRISONED_FAR =
+	{
+		--in chains & player is on screen but not that close
+		--moaning/grunting/mumbling to self?
+		"UUGH...",
+		"...(growl)...",
+		"ME FOUND IT FIRST... ME!",
+		"...UUUGH...",
+	},
+	DAYWALKER_IMPRISONED_NEAR =
+	{
+		--in chains & player is nearby
+		--duplicate some of the lines from above, and add some asking player for help?
+		"FREE... ME...",
+		"...UUGH...",
+		"COME... CLOSER...",
+        "PLEASE...",
+	},
+	DAYWALKER_RE_IMPRISONED_NEAR =
+	{
+		--switches to this speech after being beaten and then respawning
+		"CAN'T KEEP... ME HERE... FOREVER...",
+		"ME FIND CRACK TO DARK PLACE... ME!",
+        "POWER SHOULD BE FOR ME!",
+		"COWARDS!",
+	},
+	DAYWALKER_IMPRISONED_STRUGGLE =
+	{
+		--in chains & randomized brief struggling animation
+		"ITCHY!",
+		"CAN'T MOVE!",
+	},
+    DAYWALKER_IMPRISONED_PILLAR_BREAKING =
+    {
+        --as players are pickaxing pillars
+        "YES!",
+        "KEEP GOING!",
+        "HURRY! HURRY!",
+    },
+	DAYWALKER_SHAKE_LEECHES =
+	{
+		--trying to shake off shadow leeches
+		"OFF OF ME!",
+        "GET OFF!!",
+		"RAAAAUUGGHH!",
+        "VERMIN!",
+	},
+	DAYWALKER_LEECH_BITE =
+	{
+		--leech jumped on and bit
+		"AHHH!",
+		"OW!!",
+	},
+	DAYWALKER_COLLIDE =
+	{
+		--collide with pillar when stumbling around trying to shake off leeches
+		"OWWWWW!",
+        "OOF!",
+	},
+	DAYWALKER_ATTACK =
+    {
+        --attacking player
+        "HEH HEH HEH...",
+        "FREE... FREE!!",
+        "GRAAAR!!",
+        "PESTS!",
+        "ME DESTROY YOU!",
+        "IS MINE! MINE!!",
+    },
+    DAYWALKER_POWERDOWN =
+    {
+        --after player's knocked all the pure horror out
+        "M-MY POWER...",
+        "THIS NOT OVER!",
+    },
+	DAYWALKER_TIRED =
+	{
+		--kneeling down tired, recovering health
+		"HUFF... HUFF...",
+        "BETTER... YES, MUCH BETTER.",
+	},
 }
 
 STRINGS.BUNNYMANNAMES =
@@ -6474,7 +6753,9 @@ STRINGS.UI =
         NEEDSHERMITCRABSHOP_L3 = "Find someone friendly enough to make this trade!",
         NEEDSHERMITCRABSHOP_L4 = "Find someone friendly enough to make this trade!",
         NEEDSCREATURESCANNING = "Scan living creatures to collect data!",
+        NEEDSSKILL = "Learn new skills.",
         NEEDSBOOKSTATION = "Build a bookcase to craft your books.",
+		NEEDSLUNARFORGING_TWO = "Use a Brightsmithy to forge a prototype!",
 
 		NEEDSYOTG = "Available during Year of the Gobbler!",
 		NEEDSYOTV = "Available during Year of the Varg!",
@@ -6482,6 +6763,7 @@ STRINGS.UI =
 		NEEDSYOTC = "Available during Year of the Carrat!",
 		NEEDSYOTB = "Available during Year of the Beefalo!",
 		NEEDSYOTCATCOON = "Available during Year of the Catcoon!",
+        NEEDSYOTR = "Available during Year of the Bunnyman!",
 		NEEDSHALLOWED_NIGHTS = "Available during Hallowed Nights!",
 		NEEDSWINTERS_FEAST = "Available during Winter's Feast!",
 
@@ -7000,7 +7282,7 @@ STRINGS.UI =
         CANT_LOAD_ROG = "Reign of Giants is not installed. Unable to load.",
 
 		MAINBANNER_ROT_BETA_TITLE = "Beta Build", --unused now.
-		MAINBANNER_BETA_TITLE = "A Little Drama\nBeta Build",
+		MAINBANNER_BETA_TITLE = "Taking Root\nBeta Build",
 
         CONSOLE_EDITION_TEXT = "Console Edition",
 
@@ -7034,6 +7316,11 @@ STRINGS.UI =
         VERSION_OUT_OF_DATE_PLAY = "Play Anyway",
         VERSION_OUT_OF_DATE_INSTRUCTIONS = "Instructions",
         VERSION_OUT_OF_DATE_CANCEL = "Cancel",
+
+        BAD_HASHES_TITLE = "Game Files Hash Mismatch",
+        BAD_HASHES_BODY = "Your game data files look corrupted. We recommend that you run your platform's file validation routines.",
+        BAD_HASHES_PLAY = "Play Anyway",
+        BAD_HASHES_INSTRUCTIONS = "Instructions",
 
         CONTROLLER_DETECTED_HEADER = "Controller Detected",
         CONTROLLER_DETECTED_BODY = "Do you want to play Don't Starve Together with a controller?\nYou won't be asked again, but you can revert your settings in the Controls screen of the Option menu if you change your mind.",
@@ -7073,6 +7360,7 @@ STRINGS.UI =
 		TOOLTIP_LOGOUT = "Log out so you can log back in again",
 
         ITEMCOLLECTION_DISABLE = "You must be logged in to view your Profile or Item Collection.",
+		STORE_DISABLE = "You must be logged in to use the Klei Store.",
 
         LOGIN = "Login",
 
@@ -7509,7 +7797,7 @@ STRINGS.UI =
 		ARMOUR = "Armour",
 		CLOTHING = "Clothing",
 		RESTORATION = "Healing",
-		MAGIC = "Shadow Magic",
+		MAGIC = "Magic",
 		DECOR = "Decorations",
 		STRUCTURES = "Structures",
 		CONTAINERS = "Storage Solutions",
@@ -7531,6 +7819,7 @@ STRINGS.UI =
         CARTOGRAPHY = "Cartography",
         SCULPTING = "Sculptures",
 		CELESTIAL = "Celestial",
+		LUNARFORGING = "Brightsmithy",
         HERMITCRABSHOP = "Bottle Exchange",
 
         SHADOW = "Codex Umbra",
@@ -7751,6 +8040,7 @@ STRINGS.UI =
         OFFLINE_MODE_TITLE = "Offline Mode",
         OFFLINE_MODE_BODY = "Your selection is not available in offline mode. Please log in and try again.",
         KLEI_ID_PREFIX = "Klei ID: ",
+		COMMANDWHEEL = "Command / Emote Wheel Movement:",
 
 		INTRO_MOVIE = "Intro Movie",
 		CREDITS = "Credits",
@@ -7807,6 +8097,7 @@ STRINGS.UI =
             DISPLAY = "Got multiple screens? We've got you covered, choose where the game window goes when playing the game. (Fullscreen only)",
             REFRESHRATE = "Customize how many times per second the game screen refreshes. (Fullscreen only)",
             SMALLTEXTURES = "Reduces texture quality for better performance. (Only recommended for min-spec computers)",
+			SMALLTEXTURES_CONSOLE = "Reduces texture quality for better performance.\n(Only recommended if you're having problems with your world)",
             NETBOOKMODE = "Reduces the game's update frequency. (Only recommended for min-spec computers)",
             TEXTURESTREAMING = "Reduces the memory overhead for textures. Enabling this should improve performance.",
             THREADEDRENDER = "Renders the game on a different core. Enabling this should improve performance.",
@@ -7825,7 +8116,8 @@ STRINGS.UI =
             AUTOMODS = "Keep up to date with the mods of all the servers you join.",
             ANIMATED_HEADS = "Animates the survivor's heads in the menus.",
             CONSOLEAUTOPAUSE = "Allows the server to auto-pause while the console screen is open.",
-            DEFAULTCLOUDSAVES = "Chooses whether new saves will be stored in the cloud or not by default."
+            DEFAULTCLOUDSAVES = "Chooses whether new saves will be stored in the cloud or not by default.",
+			COMMANDWHEEL = "Allows you to control your player movement and the Command / Emote Wheel independently.",
     },
 
     },
@@ -7943,7 +8235,7 @@ STRINGS.UI =
         TIP_ROTATE_CAMERA = "Press {rotateleft} & {rotateright} to rotate your view of the world.",
         TIP_SHOW_MAP = "Press {map} to take a quick glance at your map.",
 
-        TIP_ENDLESS_MODE = "When creating a new world, switch the Game Mode to Endless to allow you and your friends to revive themselves at the Florid Postern.",
+        TIP_ENDLESS_MODE = "When creating a new world, switch the Game Mode to Endless to allow you and your friends to revive at the Florid Postern.",
         TIP_DISABLE_TIPS = "Is your mind already bursting with secret knowledge? You can turn off Loading Tips anytime in the Options menu.",
         TIP_ROLLBACK = "Server hosts can roll back one day or regenerate the world by accessing the Server Commands menu in the Pause Screen.",
         TIP_DICEVOTE = "Access the Server Commands menu from the Pause Screen to start votes or roll a dice.",
@@ -8742,6 +9034,7 @@ STRINGS.UI =
         YEAR_OF_THE_CARRAT = "Year of the Carrat",
         YEAR_OF_THE_BEEFALO = "Year of the Beefalo",
 		YEAR_OF_THE_CATCOON = "Year of the Catcoon",
+        YEAR_OF_THE_BUNNYMAN = "Year of the Bunnyman",
 
         PREFABSWAPS = "Changing Resources",
         PREFABSWAPS_START = "Starting Resource Variety",
@@ -8794,6 +9087,8 @@ STRINGS.UI =
         HOUNDS = "Hound Attacks",
         WINTERHOUNDS = "Ice Hound Waves",
         SUMMERHOUNDS = "Fire Hound Waves",
+        RIFTS_FREQUENCY = "Wild Rift Frequency",
+        RIFTS_ENABLED = "Wild Rifts Enabled",
         HOUNDMOUND = "Hound Mounds",
         MERMS = "Merms",
         TENTACLES = "Tentacles",
@@ -8933,6 +9228,8 @@ STRINGS.UI =
         HEALTHPENALTY = "Max Health Penalty",
 		LESSDAMAGETAKEN = "Damage Taken",
         STAGEPLAYS = "Stage Plays",
+
+        DAYWALKER = "Nightmare Werepig",
 		-- End of world customization strings
     },
 
@@ -9379,6 +9676,7 @@ STRINGS.UI =
         APPLY = "Apply",
         CANCEL = "Cancel",
         BACK = "Back",
+
         DISCONNECT = "Disconnect",
         CLIENTQUITTITLE = "Leave Server",
         CLIENTQUITBODY = "Are you sure you want to leave this server?",
@@ -10563,6 +10861,8 @@ STRINGS.UI =
         FAILED_NOPERMISSIONS_TITLE = "Permissions Required",
         FAILED_NOPERMISSIONS_BODY = "Unfortunately you will need to login to continue viewing this panel, but you do not allow data collection which is required to login.\n\nData Collection settings can be modified in the Options menu.",
         FAILED_NOPERMISSIONS_NOCHOICE = "I understand",
+		
+        MYSTERYBOX_DISABLE = "You must be logged in to access the Treasury.",
     },
 
     BEARDSCREEN =
@@ -11962,6 +12262,8 @@ STRINGS.UI =
         NO = "Not Yet",
     },
 
+    OBJECTOWNERSHIP = "{owner}'s {object}",
+
     GENDERSTRINGS =
     {
         MALE =
@@ -12181,7 +12483,8 @@ STRINGS.UI =
             YOTP = "Year of the Pig King",
             YOTC = "Year of the Carrat",
             YOTB = "Year of the Beefalo",
-			YOT_CATCOON = "Year of the Catcoon",
+            YOT_CATCOON = "Year of the Catcoon",
+            YOTR = "Year of the Bunnyman",
         },
     },
 
@@ -12197,6 +12500,7 @@ STRINGS.UI =
         YEAR_OF_THE_CARRAT = "Year of the Carrat",
         YEAR_OF_THE_BEEFALO = "Year of the Beefalo",
 		YEAR_OF_THE_CATCOON = "Year of the Catcoon",
+        YEAR_OF_THE_BUNNYMAN = "Year of the Bunnyman",
     },
 
     SAVELOAD =
@@ -12336,7 +12640,7 @@ STRINGS.LUCY =
 
     on_ground =
     {
-        "Come back! Take we with you!",
+        "Come back! Take me with you!",
         "Where did you go?",
         "Take me with you!",
         "It's cold!",
@@ -13787,6 +14091,122 @@ STRINGS.SPELLS = {
 	--SHADOW_TOPHAT = "Imbue Top Hat",
 }
 
+STRINGS.SKILLTREE = {
+    INFOPANEL = "Outfit",
+    INFOPANEL_DESC = "Become a seasoned survivor!",
+    SKILLTREE = "Skillset",
+    SKILLPOINTS = "Insight",
+    SKILLPOINTS_TO_SPEND = "Insight Remaining",
+    KILLPOINTS_MAXED = "MAX Insight Reached",
+    NEW_SKILL_POINT = "Insight Gained!",
+    ACTIVATE = "Learn",
+    ACTIVATED = "SKILL MASTERED",
+    RESPEC = "Reset Insight",
+    PANELS = {
+        ALCHEMY = "ALCHEMY",
+        TORCH = "TORCH",
+        BEARD = "BEARD",
+        ALLEGIANCE = "AFFINITY",
+    },
+
+    ONLINE_DATA_USER_OFFLINE = "Login to use online skilltree data.",
+    ONLINE_DATA_DOWNLOAD_FAILED = "Online skilltree data failed to sync. Using offline data.",
+
+    LOCKED = "PATH LOCKED",
+    UNLOCKED = "PATH UNLOCKED",
+    UNKNOWN = "PATH UNKNOWN",
+    WILSON = {
+
+        WILSON_ALCHEMY_1_TITLE = "Transmutation",
+        WILSON_ALCHEMY_1_DESC = "Transform 3 Twigs into a Log.\nTransform a Log into 2 Twigs.",
+
+        WILSON_ALCHEMY_2_TITLE = "Transmute Gems I",
+        WILSON_ALCHEMY_2_DESC = "Transform 2 Red Gems into a Blue Gem.\nTransform 2 Blue Gems into a Red Gem.\nTransform a Blue and Red Gem into a Purple Gem.",
+
+        WILSON_ALCHEMY_5_TITLE = "Transmute Gems II",
+        WILSON_ALCHEMY_5_DESC = "Transform 3 Purple Gems into an Orange Gem.\nTransform 3 Orange Gems into a Yellow Gem.",
+
+        WILSON_ALCHEMY_6_TITLE = "Transmute Gems III",
+        WILSON_ALCHEMY_6_DESC = "Transform 3 Yellow Gems into a Green Gem.\nTransform 6 Gems of different colors into an Iridescent Gem.",
+
+        WILSON_ALCHEMY_3_TITLE = "Transmute Ore I",
+        WILSON_ALCHEMY_3_DESC = "Transform 3 Rocks into a Flint.\nTransform 2 Flint into Rocks.",
+
+        WILSON_ALCHEMY_7_TITLE = "Transmute Ore II",
+        WILSON_ALCHEMY_7_DESC = "Transform 3 Nitre into a Gold Nugget.\nTransform 2 Gold Nuggets into Nitre.",
+
+        WILSON_ALCHEMY_8_TITLE = "Transmute Ore III",
+        WILSON_ALCHEMY_8_DESC = "Transform 2 Cut Stone into Marble.\nTransform Marble into Cut Stone.\nTransform 2 Marble into Moon Rock.",
+
+        WILSON_ALCHEMY_4_TITLE = "Transmute Icky I",
+        WILSON_ALCHEMY_4_DESC = "Transform 3 Morsels into a Meat.\nTransform a Meat into 2 Morsels.",
+
+        WILSON_ALCHEMY_9_TITLE = "Transmute Icky II",
+        WILSON_ALCHEMY_9_DESC = "Transform 2 Beard Hair into Beefalo Wool.\n Transform 2 Beefalo Wool into Beard Hair.",
+
+        WILSON_ALCHEMY_10_TITLE = "Transmute Icky III",
+        WILSON_ALCHEMY_10_DESC = "Transform 6 Rot into Manure.\nTransform 2 Hound's Teeth into a Bone Shards.\nTransform 2 Bone Shards into a Hound's Tooth.",
+
+        WILSON_TORCH_1_TITLE = "Torch Longevity I",
+        WILSON_TORCH_1_DESC = "Torches last a little longer.",
+
+        WILSON_TORCH_2_TITLE = "Torch Longevity II",
+        WILSON_TORCH_2_DESC = "Torches last a fair amount longer.",
+
+        WILSON_TORCH_3_TITLE = "Torch Longevity III",
+        WILSON_TORCH_3_DESC = "Torches last a lot longer.",
+
+        WILSON_TORCH_4_TITLE = "Torch Range I",
+        WILSON_TORCH_4_DESC = "Torches are a little brighter.",
+
+        WILSON_TORCH_5_TITLE = "Torch Range II",
+        WILSON_TORCH_5_DESC = "Torches are a fair amount brighter.",
+
+        WILSON_TORCH_6_TITLE = "Torch Range III",
+        WILSON_TORCH_6_DESC = "Torches are a lot brighter.",
+
+        WILSON_TORCH_1_LOCK_DESC = "Learn 3 Torch Skills to unlock.",
+
+        WILSON_TORCH_7_TITLE = "Torch Toss",
+        WILSON_TORCH_7_DESC = "Uses a scientifically formulated trajectory to always land right side up.",
+
+        WILSON_BEARD_1_TITLE = "Beard Insulation I",
+        WILSON_BEARD_1_DESC = "Gain high insulation from your beard.",
+
+        WILSON_BEARD_2_TITLE = "Beard Insulation II",
+        WILSON_BEARD_2_DESC = "Gain higher insulation from your beard.",
+
+        WILSON_BEARD_3_TITLE = "Beard Insulation III",
+        WILSON_BEARD_3_DESC = "Gain highest insulation from your beard.",
+
+        WILSON_BEARD_4_TITLE = "Beard Growth I",
+        WILSON_BEARD_4_DESC = "Your magnificent beard grows a little faster.",
+
+        WILSON_BEARD_5_TITLE = "Beard Growth II",
+        WILSON_BEARD_5_DESC = "Your magnificent beard grows a fair amount faster.",
+
+        WILSON_BEARD_6_TITLE = "Beard Growth III",
+        WILSON_BEARD_6_DESC = "Your magnificent beard grows much faster.",
+
+        WILSON_BEARD_1_LOCK_DESC = "Learn 3 Beard Skills to unlock.",
+
+        WILSON_BEARD_7_TITLE = "Beard Hair Storage",
+        WILSON_BEARD_7_DESC = "Stash food in your beard.",
+
+        WILSON_ALLEGIANCE_LOCK_1_DESC = "Learn 12 Skills to unlock.",
+        WILSON_ALLEGIANCE_LOCK_2_DESC = "Find and defeat the Ancient Fuelweaver.",
+        WILSON_ALLEGIANCE_LOCK_3_DESC = "Find and defeat the Celestial Champion.",
+
+        WILSON_ALLEGIANCE_LOCK_4_DESC = "Have no lunar affinity.",
+        WILSON_ALLEGIANCE_LOCK_5_DESC = "Have no shadow affinity.",
+
+        WILSON_ALLEGIANCE_SHADOW_TITLE = "Shadow Courtier",
+        WILSON_ALLEGIANCE_SHADOW_DESC = "The Queen will reward your loyalty with the secrets of Shadow Transmutation.",
+        
+        WILSON_ALLEGIANCE_LUNAR_TITLE = "Lunar Innovator",
+        WILSON_ALLEGIANCE_LUNAR_DESC = "The Cryptic Founder will reward your curiosity with the secrets of Lunar Transmutation.",        
+    },
+}
 --Don't include this in pot generation as this file is already translated.
 if POT_GENERATION == false then
     require "strings_pretranslated"

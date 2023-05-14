@@ -17,7 +17,7 @@ local function PlaySound(inst, sound)
 end
 
 local function call_for_reinforcements(inst, target)
-	if not target:HasTag("plantkin") then
+	if target ~= nil and not target:HasTag("plantkin") then
 		local x, y, z = inst.Transform:GetWorldPosition()
 		local defenders = TheSim:FindEntities(x, y, z, TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST, {"farm_plant_defender"})
 		for _, defender in ipairs(defenders) do
@@ -771,6 +771,7 @@ local function MakePlant(plant_def)
 
         inst:AddTag("plantedsoil")
         inst:AddTag("farm_plant")
+        inst:AddTag("lunarplant_target")
 		inst:AddTag("plant")
 		if plant_def.plant_type_tag then
 			inst:AddTag(plant_def.plant_type_tag)
@@ -842,6 +843,10 @@ local function MakePlant(plant_def)
         inst.components.workable:SetWorkAction(ACTIONS.DIG)
         inst.components.workable:SetWorkLeft(1)
         inst.components.workable:SetOnFinishCallback(dig_up)
+
+	    inst:AddComponent("knownlocations")
+	    inst:AddComponent("herdmember")
+	    inst.components.herdmember:SetHerdPrefab("domesticplantherd")
 
 		if not plant_def.fireproof then
 			MakeSmallBurnable(inst)

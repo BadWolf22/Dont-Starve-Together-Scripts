@@ -15,6 +15,8 @@ RESOLUTION_X = 1280
 RESOLUTION_Y = 720
 
 PLAYER_REVEAL_RADIUS = 30.0 -- NOTES(JBK): Keep in sync with MiniMapRenderer.cpp!
+PLAYER_CAMERA_SEE_DISTANCE = 40.0 -- NOTES(JBK): Based off of an approximation of the maximum default camera distance before seeing clouds and is the screen diagonal.
+PLAYER_CAMERA_SEE_DISTANCE_SQ = PLAYER_CAMERA_SEE_DISTANCE * PLAYER_CAMERA_SEE_DISTANCE -- Helper.
 
 MAX_FE_SCALE = 3 --Default if you don't call SetMaxPropUpscale
 MAX_HUD_SCALE = 1.25
@@ -564,6 +566,7 @@ EQUIPSLOTS =
     HANDS = "hands",
     HEAD = "head",
     BODY = "body",
+    BEARD = "beard",
 }
 
 ITEMTAG =
@@ -750,9 +753,10 @@ SPECIAL_EVENTS =
     YOTC = "year_of_the_carrat",
     YOTB = "year_of_the_beefalo",
     YOT_CATCOON = "year_of_the_catcoon",
+    YOTR = "year_of_the_bunnyman",
 }
 WORLD_SPECIAL_EVENT = SPECIAL_EVENTS.NONE
---WORLD_SPECIAL_EVENT = IS_BETA and SPECIAL_EVENTS.NONE or SPECIAL_EVENTS.HALLOWED_NIGHTS
+--WORLD_SPECIAL_EVENT = IS_BETA and SPECIAL_EVENTS.NONE or SPECIAL_EVENTS.YOTR
 WORLD_EXTRA_EVENTS = {}
 
 FESTIVAL_EVENTS =
@@ -778,6 +782,7 @@ IS_YEAR_OF_THE_SPECIAL_EVENTS =
     [SPECIAL_EVENTS.YOTC] = true,
     [SPECIAL_EVENTS.YOTB] = true,
 	[SPECIAL_EVENTS.YOT_CATCOON] = true,
+    [SPECIAL_EVENTS.YOTR] = true,
 }
 
 
@@ -802,10 +807,8 @@ SPECIAL_EVENT_MUSIC =
     --winter's feast carol
     [SPECIAL_EVENTS.WINTERS_FEAST] =
     {
-  --      bank = "music_frontend_winters_feast.fsb",
-  --      sound = "dontstarve/music/music_FE_WF",
-        bank = "music_frontend.fsb",
-        sound = "dontstarve/music/music_FE_wolfgang",
+        bank = "music_frontend_winters_feast.fsb",
+        sound = "dontstarve/music/music_FE_WF",
     },
 
     --year of the gobbler
@@ -844,6 +847,13 @@ SPECIAL_EVENT_MUSIC =
     },
 
     [SPECIAL_EVENTS.YOT_CATCOON] =
+    {
+        bank = "music_frontend_yotg.fsb",
+        sound = "dontstarve/music/music_FE_yotg",
+    },
+
+    --year of the rabbit
+    [SPECIAL_EVENTS.YOTR] =
     {
         bank = "music_frontend_yotg.fsb",
         sound = "dontstarve/music/music_FE_yotg",
@@ -1037,7 +1047,9 @@ end
 FE_MUSIC =
     (FESTIVAL_EVENT_MUSIC[WORLD_FESTIVAL_EVENT] ~= nil and FESTIVAL_EVENT_MUSIC[WORLD_FESTIVAL_EVENT].sound) or
     (SPECIAL_EVENT_MUSIC[WORLD_SPECIAL_EVENT] ~= nil and SPECIAL_EVENT_MUSIC[WORLD_SPECIAL_EVENT].sound) or
-    "dontstarve/music/music_FE_maxwell"
+    "dontstarve/music/music_FE_lunarrift"
+    --dontstarve/music/music_FE_daywalker"
+    --"dontstarve/music/music_FE_maxwell"
     --"dontstarve/music/music_FE_charliestage"
     --"dontstarve/music/music_FE_wickerbottom"
     --"dontstarve/music/music_FE"
@@ -1096,6 +1108,8 @@ TECH =
     CARRATOFFERING_THREE = { CARRATOFFERING = 3 },
     BEEFOFFERING_THREE = { BEEFOFFERING = 3 },
     CATCOONOFFERING_THREE = { CATCOONOFFERING = 3 },
+    RABBITOFFERING_THREE = { RABBITOFFERING = 3 },
+
     MADSCIENCE_ONE = { MADSCIENCE = 1 },
 	CARNIVAL_PRIZESHOP_ONE = { CARNIVAL_PRIZESHOP = 1 },
 	CARNIVAL_HOSTSHOP_ONE = { CARNIVAL_HOSTSHOP = 1 },
@@ -1124,6 +1138,7 @@ TECH =
     YOTC = { SCIENCE = 10 }, -- ApplySpecialEvent() will change this from lost to 0
     YOTB = { SCIENCE = 10 }, -- ApplySpecialEvent() will change this from lost to 0
     YOT_CATCOON = { SCIENCE = 10 }, -- ApplySpecialEvent() will change this from lost to 0
+    YOTR = { SCIENCE = 10 }, -- ApplySpecialEvent() will change this from lost to 0
 
     LOST = { MAGIC = 10, SCIENCE = 10, ANCIENT = 10 },
 
@@ -1131,6 +1146,9 @@ TECH =
 
     ROBOTMODULECRAFT_ONE = { ROBOTMODULECRAFT = 1 },
     BOOKCRAFT_ONE = { BOOKCRAFT = 1 },
+
+	LUNARFORGING_ONE = { LUNARFORGING = 1 },
+	LUNARFORGING_TWO = { LUNARFORGING = 2 },
 }
 
 -- See cell_data.h
@@ -2427,6 +2445,13 @@ SKIN_TYPES_THAT_RECEIVE_CLOTHING =
 	"old_skin",
 	"powerup",
 	"NO_BASE",
+}
+
+POSTACTIVATEHANDSHAKE = { -- NOTES(JBK): These are expected to never go backwards and only increment.
+    NONE = 0, -- Initialization purposes.
+    CTS_LOADED = 1, -- Client is ready to receive server state.
+    STC_SENDINGSTATE = 2, -- Server is sending what it knows.
+    READY = 3, -- Client is in a good sync state. Must be the end.
 }
 
 STORM_TYPES =

@@ -496,7 +496,7 @@ local function green()
 end
 
 local function orange()
-    local inst = commonfn("orangeamulet", "repairshortaction")
+    local inst = commonfn("orangeamulet", "repairshortaction", nil, true)
 
     if not TheWorld.ismastersim then
         return inst
@@ -517,6 +517,7 @@ local function orange()
     inst:AddComponent("repairable")
     inst.components.repairable.repairmaterial = MATERIALS.NIGHTMARE
     inst.components.repairable.noannounce = true
+	inst.components.repairable.onrepaired = SERVER_PlayFuelSound
 
     MakeHauntableLaunch(inst)
 

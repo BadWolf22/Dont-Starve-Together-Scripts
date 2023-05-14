@@ -2,6 +2,7 @@ local upvalue = {}
 local easing = require("easing")
 local PlayerHud = require("screens/playerhud")
 local ex_fns = require "prefabs/player_common_extensions"
+local skilltreedefs = require "prefabs/skilltree_defs"
 
 local BEEFALO_COSTUMES = require("yotb_costumes")
 
@@ -419,7 +420,12 @@ local function OnGotNewItem(inst, data)
 end
 
 local function OnEquip(inst, data)
-    TheFocalPoint.SoundEmitter:PlaySound("dontstarve/wilson/equip_item")
+    if data.eslot == EQUIPSLOTS.BEARD then
+        inst.SoundEmitter:PlaySound("dontstarve/wilson/shave_LP", "equipbeard")
+        inst:DoTaskInTime(0.5,function() inst.SoundEmitter:KillSound("equipbeard") end)
+    else
+        TheFocalPoint.SoundEmitter:PlaySound("dontstarve/wilson/equip_item")
+    end
 end
 
 local function OnPickSomething(inst, data)
@@ -519,6 +525,10 @@ fns.OnStormLevelChanged = function(inst, data)
 	inst.components.sanity:EnableLunacy(in_moonstorm, "moon_storm")
 end
 
+fns.OnRiftMoonTile = function(inst, on_rift_moon)
+	inst.components.sanity:EnableLunacy(on_rift_moon, "rift_moon")
+end
+
 --------------------------------------------------------------------------
 --Equipment Breaking Events
 --------------------------------------------------------------------------
@@ -601,6 +611,7 @@ local function RegisterMasterEventListeners(inst)
     inst:ListenForEvent("learncookbookstats", ex_fns.OnLearnCookbookStats)
     inst:ListenForEvent("oneat", ex_fns.OnEat)
 
+    --Plantregistry events
     inst:ListenForEvent("learnplantstage", ex_fns.OnLearnPlantStage)
     inst:ListenForEvent("learnfertilizer", ex_fns.OnLearnFertilizer)
     inst:ListenForEvent("takeoversizedpicture", ex_fns.OnTakeOversizedPicture)
@@ -608,6 +619,7 @@ local function RegisterMasterEventListeners(inst)
 	-- Enlightenment events
 	inst:ListenForEvent("changearea", fns.OnChangeArea)
 	inst:ListenForEvent("stormlevel", fns.OnStormLevelChanged)
+	inst:ListenForEvent("on_RIFT_MOON_tile", fns.OnRiftMoonTile)
 	inst:WatchWorldState("isnight", fns.OnAlterNight)
 	inst:WatchWorldState("isalterawake", fns.OnAlterNight)
 
@@ -618,6 +630,9 @@ local function RegisterMasterEventListeners(inst)
     inst:ListenForEvent("onstage", ex_fns.OnOnStageEvent)
     inst:ListenForEvent("startstageacting", ex_fns.StartStageActing)
     inst:ListenForEvent("stopstageacting", ex_fns.StopStageActing)
+
+    -- Generic POPUPS
+    inst:ListenForEvent("ms_closepopups", ex_fns.OnClosePopups)
 end
 
 --------------------------------------------------------------------------
@@ -722,6 +737,7 @@ local function ActivatePlayer(inst)
 
     inst:PushEvent("playeractivated")
     TheWorld:PushEvent("playeractivated", inst)
+    inst:PostActivateHandshake(POSTACTIVATEHANDSHAKE.CTS_LOADED)
 
     TheCamera:LockDistance(false)
 
@@ -797,7 +813,7 @@ local function EnableMovementPrediction(inst, enable)
                 --This is unfortunate but it doesn't seem like you can send an rpc on the first
                 --frame when a character is spawned
                 inst:DoTaskInTime(0, function(inst)
-                    SendRPCToServer(RPC.MovementPredictionEnabled)
+                    SendRPCToServer(RPC.SetMovementPredictionEnabled, true)
                     end)
             end
         elseif inst.components.locomotor ~= nil then
@@ -814,7 +830,7 @@ local function EnableMovementPrediction(inst, enable)
             --This is unfortunate but it doesn't seem like you can send an rpc on the first
             --frame when a character is spawned
             inst:DoTaskInTime(0, function(inst)
-                SendRPCToServer(RPC.MovementPredictionDisabled)
+                SendRPCToServer(RPC.SetMovementPredictionEnabled, false)
                 end)
         end
     end
@@ -1329,6 +1345,7 @@ local function OnNewSpawn(inst, starting_item_skins)
     inst.OnNewSpawn = nil
     inst.starting_inventory = nil
     TheWorld:PushEvent("ms_newplayerspawned", inst)
+
 end
 
 --------------------------------------------------------------------------
@@ -1387,8 +1404,10 @@ fns.ShowPopUp = function(inst, popup, show, ...)
 end
 
 fns.ResetMinimapOffset = function(inst) -- NOTES(JBK): Please use this only when necessary.
-    if TheWorld.ismastersim and inst.userid then
-        SendRPCToClient(CLIENT_RPC.ResetMinimapOffset, inst.userid)
+    if TheWorld.ismastersim then
+        --Forces a netvar to be dirty regardless of value
+        inst.player_classified.minimapcenter:set_local(false)
+        inst.player_classified.minimapcenter:set(false)
     end
 end
 
@@ -1462,7 +1481,9 @@ local function ScreenFlash(inst, intensity)
             --Forces a netvar to be dirty regardless of value
             inst.player_classified.screenflash:set_local(intensity)
             inst.player_classified.screenflash:set(intensity)
-            TheWorld:PushEvent("screenflash", (intensity + 1) / 8)
+			if inst.HUD ~= nil then
+				TheWorld:PushEvent("screenflash", (intensity + 1) / 8)
+			end
         end
     end
 end
@@ -1565,7 +1586,7 @@ local function SaveForReroll(inst)
         builder = inst.components.builder ~= nil and inst.components.builder:OnSave() or nil,
         petleash = inst.components.petleash ~= nil and inst.components.petleash:OnSave() or nil,
         maps = inst.player_classified ~= nil and inst.player_classified.MapExplorer ~= nil and inst.player_classified.MapExplorer:RecordAllMaps() or nil,
-		seamlessplayerswapper = inst.components.seamlessplayerswapper ~= nil and inst.components.seamlessplayerswapper:OnSave() or nil,
+		seamlessplayerswapper = inst.components.seamlessplayerswapper ~= nil and inst.components.seamlessplayerswapper:SaveForReroll() or nil,
         curses = curses,
     }
     return next(data) ~= nil and data or nil
@@ -1605,6 +1626,14 @@ local function OnWintersFeastMusic(inst)
     end
 end
 
+local function OnLunarPortalMax(inst)
+    if ThePlayer ~= nil and  ThePlayer == inst then
+        ThePlayer:PushEvent("startflareoverlay")
+        inst:DoTaskInTime(2, function() inst.components.talker:Say(GetString(inst, "ANNOUNCE_LUNAR_RIFT_MAX")) end)
+    end
+end
+
+
 local function OnHermitMusic(inst)
     if ThePlayer ~= nil and  ThePlayer == inst then
         ThePlayer:PushEvent("playhermitmusic")
@@ -1637,6 +1666,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         Asset("ANIM", "anim/player_actions.zip"),
         Asset("ANIM", "anim/player_actions_axe.zip"),
         Asset("ANIM", "anim/player_actions_pickaxe.zip"),
+		Asset("ANIM", "anim/player_actions_pickaxe_recoil.zip"),
         Asset("ANIM", "anim/player_actions_shovel.zip"),
         Asset("ANIM", "anim/player_actions_blowdart.zip"),
         Asset("ANIM", "anim/player_actions_slingshot.zip"),
@@ -1664,7 +1694,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         Asset("ANIM", "anim/player_boat.zip"),
         Asset("ANIM", "anim/player_boat_plank.zip"),
         Asset("ANIM", "anim/player_oar.zip"),
-        Asset("ANIM", "anim/player_boat_hook.zip"),
+		--Asset("ANIM", "anim/player_boat_hook.zip"), --Unfinished, bad file. For unused "fishingnet". Overwrites other anim states due to poor naming.
         Asset("ANIM", "anim/player_boat_net.zip"),
         Asset("ANIM", "anim/player_boat_sink.zip"),
         Asset("ANIM", "anim/player_boat_jump.zip"),
@@ -1751,6 +1781,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         Asset("ANIM", "anim/player_mount_travel.zip"),
         Asset("ANIM", "anim/player_mount_actions.zip"),
         Asset("ANIM", "anim/player_mount_actions_item.zip"),
+		Asset("ANIM", "anim/player_mount_actions_boomerang.zip"),
         Asset("ANIM", "anim/player_mount_actions_reading.zip"),
         Asset("ANIM", "anim/player_mount_unique_actions.zip"),
         Asset("ANIM", "anim/player_mount_actions_useitem.zip"),
@@ -1783,9 +1814,12 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
 
         Asset("ANIM", "anim/player_acting.zip"),
 
+        Asset("ANIM", "anim/player_attack_pillows.zip"),
+
         Asset("INV_IMAGE", "skull_"..name),
 
         Asset("SCRIPT", "scripts/prefabs/player_common_extensions.lua"),
+        Asset("SCRIPT", "scripts/prefabs/skilltree_defs.lua"),
     }
 
     local prefabs =
@@ -1814,6 +1848,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
 		"washashore_puddle_fx",
 		"spawnprotectionbuff",
         "battreefx",
+		"impact",
 
         -- Player specific classified prefabs
         "player_classified",
@@ -2012,7 +2047,6 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         inst.AnimState:AddOverrideBuild("player_actions_farming")
         inst.AnimState:AddOverrideBuild("player_actions_cowbell")        
 
-
         inst.DynamicShadow:SetSize(1.3, .6)
 
         inst.MiniMapEntity:SetIcon(name..".png")
@@ -2040,7 +2074,6 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         inst:AddTag(UPGRADETYPES.WATERPLANT.."_upgradeuser")
         inst:AddTag(UPGRADETYPES.MAST.."_upgradeuser")
         inst:AddTag("usesvegetarianequipment")
-
 
 		SetInstanceFunctions(inst)
 
@@ -2083,6 +2116,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
 
         inst:AddComponent("cookbookupdater")
         inst:AddComponent("plantregistryupdater")
+        inst:AddComponent("skilltreeupdater")
 
         inst:AddComponent("walkableplatformplayer")
         inst:AddComponent("boatcannonuser")
@@ -2125,6 +2159,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         inst._winters_feast_music = net_event(inst.GUID, "localplayer._winters_feast_music")
         inst._hermit_music = net_event(inst.GUID, "localplayer._hermit_music")
         inst._underleafcanopy = net_bool(inst.GUID, "localplayer._underleafcanopy","underleafcanopydirty")
+        inst._lunarportalmax = net_event(inst.GUID, "localplayer._lunarportalmax")
 
         if IsSpecialEventActive(SPECIAL_EVENTS.YOTB) then
             inst.yotb_skins_sets = net_shortint(inst.GUID, "player.yotb_skins_sets")
@@ -2133,6 +2168,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
 
         if not TheNet:IsDedicated() then
             inst:ListenForEvent("localplayer._winters_feast_music", OnWintersFeastMusic)
+            inst:ListenForEvent("localplayer._lunarportalmax", OnLunarPortalMax)
             inst:ListenForEvent("localplayer._hermit_music", OnHermitMusic)
 
             inst:AddComponent("hudindicatable")
@@ -2147,15 +2183,20 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
 
         inst._piratemusicstate = net_bool(inst.GUID, "player.piratemusicstate", "piratemusicstatedirty")
         inst._piratemusicstate:set(false)
-
-
-
         inst:ListenForEvent("piratemusicstatedirty", OnPirateMusicStateDirty)
+
+
+        inst.PostActivateHandshake = ex_fns.PostActivateHandshake
+        inst.OnPostActivateHandshake_Client = ex_fns.OnPostActivateHandshake_Client
+        inst._PostActivateHandshakeState_Client = POSTACTIVATEHANDSHAKE.NONE
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
             return inst
         end
+
+        inst.OnPostActivateHandshake_Server = ex_fns.OnPostActivateHandshake_Server
+        inst._PostActivateHandshakeState_Server = POSTACTIVATEHANDSHAKE.NONE
 
         inst.persists = false --handled in a special way
 
@@ -2198,6 +2239,8 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
             inst:ListenForEvent("playerdied", ex_fns.OnPlayerDied)
         end
 
+		inst.components.areaaware:StartWatchingTile(WORLD_TILES.RIFT_MOON)
+
         inst:AddComponent("bloomer")
         inst:AddComponent("colouradder")
         inst:AddComponent("birdattractor")
@@ -2218,6 +2261,9 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         inst.components.combat.pvp_damagemod = TUNING.PVP_DAMAGE_MOD -- players shouldn't hurt other players very much
         inst.components.combat:SetAttackPeriod(TUNING.WILSON_ATTACK_PERIOD)
         inst.components.combat:SetRange(TUNING.DEFAULT_ATTACK_RANGE)
+
+		inst:AddComponent("damagetyperesist")
+		inst:AddComponent("damagetypebonus")
 
         local gamemode = TheNet:GetServerGameMode()
         if gamemode == "lavaarena" then
@@ -2363,6 +2409,8 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
 
         inst:AddComponent("stageactor")
 
+        inst:AddComponent("experiencecollector")
+
         inst:AddInherentAction(ACTIONS.PICK)
         inst:AddInherentAction(ACTIONS.SLEEPIN)
         inst:AddInherentAction(ACTIONS.CHANGEIN)
@@ -2435,23 +2483,15 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         inst:ListenForEvent("startfiredamage", OnStartFireDamage)
         inst:ListenForEvent("stopfiredamage", OnStopFireDamage)
         inst:ListenForEvent("burnt", OnBurntHands)
-        inst:ListenForEvent("onchangecanopyzone", OnChangeCanopyZone)    
+        inst:ListenForEvent("onchangecanopyzone", OnChangeCanopyZone)
 
         inst.EnableLoadingProtection = fns.EnableLoadingProtection
         inst.DisableLoadingProtection = fns.DisableLoadingProtection
 
---[[
-        inst:ListenForEvent("stormlevel", function(owner, data)
-            if data.stormtype == STORM_TYPES.MOONSTORM and data.level > 0 then
-                print("5")
-                TheWorld.components.moonstormlightningmanager.sparks_per_sec_mod = 0.1
-            else
-                print("1")
-                TheWorld.components.moonstormlightningmanager.sparks_per_sec_mod = 1.0
-            end
-        end)
-]]
+        inst:PushEvent("newskillpointupdated")
+
         TheWorld:PushEvent("ms_playerspawn", inst)
+
 
         return inst
     end

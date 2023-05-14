@@ -65,6 +65,7 @@ return{
 			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "If we play now, they won't find a place to hide.",
 			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "If we play more, Abigail will get tired.",
             MANNEQUIN_EQUIPSWAPFAILED = "No. That would be silly.",
+            PILLOWFIGHT_NO_HANDPILLOW = "I don't even have a pillow to fight with...",
 		},
 		OPEN_CRAFTING =
 		{
@@ -387,12 +388,12 @@ return{
 
 		CAST_SPELLBOOK =
 		{
---fallback to speech_wilson.lua			NO_TOPHAT = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 			NO_TOPHAT = "only_used_by_waxwell",
 		},
 
 		CASTAOE =
 		{
---fallback to speech_wilson.lua			NO_MAX_SANITY = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 			NO_MAX_SANITY = "only_used_by_waxwell",
 		},
     },
 
@@ -417,11 +418,11 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_NOWATERNEARBY = "only_used_by_waxwell_and_wicker",
 
 	--waxwell specific
---fallback to speech_wilson.lua		ANNOUNCE_SHADOWLEVEL_ITEM = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T1 = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T2 = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T3 = "only_used_by_waxwell",
---fallback to speech_wilson.lua		ANNOUNCE_EQUIP_SHADOWLEVEL_T4 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_SHADOWLEVEL_ITEM = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T1 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T2 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T3 = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 	ANNOUNCE_EQUIP_SHADOWLEVEL_T4 = "only_used_by_waxwell",
 
     --wolfgang specific
 --fallback to speech_wilson.lua     ANNOUNCE_NORMALTOMIGHTY = "only_used_by_wolfang",
@@ -744,6 +745,8 @@ return{
 --fallback to speech_wilson.lua         BOOK_TEMPERATURE = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_LIGHT = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_RAIN = "only_used_by_wurt",
+--fallback to speech_wilson.lua         BOOK_MOON = "only_used_by_wurt",
+--fallback to speech_wilson.lua         BOOK_BEES = "only_used_by_wurt",
 
 --fallback to speech_wilson.lua         BOOK_HORTICULTURE_UPGRADED = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_RESEARCH_STATION = "only_used_by_wurt",
@@ -880,6 +883,13 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_BOOK_MOON_DAYTIME = "only_used_by_waxwell_and_wicker",
 
     ANNOUNCE_OFF_SCRIPT = "Just one little mistake...",
+
+    ANNOUNCE_COZY_SLEEP = "Such a peaceful slumber... but now I must wake.",
+
+	--
+	ANNOUNCE_TOOL_TOOWEAK = "It's not strong enough... like me...",
+
+    ANNOUNCE_LUNAR_RIFT_MAX = "I can see a light...",
 
 	BATTLECRY =
 	{
@@ -1485,6 +1495,8 @@ return{
         TURF_MOSAIC_RED = "Some ground.",
         TURF_MOSAIC_BLUE = "Some ground.",
 
+        TURF_BEARD_RUG = "How silly.",
+
 		POWCAKE = "I would have to be desperate.",
         CAVE_ENTRANCE = "Someone is trying to keep the underground at bay.",
         CAVE_ENTRANCE_RUINS = "Someone is trying to keep the underground at bay.",
@@ -1788,6 +1800,7 @@ return{
         CHESSPIECE_BEEFALO = "Merely a cold, lifeless copy.",
 		CHESSPIECE_KITCOON = "Hubris, undoubtedly.",
 		CHESSPIECE_CATCOON = "A reminder of brighter days.",
+        CHESSPIECE_MANRABBIT = "A fleeting moment of joy, captured in stone.",
         CHESSPIECE_GUARDIANPHASE3 = "It won't be looking down on us anymore.",
         CHESSPIECE_EYEOFTERROR = "Its stony gaze will glare for eternity.",
         CHESSPIECE_TWINSOFTERROR = "I still remember watching the light leave their eyes.",
@@ -2883,6 +2896,34 @@ return{
         },
         BEEFALO_GROOMER_ITEM = "Sigh. Endless toil.",
 
+        YOTR_RABBITSHRINE =
+        {
+            GENERIC = "I should pay my respects.",
+            EMPTY = "Are you hungry, Mr. Rabbit?",
+            BURNT = "Poor Mr. Rabbit.",
+        },
+
+        NIGHTCAPHAT = "There are so few comforts to be found in this wretched place.",
+
+        YOTR_FOOD1 = "I think... I would like a bit of cake.",
+        YOTR_FOOD2 = "Now my lips have turned blue...",
+        YOTR_FOOD3 = "I'm sorry Abigail, I'd share if I could.",
+        YOTR_FOOD4 = "It's sticky.",
+
+        YOTR_TOKEN = "A duel to the death might help pass the time.",
+
+        COZY_BUNNYMAN = "Poor creatures, sleep is only a temporary escape.",
+
+        HANDPILLOW_BEEFALOWOOL = "This one is just right. Except for the smell.",
+        HANDPILLOW_KELP = "This one is too... kelpy.",
+        HANDPILLOW_PETALS = "This one is too soft.",
+        HANDPILLOW_STEELWOOL = "This one is too hard.",
+
+        BODYPILLOW_BEEFALOWOOL = "This one is just right. Except for the smell.",
+        BODYPILLOW_KELP = "This one is too... kelpy.",
+        BODYPILLOW_PETALS = "This one is too soft.",
+        BODYPILLOW_STEELWOOL = "This one is too hard.",
+
 		BISHOP_CHARGE_HIT = "Ouch...",
 		TRUNKVEST_SUMMER = "Skin to wear over your skin.",
 		TRUNKVEST_WINTER = "It may warm the body, but what of the spirit?",
@@ -2943,7 +2984,7 @@ return{
 		WAXWELLJOURNAL =
 		{
 			GENERIC = "Do you want me to read you a story, Abigail?",
---fallback to speech_wilson.lua			NEEDSFUEL = "only_used_by_waxwell",
+--fallback to speech_wilson.lua 			NEEDSFUEL = "only_used_by_waxwell",
 		},
 		WETGOOP = "A miserable mess, just like life.",
         WHIP = "It only provides the illusion of control.",
@@ -4577,7 +4618,7 @@ return{
         BOAT_ROTATOR_KIT = "I could build a rudder, I suppose...",
         BOAT_BUMPER_KELP = "It will only prolong the inevitable.",
         BOAT_BUMPER_KELP_KIT = "I suppose I should make myself useful.",
-        BOAT_BUMPER_SHELL = "It will only prolong the inevitable.",
+		BOAT_BUMPER_SHELL = "It will only prolong the inevitable.",
         BOAT_BUMPER_SHELL_KIT = "I suppose I should make myself useful.",
         BOAT_CANNON = {
             GENERIC = "It's empty inside...",
@@ -4692,6 +4733,68 @@ return{
 		-- Waxwell
 		MAGICIAN_CHEST = "You can't use a magic box for hide-and-seek, that's cheating.",
 		TOPHAT_MAGICIAN = "The darkness has changed it.",
+
+        -- Year of the Rabbit
+        YOTR_FIGHTRING_KIT = "It might be... f-fun?",
+        YOTR_FIGHTRING_BELL =
+        {
+            GENERIC = "The ring is silent and still, for now.",
+            PLAYING = "Can I... play next?",
+        },
+
+        YOTR_DECOR_1 = {
+            GENERAL = "The soft glow is... comforting.",
+            OUT = "What little comfort it gave is now gone.",
+        },
+        YOTR_DECOR_2 = {
+            GENERAL = "The soft glow is... comforting.",
+            OUT = "What little comfort it gave is now gone.",
+        },
+
+        HAREBALL = "What a horrid thing!",
+        YOTR_DECOR_1_ITEM = "I should find a place for it to belong.",
+        YOTR_DECOR_2_ITEM = "I should find a place for it to belong.",
+
+		--
+		DREADSTONE = "It is cold... and beautiful.",
+		HORRORFUEL = "There are always more horrors to come.",
+		DAYWALKER =
+		{
+			GENERIC = "Kindness only begets more pain...",
+			IMPRISONED = "What a pitiful creature.",
+		},
+		DAYWALKER_PILLAR =
+		{
+			GENERIC = "We are all tethered to this place in one way or another.",
+			EXPOSED = "It is too strong, and I am too weak.",
+		},
+		ARMORDREADSTONE = "Let the darkness surround me.",
+		DREADSTONEHAT = "What's the point?",
+
+        -- Rifts 1
+        LUNARRIFT_PORTAL = "A gaping wound in the sky.",
+        LUNARRIFT_CRYSTAL = "Beautiful and fragile.",
+
+        LUNARTHRALL_PLANT = "Others must suffer for it to survive.",
+        LUNARTHRALL_PLANT_VINE_END = "It's lashing out.",
+
+		LUNAR_GRAZER = "Will you grant me the eternal slumber I seek?",
+
+        PUREBRILLIANCE = "It hurts my eyes.",
+        LUNARPLANT_HUSK = "It can't hurt anyone anymore.",
+
+		LUNAR_FORGE = "Will I be able to create anything of use?",
+		LUNAR_FORGE_KIT = "I should try to put these scattered pieces together...",
+
+		ARMOR_LUNARPLANT = "Shining armor, but no knight to save us.",
+		LUNARPLANTHAT = "It lets me hide my face from the world.",
+		BOMB_LUNARPLANT = "An instrument of destruction.",
+		STAFF_LUNARPLANT = "It will help me make sure no one gets too close.",
+		SWORD_LUNARPLANT = "A shining beacon of pain.",
+		PICKAXE_LUNARPLANT = "It makes the endless toil a bit easier.",
+		SHOVEL_LUNARPLANT = "Some things should stay buried... but not today.",
+
+        PUNCHINGBAG = "Some are simply made to suffer.",
     },
 
     DESCRIBE_GENERIC = "Sigh... I don't know.",

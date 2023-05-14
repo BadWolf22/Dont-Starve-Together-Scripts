@@ -527,9 +527,13 @@ function MakeSmallHeavyObstaclePhysics(inst, rad, height)
 end
 
 function RemovePhysicsColliders(inst)
-    inst.Physics:ClearCollisionMask()
-    if inst.Physics:GetMass() > 0 then
-        inst.Physics:CollidesWith(COLLISION.GROUND)
+    local physics = inst.Physics
+    if not physics then
+        return
+    end
+    physics:ClearCollisionMask()
+    if physics:GetMass() > 0 then
+        physics:CollidesWith(COLLISION.GROUND)
     end
 end
 
@@ -1412,6 +1416,16 @@ function MakeDeployableFertilizer(inst)
     inst.components.deployable.ondeploy = fertilizer_ondeploy
     inst.components.deployable:SetUseGridPlacer(false)
     inst.components.deployable.keep_in_inventory_on_deploy = true
+end
+
+--------------------------------------------------------------------------
+local function OnStartRegrowth(inst, data)
+    -- NOTES(JBK): inst will most likely be not valid right after this.
+    TheWorld:PushEvent("beginregrowth", inst)
+end
+function AddToRegrowthManager(inst)
+    inst:ListenForEvent("onremove", OnStartRegrowth)
+    inst.OnStartRegrowth = OnStartRegrowth -- For any special cases that need to call this.
 end
 
 --------------------------------------------------------------------------

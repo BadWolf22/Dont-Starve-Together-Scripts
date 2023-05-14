@@ -75,6 +75,7 @@ return {
 			KITCOON_HIDEANDSEEK_NOT_ENOUGH_HIDING_SPOTS = "There aren't a lot of places around for them to hide.",
 			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "I think that's enough for one day.",
             MANNEQUIN_EQUIPSWAPFAILED = "I don't think he can wear this.",
+            PILLOWFIGHT_NO_HANDPILLOW = "I need a pillow to fight with!",
 		},
 		OPEN_CRAFTING =
 		{
@@ -754,6 +755,8 @@ return {
         BOOK_TEMPERATURE = "only_used_by_wurt",
         BOOK_LIGHT = "only_used_by_wurt",
         BOOK_RAIN = "only_used_by_wurt",
+        BOOK_MOON = "only_used_by_wurt",
+        BOOK_BEES = "only_used_by_wurt",
 
         BOOK_HORTICULTURE_UPGRADED = "only_used_by_wurt",
         BOOK_RESEARCH_STATION = "only_used_by_wurt",
@@ -886,6 +889,13 @@ return {
     ANNOUNCE_BOOK_MOON_DAYTIME = "only_used_by_waxwell_and_wicker",
 
     ANNOUNCE_OFF_SCRIPT = "I have a feeling that wasn't in the script.",
+
+    ANNOUNCE_COZY_SLEEP = "I feel so refreshed!",
+
+	--
+	ANNOUNCE_TOOL_TOOWEAK = "I need a stronger tool!",
+
+    ANNOUNCE_LUNAR_RIFT_MAX = "That flash! Was that moonlight?",
 
 	BATTLECRY =
 	{
@@ -1491,6 +1501,8 @@ return {
         TURF_MOSAIC_RED = "Yet another ground type.",
         TURF_MOSAIC_BLUE = "Yet another ground type.",
 
+        TURF_BEARD_RUG = "I made it from my beard!",
+
 		POWCAKE = "Science help us.",
         CAVE_ENTRANCE = "I wonder if that rock could be moved.",
         CAVE_ENTRANCE_RUINS = "It's probably hiding something.",
@@ -1794,6 +1806,7 @@ return {
         CHESSPIECE_BEEFALO = "This sculpture is pretty beefy.",
 		CHESSPIECE_KITCOON = "These ones are much easier to find.",
 		CHESSPIECE_CATCOON = "It would probably make a great scratching post.",
+        CHESSPIECE_MANRABBIT = "I want to hug it, but the stone chafes.",
         CHESSPIECE_GUARDIANPHASE3 = "I much prefer it this way.",
         CHESSPIECE_EYEOFTERROR = "It's giving me a stony stare.",
         CHESSPIECE_TWINSOFTERROR = "That was a terrible night of very uncomfortable eye contact.",
@@ -2888,6 +2901,34 @@ return {
             BURNT = "I styled my beefalo in the hottest fashions... and paid the price.",
         },
         BEEFALO_GROOMER_ITEM = "I'd better set this up somewhere.",
+
+        YOTR_RABBITSHRINE =
+        {
+            GENERIC = "What to make...",
+            EMPTY = "That rabbit looks hungry.",
+            BURNT = "Smells like veggie barbecue.",
+        },
+
+        NIGHTCAPHAT = "No more bedhead for this scientist!",
+
+        YOTR_FOOD1 = "It's made with carrots, so science says it must be healthy.",
+        YOTR_FOOD2 = "Blue is the most scientific flavor.",
+        YOTR_FOOD3 = "A jiggly treat.",
+        YOTR_FOOD4 = "Bunny-hop right into my mouth!",
+
+        YOTR_TOKEN = "I should be careful who I hand this out to.",
+
+        COZY_BUNNYMAN = "They look so cozy.",
+
+        HANDPILLOW_BEEFALOWOOL = "If only it didn't also smell like a beefalo.",
+        HANDPILLOW_KELP = "It's soggier than I would like.",
+        HANDPILLOW_PETALS = "At least it smells nicer than the beefalo pillow.",
+        HANDPILLOW_STEELWOOL = "Who would sleep on this?",
+
+        BODYPILLOW_BEEFALOWOOL = "If only it didn't also smell like a beefalo.",
+        BODYPILLOW_KELP = "It's soggier than I would like.",
+        BODYPILLOW_PETALS = "At least it smells nicer than the beefalo pillow.",
+        BODYPILLOW_STEELWOOL = "Who would sleep on this?",
 
 		BISHOP_CHARGE_HIT = "Ow!",
 		TRUNKVEST_SUMMER = "Wilderness casual.",
@@ -4583,7 +4624,7 @@ return {
         BOAT_ROTATOR_KIT = "I think I'll take it out for a spin.",
         BOAT_BUMPER_KELP = "It won't save the boat from everything, but it sure kelps.",
         BOAT_BUMPER_KELP_KIT = "A soon-to-be boat bumper.",
-        BOAT_BUMPER_SHELL = "It gives the boat a little shellf defence.",
+		BOAT_BUMPER_SHELL = "It gives the boat a little shellf defense.",
         BOAT_BUMPER_SHELL_KIT = "A soon-to-be boat bumper.",
         BOAT_CANNON = {
             GENERIC = "I should load it with something.",
@@ -4698,6 +4739,68 @@ return {
 		-- Waxwell
 		MAGICIAN_CHEST = "Why am I starting to feel a bit uneasy...?",
 		TOPHAT_MAGICIAN = "That hat just oozes style.",
+
+        -- Year of the Rabbit
+        YOTR_FIGHTRING_KIT = "It must be built, for science!",
+        YOTR_FIGHTRING_BELL =
+        {
+            GENERIC = "It's peaceful, for now.",
+            PLAYING = "I think we've all learned a lot here today.",
+        },
+
+        YOTR_DECOR_1 = {
+            GENERAL = "That rabbit can really light up a room.",
+            OUT = "That rabbit isn't lighting up anything.",
+        },
+        YOTR_DECOR_2 = {
+            GENERAL = "That rabbit can really light up a room.",
+            OUT = "That rabbit isn't lighting up anything.",
+        },
+
+        HAREBALL = "At this point... I've eaten worse things.",
+        YOTR_DECOR_1_ITEM = "I know just the place for it.",
+        YOTR_DECOR_2_ITEM = "I know just the place for it.",
+
+		--
+		DREADSTONE = "It seems to reflect shadows instead of light.",
+		HORRORFUEL = "It sends a terrible shiver down my spine.",
+		DAYWALKER =
+		{
+			GENERIC = "Freeing him might not have been my best idea.",
+			IMPRISONED = "I feel almost sorry for him.",
+		},
+		DAYWALKER_PILLAR =
+		{
+			GENERIC = "There's something glinting inside the marble.",
+			EXPOSED = "A pillar of impossibly hard stone.",
+		},
+		ARMORDREADSTONE = "Lightweight, sturdy, and snazzy!",
+		DREADSTONEHAT = "To keep my brilliant brain safe and sound.",
+
+        -- Rifts 1
+        LUNARRIFT_PORTAL = "All that science hiding inside... and I can't get to it!",
+        LUNARRIFT_CRYSTAL = "Crystallized illuminosity.",
+
+        LUNARTHRALL_PLANT = "It doesn't seem to care about personal space.",
+        LUNARTHRALL_PLANT_VINE_END = "It has a prickly disposition.",
+
+		LUNAR_GRAZER = "It must have come through that strange rift!",
+
+        PUREBRILLIANCE = "It's blinding me with science!",
+        LUNARPLANT_HUSK = "It's incredibly tough. I could use this!",
+
+		LUNAR_FORGE = "Just the place to make something very clever and scientific.",
+		LUNAR_FORGE_KIT = "A simple combination of elements!",
+
+		ARMOR_LUNARPLANT = "This armor doesn't leaf any room for improvement.",
+		LUNARPLANTHAT = "It makes me look even brighter than usual.",
+		BOMB_LUNARPLANT = "Botany and chemistry, working together.",
+		STAFF_LUNARPLANT = "Plant power!",
+		SWORD_LUNARPLANT = "It's hard not to make sound effects when I wave it around.",
+		PICKAXE_LUNARPLANT = "Smashing!",
+		SHOVEL_LUNARPLANT = "The dirt displacing possibilities are endless!",
+
+        PUNCHINGBAG = "It comes with a finely calibrated ouch-o-meter.",
     },
 
     DESCRIBE_GENERIC = "It's a... thing.",
