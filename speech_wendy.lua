@@ -37,6 +37,7 @@ return{
             NOTALLOWED = "It doesn't go there. I know the feeling.",
             EMPTY = "Nothing comes of nothing.",
             MISMATCH = "I can't do anything right.",
+            NOTREADY = "Perhaps when my life is in slightly less peril.",
         },
 		RUMMAGE =
 		{
@@ -206,7 +207,7 @@ return{
 			--MapSpotRevealer/messagebottle
 			MESSAGEBOTTLEMANAGER_NOT_FOUND = "The world is too dark... I can't see it clearly.",--Likely trying to read messagebottle treasure map in caves
 
-            STASH_MAP_NOT_FOUND = "There's nothing marked on this map... what a cruel joke.",-- Likely trying to read stash map  in world without stash
+            STASH_MAP_NOT_FOUND = "There's nothing marked on this map... what a cruel joke.",-- Likely trying to read stash map  in world without stash                  
         },
         WRAPBUNDLE =
         {
@@ -521,6 +522,10 @@ return{
 	ANNOUNCE_HUNT_BEAST_NEARBY = "I sense the beast's presence nearby.",
 	ANNOUNCE_HUNT_LOST_TRAIL = "This trail leads nowhere.",
 	ANNOUNCE_HUNT_LOST_TRAIL_SPRING = "No trail, just a bunch of muck.",
+    ANNOUNCE_HUNT_START_FORK = "This path reeks of danger and death. Shall we?",
+    ANNOUNCE_HUNT_SUCCESSFUL_FORK = "The creature hasn't seen me yet...",
+    ANNOUNCE_HUNT_WRONG_FORK = "Abigail? Was that you...?",
+    ANNOUNCE_HUNT_AVOID_FORK = "I suppose this trail would be safer. Sigh.",
 	ANNOUNCE_INV_FULL = "I can carry no more.",
 	ANNOUNCE_KNOCKEDOUT = "Yet, again I wake to life. Sigh.",
 	ANNOUNCE_LOWRESEARCH = "Pithy knowledge...",
@@ -890,6 +895,34 @@ return{
 	ANNOUNCE_TOOL_TOOWEAK = "It's not strong enough... like me...",
 
     ANNOUNCE_LUNAR_RIFT_MAX = "I can see a light...",
+    ANNOUNCE_SHADOW_RIFT_MAX = "That glow... does it lead to my doom?",
+
+    ANNOUNCE_SCRAPBOOK_FULL = "Nothing more will fit in my scrapbook.",
+
+    ANNOUNCE_CHAIR_ON_FIRE = "This is fine. Really.",
+
+    ANNOUNCE_COACH = 
+    {
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+    },
+    ANNOUNCE_WOLFGANG_WIMPY_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_MIGHTY_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_BEGIN_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_END_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_NOTEAM = 
+    {
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+    },
 
 	BATTLECRY =
 	{
@@ -1804,6 +1837,10 @@ return{
         CHESSPIECE_GUARDIANPHASE3 = "It won't be looking down on us anymore.",
         CHESSPIECE_EYEOFTERROR = "Its stony gaze will glare for eternity.",
         CHESSPIECE_TWINSOFTERROR = "I still remember watching the light leave their eyes.",
+        CHESSPIECE_DAYWALKER = "A reminder that kindness only leads to pain.",
+        CHESSPIECE_DEERCLOPS_MUTATED = "The beast came back even colder than before.",
+        CHESSPIECE_WARG_MUTATED = "Why was it able to come back? It's not fair...",
+        CHESSPIECE_BEARGER_MUTATED = "Its new lease on life was, well, short-lived.",
 
         CHESSJUNK1 = "Cold, dead artificial life.",
         CHESSJUNK2 = "Cold, dead artificial life.",
@@ -2180,6 +2217,7 @@ return{
 		KNIGHT = "A cold, soulless horse.",
 		KOALEFANT_SUMMER = "A beast of solitude.",
 		KOALEFANT_WINTER = "It stands against the cruel elements.",
+		KOALEFANT_CARCASS = "Somehow, it comforts me.",
 		KRAMPUS = "Hello, foul creature of the underworld.",
 		KRAMPUS_SACK = "It smells of goat.",
 		LEIF = "A lumbering beast.",
@@ -2955,6 +2993,8 @@ return{
 		WALL_WOOD_ITEM = "Bundled logs.",
 		WALL_MOONROCK = "The moon... she whispers promises of protection to me.",
 		WALL_MOONROCK_ITEM = "This gift from above should not go to waste.",
+		WALL_DREADSTONE = "Nothing will ever break through.",
+		WALL_DREADSTONE_ITEM = "As dark and impenetrable as my heart.",
 		FENCE = "Sort of like an emotional barrier. But wood.",
         FENCE_ITEM = "We could use it to build a fence.",
         FENCE_GATE = "Will it keep others in, or out?",
@@ -4421,6 +4461,10 @@ return{
         BIRD_MUTANT_SPITTER = "Something is terribly wrong with that bird.",
 
         WAGSTAFF_NPC = "He flickers and fades... perhaps he's a spirit?",
+
+        WAGSTAFF_NPC_MUTATIONS = "This apparition always has some sort of task he wants help with.",
+        WAGSTAFF_NPC_WAGPUNK = "Off to haunt someone else?",
+
         ALTERGUARDIAN_CONTAINED = "It's draining the life from that creature...",
 
         WAGSTAFF_TOOL_1 = "Oh, I wish I knew if this is the tool he asked for...",
@@ -4533,6 +4577,9 @@ return{
         DUMBBELL_GEM = "Who would choose to carry such a burden...",
         POTATOSACK = "Large enough to hold a corpse... or a few dozen potatoes.",
 
+        DUMBBELL_HEAT = "It may warm the body, but not the heart.",
+        DUMBBELL_REDGEM = "It inflicts burning pain.",
+        DUMBBELL_BLUEGEM = "It chills me to my core.",
 
         TERRARIUMCHEST =
 		{
@@ -4556,6 +4603,26 @@ return{
         SHIELDOFTERROR ="Nothing can truly shield you from the horrors of this cruel world.",
         TWINOFTERROR1 = "Don't worry... Abby and I will make sure you leave this world together.",
         TWINOFTERROR2 = "Don't worry... Abby and I will make sure you leave this world together.",
+
+		-- Cult of the Lamb
+		COTL_TRINKET = "I wonder whose head it toppled from.",
+		TURF_COTL_GOLD = "If I follow the yellow bricks, will they take me home?",
+		TURF_COTL_BRICK = "Cold stone beneath my feet.",
+		COTL_TABERNACLE_LEVEL1 =
+		{
+			LIT = "A gentle glow from a gentle creature.",
+			GENERIC = "The fire has grown cold.",
+		},
+		COTL_TABERNACLE_LEVEL2 =
+		{
+			LIT = "Somehow, its presence puts my mind at ease.",
+			GENERIC = "The fire has grown cold.",
+		},
+		COTL_TABERNACLE_LEVEL3 =
+		{
+			LIT = "Look how it glitters in the firelight, Abigail!",
+			GENERIC = "The fire has grown cold.",
+		},
 
         -- Year of the Catcoon
         CATTOY_MOUSE = "The wheel is come full circle.",
@@ -4786,6 +4853,7 @@ return{
 		LUNAR_FORGE = "Will I be able to create anything of use?",
 		LUNAR_FORGE_KIT = "I should try to put these scattered pieces together...",
 
+		LUNARPLANT_KIT = "You can't always fix what's broken. But sometimes you can.",
 		ARMOR_LUNARPLANT = "Shining armor, but no knight to save us.",
 		LUNARPLANTHAT = "It lets me hide my face from the world.",
 		BOMB_LUNARPLANT = "An instrument of destruction.",
@@ -4794,7 +4862,171 @@ return{
 		PICKAXE_LUNARPLANT = "It makes the endless toil a bit easier.",
 		SHOVEL_LUNARPLANT = "Some things should stay buried... but not today.",
 
+		BROKEN_FORGEDITEM = "A broken mockery of what it once was.",
+
         PUNCHINGBAG = "Some are simply made to suffer.",
+
+        -- Rifts 2
+        SHADOWRIFT_PORTAL = "Endless, swirling nothingness... how serene.",
+
+		SHADOW_FORGE = "What terrible things will I create?",
+		SHADOW_FORGE_KIT = "I suppose if I tried I could piece it together.",
+
+        FUSED_SHADELING = "It knows nothing but pain and hunger.",
+        FUSED_SHADELING_BOMB = "They lead such short, explosive lives.",
+
+		VOIDCLOTH = "Tattered remains.",
+		VOIDCLOTH_KIT = "You can't always fix what's broken. But sometimes you can.",
+		VOIDCLOTHHAT = "I can disappear into the darkness within.",
+		ARMOR_VOIDCLOTH = "This ragged cloak will either protect me, or be my shroud.",
+
+        VOIDCLOTH_UMBRELLA = "I will stay under its shadow.",
+        VOIDCLOTH_SCYTHE = "One swift motion, and the work is done.",
+
+		SHADOWTHRALL_HANDS = "Another nightmare to torment me.",
+		SHADOWTHRALL_HORNS = "Will the darkness consume me at last?",
+		SHADOWTHRALL_WINGS = "There is no face beneath that hood.",
+
+        CHARLIE_NPC = "Are you the true face of the darkness?",
+        CHARLIE_HAND = "Do I dare approach?",
+
+        NITRE_FORMATION = "It thrives while the rest of us burn.",
+        DREADSTONE_STACK = "Do I dare imagine what kind of darkness it grew from?",
+        
+        SCRAPBOOK_PAGE = "A lost and lonely page.",
+
+        LEIF_IDOL = "Let's play \"funeral pyre.\"",
+        WOODCARVEDHAT = "Today, a pine hat... perhaps tomorrow a pine box.",
+        WALKING_STICK = "What a funny little walking cane.",
+
+        IPECACSYRUP = "I'd like a poison that is less stinky, please.",
+        BOMB_LUNARPLANT_WORMWOOD = "It's far deadlier than before.", -- Unused
+        WORMWOOD_MUTANTPROXY_CARRAT =
+        {
+        	DEAD = "It is no more.",
+        	GENERIC = "I despise how it skitters...",
+        	HELD = "Freedom is not for you.",
+        	SLEEPING = "It is arrested by deepest sleep.",
+        },
+        WORMWOOD_MUTANTPROXY_LIGHTFLIER = "A small spot of light in the darkness... waiting to be snuffed out.",
+		WORMWOOD_MUTANTPROXY_FRUITDRAGON =
+		{
+			GENERIC = "It prefers to be alone.",
+			RIPE = "You simply look too delicious.",
+			SLEEPING = "It is arrested by deepest sleep.",
+		},
+
+        SUPPORT_PILLAR_SCAFFOLD = "What hides beneath that shroud?",
+        SUPPORT_PILLAR = "The cracks have started to show...",
+        SUPPORT_PILLAR_COMPLETE = "It promises protection, but for how long?",
+        SUPPORT_PILLAR_BROKEN = "Nothing good can last...",
+
+		SUPPORT_PILLAR_DREADSTONE_SCAFFOLD = "What hides beneath that shroud?",
+		SUPPORT_PILLAR_DREADSTONE = "The cracks have started to show...",
+		SUPPORT_PILLAR_DREADSTONE_COMPLETE = "Dreadful, yet comforting.",
+		SUPPORT_PILLAR_DREADSTONE_BROKEN = "Eventually, we all fall.",
+
+        WOLFGANG_WHISTLE = "Abigail, I saw you whispering at Wolfgang to make us do pushups!",
+
+        -- Rifts 3
+
+        MUTATEDDEERCLOPS = "Forced to continue its cursed existence... I pity it.",
+        MUTATEDWARG = "It only lives for malice.",
+        MUTATEDBEARGER = "Don't worry. Abby and I will put you out of your misery.",
+
+        LUNARFROG = "What horrors have you seen, little frog?",
+
+        DEERCLOPSCORPSE =
+        {
+            GENERIC  = "This body is nothing but an empty vessel.",
+            BURNING  = "Ashes to ashes.",
+            REVIVING = "You should stay down.",
+        },
+
+        WARGCORPSE =
+        {
+            GENERIC  = "All that remains is a corpse.",
+            BURNING  = "It is at peace now.",
+            REVIVING = "You would return to this life?",
+        },
+
+        BEARGERCORPSE =
+        {
+            GENERIC  = "Laid to rest.",
+            BURNING  = "Reduced to ashes, scattered on the wind.",
+            REVIVING = "Is this what you really want?",
+        },
+
+        BEARGERFUR_SACK = "I already carry the coldness within.",
+        HOUNDSTOOTH_BLOWPIPE = "Delivering sweet death from a distance.",
+        DEERCLOPSEYEBALL_SENTRYWARD =
+        {
+            GENERIC = "No colder than a world without Abigail.",    -- Enabled.
+            NOEYEBALL = "Hot. Cold. What does it matter?",  -- Disabled.
+        },
+        DEERCLOPSEYEBALL_SENTRYWARD_KIT = "I guess I could set this up and be helpful.",
+
+        SECURITY_PULSE_CAGE = "I feel the same way.",
+        SECURITY_PULSE_CAGE_FULL = "It must be nice.",
+
+		CARPENTRY_STATION =
+        {
+            GENERIC = "Perhaps I could make something nice.",
+            BURNT = "...Perhaps not.",
+        },
+
+        WOOD_TABLE = -- Shared between the round and square tables.
+        {
+            GENERIC = "Abigail's favorite hiding spot.",
+            HAS_ITEM = "Abigail's favorite hiding spot.",
+            BURNT = "Just as well.",
+        },
+
+        WOOD_CHAIR =
+        {
+            GENERIC = "Abigail?",
+            OCCUPIED = "You might be sitting on Abigail.",
+            BURNT = "Oh well.",
+        },
+
+        DECOR_CENTERPIECE = "The mortal obsession with material things.",
+        DECOR_LAMP = "Great.",
+        DECOR_FLOWERVASE =
+        {
+            GENERIC = "We pulled the flowers from their homes for our own amusement.",
+            EMPTY = "I feel the urge to stare into it.",
+            WILTED = "I think it's lovelier this way...",
+            FRESHLIGHT = "It's illuminating... for now.",
+            OLDLIGHT = "It, too, will die.",
+        },
+        DECOR_PICTUREFRAME =
+        {
+            GENERIC = "It will be worth more after the artist dies.",
+            UNDRAWN = "Leave it.",
+        },
+        DECOR_PORTRAITFRAME = "In the end, all we have are pictures.",
+
+        PHONOGRAPH = "Shall we have a danse macabre?",
+        RECORD = "I wondered if I'd ever hear that song again.",
+        RECORD_CREEPYFOREST = "Does this music lift your spirits, Abigail?",
+        RECORD_DANGER = "Does this music lift your spirits, Abigail?",
+        RECORD_DAWN = "Does this music lift your spirits, Abigail?",
+        RECORD_DRSTYLE = "Does this music lift your spirits, Abigail?",
+        RECORD_DUSK = "I wonder if father still listens to his record collection.",
+        RECORD_EFS = "A song of sweet foreboding.",
+        RECORD_END = "I wonder if father still listens to his record collection.",
+        RECORD_MAIN = "I wonder if father still listens to his record collection.",
+        RECORD_WORKTOBEDONE = "I wonder if father still listens to his record collection.",
+
+        ARCHIVE_ORCHESTRINA_MAIN = "Abigail was better at these things.",
+
+        WAGPUNKHAT = "How freeing it would be, to think like an emotionless machine.",
+        ARMORWAGPUNK = "Even the thickest metal couldn't protect my heart.",
+        WAGSTAFF_MACHINERY = "All the broken remains.",
+        WAGPUNK_BITS = "Only parts of a greater whole. Just like me.",
+        WAGPUNKBITS_KIT = "Some things are beyond repair.",
+
+        WAGSTAFF_MUTATIONS_NOTE = "Somebody's last words?",
     },
 
     DESCRIBE_GENERIC = "Sigh... I don't know.",

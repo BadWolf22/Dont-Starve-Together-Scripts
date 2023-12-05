@@ -168,7 +168,8 @@ local function onattack_blue(inst, attacker, target, skipsanity)
         target:PushEvent("attacked", { attacker = attacker, damage = 0, weapon = inst })
     end
 
-    if target.components.freezable ~= nil then
+	--V2C: valid check in case any of the previous callbacks or events removed the target
+	if target.components.freezable ~= nil and target:IsValid() then
         target.components.freezable:AddColdness(1)
         target.components.freezable:SpawnShatterFX()
     end
@@ -431,7 +432,7 @@ local function blinkstaff_reticuletargetfn()
     rotation = rotation * DEGREES
     for r = 13, 1, -1 do
         local numtries = 2 * PI * r
-        local offset = FindWalkableOffset(pos, rotation, r, numtries, false, true, NoHoles)
+        local offset = FindWalkableOffset(pos, rotation, r, numtries, false, true, NoHoles, false, true)
         if offset ~= nil then
             pos.x = pos.x + offset.x
             pos.y = 0
@@ -627,7 +628,15 @@ local function destroystructure(staff, target)
         target.components.stewer:Harvest()
     end
 
-   	target:PushEvent("ondeconstructstructure", caster)
+	if target.components.constructionsite ~= nil then
+		target.components.constructionsite:DropAllMaterials()
+	end
+
+    if target.components.inventoryitemholder ~= nil then
+		target.components.inventoryitemholder:TakeItem()
+	end
+
+    target:PushEvent("ondeconstructstructure", caster)
 
     if target.components.stackable ~= nil then
         --if it's stackable we only want to destroy one of them.
@@ -723,6 +732,7 @@ local function commonfn(colour, tags, hasskin, hasshadowlevel)
     inst.AnimState:SetBank("staffs")
     inst.AnimState:SetBuild("staffs")
     inst.AnimState:PlayAnimation(colour.."staff")
+    inst.scrapbook_anim = colour.."staff"
 
     if tags ~= nil then
         for i, v in ipairs(tags) do
@@ -800,6 +810,8 @@ local function red()
 
     inst.projectiledelay = FRAMES
 
+    inst.scrapbook_specialinfo = "REDSTAFF"
+
     if not TheWorld.ismastersim then
         return inst
     end
@@ -835,6 +847,8 @@ local function blue()
 
     inst.projectiledelay = FRAMES
 
+    inst.scrapbook_specialinfo = "BLUESTAFF"
+
     if not TheWorld.ismastersim then
         return inst
     end
@@ -858,6 +872,8 @@ end
 
 local function purple()
 	local inst = commonfn("purple", { "nopunch" }, true, true)
+
+    inst.scrapbook_specialinfo = "PURPLESTAFF"
 
     if not TheWorld.ismastersim then
         return inst
@@ -985,6 +1001,8 @@ local function opal()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.scrapbook_adddeps = {"moonbase"}
 
     inst.fxcolour = {64/255, 64/255, 208/255}
     inst.castsound = "dontstarve/common/staffteleport"

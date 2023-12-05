@@ -304,6 +304,9 @@ local function MakeSprout(name)
             return inst
         end
 
+        inst.scrapbook_specialinfo = "MUSHROOMSPROUT"
+        inst.scrapbook_anim = "sway2_loop"
+
         inst._level = 0
         inst._targetlevel = 0
 

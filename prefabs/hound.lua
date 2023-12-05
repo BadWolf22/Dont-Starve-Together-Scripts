@@ -2,17 +2,19 @@ local assets =
 {
     Asset("ANIM", "anim/hound_basic.zip"),
     Asset("ANIM", "anim/hound_basic_water.zip"),
-    Asset("ANIM", "anim/hound.zip"),
     Asset("ANIM", "anim/hound_ocean.zip"),
-    Asset("PKGREF", "anim/hound_red.zip"),
     Asset("ANIM", "anim/hound_red_ocean.zip"),
-    Asset("PKGREF", "anim/hound_ice.zip"),
     Asset("ANIM", "anim/hound_ice_ocean.zip"),
     Asset("ANIM", "anim/hound_mutated.zip"),
     Asset("ANIM", "anim/hound_hedge_ocean.zip"),
     Asset("ANIM", "anim/hound_hedge_action.zip"),
     Asset("ANIM", "anim/hound_hedge_action_water.zip"),
     Asset("SOUND", "sound/hound.fsb"),
+
+	--DEPRECATED builds!!!
+	Asset("PKGREF", "anim/hound.zip"), --NOTE: unfortunately houndcorpse still uses this
+	Asset("PKGREF", "anim/hound_red.zip"),
+	Asset("PKGREF", "anim/hound_ice.zip"),
 }
 
 local assets_clay =
@@ -302,15 +304,17 @@ end
 
 local function OnLoad(inst, data)
     --print("OnLoad", inst, data.ispet)
-    if data ~= nil and data.ispet then
-        inst:AddTag("pet_hound")
-        if inst.sg ~= nil then
-            inst.sg:GoToState("idle")
-        end
-    end
-    if data ~= nil and data.hedgeitem then
-        inst.hedgeitem = data.hedgeitem        
-    end
+	if data ~= nil then
+		if data.ispet then
+			inst:AddTag("pet_hound")
+			if inst.sg ~= nil then
+				inst.sg:GoToState("idle")
+			end
+		end
+		if data.hedgeitem then
+			inst.hedgeitem = data.hedgeitem
+		end
+	end
 end
 
 local function GetStatus(inst)
@@ -386,25 +390,52 @@ local function RestoreLeader(inst)
     end
 end
 
-local function OnStopFollowing(inst)
+local function OnStopFollowing(inst, data)
     inst.leader_offset = nil
+	local leader = inst.components.entitytracker:GetEntity("leader")
     if not inst.components.health:IsDead() then
-        local leader = inst.components.entitytracker:GetEntity("leader")
         if leader ~= nil and not leader.components.health:IsDead() then
             inst.leadertask = inst:DoTaskInTime(.2, RestoreLeader)
         end
+	else
+		--temp bridge until replaced by an actual hound_corpse.
+		--otherwise, there's a tiny window during the death anim for too many
+		--hounds to be summoned.
+		if leader == nil and data ~= nil and data.leader ~= nil and data.leader:IsValid() then
+			leader = data.leader
+		end
+		if leader.RememberFollowerCorpse ~= nil and inst:IsValid() then
+			leader:RememberFollowerCorpse(inst)
+		end
     end
 end
 
 local function CanMutateFromCorpse(inst)
-    if not TUNING.SPAWN_MUTATED_HOUNDS then return false end
-	if (inst.components.amphibiouscreature == nil or not inst.components.amphibiouscreature.in_water)
-		and math.random() <= TUNING.MUTATEDHOUND_SPAWN_CHANCE then
-
-		local x, y, z = inst.Transform:GetWorldPosition()
-		return TheWorld.Map:IsInLunacyArea(x, y, z)
+	if inst.components.amphibiouscreature ~= nil and inst.components.amphibiouscreature.in_water then
+		return false
+	elseif inst.forcemutate then
+		return true
+	elseif not TUNING.SPAWN_MUTATED_HOUNDS then
+		return false
+	elseif math.random() <= TUNING.MUTATEDHOUND_SPAWN_CHANCE then
+		return TheWorld.Map:IsInLunacyArea(inst.Transform:GetWorldPosition())
 	end
 	return false
+end
+
+local function OnChangedLeader(inst, new, old)
+	--ignore if new is nil, (always nil upon death)
+	if new ~= nil then
+		if new.prefab == "mutatedwarg" then
+			inst.forcemutate = true
+			inst.wargleader = new
+			inst.components.follower:KeepLeaderOnAttacked()
+		else
+			inst.forcemutate = nil
+			inst.wargleader = nil
+			inst.components.follower:LoseLeaderOnAttacked()
+		end
+	end
 end
 
 local function fncommon(bank, build, morphlist, custombrain, tag, data)
@@ -456,6 +487,9 @@ local function fncommon(bank, build, morphlist, custombrain, tag, data)
         return inst
     end
 
+    -- NOTE(DiogoW): Ignore original dependencies.
+    inst.scrapbook_deps = { }
+
 	inst._CanMutateFromCorpse = data.canmutatefn
 
 	inst.sounds = sounds
@@ -497,6 +531,8 @@ local function fncommon(bank, build, morphlist, custombrain, tag, data)
     inst:SetBrain(custombrain or brain)
 
     inst:AddComponent("follower")
+	inst.components.follower.OnChangedLeader = OnChangedLeader
+
     inst:AddComponent("entitytracker")
 
     inst:AddComponent("health")
@@ -511,6 +547,7 @@ local function fncommon(bank, build, morphlist, custombrain, tag, data)
     inst.components.combat:SetRetargetFunction(3, retargetfn)
     inst.components.combat:SetKeepTargetFunction(KeepTarget)
     inst.components.combat:SetHurtSound(inst.sounds.hurt)
+	inst.components.combat.lastwasattackedtime = -math.huge --for brain
 
     inst:AddComponent("lootdropper")
     inst.components.lootdropper:SetChanceLootTable('hound')
@@ -566,6 +603,8 @@ local function fndefault()
         return inst
     end
 
+    inst.scrapbook_deps = { "gargoyle_hounddeath" }
+
     MakeMediumFreezableCharacter(inst, "hound_body")
     MakeMediumBurnableCharacter(inst, "hound_body")
 
@@ -585,6 +624,8 @@ local function fnfire()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.scrapbook_deps = { "gargoyle_hounddeath" }
 
     MakeMediumFreezableCharacter(inst, "hound_body")
     inst.components.freezable:SetResistance(4) --because fire
@@ -624,6 +665,8 @@ local function fncold()
         return inst
     end
 
+    inst.scrapbook_deps = { "gargoyle_hounddeath" }
+
     MakeMediumBurnableCharacter(inst, "hound_body")
 
     inst.components.combat:SetDefaultDamage(TUNING.ICEHOUND_DAMAGE)
@@ -657,9 +700,9 @@ local function OnMoonTransformed(inst, data)
 end
 
 local function fnmoon()
-    local inst = fncommon("hound", "hound", nil, moonbrain, "moonbeast", false)
+	local inst = fncommon("hound", "hound_ocean", nil, moonbrain, "moonbeast", false)
 
-    inst:SetPrefabNameOverride("hound")    
+	inst:SetPrefabNameOverride("hound")
 
     if not TheWorld.ismastersim then
         return inst
@@ -719,9 +762,7 @@ local function fnclay()
 end
 
 local function fnmutated()
-    local inst = fncommon("hound", "hound_mutated", nil, nil, "hound_mutated", {amphibious = true})
-    
-    inst:AddTag("lunar_aligned")
+    local inst = fncommon("hound", "hound_mutated", nil, nil, "lunar_aligned", {amphibious = true})
 
     if not TheWorld.ismastersim then
         return inst

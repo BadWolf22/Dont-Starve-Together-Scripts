@@ -375,6 +375,7 @@ local function fn()
     inst.AnimState:SetBank("mast_01")
     inst.AnimState:SetBuild("boat_mast2_wip")
     inst.AnimState:PlayAnimation("closed")
+    inst.scrapbook_anim = "open_loop"
 
     inst.MiniMapEntity:SetIcon("mast.png")
 
@@ -383,6 +384,8 @@ local function fn()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.scrapbook_facing  = FACING_DOWN
 
     fn_pst(inst)
 
@@ -402,6 +405,7 @@ local function malbatrossfn()
     inst.AnimState:SetBank("mast_malbatross")
     inst.AnimState:SetBuild("boat_mast_malbatross_build")
     inst.AnimState:PlayAnimation("closed")
+    inst.scrapbook_anim = "open_loop"
 
     inst.MiniMapEntity:SetIcon("mast_malbatross.png")
 
@@ -410,6 +414,9 @@ local function malbatrossfn()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.scrapbook_specialinfo = "MASTMALBATROSS"
+    inst.scrapbook_facing  = FACING_DOWN
 
     fn_pst(inst)
 

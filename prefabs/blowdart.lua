@@ -57,6 +57,7 @@ local function common(anim, tags, removephysicscolliders)
     inst.AnimState:SetBank("blow_dart")
     inst.AnimState:SetBuild("blow_dart")
     inst.AnimState:PlayAnimation(anim)
+    inst.scrapbook_anim = anim
 
     inst:AddTag("blowdart")
     inst:AddTag("sharp")
@@ -178,22 +179,27 @@ local function fireattack(inst, attacker, target)
 	end
 
     target:PushEvent("attacked", {attacker = attacker, damage = 0})
-    if target.components.burnable then
-        target.components.burnable:Ignite(nil, attacker)
-    end
-    if target.components.freezable then
-        target.components.freezable:Unfreeze()
-    end
-    if target.components.health then
-        target.components.health:DoFireDamage(0, attacker)
-    end
-    if target.components.combat then
-        target.components.combat:SuggestTarget(attacker)
+    -- NOTES(JBK): Valid check in case the event removed the target.
+    if target:IsValid() then
+        if target.components.burnable then
+            target.components.burnable:Ignite(nil, attacker)
+        end
+        if target.components.freezable then
+            target.components.freezable:Unfreeze()
+        end
+        if target.components.health then
+            target.components.health:DoFireDamage(0, attacker)
+        end
+        if target.components.combat then
+            target.components.combat:SuggestTarget(attacker)
+        end
     end
 end
 
 local function fire()
     local inst = common("idle_red", { "firedart" })
+
+    inst.scrapbook_specialinfo = "REDSTAFF"
 
     if not TheWorld.ismastersim then
         return inst

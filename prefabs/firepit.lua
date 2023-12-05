@@ -39,7 +39,7 @@ local function ontakefuel(inst)
 end
 
 local function updatefuelrate(inst)
-    inst.components.fueled.rate = TheWorld.state.israining and 1 + TUNING.FIREPIT_RAIN_RATE * TheWorld.state.precipitationrate or 1
+	inst.components.fueled.rate = TheWorld.state.israining and inst.components.rainimmunity == nil and 1 + TUNING.FIREPIT_RAIN_RATE * TheWorld.state.precipitationrate or 1
 end
 
 local function onupdatefueled(inst)
@@ -194,7 +194,7 @@ local function fn()
     -----------------------
     inst:AddComponent("burnable")
     --inst.components.burnable:SetFXLevel(2)
-    inst.components.burnable:AddBurnFX("campfirefire", Vector3(0, 0, 0), "firefx", true)
+    inst.components.burnable:AddBurnFX("campfirefire", Vector3(0, 25, 0), "firefx", true, nil, true)
     inst:ListenForEvent("onextinguish", onextinguish)
 
     -------------------------

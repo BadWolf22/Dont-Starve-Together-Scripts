@@ -245,6 +245,7 @@ local function fn()
     inst.AnimState:SetBank("bernie")
     inst.AnimState:SetBuild("bernie_build")
     inst.AnimState:PlayAnimation("inactive")
+    inst.scrapbook_anim = "inactive"
 
     inst.MiniMapEntity:SetIcon("bernie.png")
 
@@ -255,6 +256,8 @@ local function fn()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.scrapbook_specialinfo = "BERNIE"
 
     inst._isdeadstate = nil
     inst._decaytask = nil

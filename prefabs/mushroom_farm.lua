@@ -6,6 +6,7 @@ local assets =
     Asset("ANIM", "anim/mushroom_farm_red_build.zip"),
     Asset("ANIM", "anim/mushroom_farm_green_build.zip"),
     Asset("ANIM", "anim/mushroom_farm_blue_build.zip"),
+    Asset("ANIM", "anim/mushroom_farm_moon_build.zip"),
 }
 
 local prefabs =
@@ -13,6 +14,7 @@ local prefabs =
     "red_cap",
     "green_cap",
     "blue_cap",
+    "moon_cap",
     "collapse_small",
     "spore_tall",
     "spore_medium",
@@ -44,13 +46,29 @@ end
 local function StartGrowing(inst, giver, product)
     if inst.components.harvestable ~= nil then
         local is_spore = product:HasTag("spore")
-        local max_produce = is_spore and levels[1].amount or levels[2].amount
-        local productname = is_spore and spore_to_cap[product.prefab] or product.prefab
+
+        local grower_skilltreeupdater = giver.components.skilltreeupdater
+        local planter_is_improved = (grower_skilltreeupdater and grower_skilltreeupdater:IsActivated("wormwood_mushroomplanter_upgrade"))
+
+        local max_produce = ((is_spore or planter_is_improved) and levels[1].amount) or levels[2].amount
+        local productname = (is_spore and spore_to_cap[product.prefab]) or product.prefab
+
+        local grow_time_percent = 1.0
+
+        if grower_skilltreeupdater ~= nil then
+            if grower_skilltreeupdater:IsActivated("wormwood_mushroomplanter_ratebonus2") then
+                grow_time_percent = TUNING.WORMWOOD_MUSHROOMPLANTER_RATEBONUS_2
+            elseif grower_skilltreeupdater:IsActivated("wormwood_mushroomplanter_ratebonus1") then
+                grow_time_percent = TUNING.WORMWOOD_MUSHROOMPLANTER_RATEBONUS_1
+            end
+        end
+
+        local grow_time = grow_time_percent * TUNING.MUSHROOMFARM_FULL_GROW_TIME
 
         DoMushroomOverrideSymbol(inst, productname)
 
         inst.components.harvestable:SetProduct(productname, max_produce)
-        inst.components.harvestable:SetGrowTime(TUNING.MUSHROOMFARM_FULL_GROW_TIME / max_produce)
+        inst.components.harvestable:SetGrowTime(grow_time / max_produce)
         inst.components.harvestable:Grow()
 
         TheWorld:PushEvent("itemplanted", { doer = giver, pos = inst:GetPosition() }) --this event is pushed in other places too
@@ -224,7 +242,7 @@ local function onextinguish(inst)
     updatelevel(inst)
 end
 
-local function accepttest(inst, item)
+local function accepttest(inst, item, giver)
     if item == nil then
         return false
     elseif inst.remainingharvests == 0 then
@@ -235,9 +253,15 @@ local function accepttest(inst, item)
     elseif not (item:HasTag("mushroom") or item:HasTag("spore")) then
         return false, "MUSHROOMFARM_NEEDSSHROOM"
     elseif item:HasTag("moonmushroom") then
-        return false, "MUSHROOMFARM_NOMOONALLOWED"
+        local grower_skilltreeupdater = giver.components.skilltreeupdater
+        if grower_skilltreeupdater and grower_skilltreeupdater:IsActivated("wormwood_moon_cap_eating") then
+            return true
+        else
+            return false, "MUSHROOMFARM_NOMOONALLOWED"
+        end
+    else
+        return true
     end
-    return true
 end
 
 local function onacceptitem(inst, giver, item)
@@ -323,6 +347,8 @@ local function fn()
     inst:AddTag("alltrader")
 
     MakeSnowCoveredPristine(inst)
+
+    inst.scrapbook_specialinfo = "MUSHROOMFARM"
 
     inst.entity:SetPristine()
 

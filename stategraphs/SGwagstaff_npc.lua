@@ -69,19 +69,23 @@ local states =
         name = "idle",
         tags = { "idle", "canrotate" },
 
-        onenter = function(inst)
+        onenter = function(inst, anim)
             if inst.components.locomotor ~= nil then
                 inst.components.locomotor:StopMoving()
             end
 
-            inst.AnimState:PlayAnimation("emote_impatient", true)
+            inst.AnimState:PlayAnimation(anim or "emote_impatient", true)
+
+            if anim then
+                inst.sg.statemem.anim = anim
+            end
         end,
 
         events =
         {
             EventHandler("animover", function(inst)
                 if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
+                    inst.sg:GoToState("idle", inst.sg.statemem.anim)
                 end
             end),
         },
@@ -241,6 +245,7 @@ local states =
 
         onenter = function(inst)
             inst.Physics:Stop()
+
             inst.AnimState:PlayAnimation("emote_impatient")
         end,
 
@@ -280,7 +285,12 @@ local states =
 
                 if TheWorld.components.riftspawner and not TheWorld.components.riftspawner:GetLunarRiftsEnabled() then
                     inst.sg.statemem.request = 1
-                    inst.components.trader:Enable()
+					if inst.components.trader ~= nil then
+						inst.components.trader:Enable()
+					end
+					if inst.components.constructionsite ~= nil then
+						inst.components.constructionsite:Enable()
+					end
                     inst.request_task = inst:DoPeriodicTask(10,inst.doplayerrequest)
                 end
             else
@@ -289,7 +299,12 @@ local states =
         end,
 
         onexit = function(inst)
-            inst.components.trader:Disable()
+			if inst.components.trader ~= nil then
+				inst.components.trader:Disable()
+			end
+			if inst.components.constructionsite ~= nil then
+				inst.components.constructionsite:Disable()
+			end
             if inst.request_task then
                 inst.request_task:Cancel()
                 inst.request_task = nil
@@ -350,7 +365,9 @@ local states =
         onenter = function(inst)
             inst.Physics:Stop()
 
-            inst.AnimState:PlayAnimation("emote_impatient", true)
+            if not inst.AnimState:IsCurrentAnimation("emote_impatient") then
+                inst.AnimState:PlayAnimation("emote_impatient", true)
+            end
 
             inst.sg:SetTimeout(0.3)
         end,
@@ -368,7 +385,9 @@ local states =
         onenter = function(inst)
             inst.Physics:Stop()
 
-            inst.AnimState:PlayAnimation("emote_impatient", true)
+            if not inst.AnimState:IsCurrentAnimation("emote_impatient") then
+                inst.AnimState:PlayAnimation("emote_impatient", true)
+            end
 
             inst.sg:SetTimeout(1.5)
         end,
@@ -387,12 +406,13 @@ local states =
         name = "capture_emote",
         tags = {"busy"},
 
-        onenter = function(inst)
+		onenter = function(inst, norelocate)
             inst.Physics:Stop()
             inst.AnimState:PlayAnimation("dial_loop")
             inst.AnimState:PushAnimation("research", true)
 
             inst.sg:SetTimeout(15)
+			inst.sg.statemem.norelocate = norelocate
         end,
 
         ontimeout = function(inst)
@@ -402,7 +422,106 @@ local states =
         timeline =
         {
             TimeEvent(1.0, function(inst)
-                inst:PushEvent("doerode", ERODEOUT_DATA)
+				if inst.sg.statemem.norelocate then
+					local data = shallowcopy(ERODEOUT_DATA)
+					data.norelocate = true
+					inst:PushEvent("doerode", data)
+				else
+					inst:PushEvent("doerode", ERODEOUT_DATA)
+				end
+            end),
+        },
+    },
+
+    State{
+        name = "analyzing_pre",
+        tags = { "busy" },
+
+        onenter = function(inst)
+            if inst.components.locomotor ~= nil then
+                inst.components.locomotor:StopMoving()
+            end
+
+            inst.AnimState:PlayAnimation("notes_pre")
+            inst.AnimState:PushAnimation("notes_loop", true)
+
+            inst.sg:SetTimeout(inst.TIME_TAKING_NOTES)
+        end,
+
+        ontimeout = function(inst)
+            inst.AnimState:PlayAnimation("notes_pst")
+            inst.AnimState:PushAnimation("idle_loop", true)
+        end,
+    },
+
+    State{
+        name = "analyzing",
+        tags = { "busy" },
+
+        onenter = function(inst)
+            inst.Physics:Stop()
+
+            inst.AnimState:PlayAnimation("idle_loop", true)
+        end,
+
+        events =
+        {
+            EventHandler("ontalk", function(inst)
+                inst.sg:GoToState("talk", "analyzing")
+            end),
+
+            EventHandler("donetalking", function(inst)
+                inst.sg:GoToState("analyzing_pst_buffer")
+            end),
+        },
+    },
+
+    State{
+        name = "analyzing_pst_buffer",
+        tags = { "busy" },
+
+        onenter = function(inst)
+            inst.Physics:Stop()
+
+            inst.AnimState:PlayAnimation("idle_loop", true)
+
+            inst.sg:SetTimeout(2.5)
+        end,
+
+        ontimeout = function(inst)
+            inst.components.talker:Say(STRINGS.WAGSTAFF_NPC_ANALYSIS_OVER[math.random(#STRINGS.WAGSTAFF_NPC_ANALYSIS_OVER)])
+            inst.sg:GoToState("talk", "analyzing_pst")
+        end,
+    },
+
+    State{
+        name = "analyzing_pst",
+        tags = { "busy" },
+
+        onenter = function(inst, norelocate)
+            if inst.components.locomotor ~= nil then
+                inst.components.locomotor:StopMoving()
+            end
+
+            inst.AnimState:PlayAnimation("idle_loop", true)
+
+            inst.sg:SetTimeout(10)
+        end,
+
+        ontimeout = function(inst)
+            inst:Remove()
+        end,
+
+        timeline =
+        {
+            TimeEvent(1.5, function(inst)
+                if inst:IsAsleep() then
+                    inst:Remove()
+                else
+                    local data = shallowcopy(ERODEOUT_DATA)
+                    data.norelocate = true
+                    inst:PushEvent("doerode", data)
+                end
             end),
         },
     },

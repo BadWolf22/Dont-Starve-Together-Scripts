@@ -48,6 +48,8 @@ local function fn()
     inst.entity:AddSoundEmitter()
     inst.entity:AddNetwork()
 
+    inst.pickupsound = "rock"
+
     MakeInventoryPhysics(inst)
 
     inst.AnimState:SetBank("fossil_piece")
@@ -61,6 +63,8 @@ local function fn()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.scrapbook_anim = "f1"
 
     SetFossilType(inst, math.random(NUM_FOSSIL_TYPES))
 

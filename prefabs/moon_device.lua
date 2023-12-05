@@ -27,6 +27,8 @@ local prefabs =
     "burntground",
 
     "moon_device_meteor_spawner",
+
+	"construction_container",
 }
 
 local meteor_spawner_prefabs =
@@ -425,6 +427,10 @@ local function MakeDeviceStage(name, client_postinit, master_postinit, construct
         inst:SetPrefabNameOverride("moon_device")
 
         MakeSnowCoveredPristine(inst)
+
+        inst.scrapbook_anim = "stage1_idle"
+        inst.scrapbook_specialinfo = "MOONDEVICE"
+        inst.scrapbook_proxy = "moon_device"
 
 		inst.entity:SetPristine()
 

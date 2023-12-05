@@ -57,6 +57,9 @@ local function fn()
         return inst
     end
 
+	inst.scrapbook_specialinfo = "HALLOWEENPOTIONMOON"
+	inst.scrapbook_anim = "idle_1"
+
 	inst:AddComponent("halloweenpotionmoon")
 	inst.components.halloweenpotionmoon:SetOnUseFn(onusefn)
 

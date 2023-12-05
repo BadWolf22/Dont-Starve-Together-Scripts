@@ -445,6 +445,40 @@ function Map:IsSurroundedByWater(x, y, z, radius)
     return true
 end
 
+function Map:IsSurroundedByLand(x, y, z, radius)
+    radius = radius + 1 --add 1 to radius for map overhang, way cheaper than doing an IsVisualGround test
+    local num_edge_points = math.ceil((radius*2) / 4) - 1
+
+    --test the corners first
+    if not self:IsLandTileAtPoint(x + radius, y, z + radius) then return false end
+    if not self:IsLandTileAtPoint(x - radius, y, z + radius) then return false end
+    if not self:IsLandTileAtPoint(x + radius, y, z - radius) then return false end
+    if not self:IsLandTileAtPoint(x - radius, y, z - radius) then return false end
+
+    --if the radius is less than 1(2 after the +1), it won't have any edges to test and we can end the testing here.
+    if num_edge_points == 0 then return true end
+
+    local dist = (radius*2) / (num_edge_points + 1)
+    --test the edges next
+    for i = 1, num_edge_points do
+        local idist = dist * i
+        if not self:IsLandTileAtPoint(x - radius + idist, y, z + radius) then return false end
+        if not self:IsLandTileAtPoint(x - radius + idist, y, z - radius) then return false end
+        if not self:IsLandTileAtPoint(x - radius, y, z - radius + idist) then return false end
+        if not self:IsLandTileAtPoint(x + radius, y, z - radius + idist) then return false end
+    end
+
+    --test interior points last
+    for i = 1, num_edge_points do
+        local idist = dist * i
+        for j = 1, num_edge_points do
+            local jdist = dist * j
+            if not self:IsLandTileAtPoint(x - radius + idist, y, z - radius + jdist) then return false end
+        end
+    end
+    return true
+end
+
 function Map:GetNearestPointOnWater(x, z, radius, iterations)
     local test_increment = radius / iterations
 
@@ -526,6 +560,11 @@ function Map:FindRandomPointOnLand(max_tries)
     return self:FindRandomPointWithFilter(max_tries, self.IsLandTileAtPoint)
 end
 
+function Map:GetTopologyIDAtPoint(x, y, z)
+	local node_index = self:GetNodeIdAtPoint(x, y, z)
+    return TheWorld.topology.ids[node_index], node_index
+end
+
 function Map:FindNodeAtPoint(x, y, z)
 	-- Note: If you care about the tile overlap then use FindVisualNodeAtPoint
 	local node_index = self:GetNodeIdAtPoint(x, y, z)
@@ -537,6 +576,22 @@ function Map:NodeAtPointHasTag(x, y, z, tag)
 	local node_index = self:GetNodeIdAtPoint(x, y, z)
 	local node = TheWorld.topology.nodes[node_index]
 	return node ~= nil and node.tags ~= nil and table.contains(node.tags, tag)
+end
+
+function Map:GetRandomPointClustersForNodePrefix(prefixes, countpernode)
+    local ret = {}
+
+    local topology = TheWorld.topology
+    for id, name in ipairs(topology.ids) do
+        for _, prefix in ipairs(prefixes) do
+            if name:sub(1, #prefix) == prefix then
+                local area =  topology.nodes[id]
+                table.insert(ret, {self:GetRandomPointsForSite(area.x, area.y, area.poly, countpernode)})
+            end
+        end
+    end
+
+    return ret
 end
 
 local function FindVisualNodeAtPoint_TestArea(map, pt_x, pt_z, on_land, r)
@@ -590,12 +645,25 @@ function Map:CanCastAtPoint(pt, alwayspassable, allowwater, deployradius)
 	return false
 end
 
-function Map:IsAboveGroundInSquare(x, y, z, r)
+function Map:IsTileLandNoDocks(tile)
+    return TileGroupManager:IsLandTile(tile) and tile ~= WORLD_TILES.MONKEY_DOCK
+end
+
+function Map:IsAboveGroundInSquare(x, y, z, r, filterfn)
     r = r or 1
     for dx = -r, r do
         for dz = -r, r do
-            if not self:IsAboveGroundAtPoint(x + dx * TILE_SCALE, y, z + dz * TILE_SCALE, false) then
-                return false
+            if filterfn then
+                -- New logic allows for tile based filtering.
+                local tile = self:GetTileAtPoint(x + dx * TILE_SCALE, y, z + dz * TILE_SCALE)
+                if not filterfn(self, tile) then
+                    return false
+                end
+            else
+                -- Old logic assumes point based filtering with no ocean tiles but allows docks.
+                if not self:IsAboveGroundAtPoint(x + dx * TILE_SCALE, y, z + dz * TILE_SCALE, false) then
+                    return false
+                end
             end
         end
     end
@@ -627,7 +695,14 @@ function Map:StartFindingGoodArenaPoints()
             if not self:CheckForBadThingsInArena(check_pt) then
                 GoodArenaPoints_Count = GoodArenaPoints_Count + 1
                 GoodArenaPoints[GoodArenaPoints_Count] = Vector3(check_pt:Get()) -- Copy.
-                --local a = SpawnPrefab("bluemooneye"):SetPosition(check_pt:Get())
+                --local id, index = self:GetTopologyIDAtPoint(check_pt:Get())
+                --local r = (
+                --    id:find("BigBatCave") or id:find("RockyLand") or id:find("SpillagmiteCaverns") or id:find("LichenLand") or
+                --    id:find("BlueForest") or id:find("RedForest") or id:find("GreenForest")
+                --) and true or false
+                --if r then
+                --    SpawnPrefab("bluemooneye").Transform:SetPosition(check_pt:Get())
+                --end
                 if GoodArenaPoints_Count >= GOODARENAPOINTS_CACHE_SIZE_MAX then
                     self:StopFindingGoodArenaPoints()
                 end
@@ -668,13 +743,13 @@ function Map:GetGoodArenaPoints()
 end
 
 
-local BADARENA_CANT_TAGS = {"tree", "boulder"}
+local BADARENA_CANT_TAGS = {"tree", "boulder", "spiderden", "okayforarena"}
 local BADARENA_ONEOF_TAGS = {"structure", "blocker", "plant", "antlion_sinkhole_blocker"}
 local IS_CLEAR_AREA_RADIUS = TILE_SCALE * GOOD_ARENA_SQUARE_SIZE
 local NO_PLAYER_RADIUS = 35
 function Map:CheckForBadThingsInArena(pt, badthingsatspawnpoints)
     local x, y, z = pt.x, pt.y, pt.z
-    if self:IsAboveGroundInSquare(x, y, z, GOOD_ARENA_SQUARE_SIZE) and not IsAnyPlayerInRange(x, y, z, NO_PLAYER_RADIUS) then
+    if self:IsAboveGroundInSquare(x, y, z, GOOD_ARENA_SQUARE_SIZE, self.IsTileLandNoDocks) and not IsAnyPlayerInRange(x, y, z, NO_PLAYER_RADIUS) then
         local badthings = TheSim:FindEntities(x, y, z, IS_CLEAR_AREA_RADIUS, nil, BADARENA_CANT_TAGS, BADARENA_ONEOF_TAGS)
         local badthingscount = #badthings
         for _, v in ipairs(badthings) do
@@ -721,7 +796,7 @@ function Map:FindBestSpawningPointForArena(CustomAllowTest, perfect_only, spawnp
             self:ClearGoodArenaPoints()
             self:StartFindingGoodArenaPoints()
         end
-        return x, y, z -- These are nil.
+        return nil, nil, nil
     end
 
     -- Try a best case if structures are okay to get.
@@ -739,7 +814,7 @@ function Map:FindBestSpawningPointForArena(CustomAllowTest, perfect_only, spawnp
     x, y, z = pt.x, pt.y, pt.z
 
     local function IsValidSpawningPoint_Bridge(pt)
-        return self:IsAboveGroundInSquare(pt.x, pt.y, pt.z, GOOD_ARENA_SQUARE_SIZE)
+        return self:IsAboveGroundInSquare(pt.x, pt.y, pt.z, GOOD_ARENA_SQUARE_SIZE, self.IsTileLandNoDocks)
     end
     
     for r = 5, 15, 5 do

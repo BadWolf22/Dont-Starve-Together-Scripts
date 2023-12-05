@@ -128,6 +128,10 @@ function Combat:RestartCooldown()
     self.laststartattacktime = GetTime()
 end
 
+function Combat:OverrideCooldown(cd)
+	self.laststartattacktime = GetTime() - self.min_attack_period + cd
+end
+
 function Combat:SetRange(attack, hit)
     self.attackrange = attack
     self.hitrange = (hit or self.attackrange)
@@ -538,6 +542,11 @@ function Combat:GetAttacked(attacker, damage, weapon, stimuli, spdamage)
     self.lastattacker = attacker
 
     if self.inst.components.health ~= nil and damage ~= nil and damageredirecttarget == nil then
+        if self.inst.components.attackdodger ~= nil and self.inst.components.attackdodger:CanDodge(attacker) then
+            self.inst.components.attackdodger:Dodge()
+            damage, spdamage = 0, nil
+        end
+
         if self.inst.components.inventory ~= nil then
 			if attacker ~= nil and attacker.components.planarentity ~= nil and not self.inst.components.inventory:EquipHasSpDefenseForType("planar") then
 				attacker.components.planarentity:OnPlanarAttackUndefended(self.inst)
@@ -645,21 +654,25 @@ function Combat:GetImpactSound(target, weapon)
     local weaponmod = weapon ~= nil and weapon:HasTag("sharp") and "sharp" or "dull"
     local tgtinv = target.components.inventory
     if tgtinv ~= nil and tgtinv:IsWearingArmor() then
-        return
-            hitsound..(
-                (tgtinv:ArmorHasTag("grass") and "straw_armour_") or
-                (tgtinv:ArmorHasTag("forcefield") and "forcefield_armour_") or
-                (tgtinv:ArmorHasTag("sanity") and "sanity_armour_") or
-                (tgtinv:ArmorHasTag("dreadstone") and "dreadstone_armour_") or
-                (tgtinv:ArmorHasTag("lunarplant") and "lunarplant_armour_") or
-                (tgtinv:ArmorHasTag("marble") and "marble_armour_") or
-                (tgtinv:ArmorHasTag("shell") and "shell_armour_") or
-                (tgtinv:ArmorHasTag("fur") and "fur_armour_") or
-                (tgtinv:ArmorHasTag("metal") and "metal_armour_") or
-                "wood_armour_"
-            )..weaponmod
-
-    elseif target:HasTag("wall") then
+		--Order by priority
+		local armormod =
+			(tgtinv:ArmorHasTag("forcefield") and "forcefield_armour_") or
+			(tgtinv:ArmorHasTag("sanity") and "sanity_armour_") or
+			(tgtinv:ArmorHasTag("lunarplant") and "lunarplant_armour_") or
+			(tgtinv:ArmorHasTag("dreadstone") and "dreadstone_armour_") or
+			(tgtinv:ArmorHasTag("metal") and "metal_armour_") or
+			(tgtinv:ArmorHasTag("marble") and "marble_armour_") or
+			(tgtinv:ArmorHasTag("shell") and "shell_armour_") or
+			(tgtinv:ArmorHasTag("wood") and "wood_armour_") or
+			(tgtinv:ArmorHasTag("grass") and "straw_armour_") or
+			(tgtinv:ArmorHasTag("fur") and "fur_armour_") or
+			(tgtinv:ArmorHasTag("cloth") and "shadowcloth_armour_") or
+			nil
+		if armormod ~= nil then
+			return hitsound..armormod..weaponmod
+		end
+	end
+	if target:HasTag("wall") then
         return
             hitsound..(
                 (target:HasTag("grass") and "straw_wall_") or
@@ -853,6 +866,9 @@ function Combat:CalcDamage(target, weapon, multiplier)
 		if self.inst.components.damagetypebonus ~= nil then
 			damagetypemult = self.inst.components.damagetypebonus:GetBonus(target)
 		end
+
+        --#DiogoW: entity's own SpDamage stacks with weapon's SpDamage
+        spdamage = SpDamageUtil.CollectSpDamage(self.inst, spdamage)
     else
         basedamage = self.defaultdamage
         playermultiplier = playermultiplier and self.playerdamagepercent or 1
@@ -904,7 +920,7 @@ function Combat:CalcDamage(target, weapon, multiplier)
 	if spdamage ~= nil then
 		local spmult =
 			damagetypemult *
-			playermultiplier *
+			--playermultiplier * --@V2C excluded to avoid tuning nightmare
 			pvpmultiplier
 
 		if spmult ~= 1 then
@@ -949,11 +965,16 @@ local function _CalcReflectedDamage(inst, attacker, dmg, weapon, stimuli, reflec
 end
 
 function Combat:CalcReflectedDamage(targ, dmg, weapon, stimuli, reflect_list, spdmg)
+    if self.ignoredamagereflect then
+        return 0, nil
+    end
+
 	if targ.components.rider ~= nil and targ.components.rider:IsRiding() then
 		local dmg1, spdmg1 = _CalcReflectedDamage(targ.components.rider:GetMount(), self.inst, dmg, weapon, stimuli, reflect_list, spdmg)
 		local dmg2, spdmg2 = _CalcReflectedDamage(targ.components.rider:GetSaddle(), self.inst, dmg, weapon, stimuli, reflect_list, spdmg)
 		return dmg1 + dmg2, SpDamageUtil.MergeSpDamage(spdmg1, spdmg2)
 	end
+
 	return _CalcReflectedDamage(targ, self.inst, dmg, weapon, stimuli, reflect_list, spdmg)
 end
 

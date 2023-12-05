@@ -595,7 +595,7 @@ local function chop_down_tree(inst, chopper)
 
     inst:DoTaskInTime(.4, chop_down_tree_shake)
 
-    inst.AnimState:PushAnimation(inst.anims.stump)
+    inst.AnimState:PushAnimation(inst.anims.stump, false)
 
     make_stump(inst)
 end
@@ -1259,6 +1259,11 @@ local function makefn(build, stage, data)
 
         inst:SetPrefabName(GetBuild(inst).prefab_name)
 
+        inst.scrapbook_specialinfo = "TREE"
+        inst.scrapbook_overridedata={"swap_leaves", "tree_leaf_green_build", "swap_leaves"}
+        inst.scrapbook_proxy = "deciduoustree_tall"
+        inst.scrapbook_speechname = inst.prefab
+
         MakeSnowCoveredPristine(inst)
 
         --Sneak these into pristine state for optimization
@@ -1375,8 +1380,6 @@ local function makefn(build, stage, data)
 					inst:DoTaskInTime(0, OnInitSeason)
 				end
             end
-
-
         end
 
         inst.OnEntitySleep = OnEntitySleep

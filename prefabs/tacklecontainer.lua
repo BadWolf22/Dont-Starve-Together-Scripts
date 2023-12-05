@@ -67,6 +67,7 @@ local function MakeTackleContainer(name, bank, build, assets)
         inst.AnimState:SetBank(bank)
         inst.AnimState:SetBuild(build)
         inst.AnimState:PlayAnimation("closed")
+        inst.scrapbook_anim = "closed"
 
 		MakeInventoryPhysics(inst)
 
@@ -74,6 +75,8 @@ local function MakeTackleContainer(name, bank, build, assets)
         MakeInventoryFloatable(inst, "med", nil, nil, nil, nil, swap_data)
 
         inst.entity:SetPristine()
+
+        inst:AddTag("portablestorage")
 
         if not TheWorld.ismastersim then
             return inst

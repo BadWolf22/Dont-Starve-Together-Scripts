@@ -285,8 +285,8 @@ ACTIONS =
     UNLOCK = Action(),
     USEKLAUSSACKKEY = Action(),
     TEACH = Action({ mount_valid=true }),
-    TURNON = Action({ priority=2 }),
-    TURNOFF = Action({ priority=2 }),
+    TURNON = Action({ priority=2, invalid_hold_action = true, }),
+    TURNOFF = Action({ priority=2, invalid_hold_action = true, }),
     SEW = Action({ mount_valid=true }),
     STEAL = Action(),
     USEITEM = Action({ priority=1, instant=true }),
@@ -349,7 +349,7 @@ ACTIONS =
     ABANDON = Action({ rmb=true }),
     PET = Action(),
     DISMANTLE = Action({ rmb=true }),
-    TACKLE = Action({ rmb=true, distance=math.huge }),
+    TACKLE = Action({ rmb=true, distance=math.huge, invalid_hold_action = true, }),
 	GIVE_TACKLESKETCH = Action(),
 	REMOVE_FROM_TROPHYSCALE = Action(),
 	CYCLE = Action({ rmb=true, priority=2 }),
@@ -487,6 +487,13 @@ ACTIONS =
 	USESPELLBOOK = Action({ instant = true, mount_valid = true }),
 	CLOSESPELLBOOK = Action({ instant = true, mount_valid = true }),
 	CAST_SPELLBOOK = Action({ mount_valid = true }),
+
+    -- WOODIE
+    USE_WEREFORM_SKILL = Action({ rmb=true, distance=math.huge }),
+
+    -- Rifts
+    SCYTHE = Action({ rmb=true, distance=1.8, rangecheckfn=DefaultRangeCheck, invalid_hold_action=true }),
+	SITON = Action({invalid_hold_action = true,}),
 }
 
 ACTIONS_BY_ACTION_CODE = {}
@@ -687,20 +694,27 @@ ACTIONS.REPAIR.strfn = function(act)
 end
 
 ACTIONS.REPAIR.fn = function(act)
-    if act.target ~= nil and act.target.components.repairable ~= nil then
-        local material
-        if act.doer ~= nil and
-            act.doer.components.inventory ~= nil and
-            act.doer.components.inventory:IsHeavyLifting() and
-            not (act.doer.components.rider ~= nil and
-                act.doer.components.rider:IsRiding()) then
-            material = act.doer.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY)
-        else
-            material = act.invobject
-        end
-        if material ~= nil and material.components.repairer ~= nil then
-            return act.target.components.repairable:Repair(act.doer, material)
-        end
+	if act.target ~= nil then
+		if act.target.components.repairable ~= nil then
+			local material
+			if act.doer ~= nil and
+				act.doer.components.inventory ~= nil and
+				act.doer.components.inventory:IsHeavyLifting() and
+				not (act.doer.components.rider ~= nil and
+				act.doer.components.rider:IsRiding()) then
+				material = act.doer.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY)
+			else
+				material = act.invobject
+			end
+			if material ~= nil and material.components.repairer ~= nil then
+				return act.target.components.repairable:Repair(act.doer, material)
+			end
+		elseif act.target.components.forgerepairable ~= nil then
+			local material = act.invobject
+			if material ~= nil and material.components.forgerepair ~= nil then
+				return act.target.components.forgerepairable:Repair(act.doer, material)
+			end
+		end
     end
 end
 
@@ -1164,14 +1178,14 @@ local function DoToolWork(act, workaction)
 
 		local numworks =
 			(	(	act.invobject ~= nil and
-				act.invobject.components.tool ~= nil and
-				act.invobject.components.tool:GetEffectiveness(workaction)
-			) or
-			(	act.doer ~= nil and
-				act.doer.components.worker ~= nil and
-				act.doer.components.worker:GetEffectiveness(workaction)
-			) or
-			1
+					act.invobject.components.tool ~= nil and
+					act.invobject.components.tool:GetEffectiveness(workaction)
+				) or
+				(	act.doer ~= nil and
+					act.doer.components.worker ~= nil and
+					act.doer.components.worker:GetEffectiveness(workaction)
+				) or
+				1
 			) *
 			(	act.doer.components.workmultiplier ~= nil and
 				act.doer.components.workmultiplier:GetMultiplier(workaction) or
@@ -1180,13 +1194,20 @@ local function DoToolWork(act, workaction)
 
 		local recoil
 		recoil, numworks = act.target.components.workable:ShouldRecoil(act.doer, act.invobject, numworks)
+
+		if act.doer.components.workmultiplier ~= nil then
+			numworks = act.doer.components.workmultiplier:ResolveSpecialWorkAmount(workaction, act.target, act.invobject, numworks, recoil)
+		end
+
 		if recoil and act.doer.sg ~= nil and act.doer.sg.statemem.recoilstate ~= nil then
 			act.doer.sg:GoToState(act.doer.sg.statemem.recoilstate, { target = act.target })
 			if numworks == 0 then
 				act.doer:PushEvent("tooltooweak", { workaction = workaction })
 			end
 		end
-		act.target.components.workable:WorkedBy(act.doer, numworks)
+		--V2C: Call the "internal" function directly since we've already accounted for recoil.
+		--     Chose the "internal" naming to discourage more places from calling it directly.
+		act.target.components.workable:WorkedBy_Internal(act.doer, numworks)
         return true
     end
     return false
@@ -1613,6 +1634,8 @@ ACTIONS.GIVE.stroverridefn = function(act)
 			return subfmt(STRINGS.ACTIONS.GIVE.APPLY, { item = act.invobject:GetBasicDisplayName() })
 		elseif act.target:HasTag("wintersfeasttable") then
 			return subfmt(STRINGS.ACTIONS.GIVE.PLACE_ITEM, { item = act.invobject:GetBasicDisplayName() })
+		elseif act.target:HasTag("inventoryitemholder_give") then
+			return subfmt(STRINGS.ACTIONS.GIVE.PLACE_ITEM, { item = act.invobject:GetBasicDisplayName() })
         elseif act.target.nameoverride ~= nil and act.invobject:HasTag("quagmire_stewer") then
             return subfmt(STRINGS.ACTIONS.GIVE[string.upper(act.target.nameoverride)], { item = act.invobject:GetBasicDisplayName() })
         elseif act.target:HasTag("quagmire_altar") then
@@ -1653,6 +1676,15 @@ ACTIONS.GIVE.fn = function(act)
             return true
         elseif act.target.components.moontrader ~= nil then
             return act.target.components.moontrader:AcceptOffering(act.doer, act.invobject)
+        elseif act.target.components.furnituredecortaker then
+            local able, reason = act.target.components.furnituredecortaker:AbleToAcceptDecor(act.invobject, act.doer)
+            if not able then
+                return false, reason
+            else
+                return act.target.components.furnituredecortaker:AcceptDecor(act.invobject, act.doer)
+            end
+        elseif act.target.components.inventoryitemholder ~= nil then
+            return act.target.components.inventoryitemholder:GiveItem(act.invobject, act.doer)
         elseif act.target.components.quagmire_cookwaretrader ~= nil then
             return act.target.components.quagmire_cookwaretrader:AcceptCookware(act.doer, act.invobject)
         elseif act.target.components.quagmire_altar ~= nil then
@@ -2082,6 +2114,17 @@ ACTIONS.SHAVE.fn = function(act)
     end
 end
 
+ACTIONS.PLAY.strfn = function(act)
+	if act.invobject ~= nil then
+		if act.invobject:HasTag("coach_whistle") then
+			if act.doer:HasTag("wolfgang_coach") and act.doer:HasTag("mightiness_normal") then
+				return act.doer:HasTag("coaching") and "COACH_OFF" or "COACH_ON"
+			end
+			return "TWEET"
+		end
+	end
+end
+
 ACTIONS.PLAY.fn = function(act)
     if act.invobject and act.invobject.components.instrument then
         return act.invobject.components.instrument:Play(act.doer)
@@ -2136,7 +2179,7 @@ ACTIONS.INVESTIGATE.fn = function(act)
 end
 
 ACTIONS.COMMENT.fn = function(act)
-    if act.doer.components.talker ~= nil and act.doer.comment_data then
+    if act.doer.components.talker and act.doer.comment_data then
         act.doer.components.talker:Say(act.doer.comment_data.speech)
         act.doer.comment_data = nil
     end
@@ -2353,13 +2396,21 @@ ACTIONS.USEKLAUSSACKKEY.fn = function(act)
 end
 
 ACTIONS.TEACH.strfn = function(act)
-	return act.invobject ~= nil and act.invobject.components.mapspotrevealer ~= nil and "READ" or nil
+    return
+        act.invobject ~= nil and (
+            (act.invobject:HasTag("scrapbook_note") and "NOTES") or
+            (act.invobject:HasTag("scrapbook_data") and "SCRAPBOOK") or
+            (act.invobject.components.mapspotrevealer ~= nil and "READ") or
+            nil
+        )
 end
 
 ACTIONS.TEACH.fn = function(act)
     if act.invobject ~= nil then
         local target = act.target or act.doer
-        if act.invobject.components.teacher ~= nil then
+        if act.invobject.components.scrapbookable ~= nil then
+            return act.invobject.components.scrapbookable:Teach(act.doer)
+        elseif act.invobject.components.teacher ~= nil then
             return act.invobject.components.teacher:Teach(target)
         elseif act.invobject.components.maprecorder ~= nil then
             local success, reason = act.invobject.components.maprecorder:TeachMap(target)
@@ -2407,7 +2458,7 @@ ACTIONS.USEITEM.fn = function(act)
 		--V2C: kinda hack since USEITEM is instant action, and the useableitem will
 		--     liklely force state change (bad!) instead.
 		act.doer.sg.statemem.is_going_to_action_state = true
-		local ret = act.invobject.components.useableitem:StartUsingItem()
+		local ret = act.invobject.components.useableitem:StartUsingItem(act.doer)
 		--And clear it now in case no state change happened
 		act.doer.sg.statemem.is_going_to_action_state = nil
 		return ret
@@ -2449,6 +2500,9 @@ ACTIONS.TAKEITEM.fn = function(act)
     if act.target ~= nil and act.target.components.shelf ~= nil and act.target.components.shelf.cantakeitem then
         act.target.components.shelf:TakeItem(act.doer)
         return true
+
+    elseif act.target.components.inventoryitemholder ~= nil then
+        return act.target.components.inventoryitemholder:TakeItem(act.doer)
     end
 end
 
@@ -2457,9 +2511,9 @@ ACTIONS.TAKEITEM.strfn = function(act)
 end
 
 ACTIONS.TAKEITEM.stroverridefn = function(act)
-	if act.target.prefab == "table_winters_feast" then
+	if act.target.prefab == "table_winters_feast" or act.target:HasTag("inventoryitemholder_take") then
 		return STRINGS.ACTIONS.TAKEITEM.GENERIC
-	end
+    end
 
     local item = act.target.takeitem ~= nil and act.target.takeitem:value() or nil
     return item ~= nil and subfmt(STRINGS.ACTIONS.TAKEITEM.ITEM, { item = item:GetBasicDisplayName() }) or nil
@@ -2532,7 +2586,7 @@ ACTIONS_MAP_REMAP[ACTIONS.BLINK.code] = function(act, targetpos)
     end
     local aimassisted = false
     local distoverride = nil
-    if not TheWorld.Map:IsVisualGroundAtPoint(targetpos.x, targetpos.y, targetpos.z) then
+    if not TheWorld.Map:IsAboveGroundAtPoint(targetpos.x, targetpos.y, targetpos.z) then
         -- NOTES(JBK): No map tile at the cursor but the area might contain a boat that has a maprevealer component around it.
         -- First find a globalmapicon near here and look for if it is from a fogrevealer and assume it is on landable terrain.
         local ents = TheSim:FindEntities(targetpos.x, targetpos.y, targetpos.z, PLAYER_REVEAL_RADIUS * 0.4, BLINK_MAP_MUST)
@@ -3150,7 +3204,16 @@ ACTIONS.CONSTRUCT.stroverridefn = function(act)
 end
 
 ACTIONS.CONSTRUCT.strfn = function(act)
-    return act.invobject ~= nil and act.target:HasTag("constructionsite") and "STORE" or nil
+    return act.invobject ~= nil
+        and (
+                (act.target:HasTag("offerconstructionsite") and "OFFER") or
+                (act.target:HasTag("constructionsite")      and "STORE")
+            )
+        or  (
+				(act.target:HasTag("offerconstructionsite") and "OFFER_TO") or
+				(act.target:HasTag("repairconstructionsite") and "REPAIR")
+            )
+        or nil
 end
 
 ACTIONS.CONSTRUCT.fn = function(act)
@@ -3166,11 +3229,6 @@ ACTIONS.CONSTRUCT.fn = function(act)
         --Silent fail for construction in the dark
         if not CanEntitySeeTarget(act.doer, target) then
             return true
-        end
-
-        -- DANY: open sound here.
-        if act.doer == ThePlayer then
-            act.doer.SoundEmitter:PlaySound("dontstarve/wilson/chest_open")
         end
 
         local item = act.invobject
@@ -3225,17 +3283,24 @@ ACTIONS.STOPCONSTRUCTION.stroverridefn = function(act)
     end
 end
 
+ACTIONS.STOPCONSTRUCTION.strfn = function(act)
+	return (act.target:HasTag("offerconstructionsite") and "OFFER")
+		or (act.target:HasTag("repairconstructionsite") and "REPAIR")
+		or nil
+end
+
 ACTIONS.STOPCONSTRUCTION.fn = function(act)
     if act.doer ~= nil and act.doer.components.constructionbuilder ~= nil then
         act.doer.components.constructionbuilder:StopConstruction()
-
-        -- DANY: close sound here.
-        if act.doer == ThePlayer then
-            act.doer.SoundEmitter:PlaySound("dontstarve/wilson/chest_close")
-        end
-
     end
     return true
+end
+
+ACTIONS.APPLYCONSTRUCTION.strfn = function(act)
+	print(act.target, act.target:HasTag("repairconstructionsite"))
+	return (act.target:HasTag("offerconstructionsite") and "OFFER")
+		or (act.target:HasTag("repairconstructionsite") and "REPAIR")
+		or nil
 end
 
 ACTIONS.APPLYCONSTRUCTION.fn = function(act)
@@ -3264,6 +3329,15 @@ ACTIONS.CASTAOE.fn = function(act)
     if act.invobject ~= nil and act.invobject.components.aoespell ~= nil and act.invobject.components.aoespell:CanCast(act.doer, act_pos) then
 		return act.invobject.components.aoespell:CastSpell(act.doer, act_pos)
     end
+end
+
+ACTIONS.SCYTHE.fn = function(act)
+    if act.invobject ~= nil and act.invobject.DoScythe then
+        act.invobject:DoScythe(act.target, act.doer)
+        return true
+    end
+
+    return false
 end
 
 ACTIONS.DISMANTLE.fn = function(act)
@@ -4563,4 +4637,21 @@ ACTIONS.CAST_SPELLBOOK.fn = function(act)
 		then
 		return act.invobject.components.spellbook:CastSpell(act.doer)
 	end
+end
+
+ACTIONS.SITON.fn = function(act)
+	if act.doer ~= nil and
+		act.doer.sg ~= nil and
+		act.doer.sg.currentstate.name == "start_sitting" then
+		if act.target ~= nil and
+			act.target.components.sittable ~= nil and
+			not act.target.components.sittable:IsOccupied() then
+			act.target.components.sittable:SetOccupier(act.doer)
+			return true
+		end
+	end
+end
+
+ACTIONS.USE_WEREFORM_SKILL.fn = function(act)
+    return act.doer ~= nil and act.doer:UseWereFormSkill(act)
 end

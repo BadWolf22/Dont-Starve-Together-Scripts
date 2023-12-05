@@ -631,6 +631,27 @@ function Inventory:ForEachItem(fn, ...)
     end
 end
 
+function Inventory:ForEachWetableItem(fn, ...)
+    -- Items that can get wet are inventory, equipment, and activeitem.
+    for k,v in pairs(self.itemslots) do
+        fn(v, ...)
+    end
+
+    for k,v in pairs(self.equipslots) do
+		fn(v, ...)
+    end
+
+    if self.activeitem then
+		fn(self.activeitem, ...)
+    end
+end
+
+function Inventory:ForEachEquipment(fn, ...)
+    for k,v in pairs(self.equipslots) do
+        fn(v, ...)
+    end
+end
+
 function Inventory:RemoveItemBySlot(slot)
     if slot and self.itemslots[slot] then
         local item = self.itemslots[slot]
@@ -1029,8 +1050,14 @@ function Inventory:Unequip(equipslot, slip)
             self.heavylifting = false
         end
     end
+
     self.equipslots[equipslot] = nil
     self.inst:PushEvent("unequip", {item=item, eslot=equipslot, slip=slip})
+
+    if self.inst:HasTag("player") and item ~= nil and item.components.setbonus ~= nil then
+        item.components.setbonus:UpdateSetBonus(self, false)
+    end
+
     return item
 end
 
@@ -1047,7 +1074,7 @@ function Inventory:SetActiveItem(item)
     end
 end
 
-function Inventory:Equip(item, old_to_active, no_animation)
+function Inventory:Equip(item, old_to_active, no_animation, force_ui_anim)
     if item == nil or item.components.equippable == nil or not item:IsValid() or item.components.equippable:IsRestricted(self.inst) or (self.noheavylifting and item:HasTag("heavy")) then
         return
     end
@@ -1083,7 +1110,7 @@ function Inventory:Equip(item, old_to_active, no_animation)
         if handitem ~= nil then
             if handitem.components.inventoryitem.cangoincontainer then
                 self.silentfull = true
-                self:GiveItem(handitem)
+				self:GiveItem(handitem, nil, force_ui_anim and self.inst:GetPosition() or nil)
                 self.silentfull = false
             else
                 self:DropItem(handitem, true, true)
@@ -1113,7 +1140,7 @@ function Inventory:Equip(item, old_to_active, no_animation)
                 self:GiveActiveItem(leftovers)
             else
                 self.silentfull = true
-                self:GiveItem(leftovers)
+				self:GiveItem(leftovers, nil, force_ui_anim and self.inst:GetPosition() or nil)
                 self.silentfull = false
             end
         end
@@ -1127,7 +1154,7 @@ function Inventory:Equip(item, old_to_active, no_animation)
                 self:GiveActiveItem(olditem)
             else
                 self.silentfull = true
-                self:GiveItem(olditem)
+				self:GiveItem(olditem, nil, force_ui_anim and self.inst:GetPosition() or nil)
                 self.silentfull = false
             end
         end
@@ -1147,6 +1174,11 @@ function Inventory:Equip(item, old_to_active, no_animation)
         if METRICS_ENABLED and item.prefab ~= nil then
             ProfileStatsAdd("equip_"..item.prefab)
         end
+
+        if self.inst:HasTag("player") and item.components.setbonus ~= nil then
+            item.components.setbonus:UpdateSetBonus(self, true)
+        end
+
         return true
     end
 end
@@ -1503,7 +1535,7 @@ function Inventory:DropEverythingWithTag(tag)
 
     if self.activeitem ~= nil then
         if self.activeitem:HasTag(tag) then
-            self:DropItem(self.activeitem)
+            self:DropItem(self.activeitem, true, true)
             self:SetActiveItem(nil)
         elseif self.activeitem.components.container ~= nil then
             table.insert(containers, self.activeitem)
@@ -1540,7 +1572,7 @@ function Inventory:DropEverything(ondeath, keepequip)
         ondeath = false
     end
     if self.activeitem ~= nil and not (ondeath and self.activeitem.components.inventoryitem.keepondeath) then
-        self:DropItem(self.activeitem)
+        self:DropItem(self.activeitem, true, true)
         self:SetActiveItem(nil)
     end
 

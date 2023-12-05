@@ -11,13 +11,17 @@ local BloodOver = require "widgets/bloodover"
 local BeefBloodOver = require "widgets/beefbloodover"
 local HeatOver = require "widgets/heatover"
 local FumeOver = require "widgets/fumeover"
+local MiasmaOver = require("widgets/miasmaover")
+local MiasmaCloudsOver = require("widgets/miasmacloudsover")
 local SandOver = require "widgets/sandover"
 local SandDustOver = require "widgets/sanddustover"
 local MoonstormOver = require "widgets/moonstormover"
 local MoonstormOver_Lightning = require "widgets/moonstormover_lightning"
+local RainDomeOver = require("widgets/raindomeover")
 local Leafcanopy = require "widgets/leafcanopy"
 local MindControlOver = require "widgets/mindcontrolover"
 local InkOver = require "widgets/inkover"
+local WagpunkUI = require "widgets/wagpunkui"
 local GogglesOver = require "widgets/gogglesover"
 local NutrientsOver = require "widgets/nutrientsover"
 local BatOver = require "widgets/batover"
@@ -33,6 +37,7 @@ local InputDialogScreen = require "screens/inputdialog"
 local CookbookPopupScreen = require "screens/cookbookpopupscreen"
 local PlantRegistryPopupScreen = require "screens/plantregistrypopupscreen"
 local PlayerInfoPopupScreen = require "screens/playerinfopopupscreen"
+local ScrapbookScreen = require "screens/redux/scrapbookscreen"
 
 local TargetIndicator = require "widgets/targetindicator"
 
@@ -119,17 +124,23 @@ function PlayerHud:CreateOverlays(owner)
     self.drops_alpha= 0
 
     self.inst:ListenForEvent("moisturedelta", function(inst, data)
-            if data.new > data.old then
+			if owner.components.raindomewatcher ~= nil and owner.components.raindomewatcher:IsUnderRainDome() then
+				self.dropsplash = nil
+				if self.droptask ~= nil then
+					self.droptask:Cancel()
+					self.droptask = nil
+				end
+			elseif data.new > data.old then
                 self.dropsplash = true
                 if self.droptask then
                     self.droptask:Cancel()
-                    self.droptask = nil
                 end
                 self.droptask = self.inst:DoSimTaskInTime(3,function() self.dropsplash = nil end)
             end
         end, owner)
 
     self.leafcanopy = self.overlayroot:AddChild(Leafcanopy(owner))
+    self.raindomeover = self.overlayroot:AddChild(RainDomeOver(owner))
 
     self.storm_root = self.over_root:AddChild(Widget("storm_root"))
     self.storm_overlays = self.storm_root:AddChild(Widget("storm_overlays"))
@@ -147,6 +158,8 @@ function PlayerHud:CreateOverlays(owner)
     self.moonstormdust:SetClickable(false)
     self.moonstormover_lightning = self.storm_overlays:AddChild(MoonstormOver_Lightning(owner))
 
+	self.miasmaclouds = self.storm_overlays:AddChild(MiasmaCloudsOver(owner))
+
     self.mindcontrolover = self.over_root:AddChild(MindControlOver(owner))
 
     if IsSpecialEventActive(SPECIAL_EVENTS.HALLOWED_NIGHTS) then
@@ -154,6 +167,7 @@ function PlayerHud:CreateOverlays(owner)
     end
     self.sandover = self.overlayroot:AddChild(SandOver(owner, self.sanddustover))
     self.moonstormover = self.overlayroot:AddChild(MoonstormOver(owner, self.moonstormdust))
+	self.miasmaover = self.overlayroot:AddChild(MiasmaOver(owner, self.miasmaclouds))
 
     self.gogglesover = self.overlayroot:AddChild(GogglesOver(owner, self.storm_overlays))
     self.nutrientsover = self.overlayroot:AddChild(NutrientsOver(owner))
@@ -166,6 +180,7 @@ function PlayerHud:CreateOverlays(owner)
     self.flareover = self.overlayroot:AddChild(FlareOver(owner))
 
     self.InkOver = self.overlayroot:AddChild(InkOver(owner))
+    self.Wagpunkui = self.overlayroot:AddChild(WagpunkUI(owner))    
 
     self.clouds = self.under_root:AddChild(UIAnim())
     self.clouds.cloudcolour = GetGameModeProperty("cloudcolour") or {1, 1, 1}
@@ -186,6 +201,7 @@ function PlayerHud:CreateOverlays(owner)
     self.serverpause_underlay:SetScaleMode(SCALEMODE_FILLSCREEN)
     self.serverpause_underlay:SetTint(0,0,0,0.5)
 	self.serverpause_underlay:Hide()
+	self.serverpaused = false
     self:SetServerPaused(TheNet:IsServerPaused(true))
 
     self.eventannouncer = self.under_root:AddChild(Widget("eventannouncer_root"))
@@ -607,6 +623,22 @@ function PlayerHud:ClosePlayerInfoScreen()
             TheFrontEnd:PopScreen(self.playerinfoscreen)
         end
         self.playerinfoscreen = nil
+    end
+end
+
+function PlayerHud:OpenScrapbookScreen(player_name, data, show_net_profile, force)
+    self:CloseScrapbookScreen()
+    self.scrapbookscreen = ScrapbookScreen(self.owner)
+    self:OpenScreenUnderPause(self.scrapbookscreen)
+    return true
+end
+
+function PlayerHud:CloseScrapbookScreen()
+    if self.scrapbookscreen ~= nil then
+        if self.scrapbookscreen.inst:IsValid() then
+            TheFrontEnd:PopScreen(self.scrapbookscreen)
+        end
+        self.scrapbookscreen = nil
     end
 end
 
@@ -1062,6 +1094,10 @@ function PlayerHud:OnControl(control, down)
     if PlayerHud._base.OnControl(self, control, down) then
         return true
     elseif not self.shown then
+		if self.serverpaused and down and control == CONTROL_SERVER_PAUSE then
+			SetServerPaused(false)
+			return true
+		end
         return
     end
 
@@ -1172,6 +1208,11 @@ function PlayerHud:OnControl(control, down)
 			chat_input_screen.chat_edit:SetString("/")
 			TheFrontEnd:PushScreen(chat_input_screen)
 			return true
+		elseif control == CONTROL_START_EMOJI then
+			local chat_input_screen = ChatInputScreen(false)
+			chat_input_screen.chat_edit:SetString(":")
+			TheFrontEnd:PushScreen(chat_input_screen)
+			return true
         end
     elseif control == CONTROL_SHOW_PLAYER_STATUS then
         if not self:IsPlayerAvatarPopUpOpen() or self.playeravatarpopup.settled then
@@ -1238,12 +1279,10 @@ end
 function PlayerHud:OnRawKey(key, down)
     if PlayerHud._base.OnRawKey(self, key, down) then
         return true
-    elseif down and self.shown and key == KEY_SEMICOLON and TheInput:IsKeyDown(KEY_SHIFT) then
-        local chat_input_screen = ChatInputScreen(false)
-        chat_input_screen.chat_edit:SetString(":")
-        TheFrontEnd:PushScreen(chat_input_screen)
-        return true
     end
+    -- NOTES(JBK): Add controls to the files below to allow players to edit bound keys do not use OnRawKey for forced binds unless in dev only.
+    -- strings.lua, constants.lua, playerhud.lua, optionsscreen.lua, DontStarveInputHandler.h, DontStarveInputHandler.cpp, InputDefinitions.h
+    -- I am leaving this function stub here for dev testing only and maybe a mod already hooked it.
 end
 
 local DROPS_ALPHA_INCREASE_RATE = 0.01
@@ -1367,6 +1406,7 @@ function PlayerHud:SetServerPaused(paused)
     else
         self.serverpause_underlay:Hide()
     end
+	self.serverpaused = paused
 end
 
 function PlayerHud:OffsetServerPausedWidget(serverpausewidget)

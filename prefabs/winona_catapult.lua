@@ -458,11 +458,15 @@ local function fn()
         inst.components.deployhelper.onenablehelper = OnEnableHelper
     end
 
+    inst.scrapbook_specialinfo = "WINONACATAPULT"
+
     inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.scrapbook_facing  = FACING_DOWNRIGHT
 
     inst._state = 1
 

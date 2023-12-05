@@ -16,6 +16,8 @@ local function fn()
 	inst.AnimState:SetBuild("dreadstone")
 	inst.AnimState:PlayAnimation("idle")
 
+	inst.pickupsound = "rock"
+
 	MakeInventoryFloatable(inst, "med", .145, { .77, .75, .77 })
 
 	inst.entity:SetPristine()
@@ -32,6 +34,11 @@ local function fn()
 	inst:AddComponent("inspectable")
 
 	inst:AddComponent("inventoryitem")
+
+	inst:AddComponent("repairer")
+	inst.components.repairer.repairmaterial = MATERIALS.DREADSTONE
+	inst.components.repairer.healthrepairvalue = TUNING.REPAIR_DREADSTONE_HEALTH
+	inst.components.repairer.workrepairvalue = TUNING.REPAIR_DREADSTONE_WORK
 
 	MakeHauntableLaunchAndSmash(inst)
 

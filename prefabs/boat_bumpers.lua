@@ -231,6 +231,8 @@ function MakeBumperType(data)
             return inst
         end
 
+        inst.scrapbook_anim = "idle_1"
+
         inst:AddComponent("inspectable")
         inst:AddComponent("lootdropper")
         inst:AddComponent("savedrotation")

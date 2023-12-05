@@ -41,11 +41,25 @@ nil,
 
 --------------------------------------------------------------------------
 
+local function IsExposedToRain(inst)
+	return TheWorld.state.israining and inst.components.rainimmunity == nil
+end
+
 local function OnIsRaining(self, israining)
-    if israining then
+	if israining and self.inst.components.rainimmunity == nil then
         self:Pause()
     else
         self:Resume()
+    end
+end
+
+local function OnRainImmunity(inst)
+    inst.components.dryer:Resume()
+end
+
+local function OnRainVulnerable(inst)
+    if IsExposedToRain(inst) then
+        inst.components.dryer:Pause()
     end
 end
 
@@ -53,6 +67,8 @@ local function StartWatchingRain(self)
     if not self.watchingrain then
         self.watchingrain = true
         self:WatchWorldState("israining", OnIsRaining)
+		self.inst:ListenForEvent("gainrainimmunity", OnRainImmunity)
+		self.inst:ListenForEvent("loserainimmunity", OnRainVulnerable)
     end
 end
 
@@ -60,6 +76,8 @@ local function StopWatchingRain(self)
     if self.watchingrain then
         self.watchingrain = nil
         self:StopWatchingWorldState("israining", OnIsRaining)
+		self.inst:RemoveEventCallback("gainrainimmunity", OnRainImmunity)
+		self.inst:RemoveEventCallback("loserainimmunity", OnRainVulnerable)
     end
 end
 
@@ -132,7 +150,7 @@ local function DoSpoil(inst, self)
     if loot ~= nil then
         loot.Transform:SetPosition(inst.Transform:GetWorldPosition())
         if loot.components.inventoryitem ~= nil and not self.protectedfromrain then
-            loot.components.inventoryitem:InheritMoisture(TheWorld.state.wetness, TheWorld.state.iswet)
+			loot.components.inventoryitem:InheritWorldWetnessAtTarget(inst)
         end
     end
 
@@ -186,7 +204,7 @@ function Dryer:StartDrying(dryable)
 
     dryable:Remove()
 
-    if not TheWorld.state.israining or self.protectedfromrain then
+	if self.protectedfromrain or not IsExposedToRain(self.inst) then
         self:Resume()
     end
     if not self.protectedfromrain then
@@ -270,7 +288,7 @@ function Dryer:DropItem()
             loot.components.perishable:StartPerishing()
         end
         if loot.components.inventoryitem ~= nil and not self.protectedfromrain then
-            loot.components.inventoryitem:InheritMoisture(TheWorld.state.wetness, TheWorld.state.iswet)
+			loot.components.inventoryitem:InheritWorldWetnessAtTarget(self.inst)
         end
     end
 
@@ -305,7 +323,7 @@ function Dryer:Harvest(harvester)
             loot.components.perishable:StartPerishing()
         end
         if loot.components.inventoryitem ~= nil and not self.protectedfromrain then
-            loot.components.inventoryitem:InheritMoisture(TheWorld.state.wetness, TheWorld.state.iswet)
+			loot.components.inventoryitem:InheritWorldWetnessAtTarget(self.inst)
         end
         harvester.components.inventory:GiveItem(loot, nil, self.inst:GetPosition())
     end
@@ -355,7 +373,7 @@ function Dryer:LongUpdate(dt)
     end
 
     if self:IsDrying() then
-        if not TheWorld.state.israining or self.protectedfromrain then
+		if self.protectedfromrain or not IsExposedToRain(self.inst) then
             self:Resume()
         end
         if not self.protectedfromrain then
@@ -402,7 +420,7 @@ function Dryer:OnLoad(data)
         StopWatchingRain(self)
 
         if self:IsDrying() then
-            if not TheWorld.state.israining or self.protectedfromrain then
+			if self.protectedfromrain or not IsExposedToRain(self.inst) then
                 self:Resume()
             end
             if not self.protectedfromrain then

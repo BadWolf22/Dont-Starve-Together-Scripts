@@ -25,7 +25,6 @@ local prefabs =
     "eyeofterror_sinkhole",
     "milkywhites",
     "slide_puff",
-    "shieldofterror",
 }
 
 local twinprefabs =
@@ -43,6 +42,7 @@ local twinprefabs =
     "yellowgem",
     "winter_ornament_boss_eyeofterror1",
     "winter_ornament_boss_eyeofterror2",
+    "shieldofterror",
 }
 
 local twinmanagerprefabs =
@@ -286,6 +286,10 @@ end
 
 --------------------------------------------------------------------------
 
+local function OnDeath(inst,data)
+
+end
+
 local DEFAULT_COMMANDER_RANGE = 40
 local function common_fn(data)
     local inst = CreateEntity()
@@ -307,6 +311,7 @@ local function common_fn(data)
     inst.AnimState:Hide("ball_mouth")
     inst.AnimState:Hide("mouth")
     inst.AnimState:PlayAnimation("eye_idle", true)
+    inst.scrapbook_hide = {"mouth","ball_mouth"}
 
     MakeInventoryFloatable(inst, "large")
 
@@ -416,6 +421,7 @@ local function common_fn(data)
     inst:ListenForEvent("attacked", OnAttacked)
     inst:ListenForEvent("finished_leaving", OnFinishedLeaving)
 	inst:ListenForEvent("enterlimbo", OnEnterLimbo)
+    inst:ListenForEvent("death", OnDeath)
 
     ------------------------------------------
     -- Instance variables here

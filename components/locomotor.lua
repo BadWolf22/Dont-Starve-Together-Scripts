@@ -170,6 +170,7 @@ local function ServerGetSpeedMultiplier(self)
             end
         end
     end
+
     return mult * (self:TempGroundSpeedMultiplier() or self.groundspeedmultiplier) * self.throttle
 end
 
@@ -200,6 +201,7 @@ local function ClientGetSpeedMultiplier(self)
             end
         end
     end
+
     return mult * (self:TempGroundSpeedMultiplier() or self.groundspeedmultiplier) * self.throttle
 end
 
@@ -496,7 +498,7 @@ function LocoMotor:UpdateGroundSpeedMultiplier()
             self.wasoncreep = true
         end
         self.groundspeedmultiplier = self.slowmultiplier
-    else
+    else 
         if self.wasoncreep and self.triggerscreep then
             self.inst:PushEvent("walkoffcreep")
         end
@@ -505,7 +507,7 @@ function LocoMotor:UpdateGroundSpeedMultiplier()
         local current_ground_tile = TheWorld.Map:GetTileAtPoint(x, 0, z)
         self.groundspeedmultiplier = (self:IsFasterOnGroundTile(current_ground_tile) or 
                                      (self:FasterOnRoad() and ((RoadManager ~= nil and RoadManager:IsOnRoad(x, 0, z)) or GROUND_ROADWAYS[current_ground_tile])) or
-                                     (self:FasterOnCreep() and oncreep))
+                                     (oncreep and self:FasterOnCreep()))
 									 and self.fastmultiplier 
 									 or 1
     end
@@ -796,6 +798,11 @@ function LocoMotor:GoToEntity(target, bufferedaction, run)
     self.wantstorun = run
     --self.arrive_step_dist = ARRIVE_STEP
     self:StartUpdatingInternal()
+
+	--Try instant arrive check if we're not moving
+	if not (self.inst.sg and self.inst.sg:HasStateTag("moving")) then
+		self:OnUpdate(0, true)
+	end
 end
 
 --V2C: Added overridedest for additional network controller support
@@ -830,8 +837,12 @@ function LocoMotor:GoToPoint(pt, bufferedaction, run, overridedest)
     self.wantstomoveforward = true
     self:SetBufferedAction(bufferedaction)
     self:StartUpdatingInternal()
-end
 
+	--Try instant arrive check if we're not moving
+	if not (self.inst.sg and self.inst.sg:HasStateTag("moving")) then
+		self:OnUpdate(0, true)
+	end
+end
 
 function LocoMotor:SetBufferedAction(act)
     if self.bufferedaction ~= nil then
@@ -1095,7 +1106,7 @@ function LocoMotor:StartHopping(x,z,target_platform)
     self.time_before_next_hop_is_allowed = 0.2
 end
 
-function LocoMotor:OnUpdate(dt)
+function LocoMotor:OnUpdate(dt, arrive_check_only)
     if self.hopping then
         --self:UpdateHopping(dt)
         return
@@ -1109,7 +1120,7 @@ function LocoMotor:OnUpdate(dt)
         return
     end
 
-    if self.enablegroundspeedmultiplier then
+	if self.enablegroundspeedmultiplier and not arrive_check_only then
         local x, y, z = self.inst.Transform:GetWorldPosition()
         local tx, ty = TheWorld.Map:GetTileCoordsAtPoint(x, 0, z)
         if tx ~= self.lastpos.x or ty ~= self.lastpos.y then
@@ -1135,23 +1146,27 @@ function LocoMotor:OnUpdate(dt)
         local mypos_x, mypos_y, mypos_z = self.inst.Transform:GetWorldPosition()
 
         local reached_dest, invalid, in_cooldown = nil, nil, false
-        if self.bufferedaction ~= nil and
-            self.bufferedaction.action == ACTIONS.ATTACK and
-			not (self.bufferedaction.forced and self.bufferedaction.target == nil) and
-            self.inst.replica.combat ~= nil then
+		if self.bufferedaction and self.bufferedaction.action.customarrivecheck then
+			reached_dest, invalid = self.bufferedaction.action.customarrivecheck(self.inst, self.dest)
+		else
+			local dsq = distsq(destpos_x, destpos_z, mypos_x, mypos_z)
+			local arrive_dsq = self.arrive_dist * self.arrive_dist
+			if dt > 0 then
+				local run_dist = self:GetRunSpeed() * dt * .5
+				arrive_dsq = math.max(arrive_dsq, run_dist * run_dist)
+			end
+			reached_dest = dsq <= arrive_dsq
 
-            local dsq = distsq(destpos_x, destpos_z, mypos_x, mypos_z)
-            local run_dist = self:GetRunSpeed() * dt * .5
-            reached_dest = dsq <= math.max(run_dist * run_dist, self.arrive_dist * self.arrive_dist)
-
-            reached_dest, invalid, in_cooldown = self.inst.replica.combat:LocomotorCanAttack(reached_dest, self.bufferedaction.target)
-        elseif self.bufferedaction ~= nil
-            and self.bufferedaction.action.customarrivecheck ~= nil then
-            reached_dest, invalid = self.bufferedaction.action.customarrivecheck(self.inst, self.dest)
-        else
-            local dsq = distsq(destpos_x, destpos_z, mypos_x, mypos_z)
-            local run_dist = self:GetRunSpeed() * dt * .5
-            reached_dest = dsq <= math.max(run_dist * run_dist, self.arrive_dist * self.arrive_dist)
+			--special case for attacks (in_cooldown can get set here)
+			if self.bufferedaction and
+				self.bufferedaction.action == ACTIONS.ATTACK and
+				not (self.bufferedaction.forced and self.bufferedaction.target == nil)
+			then
+				local combat = self.inst.replica.combat
+				if combat then
+					reached_dest, invalid, in_cooldown = combat:LocomotorCanAttack(reached_dest, self.bufferedaction.target)
+				end
+			end
         end
 
         if invalid then
@@ -1183,7 +1198,7 @@ function LocoMotor:OnUpdate(dt)
             end
             self:Stop()
             self:Clear()
-        else
+		elseif not arrive_check_only then
             --Print(VERBOSITY.DEBUG, "LOCOMOTING")
             if self:WaitingForPathSearch() then
                 local pathstatus = TheWorld.Pathfinder:GetSearchStatus(self.path.handle)
@@ -1274,6 +1289,10 @@ function LocoMotor:OnUpdate(dt)
             self.wantstomoveforward = self.wantstomoveforward or not self:WaitingForPathSearch()
         end
     end
+
+	if arrive_check_only then
+		return
+	end
 
     local should_locomote = false
     if (self.ismastersim and not self.inst:IsInLimbo()) or not (self.ismastersim or self.inst:HasTag("INLIMBO")) then

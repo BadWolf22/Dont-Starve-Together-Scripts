@@ -20,6 +20,11 @@ local events =
     CommonHandlers.OnDeath(),
     CommonHandlers.OnHop(),
 	CommonHandlers.OnSink(),
+    EventHandler("cheer", function(inst, data)
+        if not (inst.sg:HasStateTag("busy") or inst.components.health:IsDead()) then
+            inst.sg:GoToState("cheer")
+        end
+    end),
 }
 
 local states =
@@ -164,6 +169,24 @@ local states =
             end),
         },
     },
+    State{
+        name = "cheer",
+        tags = { "busy" },
+
+        onenter = function(inst)
+            inst.Physics:Stop()
+            CommonHandlers.UpdateHitRecoveryDelay(inst)
+            inst.AnimState:PlayAnimation("idle_happy")
+            inst.SoundEmitter:PlaySound("dontstarve/creatures/bunnyman/happy")
+        end,
+
+        events =
+        {
+            EventHandler("animover", function(inst)
+                inst.sg:GoToState("idle")
+            end),
+        },
+    },
 }
 
 CommonStates.AddWalkStates(states, {
@@ -208,6 +231,6 @@ CommonStates.AddFrozenStates(states)
 CommonStates.AddSimpleActionState(states, "pickup", "pig_pickup", 10 * FRAMES, { "busy" })
 CommonStates.AddSimpleActionState(states, "gohome", "pig_pickup", 4 * FRAMES, { "busy" })
 CommonStates.AddHopStates(states, true, { pre = "boat_jump_pre", loop = "boat_jump_loop", pst = "boat_jump_pst"})
-CommonStates.AddSinkAndWashAsoreStates(states)
+CommonStates.AddSinkAndWashAshoreStates(states)
 
 return StateGraph("bunnyman", states, events, "idle", actionhandlers)

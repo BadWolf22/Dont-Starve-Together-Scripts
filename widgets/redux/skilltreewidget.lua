@@ -25,14 +25,14 @@ local SkillTreeWidget = Class(Widget, function(self, prefabname, targetdata, fro
 
     self.midlay = self.root:AddChild(Widget())
 
-    self.bg_tree = self.root:AddChild(Image("images/skilltree2.xml", "wilson_background_shadowbranch_white.tex"))
+    self.bg_tree = self.root:AddChild(Image(GetSkilltreeBG(self.target.."_background.tex"), self.target.."_background.tex"))
     self.bg_tree:SetPosition(2,-20)
     self.bg_tree:ScaleToSize(600, 460)
 
     if self.fromfrontend then
         local color = UICOLOURS.GOLD
         self.bg_tree:SetTint(color[1],color[2],color[3],0.6)
-    else 
+    else
         local color = UICOLOURS.BLACK
         self.bg_tree:SetTint(color[1],color[2],color[3],1)
     end
@@ -44,24 +44,29 @@ local SkillTreeWidget = Class(Widget, function(self, prefabname, targetdata, fro
     self.root.infopanel.bg:ScaleToSize(470, 130)
     self.root.infopanel.bg:SetPosition(0, -10)
 
+    self.root.infopanel.activatedbg = self.root.infopanel:AddChild(Image("images/skilltree.xml", "skilltree_backgroundart.tex"))
+    self.root.infopanel.activatedbg:ScaleToSize(470/2.4, 156/3)  -- 196 , 52
+    self.root.infopanel.activatedbg:SetPosition(0, -58)
+
+    self.root.infopanel.activatedtext = self.root.infopanel:AddChild(Text(HEADERFONT, 18, STRINGS.SKILLTREE.ACTIVATED, UICOLOURS.BLACK))
+    self.root.infopanel.activatedtext:SetPosition(0,-62)
+    self.root.infopanel.activatedtext:SetSize(20)
+
     self.root.infopanel.activatebutton = self.root.infopanel:AddChild(ImageButton("images/global_redux.xml", "button_carny_long_normal.tex", "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex"))
     self.root.infopanel.activatebutton.image:SetScale(1)
     self.root.infopanel.activatebutton:SetFont(CHATFONT)
-    self.root.infopanel.activatebutton:SetPosition(0,-37)
+    self.root.infopanel.activatebutton:SetPosition(0,-61)
     self.root.infopanel.activatebutton.text:SetColour(0,0,0,1)
     self.root.infopanel.activatebutton:SetScale(0.5)
     self.root.infopanel.activatebutton:SetText(STRINGS.SKILLTREE.ACTIVATE)
 
-    self.root.infopanel.activatedtext = self.root.infopanel:AddChild(Text(HEADERFONT, 18, STRINGS.SKILLTREE.ACTIVATED, UICOLOURS.BLACK))
-    self.root.infopanel.activatedtext:SetPosition(0,-37)
-    self.root.infopanel.activatedtext:SetSize(20)
 
     self.root.infopanel.title = self.root.infopanel:AddChild(Text(HEADERFONT, 18, "title", UICOLOURS.BROWN_DARK))
     self.root.infopanel.title:SetPosition(0,28)
     self.root.infopanel.title:SetVAlign(ANCHOR_TOP)
 
-    self.root.infopanel.desc = self.root.infopanel:AddChild(Text(CHATFONT, 13, "desc", UICOLOURS.BROWN_DARK))
-    self.root.infopanel.desc:SetPosition(0,0)
+    self.root.infopanel.desc = self.root.infopanel:AddChild(Text(CHATFONT, 16, "desc", UICOLOURS.BROWN_DARK))
+    self.root.infopanel.desc:SetPosition(0,-8)
     self.root.infopanel.desc:SetHAlign(ANCHOR_LEFT)
     self.root.infopanel.desc:SetVAlign(ANCHOR_TOP)
     self.root.infopanel.desc:SetMultilineTruncatedString(STRINGS.SKILLTREE.INFOPANEL_DESC, 3, 400, nil,nil,true,6)
@@ -129,26 +134,21 @@ function SkillTreeWidget:RespecSkills()
 end
 
 function SkillTreeWidget:SpawnFavorOverlay(pre)
-    if not self.fromfrontend then
-
-        local favor = nil
+    if not self.fromfrontend and (self.midlay ~= nil and self.midlay.splash == nil) then
+        local favor, activatedskills, characterprefab
         if self.readonly then
-            local skillselection = TheSkillTree:GetNamesFromSkillSelection(self.targetdata.skillselection, self.targetdata.prefab)
-            if skillselection["wilson_allegiance_shadow"] then
-                favor = "skills_shadow"
-            elseif skillselection["wilson_allegiance_lunar"] then
-                favor = "skills_lunar"
-            end
+            characterprefab = self.targetdata.prefab
+            activatedskills = TheSkillTree:GetNamesFromSkillSelection(self.targetdata.skillselection, characterprefab)
         else
+            characterprefab = self.target
+            -- NOTES(JBK): This is not readonly so the player accessing it has access to its state and it is safe to assume TheSkillTree here.
+            activatedskills = TheSkillTree:GetActivatedSkills(characterprefab)
+        end
 
-            local skilltreeupdater = ThePlayer and ThePlayer.components.skilltreeupdater or nil
-            if skilltreeupdater then
-                if skilltreeupdater:IsActivated("wilson_allegiance_shadow") then
-                    favor = "skills_shadow"
-                elseif skilltreeupdater:IsActivated("wilson_allegiance_lunar") then
-                    favor = "skills_lunar"
-                end
-            end
+        if skilltreedefs.FN.CountTags(characterprefab, "shadow_favor", activatedskills) > 0 then
+            favor = "skills_shadow"
+        elseif skilltreedefs.FN.CountTags(characterprefab, "lunar_favor", activatedskills) > 0 then
+            favor = "skills_lunar"
         end
 
         if favor then
@@ -161,11 +161,11 @@ function SkillTreeWidget:SpawnFavorOverlay(pre)
             end
             if pre then
                 local sound = "wilson_rework/ui/shadow_skill"
-            
+
                 if favor == "skills_lunar" then
                     sound = "wilson_rework/ui/lunar_skill"
                 end
-            
+
                 TheFrontEnd:GetSound():PlaySound(sound)
                 self.midlay.splash:GetAnimState():PlayAnimation("pre",false)
                 self.midlay.splash:GetAnimState():PushAnimation("idle",false)
@@ -175,23 +175,23 @@ function SkillTreeWidget:SpawnFavorOverlay(pre)
 
             self.midlay.splash.inst:ListenForEvent("animover", function()
                 local chance = 0.3
-                if favor == "skills_lunar" then                     
-                    chance = 0.05 
+                if favor == "skills_lunar" then
+                    chance = 0.05
                 end
                 if math.random() < chance then
                     self.midlay.splash:GetAnimState():PlayAnimation("twitch",false)
                     self.midlay.splash:GetAnimState():PushAnimation("idle",false)
                 else
                     self.midlay.splash:GetAnimState():PlayAnimation("idle",false)
-                end                
+                end
             end)
         end
     end
 end
 
 function SkillTreeWidget:Kill()
-	--ThePlantRegistry:Save() -- for saving filter settings
-	SkillTreeWidget._base.Kill(self)
+    --ThePlantRegistry:Save() -- for saving filter settings
+    SkillTreeWidget._base.Kill(self)
 end
 
 function SkillTreeWidget:OnControl(control, down)
@@ -202,8 +202,22 @@ function SkillTreeWidget:OnControl(control, down)
         return true
     end
 
+    if not down and not TheInput:ControllerAttached() and control ==  CONTROL_ACTION then
+        local skilltree = self.root.tree
+
+        if not skilltree.selectedskill or
+            not skilltree.skillgraphics[skilltree.selectedskill].status.activatable or
+            not skilltree.infopanel.activatebutton:IsVisible()
+        then
+            return false
+        end
+
+        self.root.infopanel.activatebutton.onclick()
+
+        return true
+    end
+
     return false
-    
 end
 
 function SkillTreeWidget:GetSelectedSkill()
@@ -214,8 +228,8 @@ function SkillTreeWidget:GetHelpText()
     local controller_id = TheInput:GetControllerID()
     local t = {}
 
-	if self.root.infopanel.respec_button:IsVisible() then
-		table.insert(t, TheInput:GetLocalizedControl(controller_id,  CONTROL_MENU_MISC_1).. " " .. STRINGS.SKILLTREE.RESPEC)
+    if self.root.infopanel.respec_button:IsVisible() then
+        table.insert(t, TheInput:GetLocalizedControl(controller_id,  CONTROL_MENU_MISC_1).. " " .. STRINGS.SKILLTREE.RESPEC)
     end
 
     return table.concat(t, "  ")

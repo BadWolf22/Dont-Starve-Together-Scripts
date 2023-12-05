@@ -55,6 +55,7 @@ local prefabs =
     "mosquito",
     "boneshard",
     "cookingrecipecard",
+    "scrapbook_page",
 }
 
 local CHESS_LOOT =
@@ -180,6 +181,7 @@ local function MakeLoot(inst)
         {chance = 1,    item = "gears"},
         {chance = 0.1,  item = "boneshard"},
         {chance = 0.25, item = "cookingrecipecard"},
+        {chance = 0.25,  item = "scrapbook_page"},
     }
 
     local chessunlocks = TheWorld.components.chessunlocks
@@ -424,6 +426,8 @@ local function fn()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.scrapbook_anim = "idle"
 
     inst:AddComponent("locomotor")
     inst.components.locomotor:SetTriggersCreep(false)

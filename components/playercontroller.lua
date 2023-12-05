@@ -20,7 +20,7 @@ end
 local function GetWorldControllerVector()
     local xdir = TheInput:GetAnalogControlValue(CONTROL_MOVE_RIGHT) - TheInput:GetAnalogControlValue(CONTROL_MOVE_LEFT)
     local ydir = TheInput:GetAnalogControlValue(CONTROL_MOVE_UP) - TheInput:GetAnalogControlValue(CONTROL_MOVE_DOWN)
-    local deadzone = .3
+	local deadzone = TUNING.CONTROLLER_DEADZONE_RADIUS
     if math.abs(xdir) >= deadzone or math.abs(ydir) >= deadzone then
         local dir = TheCamera:GetRightVec() * xdir - TheCamera:GetDownVec() * ydir
         return dir:GetNormalized()
@@ -38,15 +38,17 @@ local function CacheHasItemSlots(self)
 end
 
 local function OnEquipChanged(inst)
-    local self = inst.components.playercontroller
-    if self and (self.gridplacer ~= nil) == not inst.replica.inventory:EquipHasTag("turfhat") then
-        if self.gridplacer then
-            self.gridplacer:SetPlayer(nil)
-            self.gridplacer:Remove()
-            self.gridplacer = nil
-        else
-            self.gridplacer = SpawnPrefab("gridplacer_turfhat")
-            self.gridplacer:SetPlayer(self.inst)
+    if inst == ThePlayer then
+        local self = inst.components.playercontroller
+        if self and (self.gridplacer ~= nil) == not inst.replica.inventory:EquipHasTag("turfhat") then
+            if self.gridplacer then
+                self.gridplacer:SetPlayer(nil)
+                self.gridplacer:Remove()
+                self.gridplacer = nil
+            else
+                self.gridplacer = SpawnPrefab("gridplacer_turfhat")
+                self.gridplacer:SetPlayer(self.inst)
+            end
         end
     end
 end
@@ -893,20 +895,32 @@ function PlayerController:DoControllerAltActionButton()
         obj = self:GetControllerTarget()
         if obj ~= nil then
             lmb, act = self:GetSceneItemControllerAction(obj)
+			if act ~= nil and act.action == ACTIONS.APPLYCONSTRUCTION then
+				local container = act.target ~= nil and act.target.replica.container
+				if container ~= nil and
+					container.widget ~= nil and
+					container.widget.overrideactionfn ~= nil and
+					container.widget.overrideactionfn(act.target, self.inst)
+					then
+					--e.g. rift offering has a local confirmation popup
+					return
+				end
+			end
         end
         if act == nil then
-			local rider = self.inst.replica.rider
-			if rider ~= nil and rider:IsRiding() then
-				obj = self.inst
-				act = BufferedAction(obj, obj, ACTIONS.DISMOUNT)
-			else
+			act = self:GetGroundUseSpecialAction(nil, true)
+			if act ~= nil then
 				obj = nil
-				act = self:GetGroundUseSpecialAction(nil, true)
-				if act == nil then
+				isspecial = true
+			else
+				local rider = self.inst.replica.rider
+				if rider ~= nil and rider:IsRiding() then
+					obj = self.inst
+					act = BufferedAction(obj, obj, ACTIONS.DISMOUNT)
+				else
 					self:TryAOETargeting()
 					return
 				end
-				isspecial = true
 			end
         end
     end
@@ -1026,7 +1040,7 @@ function PlayerController:OnRemoteControllerAltActionButtonPoint(actioncode, pos
 end
 
 function PlayerController:DoControllerAttackButton(target)
-    if target == nil and self:IsAOETargeting() then
+	if target == nil and (self:IsAOETargeting() or self.inst:HasTag("sitting_on_chair")) then
         return
     elseif target ~= nil then
         --Don't want to spam the controller attack button when retargetting
@@ -1148,8 +1162,11 @@ function PlayerController:DoControllerUseItemOnSelfFromInvTile(item)
     if not self.deploy_mode and
         item.replica.inventoryitem:IsDeployable(self.inst) and
         item.replica.inventoryitem:IsGrandOwner(self.inst) then
-        self.deploy_mode = true
-        return
+		local rider = self.inst.replica.rider
+		if not (rider ~= nil and rider:IsRiding()) then
+			self.deploy_mode = true
+			return
+		end
     end
     self.inst.replica.inventory:ControllerUseItemOnSelfFromInvTile(item)
 end
@@ -1588,6 +1605,8 @@ local function GetPickupAction(self, target, tool)
         return ACTIONS.HARVEST
     elseif target:HasTag("donecooking") and not target:HasTag("burnt") then
         return ACTIONS.HARVEST
+    elseif target:HasTag("inventoryitemholder_take") and not target:HasTag("fire") then
+        return ACTIONS.TAKEITEM
     elseif tool ~= nil and tool:HasTag("unsaddler") and target:HasTag("saddled") and not IsEntityDead(target) then
         return ACTIONS.UNSADDLE
     elseif tool ~= nil and tool:HasTag("brush") and target:HasTag("brushable") and not IsEntityDead(target) then
@@ -1741,6 +1760,7 @@ function PlayerController:GetActionButtonAction(force_target)
                 "brushable",
                 "tapped_harvestable",
                 "tendable_farmplant",
+                "inventoryitemholder_take",
             }
             if tool ~= nil then
                 for k, v in pairs(TOOLACTIONS) do
@@ -1870,14 +1890,17 @@ function PlayerController:DoInspectButton()
         return
     end
 
-    if buffaction.action == ACTIONS.LOOKAT and
-        buffaction.target ~= nil and
-        buffaction.target.components.playeravatardata ~= nil and
-        self.inst.HUD ~= nil then
-        local client_obj = buffaction.target.components.playeravatardata:GetData()
-        if client_obj ~= nil then
-            client_obj.inst = buffaction.target
-            self.inst.HUD:TogglePlayerInfoPopup(client_obj.name, client_obj, true, buffaction.target)
+    if buffaction.action == ACTIONS.LOOKAT and buffaction.target ~= nil then
+        if buffaction.target.components.playeravatardata ~= nil and self.inst.HUD ~= nil then
+            local client_obj = buffaction.target.components.playeravatardata:GetData()
+            if client_obj ~= nil then
+                client_obj.inst = buffaction.target
+                self.inst.HUD:TogglePlayerInfoPopup(client_obj.name, client_obj, true, buffaction.target)
+            end
+        end
+        if self.handler ~= nil then
+			--assert(self.inst == ThePlayer)
+            TheScrapbookPartitions:SetInspectedByCharacter(buffaction.target, self.inst.prefab)
         end
     end
 
@@ -2068,12 +2091,28 @@ function PlayerController:OnUpdate(dt)
     end
 
     if self.draggingonground and not (isenabled and TheInput:IsControlPressed(CONTROL_PRIMARY)) then
+		local buffaction
         if self.locomotor ~= nil then
             self.locomotor:Stop()
+			if isenabled then
+				buffaction = self.locomotor.bufferedaction
+			else
+				self.locomotor:Clear()
+			end
         end
         self.draggingonground = false
         self.startdragtime = nil
         TheFrontEnd:LockFocus(false)
+
+		--restart any buffered actions that may have been pushed at the
+		--same time as the user releasing draggingonground
+		if buffaction then
+			if self.ismastersim then
+				self.locomotor:PushAction(buffaction)
+			else
+				self.locomotor:PreviewAction(buffaction)
+			end
+		end
     end
 
     --ishudblocking set to true lets us know that the only reason for isenabled returning false is due to HUD wanting to handle some input.
@@ -2153,7 +2192,9 @@ function PlayerController:OnUpdate(dt)
 
 	if self.handler ~= nil and self.inst:HasTag("usingmagiciantool") then
 		self:CancelPlacement()
-		self:CancelDeployPlacement()
+        if not self:UsingMouse() then
+            self:CancelDeployPlacement()
+        end
 		self:CancelAOETargeting()
 	end
 
@@ -2173,7 +2214,14 @@ function PlayerController:OnUpdate(dt)
 				end
 				self:DoAction(self.attack_buffer)
 			else
-				self.locomotor:PushAction(self.attack_buffer, true)
+				--Check for duplicate actions
+				local currentbuffaction = self.inst:GetBufferedAction()
+				if not (currentbuffaction ~= nil and
+						currentbuffaction.action == self.attack_buffer.action and
+						currentbuffaction.target == self.attack_buffer.target)
+				then
+					self.locomotor:PushAction(self.attack_buffer, true)
+				end
 			end
 		end
 		self.attack_buffer = nil
@@ -2307,12 +2355,7 @@ function PlayerController:OnUpdate(dt)
 					if rmb == nil and self.controller_target ~= nil then
 						lmb, rmb = self:GetSceneItemControllerAction(self.controller_target)
 					end
-					if rmb ~= nil then
-						hideactionreticuleoverride = true
-					else
-						local rider = self.inst.replica.rider
-						hideactionreticuleoverride = rider ~= nil and rider:IsRiding() or not self:HasGroundUseSpecialAction(true)
-					end
+					hideactionreticuleoverride = rmb ~= nil or not self:HasGroundUseSpecialAction(true)
 				end
 			else
 				local rmb = self:GetRightMouseAction()
@@ -2378,6 +2421,7 @@ function PlayerController:OnUpdate(dt)
 
 					if self:CanLocomote() then
 						self.locomotor:Stop()
+						self.locomotor:Clear()
 					end
 				elseif self.actionholding then
 					self:ClearActionHold()
@@ -2403,6 +2447,7 @@ function PlayerController:OnUpdate(dt)
     self:DoPredictHopping(dt)
 
 	if not isenabled and not ishudblocking then
+		self:DoClientBusyOverrideLocomote()
 		return
 	end
 
@@ -2415,9 +2460,12 @@ function PlayerController:OnUpdate(dt)
 		isbusy = false
 	end
 
-    if isbusy or
-        self:DoPredictWalking(dt) or
-        self:DoDragWalking(dt) then
+	if isbusy then
+		self:DoClientBusyOverrideLocomote()
+		self.recent_bufferedaction.act = nil
+	elseif self:DoPredictWalking(dt)
+		or self:DoDragWalking(dt)
+		then
 		self.recent_bufferedaction.act = nil
     else
         local aimingcannon = self.inst.components.boatcannonuser ~= nil and self.inst.components.boatcannonuser:GetCannon() ~= nil
@@ -2766,6 +2814,7 @@ local function UpdateControllerInteractionTarget(self, dt, x, y, z, dirx, dirz)
     local max_rad = 6
     local min_rad_sq = min_rad * min_rad
     local max_rad_sq = max_rad * max_rad
+
     local rad =
             self.controller_target ~= nil and
             math.max(min_rad, math.min(max_rad, math.sqrt(self.inst:GetDistanceSqToInst(self.controller_target)))) or
@@ -2797,10 +2846,10 @@ local function UpdateControllerInteractionTarget(self, dt, x, y, z, dirx, dirz)
                     break
                 end
 
-                --Check distance including y value
+                -- Calculate the dsq to filter out objects, ignoring the y component for now.
                 local x1, y1, z1 = v.Transform:GetWorldPosition()
                 local dx, dy, dz = x1 - x, y1 - y, z1 - z
-                local dsq = dx * dx + dy * dy + dz * dz
+                local dsq = dx * dx + dz * dz
 
                 if fishing and v:HasTag("fishable") then
                     local r = v:GetPhysicsRadius(0)
@@ -2815,6 +2864,11 @@ local function UpdateControllerInteractionTarget(self, dt, x, y, z, dirx, dirz)
                             v == self.controller_attack_target or
                             dx * dirx + dz * dirz > 0))) and
                     CanEntitySeePoint(self.inst, x1, y1, z1) then
+
+                    -- Incorporate the y component after we've performed the inclusion radius test.
+                    -- We wait until now because we might disqualify our controller_target if its transform has a y component,
+                    -- but we still want to use the y component as a tiebreaker for objects at the same x,z position.
+                    dsq = dsq + (dy * dy)
 
                     local dist = dsq > 0 and math.sqrt(dsq) or 0
                     local dot = dist > 0 and dx / dist * dirx + dz / dist * dirz or 0
@@ -2837,6 +2891,10 @@ local function UpdateControllerInteractionTarget(self, dt, x, y, z, dirx, dirz)
                     --make it easier to haunt the portal for resurrection in endless mode
                     if v:HasTag("portal") then
                         score = score * (self.inst:HasTag("playerghost") and GetPortalRez() and 1.1 or .9)
+                    end
+
+                    if v:HasTag("hasfurnituredecoritem") then
+                        score = score * 0.5
                     end
 
                     --print(v, angle_component, dist_component, mult, add, score)
@@ -2895,7 +2953,10 @@ local function UpdateControllerConflictingTargets(self)
 end
 
 function PlayerController:UpdateControllerTargets(dt)
-    if self:IsAOETargeting() or (self.inst:HasTag("weregoose") and not self.inst:HasTag("playerghost") or (self.classified and self.classified.inmightygym:value() > 0)) then
+	if self:IsAOETargeting() or
+		self.inst:HasTag("sitting_on_chair") or
+		(self.inst:HasTag("weregoose") and not self.inst:HasTag("playerghost")) or
+		(self.classified and self.classified.inmightygym:value() > 0) then
         self.controller_target = nil
         self.controller_target_age = 0
         self.controller_attack_target = nil
@@ -3021,10 +3082,13 @@ function PlayerController:OnRemotePredictWalking(x, z, isdirectwalking, isstart)
     end
 end
 
-function PlayerController:OnRemotePredictOverrideLocomote()
-	if self.ismastersim and self:IsEnabled() and self.handler == nil then
-		if self.inst.sg:HasStateTag("overridelocomote") and not self:IsBusy() then
-			self.inst:PushEvent("locomote")
+function PlayerController:OnRemotePredictOverrideLocomote(dir)
+	if self.ismastersim and self.handler == nil and self.inst.sg:HasStateTag("overridelocomote") then
+		if self:IsEnabled() and not self:IsBusy() or self.classified.busyremoteoverridelocomote:value() then
+			if self.inst.sg:HasStateTag("canrotate") then
+				self.inst.Transform:SetRotation(dir)
+			end
+			self.inst:PushEvent("locomote", { remoteoverridelocomote = true })
 		end
 	end
 end
@@ -3130,7 +3194,7 @@ function PlayerController:RemotePredictWalking(x, z, isstart)
 end
 
 function PlayerController:RemotePredictOverrideLocomote()
-	SendRPCToServer(RPC.PredictOverrideLocomote)
+	SendRPCToServer(RPC.PredictOverrideLocomote, self.inst.Transform:GetRotation())
 end
 
 function PlayerController:RemoteStopWalking()
@@ -3164,6 +3228,20 @@ function PlayerController:IsLocalOrRemoteHopping()
     local locomotor = self.inst.components.locomotor
     if locomotor ~= nil then return locomotor.hopping end
     return false
+end
+
+function PlayerController:DoClientBusyOverrideLocomote()
+	--This is specifically for passing overridelocomote events to the
+	--server when we're in a busy state and/or controls are disabled.
+	--e.g. Moose tackle can be cancelled using directional input, but
+	--     the state itself is still busy.
+	if not self.ismastersim and
+		self.handler ~= nil and
+		self.classified.busyremoteoverridelocomote:value() and
+		GetWorldControllerVector() ~= nil
+	then
+		self:RemotePredictOverrideLocomote()
+	end
 end
 
 function PlayerController:DoPredictWalking(dt)
@@ -3400,8 +3478,11 @@ function PlayerController:DoDirectWalking(dt)
         self.dragwalking = false
         self.predictwalking = false
     elseif self.directwalking or self.dragwalking then
+		local buffaction
         if self:CanLocomote() and self.controller_attack_override == nil then
             self.locomotor:Stop()
+			--instead of self.locomotor:Clear()
+			buffaction = self.locomotor.bufferedaction
         end
         self.directwalking = false
         self.dragwalking = false
@@ -3412,6 +3493,15 @@ function PlayerController:DoDirectWalking(dt)
                 self:RemoteStopWalking()
             end
         end
+		--restart any buffered actions that may have been pushed at the
+		--same time as the user letting go of directwalking controls
+		if buffaction then
+			if self.ismastersim then
+				self.locomotor:PushAction(buffaction)
+			else
+				self.locomotor:PreviewAction(buffaction)
+			end
+		end
     end
 end
 
@@ -3466,9 +3556,12 @@ function PlayerController:OnLeftUp()
         return
     end
 
+	local buffaction
     if self.draggingonground then
         if self:CanLocomote() and not IsWalkButtonDown() then
             self.locomotor:Stop()
+			--instead of self.locomotor:Clear()
+			buffaction = self.locomotor.bufferedaction
         end
         self.draggingonground = false
         self.startdragtime = nil
@@ -3479,6 +3572,16 @@ function PlayerController:OnLeftUp()
     if not self.ismastersim then
         self:RemoteStopControl(CONTROL_PRIMARY)
     end
+
+	--restart any buffered actions that may have been pushed at the
+	--same time as the user releasing draggingonground
+	if buffaction then
+		if self.ismastersim then
+			self.locomotor:PushAction(buffaction)
+		else
+			self.locomotor:PreviewAction(buffaction)
+		end
+	end
 end
 
 function PlayerController:DoAction(buffaction, spellbook)
@@ -3557,6 +3660,11 @@ function PlayerController:DoAction(buffaction, spellbook)
         self.locomotor:PushAction(buffaction, true)
     elseif self:CanLocomote() then
         self.locomotor:PreviewAction(buffaction, true)
+    end
+
+    if self.handler ~= nil and buffaction.action == ACTIONS.LOOKAT and buffaction.target then
+		--assert(self.inst == ThePlayer)
+        TheScrapbookPartitions:SetInspectedByCharacter(buffaction.target, self.inst.prefab)
     end
 end
 
@@ -3900,11 +4008,15 @@ function PlayerController:GetMapActions(position)
 
     local pos = self.inst:GetPosition()
 
+    self.inst.checkingmapactions = true -- NOTES(JBK): Workaround flag to not add function argument changes for this task and lets things opt-in to special handling.
+
     local lmbact = self.inst.components.playeractionpicker:GetLeftClickActions(pos)[1]
     LMBaction = self:RemapMapAction(lmbact, position)
 
     local rmbact = self.inst.components.playeractionpicker:GetRightClickActions(pos)[1]
     RMBaction = self:RemapMapAction(rmbact, position)
+
+    self.inst.checkingmapactions = nil
 
     return LMBaction, RMBaction
 end
@@ -4113,18 +4225,24 @@ function PlayerController:GetItemUseAction(active_item, target)
 		act = BufferedAction(self.inst, nil, ACTIONS.USEMAGICTOOL, active_item)
 	end
 
-    --V2C: Use self actions blocked by controller R.Dpad "TOGGLE_DEPLOY_MODE"
-    --     e.g. Murder/Plant, Eat/Plant
-    if act ~= nil or not (active_item.replica.inventoryitem:IsDeployable(self.inst) and active_item.replica.inventoryitem:IsGrandOwner(self.inst)) then
-        return act
-    end
-    act = --[[rmb]] self.inst.components.playeractionpicker:GetInventoryActions(active_item, true)
-    act = act[1] ~= nil and act[1].action ~= ACTIONS.TOGGLE_DEPLOY_MODE and act[1] or act[2]
-    if act == nil then
-        act = --[[lmb]] self.inst.components.playeractionpicker:GetInventoryActions(active_item, false)
-        act = act[1] ~= nil and act[1].action ~= ACTIONS.TOGGLE_DEPLOY_MODE and act[1] or act[2]
-    end
-    return act ~= nil and act.action ~= ACTIONS.LOOKAT and act or nil
+	if act ~= nil then
+		return act
+	elseif active_item.replica.inventoryitem:IsDeployable(self.inst) and active_item.replica.inventoryitem:IsGrandOwner(self.inst) then
+		--Deployable item, no item use action generated yet
+		local rider = self.inst.replica.rider
+		if not (rider ~= nil and rider:IsRiding()) then
+			--V2C: When not mounted, use self actions blocked by controller R.Dpad "TOGGLE_DEPLOY_MODE"
+			--     So force it onto L.Dpad instead here
+			--     e.g. Murder/Plant, Eat/Plant
+			act = --[[rmb]] self.inst.components.playeractionpicker:GetInventoryActions(active_item, true)
+			act = act[1] ~= nil and act[1].action ~= ACTIONS.TOGGLE_DEPLOY_MODE and act[1] or act[2]
+			if act == nil then
+				act = --[[lmb]] self.inst.components.playeractionpicker:GetInventoryActions(active_item, false)
+				act = act[1] ~= nil and act[1].action ~= ACTIONS.TOGGLE_DEPLOY_MODE and act[1] or act[2]
+			end
+			return act ~= nil and act.action ~= ACTIONS.LOOKAT and act or nil
+		end
+	end
 end
 
 function PlayerController:RemoteUseItemFromInvTile(buffaction, item)
@@ -4332,7 +4450,7 @@ function PlayerController:OnRemoteBufferedAction()
 						self.inst.Transform:SetRotation(dir)
 					end
 					--Force us to interrupt and go to movement state immediately
-					self.inst.sg:HandleEvent({ force_idle_state = true }) --force idle state in case this tiny motion was meant to cancel an action
+					self.inst.sg:HandleEvent("locomote", { force_idle_state = true }) --force idle state in case this tiny motion was meant to cancel an action
 					self.inst.Transform:SetPosition(self.remote_vector.x, 0, self.remote_vector.z)
 				end
 			end
@@ -4360,18 +4478,22 @@ function PlayerController:OnLocomotorBufferedAction(act)
 	end
 end
 
-local function OnNewState(inst, data)
+local function OnNewState(inst)--, data)
+	--V2C: -Don't use data.statename
+	--     -"newstate" events are fired off in reverse order when chaining GoToState calls in the state's onenter
+	--
 	--#V2C #client_prediction
 	--force dirty
 	--see SGWilson_client -> ClearCachedServerState
 	inst.player_classified.currentstate:set_local(0)
-	inst.player_classified.currentstate:set(data ~= nil and data.statename or 0)
+	inst.player_classified.currentstate:set(inst.sg ~= nil and inst.sg.currentstate.name or 0)
 end
 
 function PlayerController:OnRemoteToggleMovementPrediction(val)
 	if self.ismastersim and self.remote_predicting ~= val then
 		self.remote_predicting = val
 		self.locomotor:Stop()
+		self.locomotor:Clear()
 		self.locomotor:SetAllowPlatformHopping(not val)
 		self:ResetRemoteController()
 		if val then

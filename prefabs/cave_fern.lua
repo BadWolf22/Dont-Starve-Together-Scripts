@@ -32,6 +32,10 @@ local function fn()
     inst.AnimState:SetBuild("cave_ferns")
     inst.AnimState:SetRayTestOnBB(true)
 
+    inst.scrapbook_anim = "f1"
+
+    --inst.pickupsound = "vegetation_grassy"
+
     inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then

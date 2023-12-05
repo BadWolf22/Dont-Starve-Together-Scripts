@@ -681,8 +681,14 @@ function EntityScript:GetAdjectivedName()
                 return ConstructAdjectivedName(self, name, STRINGS.WET_PREFIX.FUEL)
             end
         end
+		--broken
+		if self:HasTag("broken") then
+			return ConstructAdjectivedName(self, ConstructAdjectivedName(self, name, STRINGS.WET_PREFIX.GENERIC), STRINGS.BROKENITEM)
+		end
         --generic
         return ConstructAdjectivedName(self, name, STRINGS.WET_PREFIX.GENERIC)
+	elseif self:HasTag("broken") then
+		return ConstructAdjectivedName(self, name, STRINGS.BROKENITEM)
     end
     return name
 end
@@ -709,7 +715,27 @@ function EntityScript:GetIsWet()
     if replica ~= nil then
         return replica:IsWet()
     end
-    return self:HasTag("wet") or TheWorld.state.iswet or (self:HasTag("swimming") and not self:HasTag("likewateroffducksback"))
+	return self:HasTag("wet")
+		or (TheWorld.state.iswet and not self:HasTag("rainimmunity"))
+		or (self:HasTag("swimming") and not self:HasTag("likewateroffducksback"))
+end
+--Can be used on clients
+function EntityScript:IsAcidSizzling()
+    if self:HasTag("acidrainimmune") then
+        return false
+    end
+
+    local replica = self.replica.inventoryitem
+    if replica ~= nil then
+        return replica:IsAcidSizzling()
+    end
+
+    local player_classified = self.player_classified
+    if player_classified ~= nil then
+        return player_classified.isacidsizzling:value()
+    end
+
+    return false
 end
 
 function EntityScript:GetSkinBuild()
@@ -1186,11 +1212,11 @@ function EntityScript:GetAngleToPoint(x, y, z)
         return 0
     elseif y == nil and z == nil then
         x, y, z = x:Get()
-    end    
+    end
     local x1, y1, z1 = self.Transform:GetWorldPosition()
 	return x1 == x and z1 == z
 		and self.Transform:GetRotation()
-		or math.atan2(z1 - z, x - x1) / DEGREES
+		or math.atan2(z1 - z, x - x1) * RADIANS
 end
 
 function EntityScript:GetPositionAdjacentTo(target, distance)
@@ -1460,16 +1486,25 @@ function EntityScript:PerformBufferedAction()
 			self:PushEvent("play_theme_music", {theme = action_theme_music})
 		end
 
-        local success, reason = self.bufferedaction:Do()
+		local bufferedaction = self.bufferedaction
+		--@V2C: - cahced in case self.bufferedaction changes
+		--      - ideally, should clear self.bufferedaction here
+		--      - however, legacy code might rely on inst.bufferedaction during Do()
+
+		local success, reason = bufferedaction:Do()
         if success then
-            self.bufferedaction = nil
+			if self.bufferedaction == bufferedaction then
+				self.bufferedaction = nil
+			end
             return true
         end
 
-        self:PushEvent("actionfailed", { action = self.bufferedaction, reason = reason })
+		self:PushEvent("actionfailed", { action = bufferedaction, reason = reason })
 
-        self.bufferedaction:Fail()
-        self.bufferedaction = nil
+		bufferedaction:Fail()
+		if self.bufferedaction == bufferedaction then
+			self.bufferedaction = nil
+		end
     end
 end
 

@@ -79,7 +79,7 @@ local function UpdateImages(inst, range)
     inst.currentTempRange = range
 
     inst.AnimState:PlayAnimation(tostring(range), true)
-
+    inst.scrapbook_anim = tostring(range)
     local skinname = inst:GetSkinName()
     inst.components.inventoryitem:ChangeImageName((skinname or "heat_rock")..tostring(range))
     if range == 5 then
@@ -222,13 +222,16 @@ local function fn()
         return inst
     end
 
+    inst.scrapbook_fueled_rate = TUNING.HEATROCK_NUMUSES
+    inst.scrapbook_fueled_uses = true
+
     inst:AddComponent("inspectable")
     inst.components.inspectable.getstatus = GetStatus
 
     inst:AddComponent("inventoryitem")
 
     inst:AddComponent("tradable")
-    inst.components.tradable.rocktribute = 6
+    inst.components.tradable.rocktribute = 12
 
     inst:AddComponent("temperature")
     inst.components.temperature.current = TheWorld.state.temperature

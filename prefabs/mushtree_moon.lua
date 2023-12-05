@@ -260,6 +260,7 @@ local function maketree(name, data, state)
         inst.AnimState:SetBuild(data.build)
         inst.AnimState:SetBank(data.bank)
         inst.AnimState:PlayAnimation("idle_loop", true)
+        inst.scrapbook_anim = "idle_loop"
 
         inst.MiniMapEntity:SetIcon(data.icon)
 
@@ -281,6 +282,8 @@ local function maketree(name, data, state)
         if not TheWorld.ismastersim then
             return inst
         end
+
+        inst.scrapbook_specialinfo = "TREE"
 
         local color = .5 + math.random() * .5
         inst.AnimState:SetMultColour(color, color, color, 1)

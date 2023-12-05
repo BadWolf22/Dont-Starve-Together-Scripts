@@ -67,6 +67,8 @@ local function fn()
     inst.AnimState:SetBank("static_contained")
     inst.AnimState:PlayAnimation("idle", true)
 
+    inst.scrapbook_specialinfo = "MOONSTORMSTATIC"
+
     inst.DynamicShadow:Enable(true)
     inst.DynamicShadow:SetSize(1, .5)
 
@@ -123,6 +125,8 @@ local function itemfn()
     inst:AddTag("moonstorm_static")
 
     MakeInventoryFloatable(inst, "med", 0.05, 0.68)
+
+    inst.scrapbook_anim = "finish_idle"
 
     inst.entity:SetPristine()
 

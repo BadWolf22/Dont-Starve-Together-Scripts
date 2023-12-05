@@ -138,6 +138,10 @@ local function makespore(data)
             return inst
         end
 
+        inst.scrapbook_anim = "flight_cycle"
+        inst.scrapbook_animoffsety = 65
+        inst.scrapbook_animpercent = 0.36
+
         inst:AddComponent("inspectable")
 
         inst:AddComponent("knownlocations")

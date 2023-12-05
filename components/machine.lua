@@ -6,12 +6,28 @@ local function onison(self, ison)
     end
 end
 
+local function onenabled(self, enabled)
+    if enabled then
+        self.inst:AddTag("enabled")
+    else
+        self.inst:RemoveTag("enabled")
+    end
+end
+
 local function ononcooldown(self, oncooldown)
     if oncooldown then
         self.inst:AddTag("cooldown")
     else
         self.inst:RemoveTag("cooldown")
     end
+end
+
+local function ongroundonly(self, groundonly)
+	if groundonly then
+		self.inst:AddTag("groundonlymachine")
+	else
+		self.inst:RemoveTag("groundonlymachine")
+	end
 end
 
 local Machine = Class(function(self, inst)
@@ -21,16 +37,25 @@ local Machine = Class(function(self, inst)
     self.ison = false
 	self.cooldowntime = 3
     self.oncooldown = false
+    self.enabled = true
+	--self.groundonly = false
 end,
 nil,
 {
     ison = onison,
     oncooldown = ononcooldown,
+	groundonly = ongroundonly,
+	enabled = onenabled,
 })
 
 function Machine:OnRemoveFromEntity()
     self.inst:RemoveTag("turnedon")
     self.inst:RemoveTag("cooldown")
+	self.inst:RemoveTag("groundonlymachine")
+end
+
+function Machine:SetGroundOnlyMachine(groundonly)
+	self.groundonly = groundonly
 end
 
 function Machine:OnSave()
@@ -47,7 +72,6 @@ function Machine:OnLoad(data)
 end
 
 function Machine:TurnOn()
-
 	if self.cooldowntime > 0 then
 		self.oncooldown = true
 		self.inst:DoTaskInTime(self.cooldowntime, function() self.oncooldown = false end)
@@ -65,11 +89,11 @@ function Machine:CanInteract()
         not (self.inst.replica.equippable ~= nil and
             not self.inst.replica.equippable:IsEquipped() and
             self.inst.replica.inventoryitem ~= nil and
-            self.inst.replica.inventoryitem:IsHeld())
+            self.inst.replica.inventoryitem:IsHeld()) and
+        	self.enabled == true
 end
 
 function Machine:TurnOff()
-
 	if self.cooldowntime > 0 then
 		self.oncooldown = true
 		self.inst:DoTaskInTime(self.cooldowntime, function() self.oncooldown = false end)
@@ -86,7 +110,6 @@ function Machine:IsOn()
 end
 
 function Machine:GetDebugString()
-
     return string.format("on=%s, cooldowntime=%2.2f, oncooldown=%s", tostring(self.ison), self.cooldowntime, tostring(self.oncooldown) )
 end
 

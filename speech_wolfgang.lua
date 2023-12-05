@@ -37,6 +37,7 @@ return{
             NOTALLOWED = "Is not right place for that.",
             EMPTY = "Wolfgang needs something to put here.",
             MISMATCH = "Wolfgang have wrong plans.",
+            NOTREADY = "Is too scary here! Will come back later!",
         },
 		RUMMAGE =
 		{
@@ -206,7 +207,7 @@ return{
 			--MapSpotRevealer/messagebottle
 			MESSAGEBOTTLEMANAGER_NOT_FOUND = "Wolfgang can't read in here.",--Likely trying to read messagebottle treasure map in caves
 
-            STASH_MAP_NOT_FOUND = "Is hard to read monkey writing.",-- Likely trying to read stash map  in world without stash
+            STASH_MAP_NOT_FOUND = "Is hard to read monkey writing.",-- Likely trying to read stash map  in world without stash                  
         },
         WRAPBUNDLE =
         {
@@ -522,6 +523,10 @@ return{
 	ANNOUNCE_HUNT_BEAST_NEARBY = "Animal is close!",
 	ANNOUNCE_HUNT_LOST_TRAIL = "No animal here.",
 	ANNOUNCE_HUNT_LOST_TRAIL_SPRING = "Animal tracks is mud now.",
+    ANNOUNCE_HUNT_START_FORK = "Wolfgang not afraid to follow this scary trail, just don't feel like.",
+    ANNOUNCE_HUNT_SUCCESSFUL_FORK = "Wolfgang is coming to get you, big scary creature!",
+    ANNOUNCE_HUNT_WRONG_FORK = "Something watching Wolfgang, but Wolfgang not scared... and Wolfgang not cry!",
+    ANNOUNCE_HUNT_AVOID_FORK = "Wolfgang prefer dangerous trail, but don't mind this safe trail.",
 	ANNOUNCE_INV_FULL = "My mighty arms can carry no more.",
 	ANNOUNCE_KNOCKEDOUT = "Ugh, I must have hit head.",
 	ANNOUNCE_LOWRESEARCH = "Is tiny information.",
@@ -887,6 +892,34 @@ return{
 	ANNOUNCE_TOOL_TOOWEAK = "Tool is weak! Wolfgang needs something mightier!",
 
     ANNOUNCE_LUNAR_RIFT_MAX = "Oh! Wolfgang can see pretty light up ahead!",
+    ANNOUNCE_SHADOW_RIFT_MAX = "Maybe is best to not go toward creepy light, yes?",
+
+    ANNOUNCE_SCRAPBOOK_FULL = "Wolfgang's scrapbook will fit no more!",
+
+    ANNOUNCE_CHAIR_ON_FIRE = "Wolfgang is fine.",
+
+    ANNOUNCE_COACH = 
+    {
+        "Do not worry, friends! Wolfgang is here to fight with you!",
+        "Remember what Wolfgang has taught you!",
+        "When you are scared, just think of Wolfgang!",
+        "Be brave, friends! Like Wolfgang!",
+        "You are strong! Strong like Wolfgang!",
+        "Believe in yourself, like Wolfgang believes in you!",
+        "Good job! Burning feeling in muscles means you're doing it right!",
+        "Do not give up!",
+        "Yes! You can do it!",
+    },
+    ANNOUNCE_WOLFGANG_WIMPY_COACHING = "They'll never listen to Wolfgang like this! Need to train!",
+    ANNOUNCE_WOLFGANG_MIGHTY_COACHING = "Wolfgang's muscles are too impressive. Would not want to embarrass others.",
+    ANNOUNCE_WOLFGANG_BEGIN_COACHING = "Come, friends! Wolfgang will show you how it's done!",
+    ANNOUNCE_WOLFGANG_END_COACHING = "Is time to rest weary muscles.",
+    ANNOUNCE_WOLFGANG_NOTEAM = 
+    {
+        "Where is team?",
+        "Wolfgang needs team.",
+        "Let's go... team?",
+    },
 
 	BATTLECRY =
 	{
@@ -1801,6 +1834,10 @@ return{
         CHESSPIECE_GUARDIANPHASE3 = "Wolfgang glad is just statue.",
         CHESSPIECE_EYEOFTERROR = "No like the way it look at Wolfgang.",
         CHESSPIECE_TWINSOFTERROR = "Brrr, still sends chill down Wolfgang's spine.",
+        CHESSPIECE_DAYWALKER = "Wolfgang has bigger muscles, see?",
+        CHESSPIECE_DEERCLOPS_MUTATED = "Wolfgang not scared of statue, but be careful with pointy part.",
+        CHESSPIECE_WARG_MUTATED = "Cute doggy, but dead is better.",
+        CHESSPIECE_BEARGER_MUTATED = "Wolfgang stronger than bear. Just have off day.",
 
         CHESSJUNK1 = "Metal junk.",
         CHESSJUNK2 = "Metal junk.",
@@ -2177,6 +2214,7 @@ return{
 		KNIGHT = "Horsey horse!",
 		KOALEFANT_SUMMER = "Nose meat!",
 		KOALEFANT_WINTER = "So soft, I want to squish it!",
+		KOALEFANT_CARCASS = "No nose meat for Wolfgang. So sad.",
 		KRAMPUS = "Scary goat man! Run!",
 		KRAMPUS_SACK = "Goat man finally give up his sack!",
 		LEIF = "Wood man!",
@@ -2952,6 +2990,8 @@ return{
 		WALL_WOOD_ITEM = "Pokey sticks!",
 		WALL_MOONROCK = "Rock of moon protects Wolfgang.",
 		WALL_MOONROCK_ITEM = "Can build with power of moon!",
+		WALL_DREADSTONE = "Wall is mighty! And scary!",
+		WALL_DREADSTONE_ITEM = "Pile of scary rocks!",
 		FENCE = "I do not like trapping little animals.",
         FENCE_ITEM = "Wolfgang will help make fence!",
         FENCE_GATE = "Is little flimsy swingboards.",
@@ -4418,6 +4458,10 @@ return{
         BIRD_MUTANT_SPITTER = "Something wrong with that bird.",
 
         WAGSTAFF_NPC = "Do not worry, Wolfgang is here to help flickery science man.",
+
+        WAGSTAFF_NPC_MUTATIONS = "Flickery science man is back!",
+        WAGSTAFF_NPC_WAGPUNK = "Wait for Wolfgang!",
+
         ALTERGUARDIAN_CONTAINED = "Old man brought big fancy thingamobob with him!",
 
         WAGSTAFF_TOOL_1 = "Wolfgang found thing for funny old man!",
@@ -4530,6 +4574,9 @@ return{
         DUMBBELL_GEM = "Make muscles mighty!",
         POTATOSACK = "Ha! Lifting and potatoes are three of Wolfgang's favorite things!",
 
+        DUMBBELL_HEAT = "Wolfgang is getting good warm-up!",
+        DUMBBELL_REDGEM = "Is fiery, like Wolfgang's spirit!",
+        DUMBBELL_BLUEGEM = "Is icy, like... ice!",
 
         TERRARIUMCHEST =
 		{
@@ -4553,6 +4600,26 @@ return{
         SHIELDOFTERROR ="Haha! Now big scary teeth belong to Wolfgang!",
         TWINOFTERROR1 = "Eep! Big scary metal eyes even worse!",
         TWINOFTERROR2 = "Eep! Big scary metal eyes even worse!",
+
+		-- Cult of the Lamb
+		COTL_TRINKET = "Is spooky crown for tiny head.",
+		TURF_COTL_GOLD = "Wolfgang has never seen floor so fancy.",
+		TURF_COTL_BRICK = "Is bricks.",
+		COTL_TABERNACLE_LEVEL1 =
+		{
+			LIT = "Aw, is little statue!",
+			GENERIC = "Little statue needs fire!",
+		},
+		COTL_TABERNACLE_LEVEL2 =
+		{
+			LIT = "Wolfgang likes looking at cute little lamb statue.",
+			GENERIC = "Little statue needs fire!",
+		},
+		COTL_TABERNACLE_LEVEL3 =
+		{
+			LIT = "Tiny statue has grown mighty!",
+			GENERIC = "Little statue needs fire!",
+		},
 
         -- Year of the Catcoon
         CATTOY_MOUSE = "Eep! Oh, is not real.",
@@ -4783,6 +4850,7 @@ return{
 		LUNAR_FORGE = "Is there a mighty hammer for Wolfgang to swing?",
 		LUNAR_FORGE_KIT = "Wolfgang will find good spot for it!",
 
+		LUNARPLANT_KIT = "Wolfgang will fix, good as new!",
 		ARMOR_LUNARPLANT = "Tough, like Wolfgang!",
 		LUNARPLANTHAT = "Wolfgang feels very safe inside.",
 		BOMB_LUNARPLANT = "Boom!",
@@ -4791,7 +4859,171 @@ return{
 		PICKAXE_LUNARPLANT = "Rocks will tremble before Wolfgang!",
 		SHOVEL_LUNARPLANT = "But is not shoe? Wolfgang is confused...",
 
+		BROKEN_FORGEDITEM = "Sorry friends, Wolfgang forgets his own strength.",
+
         PUNCHINGBAG = "Wolfgang will try to go easy on tiny punch man.",
+
+        -- Rifts 2
+        SHADOWRIFT_PORTAL = "Wolfgang will be very careful not to fall into that.",
+
+		SHADOW_FORGE = "Creepy hands make things for Wolfgang.",
+		SHADOW_FORGE_KIT = "Is almost done!",
+
+        FUSED_SHADELING = "Is creepy and crawly!",
+        FUSED_SHADELING_BOMB = "Boom bug!",
+
+		VOIDCLOTH = "Scary little rags.",
+		VOIDCLOTH_KIT = "Wolfgang will fix, good as new!",
+		VOIDCLOTHHAT = "Eep! Is too dark in there!",
+		ARMOR_VOIDCLOTH = "Creepy shirt is happy to be worn by Wolfgang.",
+
+        VOIDCLOTH_UMBRELLA = "Wolfgang would like less spooky umbrella, please.",
+        VOIDCLOTH_SCYTHE = "Wolfgang will cut with one mighty swipe!",
+
+		SHADOWTHRALL_HANDS = "Creepy shadow wants to arm wrestle?",
+		SHADOWTHRALL_HORNS = "Eep! Wolfgang's muscles are too tough for chewing!",
+		SHADOWTHRALL_WINGS = "Scary flapper!",
+
+        CHARLIE_NPC = "Wolfgang has seen that face in the dark...",
+        CHARLIE_HAND = "Is needing something, yes?",
+
+        NITRE_FORMATION = "It grew from burny rain?",
+        DREADSTONE_STACK = "Scary rock comes from scary place...",
+        
+        SCRAPBOOK_PAGE = "Is page of funny scribbles.",
+
+        LEIF_IDOL = "Beardman has made tiny tree.",
+        WOODCARVEDHAT = "Is thick and sturdy, like Wolfgang's own mighty skull!",
+        WALKING_STICK = "Is little toothpick for walking?",
+
+        IPECACSYRUP = "Will leafy green man be sad if Wolfgang doesn't have a taste?",
+        BOMB_LUNARPLANT_WORMWOOD = "Ha! Little leafy green friend has made it better!", -- Unused
+        WORMWOOD_MUTANTPROXY_CARRAT =
+        {
+        	DEAD = "Is dead.",
+        	GENERIC = "Leggy carrot is getting away!",
+        	HELD = "You are safe now, leggy carrot.",
+        	SLEEPING = "Leggy carrot is sleeping.",
+        },
+        WORMWOOD_MUTANTPROXY_LIGHTFLIER = "Please stay close to Wolfgang.",
+		WORMWOOD_MUTANTPROXY_FRUITDRAGON =
+		{
+			GENERIC = "Is little planty scrambler!",
+			RIPE = "Planty scrambler smells delicious today.",
+			SLEEPING = "Wolfgang will not disturb.",
+		},
+
+        SUPPORT_PILLAR_SCAFFOLD = "Do not look! Is not done yet!",
+        SUPPORT_PILLAR = "Stay strong, mighty pillar!",
+        SUPPORT_PILLAR_COMPLETE = "Is mighty pillar!",
+        SUPPORT_PILLAR_BROKEN = "Is crumbled. Very sad.",
+
+		SUPPORT_PILLAR_DREADSTONE_SCAFFOLD = "Do not look! Is not done yet!",
+		SUPPORT_PILLAR_DREADSTONE = "Stay strong, mighty pillar!",
+		SUPPORT_PILLAR_DREADSTONE_COMPLETE = "Mighty pillar is mighty... and little bit scary.",
+		SUPPORT_PILLAR_DREADSTONE_BROKEN = "Poor scary pillar is broke. So sad.",
+
+        WOLFGANG_WHISTLE = "Wolfgang is good teacher!",
+
+        -- Rifts 3
+
+        MUTATEDDEERCLOPS = "Wolfgang not afraid of terryifying deer monster with sharp things. Right?",
+        MUTATEDWARG = "Good monster doggy. Don't kill Wolfgang.",
+        MUTATEDBEARGER = "No fair, giant killing beast have armor too?",
+
+        LUNARFROG = "This weird froggy make Wolfgang uncomfortable.",
+
+        DEERCLOPSCORPSE =
+        {
+            GENERIC  = "Ha! Big bad guy not so tough now- wait, is dead, yes?",
+            BURNING  = "Wolfgang not crying. Is smoke.",
+            REVIVING = "No-no-no. This not what Wolfgang sign for.",
+        },
+
+        WARGCORPSE =
+        {
+            GENERIC  = "Doggy has died. Moment of silent. Start now.",
+            BURNING  = "Why burn doggy? Already dead.",
+            REVIVING = "Oh. Should have burn doggy.",
+        },
+
+        BEARGERCORPSE =
+        {
+            GENERIC  = "Is dead, yes?",
+            BURNING  = "Better this way.",
+            REVIVING = "Is unnatural and disturbing. Wolfgang not like.",
+        },
+
+        BEARGERFUR_SACK = "Keep food cold and Wolfgang fed.",
+        HOUNDSTOOTH_BLOWPIPE = "This use doggy teeth. Is not creepy at all.",
+        DEERCLOPSEYEBALL_SENTRYWARD =
+        {
+            GENERIC = "Scary eye put chill in Wolfgang's spine.",    -- Enabled.
+            NOEYEBALL = "Okay, scary eye gone but now is too hot for Wolfgang.",  -- Disabled.
+        },
+        DEERCLOPSEYEBALL_SENTRYWARD_KIT = "Is not ready! Wolfgang will fix this.",
+
+        SECURITY_PULSE_CAGE = "Is too small for Wolfgang to hide in. Not that Wolfgang need to hide.",
+        SECURITY_PULSE_CAGE_FULL = "Glowing ball of energy not explode, right?",
+
+		CARPENTRY_STATION =
+        {
+            GENERIC = "Who mightier? Man or machine? Wrong. Wolfgang.",
+            BURNT = "Poor little saw.",
+        },
+
+        WOOD_TABLE = -- Shared between the round and square tables.
+        {
+            GENERIC = "Is table.",
+            HAS_ITEM = "Is table.",
+            BURNT = "Is not table anymore.",
+        },
+
+        WOOD_CHAIR =
+        {
+            GENERIC = "Is tiny chair strong enough to hold Wolfgang?",
+            OCCUPIED = "Do not worry, friend. Wolfgang will stand.",
+            BURNT = "Chair looks burnt and sad.",
+        },
+
+        DECOR_CENTERPIECE = "Tiny thing has no purpose. Is what makes it fancy.",
+        DECOR_LAMP = "Wolfgang likes little light.",
+        DECOR_FLOWERVASE =
+        {
+            GENERIC = "Pretty little flower.",
+            EMPTY = "Wolfgang will be careful not to break.",
+            WILTED = "Little flowers are weaker than usual.",
+            FRESHLIGHT = "Wolfgang does not like dark.",
+            OLDLIGHT = "Please do not go out, little light.",
+        },
+        DECOR_PICTUREFRAME =
+        {
+            GENERIC = "Is art!",
+            UNDRAWN = "Is picture of nothing!",
+        },
+        DECOR_PORTRAITFRAME = "Next draw Wolfgang's good side!",
+
+        PHONOGRAPH = "Is box that sings!",
+        RECORD = "This give Wolfgang bad feelings.",
+        RECORD_CREEPYFOREST = "No. Wolfgang don't like.",
+        RECORD_DANGER = "Terrible!",
+        RECORD_DAWN = "Ah yes. Soothing Wolfgang soul.",
+        RECORD_DRSTYLE = "Watch Wolfgang dance!",
+        RECORD_DUSK = "Is make Wolfgang sad.",
+        RECORD_EFS = "Terrible!",
+        RECORD_END = "Eh. Is okay.",
+        RECORD_MAIN = "Eh. Is okay.",
+        RECORD_WORKTOBEDONE = "Music for make big muscles.",
+
+        ARCHIVE_ORCHESTRINA_MAIN = "Floor is making sounds!",
+
+        WAGPUNKHAT = "Robot hat make Wolfgang more deadly? Impossible. Give to me.",
+        ARMORWAGPUNK = "Wolfgang not need robot armor for protection, only like it for color.",
+        WAGSTAFF_MACHINERY = "Wolfgang is not sure he likes old man leaving garbage around.",
+        WAGPUNK_BITS = "Funny metal bits.",
+        WAGPUNKBITS_KIT = "Is robot armor fixer.",
+
+        WAGSTAFF_MUTATIONS_NOTE = "Wolfgang has no interest in old man scribblemarks.",
     },
 
     DESCRIBE_GENERIC = "What is this thing?",

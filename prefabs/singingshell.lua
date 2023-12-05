@@ -147,6 +147,8 @@ local function MakeShell(octave, common_postinit, master_postinit, prefabs)
         inst.AnimState:SetBuild("singingshell")
 		inst.AnimState:PlayAnimation("idle")
 
+		inst.pickupsound = "rock"
+
 		inst:AddTag("singingshell")
 
 		MakeInventoryFloatable(inst, FLOATER_SIZES[octave_str].size, 0, FLOATER_SIZES[octave_str].scale)
@@ -160,6 +162,9 @@ local function MakeShell(octave, common_postinit, master_postinit, prefabs)
 		if not TheWorld.ismastersim then
 			return inst
 		end
+
+		inst.scrapbook_overridedata = {"shell_placeholder", "singingshell", octave_str.."_2"}
+		inst.scrapbook_tex = inv_image_name.."2"
 
 		-- Called from singingshelltrigger
 		inst._activatefn = PlaySound
@@ -181,6 +186,7 @@ local function MakeShell(octave, common_postinit, master_postinit, prefabs)
 		inst.components.inventoryitem:SetSinks(false)
 
 		inst.AnimState:OverrideSymbol("shell_placeholder", "singingshell", octave_str.."_"..inst._variation)
+		
 		inst.components.inventoryitem:ChangeImageName("singingshell_"..octave_str.."_"..inst._variation)
 
 		inst:AddComponent("lootdropper")

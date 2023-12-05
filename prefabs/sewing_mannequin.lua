@@ -195,10 +195,15 @@ local function fn()
     inst.components.talker.colour = TALKER_COLOUR
     inst.components.talker.offset = TALKER_OFFSET
 
+    inst.scrapbook_specialinfo = "SEWINGMANNEQUIN"
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.scrapbook_hide = { "ARM_carry", "LANTERN_OVERLAY" }
+    inst.scrapbook_facing  = FACING_DOWN
 
     -------------------------------------------------------
     inst:AddComponent("inspectable")
@@ -236,6 +241,10 @@ local function fn()
     -------------------------------------------------------
     inst:AddComponent("savedrotation")
     inst.components.savedrotation.dodelayedpostpassapply = true
+
+    -------------------------------------------------------
+	inst:AddComponent("colouradder")
+	inst:AddComponent("bloomer")
 
     -------------------------------------------------------
     MakeMediumBurnable(inst, nil, nil, true)

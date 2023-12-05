@@ -80,7 +80,7 @@ local function getstatus(inst)
 		local pst = inst.components.dryer.foodtype == FOODTYPE.MEAT and "" or "_NOTMEAT"
         return (inst.components.dryer:IsDone() and "DONE"..pst)
             or (inst.components.dryer:IsDrying() and
-                (TheWorld.state.israining and "DRYINGINRAIN"..pst or "DRYING"..pst))
+                (TheWorld.state.israining and inst.components.rainimmunity == nil and "DRYINGINRAIN"..pst or "DRYING"..pst))
             or nil
     end
 end
@@ -156,6 +156,8 @@ local function MakeMeatrack(name, common_postinit, master_postinit)
             return inst
         end
 
+        inst.scrapbook_anim = "idle_empty"
+
         MakeHauntableWork(inst)
 
         inst:AddComponent("dryer")
@@ -195,12 +197,14 @@ local function meatrack_hermit(inst)
     inst.AnimState:SetBuild("meatrack_hermit")
     inst.AnimState:PlayAnimation("idle_empty")
 
+    inst.scrapbook_specialinfo = "MEATRACK"
+
+
 	inst:AddTag("antlion_sinkhole_blocker")
 
 end
 
 local function meatrack_master(inst)
-
     inst:AddComponent("lootdropper")
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.HAMMER) -- should be DRY

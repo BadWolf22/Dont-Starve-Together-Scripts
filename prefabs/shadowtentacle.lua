@@ -27,16 +27,21 @@ local function fn()
     inst.AnimState:SetBank("tentacle_arm")
     inst.AnimState:SetBuild("tentacle_arm_black_build")
     inst.AnimState:PlayAnimation("idle", true)
+    inst.scrapbook_anim = "atk_idle"
 
     inst:AddTag("shadow")
     inst:AddTag("notarget")
     inst:AddTag("shadow_aligned")
+
+    inst.scrapbook_inspectonseen = true
 
     inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then
         return inst
     end
+
+	--inst.owner is set when spawned from ruins_bat, slingshotammo
 
     inst:AddComponent("health")
     inst.components.health:SetMaxHealth(TUNING.TENTACLE_HEALTH)

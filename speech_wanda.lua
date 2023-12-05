@@ -37,6 +37,7 @@ return{
             NOTALLOWED = "These won't fit together.",
             EMPTY = "I thought I'd already put... ah, I must've done it later.",
             MISMATCH = "Hold on... these are the wrong plans! What a waste of time!",
+            NOTREADY = "This might not be the best time...",
         },
 		RUMMAGE =
 		{
@@ -206,7 +207,7 @@ return{
 			--MapSpotRevealer/messagebottle
 			MESSAGEBOTTLEMANAGER_NOT_FOUND = "It's too dark in here... I can't make anything out.",--Likely trying to read messagebottle treasure map in caves
 
-            STASH_MAP_NOT_FOUND = "What is this gibberish? None of the islands around here are this shape.",-- Likely trying to read stash map  in world without stash
+            STASH_MAP_NOT_FOUND = "What is this gibberish? None of the islands around here are this shape.",-- Likely trying to read stash map  in world without stash                  
         },
         WRAPBUNDLE =
         {
@@ -521,6 +522,10 @@ return{
 	ANNOUNCE_HUNT_BEAST_NEARBY = "An animal must've been through here just moments ago.",
 	ANNOUNCE_HUNT_LOST_TRAIL = "Lost it. Maybe I should retrace my steps.",
 	ANNOUNCE_HUNT_LOST_TRAIL_SPRING = "Everything's too soggy, I'm not wasting my time with this.",
+    ANNOUNCE_HUNT_START_FORK = "I don't think I'll like what I find at the end of this trail...",
+    ANNOUNCE_HUNT_SUCCESSFUL_FORK = "It's not getting away from me this time!",
+    ANNOUNCE_HUNT_WRONG_FORK = "Who's out there?! Something's watching me, I just know it!",
+    ANNOUNCE_HUNT_AVOID_FORK = "This trail seems less risky.",
 	ANNOUNCE_INV_FULL = "I'll have to come back for it later. Or earlier.",
 	ANNOUNCE_KNOCKEDOUT = "How long have I been out? How much time did I lose?!",
 	ANNOUNCE_LOWRESEARCH = "Well I learned a bit, but not much.",
@@ -886,6 +891,34 @@ return{
 	ANNOUNCE_TOOL_TOOWEAK = "Oh botheration! I'll need something stronger than this...",
 
     ANNOUNCE_LUNAR_RIFT_MAX = "Did anyone else feel that temporal burst?",
+    ANNOUNCE_SHADOW_RIFT_MAX = "Something has shifted...",
+
+    ANNOUNCE_SCRAPBOOK_FULL = "Didn't I already fill out my scrapbook?",
+
+    ANNOUNCE_CHAIR_ON_FIRE = "This is fine.",
+
+    ANNOUNCE_COACH = 
+    {
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+    },
+    ANNOUNCE_WOLFGANG_WIMPY_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_MIGHTY_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_BEGIN_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_END_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_NOTEAM = 
+    {
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+    },
 
 	BATTLECRY =
 	{
@@ -1559,7 +1592,7 @@ return{
 		BASALT = "That's too strong to break through!", --removed
 		BEARDHAIR = "I know it's the wilderness, but does he have to leave whiskers everywhere?",
 		BEARGER = "All the worst parts of a bear and a badger rolled into one.",
-		BEARGERVEST = "It reminds me of that time I was almost eaten by a bearger, but it's cozy.",
+		BEARGERVEST = "It reminds me of that time I was almost eaten by a Bearger, but it's cozy.",
 		ICEPACK = "It'll give my food a longer lifespan.",
 		BEARGER_FUR = "It was either him or me.",
 		BEDROLL_STRAW = "That doesn't look comfortable at all.",
@@ -1800,6 +1833,10 @@ return{
         CHESSPIECE_GUARDIANPHASE3 = "I hope I won't have to do that again.",
         CHESSPIECE_EYEOFTERROR = "Certainly an eye to behold.",
         CHESSPIECE_TWINSOFTERROR = "I'd be quite happy to never lay eyes on them again.",
+        CHESSPIECE_DAYWALKER = "Ah yes, how could I forget that time I was nearly smashed to bits?",
+        CHESSPIECE_DEERCLOPS_MUTATED = "What an unpleasant subject for a statue.",
+        CHESSPIECE_WARG_MUTATED = "That's one memory I'd be happy not to revisit.",
+        CHESSPIECE_BEARGER_MUTATED = "Oh, wonderful. It's even worse than I remembered.",
 
         CHESSJUNK1 = "I don't see much in the way of proper clockwork in there.",
         CHESSJUNK2 = "I have a suspicion these were held together with more magic than craftsmanship.",
@@ -2176,6 +2213,7 @@ return{
 		KNIGHT = "Clockwork and I usually get along just fine...",
 		KOALEFANT_SUMMER = "It's in the spring of its life.",
 		KOALEFANT_WINTER = "It's grown a warm winter coat.",
+		KOALEFANT_CARCASS = "Its time has ended.",
 		KRAMPUS = "He really puts a damper on this time of year.",
 		KRAMPUS_SACK = "For me? You shouldn't have!",
 		LEIF = "Even the trees are out to get me!",
@@ -2951,6 +2989,8 @@ return{
 		WALL_WOOD_ITEM = "The sooner I can get it built, the better I'll feel.",
 		WALL_MOONROCK = "I'd like to see anything break through that! Actually no, I wouldn't.",
 		WALL_MOONROCK_ITEM = "I feel safer already.",
+		WALL_DREADSTONE = "It's just a wall, nothing more than that.",
+		WALL_DREADSTONE_ITEM = "I'd better get it set up, no time to waste.",
 		FENCE = "An incredibly ordinary wooden fence.",
         FENCE_ITEM = "Didn't I build that already?",
         FENCE_GATE = "An incredibly ordinary wooden gate.",
@@ -4417,6 +4457,10 @@ return{
         BIRD_MUTANT_SPITTER = "Why don't you run along and spit somewhere else?",
 
         WAGSTAFF_NPC = "You, sir! There's a few things I'd like to discuss with you...",
+
+        WAGSTAFF_NPC_MUTATIONS = "Do you think I have all the time in the world for your schemes?",
+        WAGSTAFF_NPC_WAGPUNK = "Off he goes.",
+
         ALTERGUARDIAN_CONTAINED = "I should have known it would happen like this again.",
 
         WAGSTAFF_TOOL_1 = "His tools are quite interesting.",
@@ -4529,6 +4573,9 @@ return{
         DUMBBELL_GEM = "What a dreadfully repetitive way to spend one's time.",
         POTATOSACK = "Who would want to lug this heavy thing around?",
 
+        DUMBBELL_HEAT = "Well, at least it's efficient.",
+        DUMBBELL_REDGEM = "Not the most conventional weapon, but to each their own.",
+        DUMBBELL_BLUEGEM = "Not the most conventional weapon, but to each their own.",
 
         TERRARIUMCHEST =
 		{
@@ -4552,6 +4599,26 @@ return{
         SHIELDOFTERROR ="Oh, how alarming... but I'm not one to look a gift shield in the mouth.",
         TWINOFTERROR1 = "That doesn't look like any clockwork I've ever seen.",
         TWINOFTERROR2 = "That doesn't look like any clockwork I've ever seen.",
+
+		-- Cult of the Lamb
+		COTL_TRINKET = "A little lost, are you?",
+		TURF_COTL_GOLD = "Surely there's a better use for all that gold?!",
+		TURF_COTL_BRICK = "You've seen one brick, you've seen them all.",
+		COTL_TABERNACLE_LEVEL1 =
+		{
+			LIT = "It does make a nice little fire, I suppose.",
+			GENERIC = "That seems a bit out of place, doesn't it?",
+		},
+		COTL_TABERNACLE_LEVEL2 =
+		{
+			LIT = "It really is a lovely little statue.",
+			GENERIC = "That seems a bit out of place, doesn't it?",
+		},
+		COTL_TABERNACLE_LEVEL3 =
+		{
+			LIT = "I suppose I can stay and watch it, just for a minute or two.",
+			GENERIC = "That seems a bit out of place, doesn't it?",
+		},
 
         -- Year of the Catcoon
         CATTOY_MOUSE = "What a clever little clockwork contraption!",
@@ -4782,6 +4849,7 @@ return{
 		LUNAR_FORGE = "Why waste time staring at it when I could be making something?",
 		LUNAR_FORGE_KIT = "Well, it's not going to build itself.",
 
+		LUNARPLANT_KIT = "Fixing it is faster than making a new one.",
 		ARMOR_LUNARPLANT = "Some extra protection is always welcome.",
 		LUNARPLANTHAT = "It's incredible that I can see anything while wearing it.",
 		BOMB_LUNARPLANT = "This should end a fight quickly.",
@@ -4790,7 +4858,171 @@ return{
 		PICKAXE_LUNARPLANT = "Unbelievably, it works rather well.",
 		SHOVEL_LUNARPLANT = "An odd, yet extremely efficient design.",
 
+		BROKEN_FORGEDITEM = "It looks well past its prime.",
+
         PUNCHINGBAG = "I could spare a moment to test my weapons... and let off some steam.",
+
+        -- Rifts 2
+        SHADOWRIFT_PORTAL = "This isn't good...",
+
+		SHADOW_FORGE = "Quite a nice change of pace to have shadows working for me.",
+		SHADOW_FORGE_KIT = "I'll have it up and running in just a tick.",
+
+        FUSED_SHADELING = "You stay away from me!",
+        FUSED_SHADELING_BOMB = "What a nasty little thing!",
+
+		VOIDCLOTH = "Tatters of spacetime.",
+		VOIDCLOTH_KIT = "Fixing it is faster than making a new one.",
+		VOIDCLOTHHAT = "Oooh, it makes one look rather mysterious, doesn't it?",
+		ARMOR_VOIDCLOTH = "I prefer chains that have a pocket watch at the end of them.",
+
+        VOIDCLOTH_UMBRELLA = "At least it will keep me dry.",
+        VOIDCLOTH_SCYTHE = "Did I just hear a whisper? No, I must have imagined it.",
+
+		SHADOWTHRALL_HANDS = "Try all you might, you'll never catch me!",
+		SHADOWTHRALL_HORNS = "I will not be your dinner!",
+		SHADOWTHRALL_WINGS = "Shoo! Shoo!!",
+
+        CHARLIE_NPC = "She looks happy... that doesn't bode well.",
+        CHARLIE_HAND = "Me? Help YOU?!",
+
+        NITRE_FORMATION = "How exciting, more rocks!",
+        DREADSTONE_STACK = "It's coming from deep below the surface.",
+        
+        SCRAPBOOK_PAGE = "Did I leave this here?",
+
+        LEIF_IDOL = "What a funny little trinket!",
+        WOODCARVEDHAT = "How rugged!",
+        WALKING_STICK = "Nothing like a walking stick to add some pep to one's step.",
+
+        IPECACSYRUP = "I'm not going to be fooled into tasting that, thank you very much!",
+        BOMB_LUNARPLANT_WORMWOOD = "Wait a tick... did they always look like that?", -- Unused
+        WORMWOOD_MUTANTPROXY_CARRAT =
+        {
+        	DEAD = "I think it's gone off.",
+        	GENERIC = "That's the liveliest carrot I've ever seen.",
+        	HELD = "Stop wriggling!",
+        	SLEEPING = "It's taking a quick little nap.",
+        },
+        WORMWOOD_MUTANTPROXY_LIGHTFLIER = "I feel a bit reassured knowing it's nearby.",
+		WORMWOOD_MUTANTPROXY_FRUITDRAGON =
+		{
+			GENERIC = "What a funny little creature.",
+			RIPE = "It's a shame they're so delicious.",
+			SLEEPING = "I guess it doesn't have anything better to do.",
+		},
+
+        SUPPORT_PILLAR_SCAFFOLD = "Oh! I thought that was done already.",
+        SUPPORT_PILLAR = "Everything breaks down over time. Well, most things anyway.",
+        SUPPORT_PILLAR_COMPLETE = "I wonder how long it will last.",
+        SUPPORT_PILLAR_BROKEN = "Time has not been kind.",
+
+		SUPPORT_PILLAR_DREADSTONE_SCAFFOLD = "Oh! I thought that was done already.",
+		SUPPORT_PILLAR_DREADSTONE = "Everything breaks down over time. Well, most things anyway.",
+		SUPPORT_PILLAR_DREADSTONE_COMPLETE = "Hmph. Time will tell.",
+		SUPPORT_PILLAR_DREADSTONE_BROKEN = "Does anything last?",
+
+        WOLFGANG_WHISTLE = "There's a time and a place for exercise, I suppose.",
+
+        -- Rifts 3
+
+        MUTATEDDEERCLOPS = "Ah. I forgot that they do this sometimes.",
+        MUTATEDWARG = "Oh botheration, I'm getting deja vu...",
+        MUTATEDBEARGER = "It's even worse the second time around.",
+
+        LUNARFROG = "Shoo, you vile thing!",
+
+        DEERCLOPSCORPSE =
+        {
+            GENERIC  = "And stay down!",
+            BURNING  = "It doesn't hurt to take precautions.",
+            REVIVING = "Don't you dare!",
+        },
+
+        WARGCORPSE =
+        {
+            GENERIC  = "Took long enough!",
+            BURNING  = "We won't be meeting again.",
+            REVIVING = "No, no, no! Back down, you!",
+        },
+
+        BEARGERCORPSE =
+        {
+            GENERIC  = "Finally, it's over!",
+            BURNING  = "You're not coming back this time.",
+            REVIVING = "Oh botheration! I have to deal with you again?!",
+        },
+
+        BEARGERFUR_SACK = "It can keep my perishables cold anywhere, anytime.",
+        HOUNDSTOOTH_BLOWPIPE = "A toothy take on a timeless design.",
+        DEERCLOPSEYEBALL_SENTRYWARD =
+        {
+            GENERIC = "Feels like we're back in the ice age.",    -- Enabled.
+            NOEYEBALL = "The part that makes it work is missing. Typical.",  -- Disabled.
+        },
+        DEERCLOPSEYEBALL_SENTRYWARD_KIT = "I think I already built this later.",
+
+        SECURITY_PULSE_CAGE = "It's empty.",
+        SECURITY_PULSE_CAGE_FULL = "Well, it's caught something. Now what?",
+
+		CARPENTRY_STATION =
+        {
+            GENERIC = "I like my furniture simple and functional.",
+            BURNT = "Well, that's decidedly unfunctional.",
+        },
+
+        WOOD_TABLE = -- Shared between the round and square tables.
+        {
+            GENERIC = "A table. Will wonders never cease.",
+            HAS_ITEM = "Yes, there is something on it.",
+            BURNT = "Its days were numbered in a place like this.",
+        },
+
+        WOOD_CHAIR =
+        {
+            GENERIC = "I believe in my time, we called that a chair.",
+            OCCUPIED = "It is occupied.",
+            BURNT = "Its chairing days are done.",
+        },
+
+        DECOR_CENTERPIECE = "I'm sure somebody likes it.",
+        DECOR_LAMP = "How fast does light travel in this place?",
+        DECOR_FLOWERVASE =
+        {
+            GENERIC = "Beautiful.",
+            EMPTY = "I thought I just replaced these. Or was that later?",
+            WILTED = "Fleeting.",
+            FRESHLIGHT = "Good as new.",
+            OLDLIGHT = "I swear I just replaced this.",
+        },
+        DECOR_PICTUREFRAME =
+        {
+            GENERIC = "Looks like it was done in no time at all.",
+            UNDRAWN = "A blank canvas, containing infinite possibilities.",
+        },
+        DECOR_PORTRAITFRAME = "A moment captured in time.",
+
+        PHONOGRAPH = "Shall we play something new or something old?",
+        RECORD = "Is this that newfangled ragtime music the youth are raving about?",
+        RECORD_CREEPYFOREST = "Do I look like I have time to sit around listening to records?",
+        RECORD_DANGER = "I prefer their earlier work.",
+        RECORD_DAWN = "I prefer their later work.",
+        RECORD_DRSTYLE = "I prefer their earlier work.",
+        RECORD_DUSK = "I prefer their earlier work.",
+        RECORD_EFS = "I prefer their later work.",
+        RECORD_END = "Do I look like I have time to sit around listening to records?",
+        RECORD_MAIN = "I prefer their earlier work.",
+        RECORD_WORKTOBEDONE = "I prefer their later work.",
+
+        ARCHIVE_ORCHESTRINA_MAIN = "What an intricate design.",
+
+        WAGPUNKHAT = "I'd love to take it apart and see how it ticks.",
+        ARMORWAGPUNK = "You can always rely on clockwork.",
+        WAGSTAFF_MACHINERY = "Someone must have left these in a hurry.",
+        WAGPUNK_BITS = "Gears and wires and sprockets, oh my!",
+        WAGPUNKBITS_KIT = "What will they think of next?",
+
+        WAGSTAFF_MUTATIONS_NOTE = "Someone must have a lot of time on their hands.",
     },
 
     DESCRIBE_GENERIC = "A very particular something or other.",

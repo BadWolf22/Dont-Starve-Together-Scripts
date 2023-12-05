@@ -37,6 +37,7 @@ return{
             NOTALLOWED = "Nuh-uh.",
             EMPTY = "Need some buildy things.",
             MISMATCH = "Glort? Not right?",
+            NOTREADY = "Later! Too scary here, florp!",
         },
 		RUMMAGE =
 		{
@@ -206,7 +207,7 @@ return{
 			--MapSpotRevealer/messagebottle
 			MESSAGEBOTTLEMANAGER_NOT_FOUND = "Grrr, can't read! Too dark here!",--Likely trying to read messagebottle treasure map in caves
 
-            STASH_MAP_NOT_FOUND = "Glurgh... can't read monkey scribbles.",-- Likely trying to read stash map  in world without stash
+            STASH_MAP_NOT_FOUND = "Glurgh... can't read monkey scribbles.",-- Likely trying to read stash map  in world without stash                  
         },
         WRAPBUNDLE =
         {
@@ -521,6 +522,10 @@ return{
 	ANNOUNCE_HUNT_BEAST_NEARBY = "Where these footprints go?",
 	ANNOUNCE_HUNT_LOST_TRAIL = "No more prints, flort.",
 	ANNOUNCE_HUNT_LOST_TRAIL_SPRING = "Dirt too wet for tracks, have mud bath instead!",
+    ANNOUNCE_HUNT_START_FORK = "Danger way!",
+    ANNOUNCE_HUNT_SUCCESSFUL_FORK = "Glorp! Me sneak!",
+    ANNOUNCE_HUNT_WRONG_FORK = "Flurp! Me feel eyeballs!",
+    ANNOUNCE_HUNT_AVOID_FORK = "Easy way! Boring!",
 	ANNOUNCE_INV_FULL = "Don't have enough pockets, florp.",
 	ANNOUNCE_KNOCKEDOUT = "Glurgh... head hurt...",
 	ANNOUNCE_LOWRESEARCH = "Don't get it...",
@@ -886,6 +891,34 @@ return{
 	ANNOUNCE_TOOL_TOOWEAK = "Grrr... need something stronger, florp!",
 
     ANNOUNCE_LUNAR_RIFT_MAX = "Grrr! Who make that light?",
+    ANNOUNCE_SHADOW_RIFT_MAX = "N-not scared of weird light, florp!",
+
+    ANNOUNCE_SCRAPBOOK_FULL = "No more room in scrappy book.",
+
+    ANNOUNCE_CHAIR_ON_FIRE = "This not fine!!",
+
+    ANNOUNCE_COACH = 
+    {
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+    },
+    ANNOUNCE_WOLFGANG_WIMPY_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_MIGHTY_COACHING = "only_used_by_wolfang",
+    ANNOUNCE_WOLFGANG_BEGIN_COACHING = "only_used_by_wolfang",
+    ANNOUNCE_WOLFGANG_END_COACHING = "only_used_by_wolfang",
+    ANNOUNCE_WOLFGANG_NOTEAM = 
+    {
+        "only_used_by_wolfang",
+        "only_used_by_wolfang",
+        "only_used_by_wolfang",
+    },
 
 	BATTLECRY =
 	{
@@ -1510,7 +1543,7 @@ return{
             FULL = "Lemme out!",
         },
 
-		MAXWELLPHONOGRAPH = "Music comes out of it, florp!",--single player
+		MAXWELLPHONOGRAPH = "Music come out of it, florp!",--single player
 		BOOMERANG = "Come-back stick!",
 		PIGGUARD = "Glurp, he even scarier than others.",
 		ABIGAIL =
@@ -1800,6 +1833,10 @@ return{
         CHESSPIECE_GUARDIANPHASE3 = "Glorp! Oh, it not real.",
         CHESSPIECE_EYEOFTERROR = "Oh no... got dried out, glorp...",
         CHESSPIECE_TWINSOFTERROR = "Ha ha, they just rocks now!",
+        CHESSPIECE_DAYWALKER = "Grrr... why we have nasty Pig statue?!",
+        CHESSPIECE_DEERCLOPS_MUTATED = "Bye bye deer. No more eye pokey",
+        CHESSPIECE_WARG_MUTATED = "Poor doggy. Not so bad",
+        CHESSPIECE_BEARGER_MUTATED = "Remember bad teddy",
 
         CHESSJUNK1 = "It all broken.",
         CHESSJUNK2 = "Didn't do it!!",
@@ -2176,6 +2213,7 @@ return{
 		KNIGHT = "Springy Ironfolk.",
 		KOALEFANT_SUMMER = "What big ears you have!",
 		KOALEFANT_WINTER = "What big ears you have!",
+		KOALEFANT_CARCASS = "Glurgh... stinky dead thing!",
 		KRAMPUS = "Big meanie!!",
 		KRAMPUS_SACK = "It jingles!",
 		LEIF = "Treebeast!!",
@@ -2327,7 +2365,7 @@ return{
             FULL = "That house full of nasty Pigfolk!",
             GENERIC = "Sniff... smell like... Pigfolk!",
             LIGHTSOUT = "Coast clear, florp.",
-            BURNT = "Hee-hee, pig house all burnt up!",
+            BURNT = "Hee-hee, Pig house all burnt up!",
         },
         PIGKING = "He no King, flort!!",
         PIGMAN =
@@ -2795,7 +2833,7 @@ return{
             BURNT = "Good, it gone now.",
 		},
 		PIG_TOKEN = "Stole Pigman's belt!",
-		PIG_COIN = "Shiny pig nose, florp!",
+		PIG_COIN = "Shiny Pig nose, florp!",
 		YOTP_FOOD1 = "Blegh! Has nasty Pig face!",
 		YOTP_FOOD2 = "Usually like mud, but that just bad.",
 		YOTP_FOOD3 = "This insulting to fish.",
@@ -2951,6 +2989,8 @@ return{
 		WALL_WOOD_ITEM = "Nice and sharp, florp.",
 		WALL_MOONROCK = "Moon wall!",
 		WALL_MOONROCK_ITEM = "Tough rocks.",
+		WALL_DREADSTONE = "Pretty wall!",
+		WALL_DREADSTONE_ITEM = "Will be good wall, florp.",
 		FENCE = "Keep out nasty Pigfolk, florp.",
         FENCE_ITEM = "For building fence!",
         FENCE_GATE = "Oooh smart, put door in fence.",
@@ -4417,6 +4457,10 @@ return{
         BIRD_MUTANT_SPITTER = "Pt-ooey back at you, florp!",
 
         WAGSTAFF_NPC = "Is another scale-less? Can't smell him, florpt...",
+
+        WAGSTAFF_NPC_MUTATIONS = "Weird scale-less is back!",
+        WAGSTAFF_NPC_WAGPUNK = "Where he going, florp?",
+
         ALTERGUARDIAN_CONTAINED = "What that thing for?",
 
         WAGSTAFF_TOOL_1 = "Hmm... it have no smell, like weird scale-less.",
@@ -4529,6 +4573,9 @@ return{
         DUMBBELL_GEM = "Muscly mustache man leave rocks everywhere.",
         POTATOSACK = "Snacks! Mine!!",
 
+        DUMBBELL_HEAT = "Muscly mustache man leave rocks everywhere.",
+        DUMBBELL_REDGEM = "Glurp! Hot rocks!",
+        DUMBBELL_BLUEGEM = "Glorph! Too cold!",
 
         TERRARIUMCHEST =
 		{
@@ -4552,6 +4599,26 @@ return{
         SHIELDOFTERROR ="How come it allowed to bite, but me get in trouble?!",
         TWINOFTERROR1 = "M-mermfolk not scared of any Ironfolk, flort!",
         TWINOFTERROR2 = "M-mermfolk not scared of any Ironfolk, flort!",
+
+		-- Cult of the Lamb
+		COTL_TRINKET = "Crown belong to Mermfolk now!",
+		TURF_COTL_GOLD = "Fancy ground.",
+		TURF_COTL_BRICK = "Buncha rocks for ground.",
+		COTL_TABERNACLE_LEVEL1 =
+		{
+			LIT = "It okay for statue of fuzzy scale-less.",
+			GENERIC = "Need fire, florp!",
+		},
+		COTL_TABERNACLE_LEVEL2 =
+		{
+			LIT = "Statue small but strong, flort!",
+			GENERIC = "Need fire, florp!",
+		},
+		COTL_TABERNACLE_LEVEL3 =
+		{
+			LIT = "Such pretty statue...",
+			GENERIC = "Need fire, florp!",
+		},
 
         -- Year of the Catcoon
         CATTOY_MOUSE = "It so fast!",
@@ -4756,12 +4823,12 @@ return{
 		HORRORFUEL = "I-is just goop! Not scared!",
 		DAYWALKER =
 		{
-			GENERIC = "Grrr! You just big stinky pig!",
+			GENERIC = "Grrr! You just big stinky Pig!",
 			IMPRISONED = "Nyeeeeehhh!!",
 		},
 		DAYWALKER_PILLAR =
 		{
-			GENERIC = "Heehee, stinky pig all locked up!",
+			GENERIC = "Heehee, stinky Pig all locked up!",
 			EXPOSED = "Rock too hard for breaking, florp.",
 		},
 		ARMORDREADSTONE = "So pretty... it mine!",
@@ -4782,6 +4849,7 @@ return{
 		LUNAR_FORGE = "Make shiny things.",
 		LUNAR_FORGE_KIT = "Look easy to build, florp.",
 
+		LUNARPLANT_KIT = "Fix-up stuff.",
 		ARMOR_LUNARPLANT = "Tough and glowy!",
 		LUNARPLANTHAT = "Cage for head, florp?",
 		BOMB_LUNARPLANT = "Hee-hee-hee... boom!!",
@@ -4790,7 +4858,171 @@ return{
 		PICKAXE_LUNARPLANT = "It real good at breaking stuff.",
 		SHOVEL_LUNARPLANT = "Good scooper-upper, florp.",
 
+		BROKEN_FORGEDITEM = "Didn't break it!! Was someone else!",
+
         PUNCHINGBAG = "Allowed to hit it? Yay!!",
+
+        -- Rifts 2
+        SHADOWRIFT_PORTAL = "Glorp! Ground broken!",
+
+		SHADOW_FORGE = "Make me things! Now!",
+		SHADOW_FORGE_KIT = "It not ready yet.",
+
+        FUSED_SHADELING = "Something stuck to its tail?",
+        FUSED_SHADELING_BOMB = "It gonna 'splode!",
+
+		VOIDCLOTH = "All torn up.",
+		VOIDCLOTH_KIT = "Fix-up stuff.",
+		VOIDCLOTHHAT = "It dark inside!",
+		ARMOR_VOIDCLOTH = "Scary shirt...",
+
+        VOIDCLOTH_UMBRELLA = "Huh? Th-there a storm in it!",
+        VOIDCLOTH_SCYTHE = "Swish swish, bye-bye plants! Hee-hee!",
+
+		SHADOWTHRALL_HANDS = "G-go away!!",
+		SHADOWTHRALL_HORNS = "Hey! No eating!!",
+		SHADOWTHRALL_WINGS = "N-not scared of you, florp!",
+
+        CHARLIE_NPC = "It the scary night lady!!",
+        CHARLIE_HAND = "What you want, florp?",
+
+        NITRE_FORMATION = "Big bunch of funny rocks.",
+        DREADSTONE_STACK = "Oooh, big shiny rock!",
+        
+        SCRAPBOOK_PAGE = "Found page for scrappy book!",
+
+        LEIF_IDOL = "Aww, little Treebeast!",
+        WOODCARVEDHAT = "Wood choppy man make it with metal choppy friend!",
+        WALKING_STICK = "Wicker-lady say is for walking, not for poking Wen-dee...",
+
+        IPECACSYRUP = "Smell good! Like swamp and rot!",
+        BOMB_LUNARPLANT_WORMWOOD = "Leafy make it different. How?", -- Unused
+        WORMWOOD_MUTANTPROXY_CARRAT =
+        {
+        	DEAD = "It not moving anymore.",
+        	GENERIC = "What that?",
+        	HELD = "Food or pet, florp?",
+        	SLEEPING = "It sleeping now.",
+        },
+        WORMWOOD_MUTANTPROXY_LIGHTFLIER = "Follow me, glowy bug!",
+		WORMWOOD_MUTANTPROXY_FRUITDRAGON =
+		{
+			GENERIC = "It not easy being green.",
+			RIPE = "Smell like... fruit?",
+			SLEEPING = "It taking a nap.",
+		},
+
+        SUPPORT_PILLAR_SCAFFOLD = "Need rocks! MORE ROCKS!!",
+        SUPPORT_PILLAR = "Hey, stop it! Not allowed to break, florp!",
+        SUPPORT_PILLAR_COMPLETE = "Made with own two claws!",
+        SUPPORT_PILLAR_BROKEN = "Didn't do it!",
+
+		SUPPORT_PILLAR_DREADSTONE_SCAFFOLD = "Need rocks! MORE ROCKS!!",
+		SUPPORT_PILLAR_DREADSTONE = "Hey, stop it! Not allowed to break, florp!",
+		SUPPORT_PILLAR_DREADSTONE_COMPLETE = "Pretty pretty pillar, florp!",
+		SUPPORT_PILLAR_DREADSTONE_BROKEN = "Glorp! Found it like that.",
+
+        WOLFGANG_WHISTLE = "Shiny... maybe he not mind if me borrow...",
+
+        -- Rifts 3
+
+        MUTATEDDEERCLOPS = "Poor deer. Want me pull out eye pokey?",
+        MUTATEDWARG = "Spikey doggy.",
+        MUTATEDBEARGER = "Bad teddy.",
+
+        LUNARFROG = "What happened to you, froggy?",
+
+        DEERCLOPSCORPSE =
+        {
+            GENERIC  = "Oh dear, deer dead.",
+            BURNING  = "At least she warm now.",
+            REVIVING = "Uh oh.",
+        },
+
+        WARGCORPSE =
+        {
+            GENERIC  = "Doggy sleeping?",
+            BURNING  = "Doggy getting crispy.",
+            REVIVING = "This bad, florp?",
+        },
+
+        BEARGERCORPSE =
+        {
+            GENERIC  = "Deady teddy.",
+            BURNING  = "Lucky me have no fur.",
+            REVIVING = "Glorp! Teddy awake!",
+        },
+
+        BEARGERFUR_SACK = "Blegh. Better not get teddy hair in food!",
+        HOUNDSTOOTH_BLOWPIPE = "Awww, doggy teeth here!",
+        DEERCLOPSEYEBALL_SENTRYWARD =
+        {
+            GENERIC = "Hi Eye!",    -- Enabled.
+            NOEYEBALL = "Glorp! Who take shiny eyeball?",  -- Disabled.
+        },
+        DEERCLOPSEYEBALL_SENTRYWARD_KIT = "Look easy to build, flort.",
+
+        SECURITY_PULSE_CAGE = "Glorp! Empty!",
+        SECURITY_PULSE_CAGE_FULL = "Oooh, like glowy ball.",
+
+		CARPENTRY_STATION =
+        {
+            GENERIC = "Wood cutty thing!",
+            BURNT = "Who play with fire?",
+        },
+
+        WOOD_TABLE = -- Shared between the round and square tables.
+        {
+            GENERIC = "Table not set yet!",
+            HAS_ITEM = "Wicker-lady! Table all set!",
+            BURNT = "Didn't do it, florp!",
+        },
+
+        WOOD_CHAIR =
+        {
+            GENERIC = "Oooh, fancy sitting-place!",
+            OCCUPIED = "Wanna turn! Move over!",
+            BURNT = "Aww...",
+        },
+
+        DECOR_CENTERPIECE = "What this? Can't even eat it!",
+        DECOR_LAMP = "Pretty light for table.",
+        DECOR_FLOWERVASE =
+        {
+            GENERIC = "Glurgh. Have ugly flower in it.",
+            EMPTY = "Think fish would look better in there than flower.",
+            WILTED = "Fish wouldn't get wilty like this, florp.",
+            FRESHLIGHT = "Friendly little light.",
+            OLDLIGHT = "Need new light.",
+        },
+        DECOR_PICTUREFRAME =
+        {
+            GENERIC = "It hard to draw with claws...",
+            UNDRAWN = "Glurgh. It blank and boring!",
+        },
+        DECOR_PORTRAITFRAME = "It hard to draw with claws...",
+
+        PHONOGRAPH = "Music come out of it, florp!",
+        RECORD = "Again.",
+        RECORD_CREEPYFOREST = "Boring. Next one.",
+        RECORD_DANGER = "Next.",
+        RECORD_DAWN = "What else?",
+        RECORD_DRSTYLE = "Too long.",
+        RECORD_DUSK = "Next.",
+        RECORD_EFS = "Don't like. Next.",
+        RECORD_END = "Next.",
+        RECORD_MAIN = "Boring. Next one.",
+        RECORD_WORKTOBEDONE = "Don't like. Next.",
+
+        ARCHIVE_ORCHESTRINA_MAIN = "Why floor make weird sounds, florp?",
+
+        WAGPUNKHAT = "Nice Ironfolk hat.",
+        ARMORWAGPUNK = "Ooh, Ironfolk shirt.",
+        WAGSTAFF_MACHINERY = "Hey! Weird scale-less leave stuff everywhere, florpt!",
+        WAGPUNK_BITS = "Blegh. Not food.",
+        WAGPUNKBITS_KIT = "It good at fixing. Like Weenowna-lady!",
+
+        WAGSTAFF_MUTATIONS_NOTE = "Moo-tay-shuns... studdy? Glurgh, this one really hard!",
     },
 
     DESCRIBE_GENERIC = "What that?",

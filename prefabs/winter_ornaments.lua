@@ -223,8 +223,10 @@ local function MakeOrnament(ornamentid, overridename, lightdata, build, float_sc
             inst:AddTag("lightbattery")
 
             inst.AnimState:PlayAnimation(tostring(ornamentid).."_on")
+            inst.scrapbook_anim = tostring(ornamentid).."_on"
         else
             inst.AnimState:PlayAnimation(tostring(ornamentid))
+            inst.scrapbook_anim = tostring(ornamentid)
         end
 
         MakeInventoryFloatable(inst)
@@ -234,6 +236,9 @@ local function MakeOrnament(ornamentid, overridename, lightdata, build, float_sc
         if not TheWorld.ismastersim then
             return inst
         end
+
+        inst.scrapbook_specialinfo = "WINTERTREE_ORNAMENT"
+        inst.scrapbook_build = build
 
         inst:AddComponent("inspectable")
         inst:AddComponent("inventoryitem")

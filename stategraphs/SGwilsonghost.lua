@@ -75,9 +75,15 @@ local states =
     State{
         name = "idle",
         tags = { "idle", "canrotate" },
+
         onenter = function(inst)
-            inst.components.locomotor:Stop()
-            inst.components.locomotor:Clear()
+			if inst.sg.lasttags and not inst.sg.lasttags["busy"] then
+				inst.components.locomotor:StopMoving()
+			else
+				inst.components.locomotor:Stop()
+				inst.components.locomotor:Clear()
+			end
+			inst:ClearBufferedAction()
 
             if not inst.AnimState:IsCurrentAnimation("idle") then
                 inst.AnimState:PlayAnimation("idle", true)
@@ -395,7 +401,7 @@ local states =
 
         onenter = function(inst)
             inst.components.locomotor:Stop()
-            inst.AnimState:PlayAnimation("dissipate", false)
+			inst.AnimState:PlayAnimation("dissipate")
             inst.SoundEmitter:PlaySound("dontstarve/ghost/ghost_haunt", nil, nil, true)
         end,
 

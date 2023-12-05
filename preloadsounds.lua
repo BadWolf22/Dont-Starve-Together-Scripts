@@ -199,6 +199,19 @@ local MainSounds =
 
     "rifts.fev",
     "rifts.fsb",
+
+    "aqol.fev",
+    "aqol.fsb",
+
+    "rifts2.fev",
+    "rifts2.fsb",
+
+    "meta2.fev",
+    "meta2.fsb",
+
+    "rifts3.fev",
+    "rifts3.fsb",
+    "rifts3_AMB.fsb",
 }
 
 function PreloadSoundList(list)

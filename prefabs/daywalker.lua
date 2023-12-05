@@ -12,11 +12,15 @@ local prefabs =
 {
 	"shadow_leech",
 	"daywalker_sinkhole",
+	"daywalker_pillar",
 
 	"nightmarefuel",
 	"horrorfuel",
 	"armordreadstone_blueprint",
 	"dreadstonehat_blueprint",
+	"wall_dreadstone_item_blueprint",
+	"support_pillar_dreadstone_scaffold_blueprint",
+	"chesspiece_daywalker_sketch",
 }
 
 local brain = require("brains/daywalkerbrain")
@@ -33,7 +37,10 @@ SetSharedLootTable("daywalker",
 
 	{ "armordreadstone_blueprint",	1 },
 	{ "dreadstonehat_blueprint",	1 },
+	{ "wall_dreadstone_item_blueprint", 1 },
+	{'chesspiece_daywalker_sketch', 1.00},
 })
+local BONUS_PILLAR_LOOT = { "support_pillar_dreadstone_scaffold_blueprint" }
 
 --------------------------------------------------------------------------
 
@@ -353,7 +360,6 @@ local function DetachLeech(inst, attachpos, speedmult, randomdir)
 	todetach.Physics:Teleport(x + math.cos(rot) * speedmult, y, z - math.sin(rot) * speedmult)
 	todetach.sg:GoToState("flung", speedmult)]]
 	--V2C: moved to shadow_leech.OnFlungFrom
-	--NOTE: the leech gets replaced with a new spawn
 	todetach:OnFlungFrom(inst, speedmult, randomdir)
 	return true
 end
@@ -1092,6 +1098,13 @@ end
 
 --------------------------------------------------------------------------
 
+local function LootSetupFn(lootdropper)
+	lootdropper:SetLoot(lootdropper.inst.components.knownlocations:GetLocation("prison") == nil and BONUS_PILLAR_LOOT or nil)
+	lootdropper:SetChanceLootTable("daywalker")
+end
+
+--------------------------------------------------------------------------
+
 local function fn()
 	local inst = CreateEntity()
 
@@ -1118,6 +1131,7 @@ local function fn()
 	inst.AnimState:PlayAnimation("idle", true)
 	inst.AnimState:SetSymbolLightOverride("ww_armlower_red", .6)
 	inst.AnimState:SetSymbolLightOverride("flake", .6)
+	inst.scrapbook_anim = "scrapbook"
 
 	inst.DynamicShadow:SetSize(3.5, 1.5)
 
@@ -1201,7 +1215,7 @@ local function fn()
 	inst.components.epicscare:SetRange(TUNING.DAYWALKER_EPICSCARE_RANGE)
 
 	inst:AddComponent("lootdropper")
-	inst.components.lootdropper:SetChanceLootTable("daywalker")
+	inst.components.lootdropper:SetLootSetupFn(LootSetupFn)
 	inst.components.lootdropper.min_speed = 1
 	inst.components.lootdropper.max_speed = 3
 	inst.components.lootdropper.y_speed = 14

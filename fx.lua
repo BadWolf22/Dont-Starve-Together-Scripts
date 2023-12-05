@@ -596,6 +596,9 @@ local fx =
         anim = "idle",
         sound = "dontstarve_DLC001/common/firesupressor_impact",
     },
+
+	------------------------------------------------------------
+	--These are deprecated: use "deerclops_icespike_fx"
     {
         name = "icespike_fx_1",
         bank = "deerclops_icespike",
@@ -624,6 +627,8 @@ local fx =
         anim = "spike4",
         sound = "dontstarve/creatures/deerclops/ice_small",
     },
+	------------------------------------------------------------
+
     {
         name = "shock_fx",
         bank = "shock_fx",
@@ -801,6 +806,13 @@ local fx =
         bank = "bearger_ground_fx",
         build = "bearger_ground_fx",
         sound = "dontstarve_DLC001/creatures/bearger/dustpoof",
+        anim = "idle",
+    },
+    {
+        name = "werebeaver_groundpound_fx",
+        bank = "bearger_ground_fx",
+        build = "bearger_ground_fx",
+        sound = "meta2/woodie/ground_fx",
         anim = "idle",
     },
     {
@@ -1543,6 +1555,13 @@ local fx =
         bank = "glass_mining_fx",
         build = "glass_mining_fx",
         anim = "anim",
+    },
+    {
+        name = "mining_charged_moonglass_fx",
+        bank = "glass_mining_fx",
+        build = "glass_mining_fx",
+        anim = "anim",
+        fn = function(inst) inst.AnimState:SetLightOverride(0.1) end,
     },
     {
         name = "splash_sink",
@@ -2750,6 +2769,80 @@ local fx =
 			inst.AnimState:SetSymbolLightOverride("flame01", 1)
 		end,
 	},
+    {
+        name = "fused_shadeling_spawn_fx",
+        bank = "fused_shadeling",
+        build = "fused_shadeling",
+        anim = "spawn_fx",
+    },
+    {
+        name = "dreadstone_spawn_fx",
+        bank = "mutate_fx",
+        build = "mutate_fx",
+        anim = "mutate",
+        nofaced = true,
+        fn = function(inst)
+            inst.AnimState:SetMultColour(0, 0, 0, 1)
+            inst.AnimState:SetFinalOffset(1)
+        end,
+    },
+    {
+        name = "wormwood_lunar_transformation_finish",
+        bank = "fx_moon_tea",
+        build = "moon_tea_fx",
+        anim = "puff",
+        bloom = true,
+		sound = "meta2/wormwood/animation_dropdown",
+        fn = FinalOffset1,
+    },
+    
+-------------------------------------------- WAGPUNK Steam
+    {
+        name = "wagpunksteam_hat_up",
+        bank = "wagpunk_fx",
+        build = "wagpunk_fx",
+        anim = "hat_powerup",
+        sound = "rifts3/wagpunk_armor/upgrade",
+        fn = function(inst)
+            inst.Transform:SetFourFaced()
+            inst.AnimState:SetFinalOffset(3)
+        end,
+    },
+    {
+        name = "wagpunksteam_hat_down",
+        bank = "wagpunk_fx",
+        build = "wagpunk_fx",
+        anim = "hat_powerdown",
+        sound = "rifts3/wagpunk_armor/downgrade",
+        fn = function(inst)
+            inst.Transform:SetFourFaced()
+            inst.AnimState:SetFinalOffset(3)
+        end,
+    },
+    {
+        name = "wagpunksteam_armor_up",
+        bank = "wagpunk_fx",
+        build = "wagpunk_fx",
+        anim = "armor_powerup",
+        sound = "rifts3/wagpunk_armor/upgrade",
+        fn = function(inst)
+            inst.Transform:SetFourFaced()
+            inst.AnimState:SetFinalOffset(3)
+        end,
+    },
+    {
+        name = "wagpunksteam_armor_down",
+        bank = "wagpunk_fx",
+        build = "wagpunk_fx",
+        anim = "armor_powerdown",
+        sound = "rifts3/wagpunk_armor/downgrade",
+        fn = function(inst)
+            inst.Transform:SetFourFaced()
+            inst.AnimState:SetFinalOffset(3)
+        end,
+    },
+----------------------------------------------------------
+
 }
 
 for cratersteamindex = 1, 4 do

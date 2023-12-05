@@ -165,6 +165,8 @@ local function trap_starfish()
     inst.AnimState:SetBuild("star_trap")
     inst.AnimState:PlayAnimation("idle", true)
 
+    inst.scrapbook_damage = TUNING.STARFISH_TRAP_DAMAGE
+
     inst:AddTag("trap")
     inst:AddTag("trapdamage")
     inst:AddTag("birdblocker")
@@ -240,6 +242,8 @@ local function dug_trap_starfish()
     inst.AnimState:SetBank("star_trap")
     inst.AnimState:SetBuild("star_trap")
     inst.AnimState:PlayAnimation("inactive", true)
+    inst.scrapbook_anim = "inactive"
+    inst.scrapbook_scale = 2
 
     MakeInventoryFloatable(inst, "med")
 

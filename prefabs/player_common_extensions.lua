@@ -267,6 +267,8 @@ local function DoActualRez(inst, source, item)
     inst.AnimState:Show("HAIR")
     inst.AnimState:Show("HEAD")
     inst.AnimState:Hide("HEAD_HAT")
+	inst.AnimState:Hide("HEAD_HAT_NOHELM")
+	inst.AnimState:Hide("HEAD_HAT_HELM")
 
     inst:Show()
 
@@ -929,6 +931,20 @@ local function OnClosePopups(inst)
     inst:ShowPopUp(POPUPS.PLAYERINFO, false)
 end
 
+local SCRAPBOOK_CANT_TAGS = { "FX", "INLIMBO" }
+local function UpdateScrapbook(inst)
+	--assert(inst = ThePlayer)
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local ents = TheSim:FindEntities(x, y, z, TUNING.SCRAPBOOK_UPDATERADIUS, nil, SCRAPBOOK_CANT_TAGS) 
+    for _, ent in ipairs(ents) do
+        if IsEntityDead(ent) or ent.scrapbook_inspectonseen then 
+            TheScrapbookPartitions:SetInspectedByCharacter(ent, inst.prefab)
+        else
+            TheScrapbookPartitions:SetSeenInGame(ent)
+        end
+    end
+end
+
 return
 {
     ShouldKnockout              = ShouldKnockout,
@@ -963,4 +979,5 @@ return
     OnPostActivateHandshake_Server = OnPostActivateHandshake_Server,
     PostActivateHandshake       = PostActivateHandshake,
     OnClosePopups               = OnClosePopups,
+    UpdateScrapbook             = UpdateScrapbook,
 }

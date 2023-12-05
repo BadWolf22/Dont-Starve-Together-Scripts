@@ -131,7 +131,11 @@ local function onharvest(inst, picker, produce)
 			AwardPlayerAchievement("honey_harvester", picker)
 		end
         updatelevel(inst)
-        if inst.components.childspawner ~= nil and not TheWorld.state.iswinter then
+
+        if inst.components.childspawner ~= nil and
+            not TheWorld.state.iswinter and
+            not (picker ~= nil and picker.components.skilltreeupdater ~= nil and picker.components.skilltreeupdater:IsActivated("wormwood_bugs"))
+        then
             inst.components.childspawner:ReleaseAllChildren(picker)
         end
     end
@@ -338,6 +342,8 @@ local function beebox_hermit(inst)
     inst.AnimState:PlayAnimation("idle")
 
 	inst:AddTag("antlion_sinkhole_blocker")
+
+    inst.scrapbook_specialinfo = "BEEBOX"
 end
 
 local function beebox_master(inst)

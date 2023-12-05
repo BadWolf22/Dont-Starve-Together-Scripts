@@ -1,4 +1,5 @@
 local cooking = require("cooking")
+local RiftConfirmScreen = require("screens/redux/riftconfirmscreen")
 
 local params = {}
 local containers = { MAXITEMSLOTS = 0 }
@@ -370,9 +371,15 @@ params.construction_container =
         top_align_tip = 50,
         buttoninfo =
         {
-            text = STRINGS.ACTIONS.APPLYCONSTRUCTION,
+            text = STRINGS.ACTIONS.APPLYCONSTRUCTION.GENERIC,
             position = Vector3(0, -94, 0),
-        }
+		},
+		--V2C: -override the default widget sound, which is heard only by the client
+		--     -most containers disable the client sfx via skipopensnd/skipclosesnd,
+		--      and play it in world space through the prefab instead.
+		opensound = "dontstarve/wilson/chest_open",
+		closesound = "dontstarve/wilson/chest_close",
+		--
     },
     usespecificslotsforitems = true,
     type = "cooker",
@@ -401,6 +408,92 @@ end
 function params.construction_container.widget.buttoninfo.validfn(inst)
     return inst.replica.container ~= nil and not inst.replica.container:IsEmpty()
 end
+
+params.construction_repair_container = deepcopy(params.construction_container)
+params.construction_repair_container.widget.buttoninfo.text = STRINGS.ACTIONS.APPLYCONSTRUCTION.REPAIR
+
+--------------------------------------------------------------------------
+--[[ enable_shadow_rift_construction_container ]]
+--------------------------------------------------------------------------
+
+params.enable_shadow_rift_construction_container = deepcopy(params.construction_container)
+
+params.enable_shadow_rift_construction_container.widget.slotpos = {Vector3(0, 8, 0)}
+params.enable_shadow_rift_construction_container.widget.side_align_tip = 120
+params.enable_shadow_rift_construction_container.widget.animbank = "ui_bundle_2x2"
+params.enable_shadow_rift_construction_container.widget.animbuild = "ui_bundle_2x2"
+params.enable_shadow_rift_construction_container.widget.buttoninfo.text = STRINGS.ACTIONS.APPLYCONSTRUCTION.OFFER
+
+local function IsConstructionSiteComplete(inst, doer)
+    local container = inst.replica.container
+
+    if container ~= nil and not container:IsEmpty() then
+        local constructionsite = doer.components.constructionbuilderuidata ~= nil and doer.components.constructionbuilderuidata:GetConstructionSite() or nil
+        
+        if constructionsite ~= nil then
+            local ingredients = constructionsite:GetIngredients()
+
+            if ingredients ~= nil then
+                for i, v in ipairs(ingredients) do
+                    local complete, new_count = container:Has(v.type, v.amount)
+                    local old_count = constructionsite:GetSlotCount(i)
+                    if not (new_count +  old_count >= v.amount) then
+                        return false
+                    end
+                end
+            else
+                return false
+            end
+
+            return true
+        end
+    end
+
+    return false
+end
+
+local function EnableRiftsPopUpGoBack()
+    TheFrontEnd:PopScreen()
+end
+
+local function EnableRiftsDoAct(inst, doer)
+	if inst.components.container ~= nil then
+		BufferedAction(doer, inst, ACTIONS.APPLYCONSTRUCTION):Do()
+	elseif inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
+		SendRPCToServer(RPC.DoWidgetButtonAction, ACTIONS.APPLYCONSTRUCTION.code, inst, ACTIONS.APPLYCONSTRUCTION.mod_name)
+	end
+end
+
+function params.enable_shadow_rift_construction_container.widget.buttoninfo.fn(inst, doer)
+	if not params.enable_shadow_rift_construction_container.widget.overrideactionfn(inst, doer) then
+		-- No UI no dialogue.
+		EnableRiftsDoAct(inst, doer)
+	end
+end
+
+function params.enable_shadow_rift_construction_container.widget.overrideactionfn(inst, doer)
+	if doer ~= nil and doer.HUD ~= nil and IsConstructionSiteComplete(inst, doer) then
+		-- We have UI do dialogue.
+		local function EnableRiftsPopUpConfirm()
+			EnableRiftsDoAct(inst, doer)
+			TheFrontEnd:PopScreen()
+		end
+
+		local str = inst.POPUP_STRINGS
+		local confirmation = RiftConfirmScreen(str.TITLE, str.BODY,
+		{
+			{ text = str.OK,     cb = EnableRiftsPopUpConfirm },
+			{ text = str.CANCEL, cb = EnableRiftsPopUpGoBack  },
+		})
+
+		TheFrontEnd:PushScreen(confirmation)
+		return true
+	end
+	return false
+end
+
+--lunar is same as shadow, just different strings specified in prefab
+params.enable_lunar_rift_construction_container = params.enable_shadow_rift_construction_container
 
 --------------------------------------------------------------------------
 --[[ mushroom_light ]]
@@ -1221,6 +1314,48 @@ end
 
 function params.bookstation.itemtestfn(container, item, slot)
     return item:HasTag("bookcabinet_item")
+end
+
+--------------------------------------------------------------------------
+--[[ beargerfur_sack ]]
+--------------------------------------------------------------------------
+
+params.beargerfur_sack =
+{
+    widget =
+    {
+        slotpos = {},
+        slotbg  = {},
+        animbank  = "ui_icepack_2x3",
+        animbuild = "ui_icepack_2x3",
+        pos = Vector3(75, 195, 0),
+        side_align_tip = 160,
+    },
+    type = "chest",
+}
+
+for y = 0, 2 do
+    for x = 0, 1 do
+        table.insert(params.beargerfur_sack.widget.slotpos, Vector3(-163 + (75 * x),   -75 * y + 73,   0))
+        table.insert(params.beargerfur_sack.widget.slotbg, { image = "coooked_food_slot.tex", atlas = "images/hud2.xml" })
+    end
+end
+
+function params.beargerfur_sack.itemtestfn(container, item, slot)
+    -- Prepared food.
+    return item:HasTag("beargerfur_sack_valid") or item:HasTag("preparedfood")
+end
+
+--------------------------------------------------------------------------
+--[[ houndstooth_blowpipe ]]
+--------------------------------------------------------------------------
+
+params.houndstooth_blowpipe = deepcopy(params.slingshot)
+
+params.houndstooth_blowpipe.widget.slotbg = {{ image = "houndstooth_ammo_slot.tex", atlas = "images/hud2.xml" }}
+
+function params.houndstooth_blowpipe.itemtestfn(container, item, slot)
+	return item:HasTag("blowpipeammo")
 end
 
 --------------------------------------------------------------------------

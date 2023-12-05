@@ -3,10 +3,6 @@ local assets =
     Asset("ANIM", "anim/wx_scanner.zip"),
     Asset("INV_IMAGE", "wx78_scanner_item_on"),
     Asset("MINIMAP_IMAGE", "wx78_scanner_item"),
-}
-
-local ringassets =
-{
     Asset("ANIM", "anim/winona_catapult_placement.zip"),
 }
 
@@ -214,6 +210,12 @@ local function itemfn()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.scrapbook_specialinfo = "WX78SCANNER"
+    inst.scrapbook_hide = { "top_light", "bottom_light" }
+
+    inst.scrapbook_animoffsetx = 10
+    inst.scrapbook_animoffsety = -10
 
     -------------------------------------------------------------------
     inst:AddComponent("inspectable")

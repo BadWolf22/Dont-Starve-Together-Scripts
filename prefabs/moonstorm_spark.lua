@@ -180,6 +180,12 @@ local function fn()
     inst:AddTag("show_spoilage")
     inst:AddTag("moonstorm_spark")
 
+    inst.scrapbook_damage = TUNING.LIGHTNING_DAMAGE
+    inst.scrapbook_animpercent = 0.5
+    inst.scrapbook_anim = "idle_flight_loop"
+    inst.scrapbook_animoffsetx = 20
+    inst.scrapbook_animoffsety = 35
+
     inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then

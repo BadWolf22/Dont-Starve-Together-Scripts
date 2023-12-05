@@ -170,6 +170,12 @@ local all_controls =
     {name=CONTROL_MENU_MISC_2, keyboard=nil, controller=CONTROL_MENU_MISC_2},
     {name=CONTROL_MENU_MISC_3, keyboard=nil, controller=CONTROL_MENU_MISC_3},
     {name=CONTROL_MENU_MISC_4, keyboard=nil, controller=CONTROL_MENU_MISC_4},
+
+    -- Chat based commands.
+    {name=CONTROL_TOGGLE_SLASH_COMMAND, keyboard=CONTROL_TOGGLE_SLASH_COMMAND, controller=nil},
+    {name=CONTROL_START_EMOJI, keyboard=CONTROL_START_EMOJI, controller=nil},
+
+    -- Available debug commands.
     {name=CONTROL_OPEN_DEBUG_CONSOLE, keyboard=CONTROL_OPEN_DEBUG_CONSOLE, controller=nil},
     {name=CONTROL_TOGGLE_LOG, keyboard=CONTROL_TOGGLE_LOG, controller=nil},
     {name=CONTROL_TOGGLE_DEBUGRENDER, keyboard=CONTROL_TOGGLE_DEBUGRENDER, controller=nil},
@@ -311,6 +317,8 @@ local OptionsScreen = Class(Screen, function( self, prev_screen, default_section
 		minimapzoomcursor = Profile:IsMinimapZoomCursorFollowing(),
 		loadingtips = Profile:GetLoadingTipsOption(),
 		defaultcloudsaves = Profile:GetDefaultCloudSaves(),
+		scrapbookhuddisplay = Profile:GetScrapbookHudDisplay(),
+		poidisplay = Profile:GetPOIDisplay(),
 	}
 
 	if IsWin32() then
@@ -635,6 +643,8 @@ function OptionsScreen:Save(cb)
 	Profile:SetCampfireStoryCameraEnabled( self.options.waltercamera )
 	Profile:SetMinimapZoomCursorEnabled( self.options.minimapzoomcursor )
 	Profile:SetDefaultCloudSaves( self.options.defaultcloudsaves )
+	Profile:SetScrapbookHudDisplay( self.options.scrapbookhuddisplay )
+	Profile:SetPOIDisplay( self.options.poidisplay )	
 
 	if self.integratedbackpackSpinner:IsEnabled() then
 		Profile:SetIntegratedBackpack( self.options.integratedbackpack )
@@ -760,6 +770,8 @@ function OptionsScreen:Apply()
 	Profile:SetCraftingHintAllRecipesEnabled( self.working.craftinghintallrecipes )
 	Profile:SetLoadingTipsOption( self.working.loadingtips )
 	Profile:SetDefaultCloudSaves( self.options.defaultcloudsaves )
+	Profile:SetScrapbookHudDisplay( self.options.scrapbookhuddisplay )
+	Profile:SetPOIDisplay( self.options.poidisplay )
 	
 	DoAutopause()
 	local pausescreen = TheFrontEnd:GetOpenScreenOfType("PauseScreen")
@@ -1559,13 +1571,21 @@ function OptionsScreen:_BuildSettings()
 			self:UpdateMenu()
 		end
 
+	self.scrapbookhuddisplaySpinner =  CreateTextSpinner(STRINGS.UI.OPTIONS.SCAPBOOKHUDDISPLAY, enableDisableOptions, STRINGS.UI.OPTIONS.TOOLTIPS.SCAPBOOKHUDDISPLAY)
+	self.scrapbookhuddisplaySpinner.OnChanged =
+		function( _, data )
+			self.working.scrapbookhuddisplay = data
+			--self:Apply()
+			self:UpdateMenu()
+		end
+
 	self.craftingmenunumpinpagesSpinner = CreateNumericSpinner(STRINGS.UI.OPTIONS.CRAFTINGMENUNUMPINPAGES, 2, 9, STRINGS.UI.OPTIONS.TOOLTIPS.CRAFTINGMENUNUMPINPAGES)
 	self.craftingmenunumpinpagesSpinner.OnChanged =
 		function( _, data )
 			self.working.craftingmenunumpinpages = data
 			--self:Apply()
 			self:UpdateMenu()
-		end
+		end		
 
 	self.craftingautopauseSpinner = CreateTextSpinner(STRINGS.UI.OPTIONS.CRAFTINGAUTOPAUSE, enableDisableOptions, STRINGS.UI.OPTIONS.TOOLTIPS.CRAFTINGAUTOPAUSE)
 	self.craftingautopauseSpinner.OnChanged =
@@ -1734,6 +1754,7 @@ function OptionsScreen:_BuildSettings()
     table.insert( self.right_spinners, self.autopauseSpinner )
 	table.insert( self.right_spinners, self.craftingautopauseSpinner )
 	table.insert( self.right_spinners, self.craftingmenunumpinpagesSpinner )
+	table.insert( self.right_spinners, self.scrapbookhuddisplaySpinner )
 	
 	if self.show_datacollection then
 		table.insert( self.right_spinners, self.datacollectionCheckbox)
@@ -1793,6 +1814,14 @@ function OptionsScreen:_BuildAdvancedSettings()
 			--self:Apply()
 			self:UpdateMenu()
 		end
+
+	self.poidisplaySpinner = CreateTextSpinner(STRINGS.UI.OPTIONS.POIDISPLAY, enableDisableOptions, STRINGS.UI.OPTIONS.TOOLTIPS.POIDISPLAY)
+	self.poidisplaySpinner.OnChanged =
+		function( _, data )
+			self.working.poidisplay = data
+			--self:Apply()
+			self:UpdateMenu()
+		end		
 
 	self.minimapzoomcursorSpinner = CreateTextSpinner(STRINGS.UI.OPTIONS.MINIMAPZOOMCURSOR, enableDisableOptions, STRINGS.UI.OPTIONS.TOOLTIPS.MINIMAPZOOMCURSOR)
 	self.minimapzoomcursorSpinner.OnChanged =
@@ -1895,6 +1924,7 @@ function OptionsScreen:_BuildAdvancedSettings()
 	table.insert( self.left_spinners, self.animatedHeadsSpinner )
     table.insert( self.left_spinners, self.wathgrithrfontSpinner)
 	table.insert( self.left_spinners, self.waltercameraSpinner)
+	table.insert( self.left_spinners, self.poidisplaySpinner)
 
 	table.insert( self.right_spinners, self.consoleautopauseSpinner )
 	table.insert( self.right_spinners, self.craftingmenubufferedbuildautocloseSpinner )
@@ -2405,9 +2435,11 @@ function OptionsScreen:InitializeSpinners(first)
 	if not TheSim:IsSteamChinaClient() then
 		self.profanityfilterchatSpinner:SetSelectedIndex( EnabledOptionsIndex( self.working.profanityfilterchat ) )
 	end
+	self.scrapbookhuddisplaySpinner:SetSelectedIndex( EnabledOptionsIndex(self.working.scrapbookhuddisplay))
     self.movementpredictionSpinner:SetSelectedIndex(EnabledOptionsIndex(self.working.movementprediction))
 	self.wathgrithrfontSpinner:SetSelectedIndex( EnabledOptionsIndex( self.working.wathgrithrfont ) )
 	self.waltercameraSpinner:SetSelectedIndex( EnabledOptionsIndex( self.working.waltercamera ) )
+	self.poidisplaySpinner:SetSelectedIndex( EnabledOptionsIndex( self.working.poidisplay ) )
 	self.minimapzoomcursorSpinner:SetSelectedIndex( EnabledOptionsIndex( self.working.minimapzoomcursor ) )
 	self.boatcameraSpinner:SetSelectedIndex( EnabledOptionsIndex( self.working.boatcamera ) )
 	self.integratedbackpackSpinner:SetSelectedIndex( EnabledOptionsIndex( self.working.integratedbackpack ) )

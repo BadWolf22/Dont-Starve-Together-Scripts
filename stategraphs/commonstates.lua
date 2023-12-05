@@ -148,7 +148,9 @@ end
 
 --------------------------------------------------------------------------
 local function ondeath(inst, data)
-    inst.sg:GoToState("death", data)
+	if not inst.sg:HasStateTag("dead") then
+		inst.sg:GoToState("death", data)
+	end
 end
 
 CommonHandlers.OnDeath = function()
@@ -1294,6 +1296,10 @@ CommonHandlers.OnNoSleepTimeEvent = function(t, fn)
     end)
 end
 
+CommonHandlers.OnNoSleepFrameEvent = function(frame, fn)
+	return CommonHandlers.OnNoSleepTimeEvent(frame * FRAMES, fn)
+end
+
 local function sleepexonanimover(inst)
     if inst.AnimState:AnimDone() then
         inst.sg.statemem.continuesleeping = true
@@ -1745,7 +1751,7 @@ local function DoWashAshore(inst, skip_splash)
 	inst.components.drownable:WashAshore()
 end
 
-CommonStates.AddSinkAndWashAsoreStates = function(states, anims, timelines, fns)
+CommonStates.AddSinkAndWashAshoreStates = function(states, anims, timelines, fns)
 	anims = anims or {}
 	timelines = timelines or {}
 	fns = fns or {}
@@ -1885,7 +1891,8 @@ CommonStates.AddSinkAndWashAsoreStates = function(states, anims, timelines, fns)
 	})
 end
 
-CommonStates.AddSinkAndWashAshoreStates = CommonStates.AddSinkAndWashAsoreStates
+--Backward compatibility for originally mispelt function name
+CommonStates.AddSinkAndWashAsoreStates = CommonStates.AddSinkAndWashAshoreStates
 
 --------------------------------------------------------------------------
 
@@ -1893,21 +1900,55 @@ function PlayMiningFX(inst, target, nosound)
     if target ~= nil and target:IsValid() then
         local frozen = target:HasTag("frozen")
         local moonglass = target:HasTag("moonglass")
+        local crystal = target:HasTag("crystal")
         if target.Transform ~= nil then
             SpawnPrefab(
                 (frozen and "mining_ice_fx") or
                 (moonglass and "mining_moonglass_fx") or
+                (crystal and "mining_crystal_fx") or
                 "mining_fx"
             ).Transform:SetPosition(target.Transform:GetWorldPosition())
         end
         if not nosound and inst.SoundEmitter ~= nil then
             inst.SoundEmitter:PlaySound(
                 (frozen and "dontstarve_DLC001/common/iceboulder_hit") or
-                (moonglass and "turnoftides/common/together/moon_glass/mine") or
+                ((moonglass or crystal) and "turnoftides/common/together/moon_glass/mine") or
                 "dontstarve/wilson/use_pick_rock"
             )
         end
     end
+end
+
+--------------------------------------------------------------------------
+
+local function IpecacPoop(inst)
+    if not (inst.sg:HasStateTag("busy") or (inst.components.health ~= nil and inst.components.health:IsDead())) then
+        inst.sg:GoToState("ipecacpoop")
+    end
+end
+
+CommonHandlers.OnIpecacPoop = function()
+    return EventHandler("ipecacpoop", IpecacPoop)
+end
+
+CommonStates.AddIpecacPoopState = function(states, anim)
+    anim = anim or "hit"
+
+    table.insert(states, State{
+        name = "ipecacpoop",
+        tags = { "busy" },
+
+        onenter = function(inst)
+            inst.SoundEmitter:PlaySound("meta2/wormwood/laxative_poot")
+            inst.AnimState:PlayAnimation(anim)
+            inst.Physics:Stop()
+        end,
+
+        events =
+        {
+            EventHandler("animover", idleonanimover),
+        },
+    })
 end
 
 --------------------------------------------------------------------------

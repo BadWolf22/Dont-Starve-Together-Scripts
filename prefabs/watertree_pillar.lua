@@ -373,6 +373,7 @@ local function OnRemoveEntity(inst)
 end
 
 local FIREFLY_MUST = {"firefly"}
+local FIREFLY_CANT = {"FX", "NOBLOCK", "NOCLICK", "DECOR", "flying", "boat", "walkingplank", "_inventoryitem", "structure"}
 local function OnPhaseChanged(inst, phase)
    if phase == "day" then
 
@@ -391,7 +392,7 @@ local function OnPhaseChanged(inst, phase)
 
                     pos = {x=x+offset.x,y=0,z=z+offset.z}
 
-                    if TheSim:CountEntities(pos.x, pos.y, pos.z, 5) > 0 then
+                    if TheSim:CountEntities(pos.x, pos.y, pos.z, 5, nil, FIREFLY_CANT) > 0 then
                         offset = nil
                     end
                 end
@@ -441,11 +442,15 @@ local function fn()
         inst.components.canopyshadows.range = math.floor(TUNING.SHADE_CANOPY_RANGE/4)
     end
 
+    inst.scrapbook_specialinfo = "WATERTREEPILLAR"
+
     inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.scrapbook_adddeps = { "oceanvine" }
 
     -- inst.target_num_oceanvines = nil
     -- inst.items_to_drop = nil

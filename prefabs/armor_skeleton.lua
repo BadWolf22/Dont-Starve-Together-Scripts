@@ -14,6 +14,7 @@ local RESISTANCES =
     "_combat",
     "explosive",
     "quakedebris",
+    "lunarhaildebris",
     "caveindebris",
     "trapdamage",
 }
@@ -194,6 +195,8 @@ local function fn()
     inst.AnimState:SetBuild("armor_skeleton")
     inst.AnimState:PlayAnimation("anim")
 
+    inst.scrapbook_specialinfo = "ARMORBONE"
+
     inst:AddTag("fossil")
 
 	--shadowlevel (from shadowlevel component) added to pristine state for optimization
@@ -214,6 +217,9 @@ local function fn()
 
         return inst
     end
+
+    inst.scrapbook_fueled_rate = TUNING.MED_FUEL
+    inst.scrapbook_fueled_uses = true
 
     inst:AddComponent("inspectable")
 

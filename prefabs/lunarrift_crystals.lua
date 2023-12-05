@@ -54,15 +54,33 @@ local function do_crystal_spawnin(inst, time)
 end
 
 --------------------------------------------------------------------------
+-- An extra-safe cleanup in case the terraformer reverting fails to find & destroy us.
+local function do_deterraform_cleanup(inst)
+    if inst:IsInLimbo() then
+        inst:Remove()
+    else
+        inst.components.lootdropper:SetLoot(nil)
+        inst.components.lootdropper:SetChanceLootTable(nil)
+        inst.components.workable:Destroy(inst)
+    end
+end
+
+--------------------------------------------------------------------------
 local function on_crystal_timerdone(inst, data)
     if data.name == "finish_spawnin" then
         finish_crystal_spawnin(inst)
+    elseif data.name == "do_deterraform_cleanup" then
+        do_deterraform_cleanup(inst)
     end
 end
 
 --------------------------------------------------------------------------
 local function ShouldRecoil(inst, worker, tool, numworks)
-	if worker ~= nil and inst.components.workable:GetWorkLeft() > math.max(1, numworks) and not (tool ~= nil and tool.components.tool ~= nil and tool.components.tool:GetEffectiveness(ACTIONS.MINE) > 1) then
+	if inst.components.workable:GetWorkLeft() > math.max(1, numworks) and
+		not (worker ~= nil and (worker:HasTag("toughworker") or worker:HasTag("explosive"))) and
+		not (tool ~= nil and tool.components.tool ~= nil and tool.components.tool:CanDoToughWork())
+		then
+		--
 		local t = GetTime()
 		if inst._recoils == nil then
 			inst._recoils = {}
@@ -123,9 +141,13 @@ local function basecrystal_fn(anim_prefix, physics_size)
     inst.AnimState:PlayAnimation(anim_prefix, true)
     inst.AnimState:SetLightOverride(0.1)
 
+    inst.pickupsound = "gem"
+
     inst:AddTag("birdblocker")
     inst:AddTag("boulder")
     inst:AddTag("crystal")
+
+    inst.scrapbook_specialinfo = "LUNARRIFTCRYSTAL"
 
     MakeSnowCoveredPristine(inst)
 
@@ -191,7 +213,7 @@ local function on_big_crystal_worked(inst, worker, work_left)
 
         inst:Remove()
     else
-		local anim = work_left < HALF_WORK and "half" or "full"
+		local anim = work_left <= HALF_WORK and "half" or "full"
 		if not inst.AnimState:IsCurrentAnimation(anim) then
 			inst.AnimState:PlayAnimation(anim, true)
 		end
@@ -200,7 +222,7 @@ end
 
 local function big_fn()
     local crystal = basecrystal_fn("full", 1.0)
-
+    crystal.scrapbook_anim = "full"
     if not TheWorld.ismastersim then
         return crystal
     end
@@ -234,7 +256,7 @@ end
 local SMALL_LOOT = {"purebrilliance"}
 local function small_fn()
     local crystal = basecrystal_fn("small", 0.25, SMALL_LOOT)
-
+    crystal.scrapbook_anim = "small"
     if not TheWorld.ismastersim then
         return crystal
     end

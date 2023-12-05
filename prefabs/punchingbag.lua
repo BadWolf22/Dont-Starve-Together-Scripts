@@ -194,11 +194,17 @@ local function basefn(build, tags)
         return inst
     end
 
+    inst.scrapbook_hidehealth = true
+
     --
     inst:AddComponent("combat")
 
     --
     inst:AddComponent("debuffable")
+
+	--
+	inst:AddComponent("colouradder")
+	inst:AddComponent("bloomer")
 
     --
     local health = inst:AddComponent("health")

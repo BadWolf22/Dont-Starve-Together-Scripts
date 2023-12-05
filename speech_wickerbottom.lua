@@ -37,6 +37,7 @@ return{
             NOTALLOWED = "That was erroneous.",
             EMPTY = "I need something to build with first.",
             MISMATCH = "Those are the wrong plans.",
+            NOTREADY = "Perhaps when the ground is more stable...",
         },
 		RUMMAGE =
 		{
@@ -206,7 +207,7 @@ return{
 			--MapSpotRevealer/messagebottle
 			MESSAGEBOTTLEMANAGER_NOT_FOUND = "It's much too dark to make any sense of this.",--Likely trying to read messagebottle treasure map in caves
 
-            STASH_MAP_NOT_FOUND = "The apes seem to have neglected to mark any particular sites on this map.",-- Likely trying to read stash map  in world without stash
+            STASH_MAP_NOT_FOUND = "The apes seem to have neglected to mark any particular sites on this map.",-- Likely trying to read stash map  in world without stash                  
         },
         WRAPBUNDLE =
         {
@@ -521,6 +522,10 @@ return{
 	ANNOUNCE_HUNT_BEAST_NEARBY = "The appearance of this track indicates recent activity.",
 	ANNOUNCE_HUNT_LOST_TRAIL = "The trail is no longer distinguishable.",
 	ANNOUNCE_HUNT_LOST_TRAIL_SPRING = "The trail's been washed away by the precipitation.",
+    ANNOUNCE_HUNT_START_FORK = "I suspect whatever lies at the end of this trail will be formidable.",
+    ANNOUNCE_HUNT_SUCCESSFUL_FORK = "It seems I've managed to track the creature without alerting it.",
+    ANNOUNCE_HUNT_WRONG_FORK = "Oh dear... I have the most peculiar sensation that I'm being observed.",
+    ANNOUNCE_HUNT_AVOID_FORK = "This trail will likely yeild less dangerous results.",
 	ANNOUNCE_INV_FULL = "I can't carry anything more.",
 	ANNOUNCE_KNOCKEDOUT = "Oof, that's one way to get some rest, I suppose.",
 	ANNOUNCE_LOWRESEARCH = "Not a great resource, but there were useful bits.",
@@ -883,9 +888,37 @@ return{
     ANNOUNCE_COZY_SLEEP = "I suppose it was worth a try.",
 
 	--
-	ANNOUNCE_TOOL_TOOWEAK = "This will require a more robust tool than I currently possess.",
+	ANNOUNCE_TOOL_TOOWEAK = "This will require a more robust tool.",
 
     ANNOUNCE_LUNAR_RIFT_MAX = "I suspect a powerful influx of energy is the source of that strange glow.",
+    ANNOUNCE_SHADOW_RIFT_MAX = "As nonsensical as it sounds, there is something dark about that \"light\"...",
+
+    ANNOUNCE_SCRAPBOOK_FULL = "My scrapbook has already been completed.",
+
+    ANNOUNCE_CHAIR_ON_FIRE = "This is unacceptable.",
+
+    ANNOUNCE_COACH = 
+    {
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+    },
+    ANNOUNCE_WOLFGANG_WIMPY_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_MIGHTY_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_BEGIN_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_END_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_NOTEAM = 
+    {
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+    },
 
 	BATTLECRY =
 	{
@@ -1800,6 +1833,10 @@ return{
         CHESSPIECE_GUARDIANPHASE3 = "I must commend the artist for their attention to detail.",
         CHESSPIECE_EYEOFTERROR = "A trophy that doubles as a useful anatomical model.",
         CHESSPIECE_TWINSOFTERROR = "A stone rendition of a pair of mechanical marvels.",
+        CHESSPIECE_DAYWALKER = "An accurate stone model of that ill-behaved creature.",
+        CHESSPIECE_DEERCLOPS_MUTATED = "Such a strange and grotesque affliction...",
+        CHESSPIECE_WARG_MUTATED = "There is much I still don't understand about this beast.",
+        CHESSPIECE_BEARGER_MUTATED = "The artist truly captured its ferocity!",
 
         CHESSJUNK1 = "The magician's unfinished projects?",
         CHESSJUNK2 = "The magician's unfinished projects?",
@@ -2176,6 +2213,7 @@ return{
 		KNIGHT = "An automatic equine.",
 		KOALEFANT_SUMMER = "Koalefanta Proboscidea.",
 		KOALEFANT_WINTER = "Koalefanta Proboscidea in thick winter pelage.",
+		KOALEFANT_CARCASS = "This creature has expired.",
 		KRAMPUS = "It's a mythological holiday monster.",
 		KRAMPUS_SACK = "It seems bigger inside than out.",
 		LEIF = "I... don't even know.",
@@ -2951,6 +2989,8 @@ return{
 		WALL_WOOD_ITEM = "Deployable pickets.",
 		WALL_MOONROCK = "A job well done.",
 		WALL_MOONROCK_ITEM = "Fits comfortably in my pocket.",
+		WALL_DREADSTONE = "A highly secure wall.",
+		WALL_DREADSTONE_ITEM = "The stone's density makes for an incredibly strong building material.",
 		FENCE = "A simply constructed fence.",
         FENCE_ITEM = "All the components for a wooden fence.",
         FENCE_GATE = "That is a wooden gate.",
@@ -4417,6 +4457,10 @@ return{
         BIRD_MUTANT_SPITTER = "The poor thing appears to have been altered by its proximity to the storm.",
 
         WAGSTAFF_NPC = "He seems to be conducting research on the storm, I should assist him.",
+
+        WAGSTAFF_NPC_MUTATIONS = "Rather convenient of him to show up now that the hard work is done.",
+        WAGSTAFF_NPC_WAGPUNK = "Ah, the pursuit of knowledge.",
+
         ALTERGUARDIAN_CONTAINED = "I wonder what he means to do with all that energy.",
 
         WAGSTAFF_TOOL_1 = "Oh dear, I wonder whether that is the tool he requested or not...",
@@ -4529,6 +4573,9 @@ return{
         DUMBBELL_GEM = "A bit of exercise can be quite beneficial to one's health.",
         POTATOSACK = "He seems to have a deep fondness for tubers.",
 
+        DUMBBELL_HEAT = "An interesting combination of exercise and temperature regulation.",
+        DUMBBELL_REDGEM = "Careful dear, that looks suspiciously combustible.",
+        DUMBBELL_BLUEGEM = "My, it's ice-cold to the touch!",
 
         TERRARIUMCHEST =
 		{
@@ -4552,6 +4599,26 @@ return{
         SHIELDOFTERROR ="It seems better suited to offensive measures, rather than defensive as one might think.",
         TWINOFTERROR1 = "How curious, I wonder who might have constructed such a thing?",
         TWINOFTERROR2 = "How curious, I wonder who might have constructed such a thing?",
+
+		-- Cult of the Lamb
+		COTL_TRINKET = "Oh dear, did it just blink at me?",
+		TURF_COTL_GOLD = "Children, wipe your feet before you even think about walking on that floor!",
+		TURF_COTL_BRICK = "Brickwork, to be applied to the ground.",
+		COTL_TABERNACLE_LEVEL1 =
+		{
+			LIT = "This statue seems to have fallen into disrepair.",
+			GENERIC = "A small fire is needed to achieve the full effect.",
+		},
+		COTL_TABERNACLE_LEVEL2 =
+		{
+			LIT = "What a charming statue.",
+			GENERIC = "A small fire is needed to achieve the full effect.",
+		},
+		COTL_TABERNACLE_LEVEL3 =
+		{
+			LIT = "The firelight reflecting against the gold surface is almost hypnotic.",
+			GENERIC = "Fire is needed to achieve the full effect.",
+		},
 
         -- Year of the Catcoon
         CATTOY_MOUSE = "A simple mechanism behind an entertaining toy for felines.",
@@ -4782,6 +4849,7 @@ return{
 		LUNAR_FORGE = "It utilizes crystallized energy to reshape and reinforce organic material.",
 		LUNAR_FORGE_KIT = "It should be a simple matter to construct it.",
 
+		LUNARPLANT_KIT = "Now that I'm familiar with the material, it's a simple matter to repair it.",
 		ARMOR_LUNARPLANT = "Surprisingly effective plant-based armor.",
 		LUNARPLANTHAT = "It does not fit well over my glasses, but I suppose I must make do.",
 		BOMB_LUNARPLANT = "Unstable energy, barely held together by a hardy plant epidermis.",
@@ -4790,7 +4858,171 @@ return{
 		PICKAXE_LUNARPLANT = "A surprisingly effective mining and crushing implement.",
 		SHOVEL_LUNARPLANT = "A surprisingly effective digging implement.",
 
+		BROKEN_FORGEDITEM = "With the right materials, it could be repaired.",
+
         PUNCHINGBAG = "A useful tool for testing a weapon's efficacy.",
+
+        -- Rifts 2
+        SHADOWRIFT_PORTAL = "Intriguing and deeply worrying in equal measures.",
+
+		SHADOW_FORGE = "I do not care for this type of magic.",
+		SHADOW_FORGE_KIT = "It cannot be utilized until its been assembled.",
+
+        FUSED_SHADELING = "It is reminiscent of the parasitic shadows we encountered before.",
+        FUSED_SHADELING_BOMB = "Its body is highly volatile.",
+
+		VOIDCLOTH = "This unusual fabric may be quite useful.",
+		VOIDCLOTH_KIT = "Now that I'm familiar with the material, it's a simple matter to repair it.",
+		VOIDCLOTHHAT = "Prolonged use will surely have detrimental effects on the mind.",
+		ARMOR_VOIDCLOTH = "Armor against metaphysical damage.",
+
+        VOIDCLOTH_UMBRELLA = "It provides a useful barrier against acid droplets.",
+        VOIDCLOTH_SCYTHE = "A common harvesting implement, with an admittedly unsettling appearance.",
+
+		SHADOWTHRALL_HANDS = "I would advise against challenging it in hand-to-hand combat.",
+		SHADOWTHRALL_HORNS = "A ravenous shadow beast.",
+		SHADOWTHRALL_WINGS = "Its wings seem to be utilized for propulsion, not to remain airborne.",
+
+        CHARLIE_NPC = "I'd like to give that young lady a stern talking to!",
+        CHARLIE_HAND = "It requires materials.",
+
+        NITRE_FORMATION = "The acidic rain seems to have caused a chemical reaction, producing these formations.",
+        DREADSTONE_STACK = "Its source must lie even deeper underground.",
+        
+        SCRAPBOOK_PAGE = "What a hideous sight! A page torn from its book!",
+
+        LEIF_IDOL = "I believe it requires the application of a flame.",
+        WOODCARVEDHAT = "A bit utilitarian, but sturdy enough.",
+        WALKING_STICK = "An impressive level of detail, considering it was carved with an axe.",
+
+        IPECACSYRUP = "Ingesting it would be detrimental to one's health.",
+        BOMB_LUNARPLANT_WORMWOOD = "Our verdant friend seems to have worked his magic on this.", -- Unused
+        WORMWOOD_MUTANTPROXY_CARRAT =
+        {
+        	DEAD = "Perhaps that was unnecessary.",
+        	GENERIC = "My, another plant and animal hybrid. How odd.",
+        	HELD = "The plant and animal matter has fused in total harmony.",
+        	SLEEPING = "It's in a deep sleep.",
+        },
+        WORMWOOD_MUTANTPROXY_LIGHTFLIER = "If it could be convinced to stay still, it would make an excellent reading light.",
+		WORMWOOD_MUTANTPROXY_FRUITDRAGON =
+		{
+			GENERIC = "Plant and animal have merged into one in this specimen.",
+			RIPE = "It does smell quite delicious.",
+			SLEEPING = "It's in a deep sleep.",
+		},
+
+        SUPPORT_PILLAR_SCAFFOLD = "It appears some construction is required.",
+        SUPPORT_PILLAR = "I'm afraid it will not be able to withstand these tectonic shifts forever.",
+        SUPPORT_PILLAR_COMPLETE = "That should stabilize the cave's ceiling for now.",
+        SUPPORT_PILLAR_BROKEN = "It would be prudent to attempt some repairs.",
+
+		SUPPORT_PILLAR_DREADSTONE_SCAFFOLD = "It appears some construction is required.",
+		SUPPORT_PILLAR_DREADSTONE = "I'm afraid it will not be able to withstand these tectonic shifts forever.",
+		SUPPORT_PILLAR_DREADSTONE_COMPLETE = "Dreadstone. This will hold.",
+		SUPPORT_PILLAR_DREADSTONE_BROKEN = "Broken? Perhaps this material is not as indestructible as I surmised.",
+
+        WOLFGANG_WHISTLE = "Please try to keep the noise to a minimum, dear.",
+
+        -- Rifts 3
+
+        MUTATEDDEERCLOPS = "The reanimation process seems to have altered its physicality.",
+        MUTATEDWARG = "Its body has been drastically altered.",
+        MUTATEDBEARGER = "The parasite seems capable of altering its host body to suit its needs.",
+
+        LUNARFROG = "It possesses a truly unnecessary abundance of eyes.",
+
+        DEERCLOPSCORPSE =
+        {
+            GENERIC  = "It might be prudent to dispose of the body.",
+            BURNING  = "It's the safest course of action.",
+            REVIVING = "Goodness! Something is reanimating the body!",
+        },
+
+        WARGCORPSE =
+        {
+            GENERIC  = "I'd rather not leave such a thing lying around.",
+            BURNING  = "A necessary precaution.",
+            REVIVING = "Some parasitic entity is utilizing the body as a host!",
+        },
+
+        BEARGERCORPSE =
+        {
+            GENERIC  = "It could lead to trouble if it's not promptly disposed of.",
+            BURNING  = "I'm relieved to see it go.",
+            REVIVING = "Oh dear. It seems I'm too late.",
+        },
+
+        BEARGERFUR_SACK = "A portable chilling unit. Well and good, but cold food makes my teeth ache.",
+        HOUNDSTOOTH_BLOWPIPE = "An improvised dental projectile device.",
+        DEERCLOPSEYEBALL_SENTRYWARD =
+        {
+            GENERIC = "An implement that conditions the air, or ambient-temperature-reduction-device for short.",    -- Enabled.
+            NOEYEBALL = "It is rendered useless without the eye of that beast.",  -- Disabled.
+        },
+        DEERCLOPSEYEBALL_SENTRYWARD_KIT = "It should be a simple matter to construct it.",
+
+        SECURITY_PULSE_CAGE = "I have not come across this in any book.",
+        SECURITY_PULSE_CAGE_FULL = "The glowing object inside emits some sort of energy.",
+
+		CARPENTRY_STATION =
+        {
+            GENERIC = "I could use a new reading chair.",
+            BURNT = "I suppose my reading chair will have to wait.",
+        },
+
+        WOOD_TABLE = -- Shared between the round and square tables.
+        {
+            GENERIC = "Perfect for enjoying a cup of tea and a good book.",
+            HAS_ITEM = "Perfect for enjoying a cup of tea and a good book.",
+            BURNT = "What a shame.",
+        },
+
+        WOOD_CHAIR =
+        {
+            GENERIC = "Reminds me of the chair in my reading nook.",
+            OCCUPIED = "If you're going to sit, you might as well read.",
+            BURNT = "Can't we have any nice things?",
+        },
+
+        DECOR_CENTERPIECE = "I suppose it's pretty, but it doesn't do much.",
+        DECOR_LAMP = "Now I can read my books at night.",
+        DECOR_FLOWERVASE =
+        {
+            GENERIC = "It's pleasant to see a little decor out here.",
+            EMPTY = "Ah, could use a doily, wouldn't you say?",
+            WILTED = "A pity. Shall we find replacements?",
+            FRESHLIGHT = "The more light to read by the better, in my opinion.",
+            OLDLIGHT = "It is Maxwell's turn to procure bulbs. I've it written down right here.",
+        },
+        DECOR_PICTUREFRAME =
+        {
+            GENERIC = "Sure. Why not?",
+            UNDRAWN = "All art begins with a blank page.",
+        },
+        DECOR_PORTRAITFRAME = "A decent resemblance.",
+
+        PHONOGRAPH = "The music was better back in my day.",
+        RECORD = "I could see it getting a tad repetitive.",
+        RECORD_CREEPYFOREST = "I can't imagine where one would find a record press out here.",
+        RECORD_DANGER = "I can't imagine where one would find a record press out here.",
+        RECORD_DAWN = "I can't imagine where one would find a record press out here.",
+        RECORD_DRSTYLE = "The music was better back in my day.",
+        RECORD_DUSK = "The music was better back in my day.",
+        RECORD_EFS = "The music was better back in my day.",
+        RECORD_END = "The music was better back in my day.",
+        RECORD_MAIN = "I can't imagine where one would find a record press out here.",
+        RECORD_WORKTOBEDONE = "I can't imagine where one would find a record press out here.",
+
+        ARCHIVE_ORCHESTRINA_MAIN = "There must be a manual somewhere.",
+
+        WAGPUNKHAT = "It analyzes combat in order to augment the physical capabilities of the wearer.",
+        ARMORWAGPUNK = "I do wish it wasn't quite so noisy.",
+        WAGSTAFF_MACHINERY = "Someone neglected to clean up their mess.",
+        WAGPUNK_BITS = "Where are the instructions?",
+        WAGPUNKBITS_KIT = "We should consult the manual before using this.",
+
+        WAGSTAFF_MUTATIONS_NOTE = "I have a bad feeling about what is written here.",
     },
 
     DESCRIBE_GENERIC = "A rare occurrence. I don't know what that is.",

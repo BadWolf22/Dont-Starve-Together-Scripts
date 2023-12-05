@@ -57,7 +57,6 @@ local function do_portal_tiles(inst, portal_position, stage)
     end
 
     local _map = TheWorld.Map
-    local undertile = TheWorld.components.undertile
     local portal_tile_x, portal_tile_y = _map:GetTileCoordsAtPoint(ix, iy, iz)
 
     stage = stage or inst._stage
@@ -265,7 +264,7 @@ end
 
 --------------------------------------------------------------------------------
 local function setmaxminimapstatus(inst)
-    inst.MiniMapEntity:SetCanUseCache(true)
+    inst.MiniMapEntity:SetCanUseCache(false)
     inst.MiniMapEntity:SetDrawOverFogOfWar(true)
     inst.MiniMapEntity:SetPriority(22)
     inst.MiniMapEntity:SetIcon("lunarrift_portal_max.png")
@@ -373,7 +372,9 @@ local function on_portal_removed(inst)
     local ix, iy, iz = inst.Transform:GetWorldPosition()
     local portal_tile_x, portal_tile_y = _map:GetTileCoordsAtPoint(ix, iy, iz)
 
-    local undertile = TheWorld.components.undertile
+    if inst._terraformer ~= nil then
+        inst._terraformer:OnParentRemoved()
+    end
 
     inst._terraformer = inst._terraformer or make_terraformer_proxy(inst, ix, iy, iz)
     inst._terraformer:AddTerraformTask(portal_tile_x, portal_tile_y, 0, {0, 0}, true)
@@ -407,6 +408,13 @@ local function on_portal_removed(inst)
             end
         end
     end
+
+    if inst._crystals then
+        for crystal in pairs(inst._crystals) do
+            crystal.components.timer:StartTimer("do_deterraform_cleanup", (current_portal_radius - 0.5) * 2.0)
+        end
+    end
+
     TheWorld:PushEvent("ms_lunarportal_removed",inst)
 end
 
@@ -492,7 +500,7 @@ local function on_portal_load(inst, data)
     if data then
         inst._stage = data.stage or inst._stage
         if inst._stage >= TUNING.RIFT_LUNAR1_MAXSTAGE then
-            inst.components.timer:StopTimer("trynextstage")            
+            inst.components.timer:StopTimer("trynextstage")
         end
 
         -- Re-load our presentation state
@@ -565,6 +573,10 @@ local function portalfn()
     inst.AnimState:PlayAnimation("stage_1_appear")
     inst.AnimState:PushAnimation("stage_1_loop", true)
 
+    inst.scrapbook_anim = "stage_3_loop"
+    inst.scrapbook_nodamage = true
+    inst.scrapbook_specialinfo = "LUNARRIFTPORTAL"
+
     inst.AnimState:SetLightOverride(1)
 
     inst.Light:SetIntensity(0.7)
@@ -614,6 +626,7 @@ local function portalfn()
     ----------------------------------------------------------
     local groundpounder = inst:AddComponent("groundpounder")
     table.insert(groundpounder.noTags, "lunar_aligned")
+	groundpounder:UseRingMode()
     groundpounder.damageRings = 6
     groundpounder.destructionRings = 0
     groundpounder.platformPushingRings = 6

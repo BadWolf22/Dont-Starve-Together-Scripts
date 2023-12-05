@@ -251,6 +251,7 @@ local prefabs =
     "teleportato_crank",
     "teleportato_potato",
     "pond",
+    "pond_mos",
     "marsh_tree",
     "marsh_bush",
     "burnt_marsh_bush",
@@ -258,6 +259,7 @@ local prefabs =
     "mist",
     "snow",
     "rain",
+    "lunarhail",
     "pollen",
     "marblepillar",
     "marbletree",
@@ -393,6 +395,8 @@ local prefabs =
 
     -- moon geyser
     "wagstaff_npc",
+    "wagstaff_npc_mutations",
+    "wagstaff_npc_wagpunk",
 
     "moon_device",
     "moon_device_construction1",
@@ -454,7 +458,18 @@ local prefabs =
     "lunarthrall_plant",
     "domesticplantherd",
 
-    --
+    -- Shadow Rifts
+    "charlie_npc",
+    "scrapbook_page",
+
+    -- Rifts 3
+    "phonograph",
+
+    "armorwagpunk",
+    "wagpunkhat",
+    "wagstaff_machinery",
+    "lunarfrog",
+    "scrapbook_page_special",
 }
 
 local FISH_DATA = require("prefabs/oceanfishdef")
@@ -578,10 +593,13 @@ local function master_postinit(inst)
 
     inst:AddComponent("sharklistener")
 
-    inst:AddComponent("entitytracker")
-
     inst:AddComponent("riftspawner")
     inst:AddComponent("lunarthrall_plantspawner")
+
+    inst:AddComponent("lunarhailmanager")
+    inst:AddComponent("lunarriftmutationsmanager")
+
+    inst:AddComponent("wagpunk_manager")
 
     if METRICS_ENABLED then
         inst:AddComponent("worldoverseer")

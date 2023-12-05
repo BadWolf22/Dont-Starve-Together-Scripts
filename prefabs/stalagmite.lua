@@ -82,6 +82,10 @@ local function commonfn(anim)
 
     inst:SetPrefabNameOverride("stalagmite")
 
+    inst:AddTag("boulder")
+
+    inst.scrapbook_anim = "full"
+
     inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then

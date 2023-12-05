@@ -14,7 +14,7 @@ end
 
 local function DoRegen(inst, owner)
 	if owner.components.sanity ~= nil and owner.components.sanity:IsInsanityMode() then
-		local setbonus = GetSetBonusEquip(inst, owner) ~= nil and TUNING.ARMOR_DREADSTONE_REGEN_SETBONUS or 1
+		local setbonus = inst.components.setbonus ~= nil and inst.components.setbonus:IsEnabled(EQUIPMENTSETNAMES.DREADSTONE) and TUNING.ARMOR_DREADSTONE_REGEN_SETBONUS or 1
 		local rate = 1 / Lerp(1 / TUNING.ARMOR_DREADSTONE_REGEN_MAXRATE, 1 / TUNING.ARMOR_DREADSTONE_REGEN_MINRATE, owner.components.sanity:GetPercent())
 		inst.components.armor:Repair(inst.components.armor.maxcondition * rate * setbonus)
 	end
@@ -80,9 +80,9 @@ local function CalcDapperness(inst, owner)
 	local insanity = owner.components.sanity ~= nil and owner.components.sanity:IsInsanityMode()
 	local other = GetSetBonusEquip(inst, owner)
 	if other ~= nil then
-		return (insanity and (inst.regentask ~= nil or other.regentask ~= nil) and TUNING.CRAZINESS_MED or TUNING.CRAZINESS_SMALL) * 0.5
+		return (insanity and (inst.regentask ~= nil or other.regentask ~= nil) and TUNING.CRAZINESS_MED or 0) * 0.5
 	end
-	return insanity and inst.regentask ~= nil and TUNING.CRAZINESS_MED or TUNING.CRAZINESS_SMALL
+	return insanity and inst.regentask ~= nil and TUNING.CRAZINESS_MED or 0
 end
 
 local function fn()
@@ -138,6 +138,9 @@ local function fn()
 
 	inst:AddComponent("shadowlevel")
 	inst.components.shadowlevel:SetDefaultLevel(TUNING.ARMORDREADSTONE_SHADOW_LEVEL)
+
+	local setbonus = inst:AddComponent("setbonus")
+	setbonus:SetSetName(EQUIPMENTSETNAMES.DREADSTONE)
 
 	MakeHauntableLaunch(inst)
 

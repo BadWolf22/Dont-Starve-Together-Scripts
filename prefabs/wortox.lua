@@ -43,40 +43,6 @@ local function OnRestoreSoul(victim)
     victim.nosoultask = nil
 end
 
-local function SpawnSoulAt(x, y, z, victim, marksource)
-    local fx = SpawnPrefab("wortox_soul_spawn")
-    if marksource then
-        fx._soulsource = victim and victim._soulsource or nil
-    end
-    fx.Transform:SetPosition(x, y, z)
-    fx:Setup(victim)
-end
-
-local function SpawnSoulsAt(victim, numsouls)
-    local x, y, z = victim.Transform:GetWorldPosition()
-    if numsouls == 2 then
-        local theta = math.random() * 2 * PI
-        local radius = .4 + math.random() * .1
-        SpawnSoulAt(x + math.cos(theta) * radius, 0, z - math.sin(theta) * radius, victim, true)
-        theta = GetRandomWithVariance(theta + PI, PI / 15)
-        SpawnSoulAt(x + math.cos(theta) * radius, 0, z - math.sin(theta) * radius, victim, false) -- NOTES(JBK): Only one guarantee.
-    else
-        SpawnSoulAt(x, y, z, victim, true)
-        if numsouls > 1 then
-            numsouls = numsouls - 1
-            local theta0 = math.random() * 2 * PI
-            local dtheta = 2 * PI / numsouls
-            local thetavar = dtheta / 10
-            local theta, radius
-            for i = 1, numsouls do
-                theta = GetRandomWithVariance(theta0 + dtheta * i, thetavar)
-                radius = 1.6 + math.random() * .4
-                SpawnSoulAt(x + math.cos(theta) * radius, 0, z - math.sin(theta) * radius, victim, false) -- NOTES(JBK): Only one guarantee.
-            end
-        end
-    end
-end
-
 local function OnEntityDropLoot(inst, data)
     local victim = data.inst
     if victim ~= nil and
@@ -90,7 +56,7 @@ local function OnEntityDropLoot(inst, data)
         ) then
         --V2C: prevents multiple Wortoxes in range from spawning multiple souls per corpse
         victim.nosoultask = victim:DoTaskInTime(5, OnRestoreSoul)
-        SpawnSoulsAt(victim, wortox_soul_common.GetNumSouls(victim))
+        wortox_soul_common.SpawnSoulsAt(victim, wortox_soul_common.GetNumSouls(victim))
     end
 end
 
@@ -112,16 +78,8 @@ local function OnStarvedTrapSouls(inst, data)
         inst:IsNear(trap, TUNING.WORTOX_SOULEXTRACT_RANGE) then
         --V2C: prevents multiple Wortoxes in range from spawning multiple souls per trap
         trap.nosoultask = trap:DoTaskInTime(5, OnRestoreSoul)
-        SpawnSoulsAt(trap, data.numsouls)
+        wortox_soul_common.SpawnSoulsAt(trap, data.numsouls)
     end
-end
-
-local function GiveSouls(inst, num, pos)
-    local soul = SpawnPrefab("wortox_soul")
-    if soul.components.stackable ~= nil then
-        soul.components.stackable:SetStackSize(num)
-    end
-    inst.components.inventory:GiveItem(soul, nil, pos)
 end
 
 local function OnMurdered(inst, data)
@@ -134,13 +92,13 @@ local function OnMurdered(inst, data)
         ) then
         --V2C: prevents multiple Wortoxes in range from spawning multiple souls per corpse
         victim.nosoultask = victim:DoTaskInTime(5, OnRestoreSoul)
-        GiveSouls(inst, wortox_soul_common.GetNumSouls(victim) * (data.stackmult or 1), inst:GetPosition())
+        wortox_soul_common.GiveSouls(inst, wortox_soul_common.GetNumSouls(victim) * (data.stackmult or 1), inst:GetPosition())
     end
 end
 
 local function OnHarvestTrapSouls(inst, data)
     if (data.numsouls or 0) > 0 then
-        GiveSouls(inst, data.numsouls, data.pos or inst:GetPosition())
+        wortox_soul_common.GiveSouls(inst, data.numsouls, data.pos or inst:GetPosition())
     end
 end
 
@@ -297,6 +255,10 @@ local function CanBlinkTo(pt)
     return (TheWorld.Map:IsAboveGroundAtPoint(pt.x, pt.y, pt.z) or TheWorld.Map:GetPlatformAtPoint(pt.x, pt.z) ~= nil) and not TheWorld.Map:IsGroundTargetBlocked(pt)
 end
 
+local function CanBlinkFromWithMap(pt)
+    return true -- NOTES(JBK): Change this if there is a reason to anchor Wortox when trying to use the map to teleport.
+end
+
 local BLINKFOCUS_MUST_TAGS = { "blinkfocus" }
 
 local function ReticuleTargetFn(inst)
@@ -318,7 +280,7 @@ local function ReticuleTargetFn(inst)
 
     pos.y = 0
     for r = 13, 4, -.5 do
-        local offset = FindWalkableOffset(pos, rotation, r, 1, false, true, CanBlinkTo)
+        local offset = FindWalkableOffset(pos, rotation, r, 1, false, true, inst.CanBlinkTo)
         if offset ~= nil then
             pos.x = pos.x + offset.x
             pos.z = pos.z + offset.z
@@ -326,7 +288,7 @@ local function ReticuleTargetFn(inst)
         end
     end
     for r = 13.5, 16, .5 do
-        local offset = FindWalkableOffset(pos, rotation, r, 1, false, true, CanBlinkTo)
+        local offset = FindWalkableOffset(pos, rotation, r, 1, false, true, inst.CanBlinkTo)
         if offset ~= nil then
             pos.x = pos.x + offset.x
             pos.z = pos.z + offset.z
@@ -349,8 +311,16 @@ local function CanSoulhop(inst, souls)
 end
 
 local function GetPointSpecialActions(inst, pos, useitem, right)
-    if right and useitem == nil and CanBlinkTo(pos) and inst.CanSoulhop and inst:CanSoulhop() then
-        return { ACTIONS.BLINK }
+    if right and useitem == nil then
+        local canblink
+        if inst.checkingmapactions then
+            canblink = inst.CanBlinkFromWithMap(inst:GetPosition())
+        else
+            canblink = inst.CanBlinkTo(pos)
+        end
+        if canblink and inst.CanSoulhop and inst:CanSoulhop() then
+            return { ACTIONS.BLINK }
+        end
     end
     return {}
 end
@@ -473,6 +443,8 @@ local function common_postinit(inst)
 
     inst._freesoulhop_counter = 0
     inst.CanSoulhop = CanSoulhop
+    inst.CanBlinkTo = CanBlinkTo
+    inst.CanBlinkFromWithMap = CanBlinkFromWithMap
     inst:ListenForEvent("setowner", OnSetOwner)
 
     inst:AddComponent("reticule")

@@ -142,6 +142,8 @@ local function fn()
     inst.components.reticule.shouldhidefn = reticuleshouldhidefn
     inst.components.reticule.ease = true
     inst.components.reticule.ispassableatallpoints = true
+    
+    inst.scrapbook_subcat = "tool"
 
     inst.entity:SetPristine()
 

@@ -16,7 +16,11 @@ local assets =
     Asset("ATLAS", "images/fx5.xml"),
     Asset("IMAGE", "images/fx5.tex"),
 
+	Asset("ATLAS", "images/rain_dome_over.xml"),
+	Asset("IMAGE", "images/rain_dome_over.tex"),
+
     Asset("ANIM", "anim/sand_over.zip"),
+	Asset("ANIM", "anim/miasma_over.zip"),
     Asset("ANIM", "anim/moonstorm_over.zip"),
     Asset("ANIM", "anim/moonstorm_over_static.zip"),
     Asset("ANIM", "anim/mind_control_overlay.zip"),
@@ -54,6 +58,7 @@ local assets =
     Asset("ANIM", "anim/spoiled_meter.zip"),
     Asset("ANIM", "anim/recharge_meter.zip"),
     Asset("ANIM", "anim/inventory_fx_shadow.zip"),
+    Asset("ANIM", "anim/inventory_fx_acidsizzle.zip"),
     Asset("ANIM", "anim/compass_bg.zip"),
     Asset("ANIM", "anim/compass_needle.zip"),
     Asset("ANIM", "anim/compass_hud.zip"),
@@ -83,6 +88,8 @@ local assets =
     Asset("ANIM", "anim/tab_gift.zip"),
     Asset("ANIM", "anim/tab_yotb.zip"),
     Asset("ANIM", "anim/tab_skills.zip"),
+
+    Asset("ANIM", "anim/scrapbook_updated.zip"),    
 
     Asset("INV_IMAGE", "unknown_head"),
     Asset("INV_IMAGE", "unknown_hand"),
@@ -123,6 +130,9 @@ local assets =
     Asset("ANIM", "anim/skills_shadow.zip"),
     Asset("ANIM", "anim/skills_lunar.zip"),
     Asset("ANIM", "anim/skill_unlock.zip"),
+
+    Asset("ANIM", "anim/wagstaff_armor_target.zip"),
+    Asset("ANIM", "anim/wagpunk_over.zip"),
 
 }
 

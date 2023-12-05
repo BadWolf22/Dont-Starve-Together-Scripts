@@ -217,7 +217,7 @@ local function reticule_target_function(inst)
         dir.x = TheInput:GetAnalogControlValue(CONTROL_MOVE_RIGHT) - TheInput:GetAnalogControlValue(CONTROL_MOVE_LEFT)
         dir.y = 0
         dir.z = TheInput:GetAnalogControlValue(CONTROL_MOVE_UP) - TheInput:GetAnalogControlValue(CONTROL_MOVE_DOWN)
-        local deadzone = .3
+		local deadzone = TUNING.CONTROLLER_DEADZONE_RADIUS
 
         local reticule = inst.components.reticule.reticule
         if math.abs(dir.x) >= deadzone or math.abs(dir.z) >= deadzone then
@@ -277,6 +277,8 @@ local function fn()
     inst.AnimState:SetBuild("boat_cannon")
     inst.AnimState:PlayAnimation("idle")
 	inst.AnimState:HideSymbol("cannon_flap_down")
+
+    inst.scrapbook_specialinfo = "BOATCANNON"
 
     inst:AddTag("boatcannon")
     inst.Transform:SetEightFaced()

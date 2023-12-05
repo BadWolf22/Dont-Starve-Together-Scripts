@@ -86,7 +86,7 @@ local function ConfigureRunState(inst)
         else
             inst.sg.statemem.normal = true
         end
-    elseif inst:GetStormLevel() >= TUNING.SANDSTORM_FULL_LEVEL and not inst.components.playervision:HasGoggleVision() then
+	elseif inst:IsInAnyStormOrCloud() and not inst.components.playervision:HasGoggleVision() then
         inst.sg.statemem.sandstorm = true
     elseif inst:HasTag("groggy") then
         inst.sg.statemem.groggy = true
@@ -230,10 +230,15 @@ local actionhandlers =
     ActionHandler(ACTIONS.OPEN_CRAFTING, "dostandingaction"),
     ActionHandler(ACTIONS.PICK,
         function(inst, action)
-            return (inst.replica.rider ~= nil and inst.replica.rider:IsRiding() and "dolongaction")
+			return (inst:HasTag("farmplantfastpicker") and action.target:HasTag("farm_plant") and "domediumaction")
+				or (inst.replica.rider ~= nil and inst.replica.rider:IsRiding() and (
+						(inst:HasTag("woodiequickpicker") and "dowoodiefastpick") or
+						"dolongaction"
+					))
                 or (action.target:HasTag("jostlepick") and "dojostleaction")
                 or (action.target:HasTag("quickpick") and "doshortaction")
                 or (inst:HasTag("fastpicker") and "doshortaction")
+				or (inst:HasTag("woodiequickpicker") and "dowoodiefastpick")
                 or (inst:HasTag("quagmire_fasthands") and "domediumaction")
                 or "dolongaction"
         end),
@@ -408,7 +413,7 @@ local actionhandlers =
                 end
                 local inventoryitem = equip.replica.inventoryitem
                 return (not (inventoryitem ~= nil and inventoryitem:IsWeapon()) and "attack")
-                    or (equip:HasTag("blowdart") and "blowdart")
+                    or (equip:HasOneOfTags({"blowdart", "blowpipe"}) and "blowdart")
 					or (equip:HasTag("slingshot") and "slingshot_shoot")
                     or (equip:HasTag("thrown") and "throw")
                     or (equip:HasTag("pillow") and "attack_pillow_pre")
@@ -605,10 +610,21 @@ local actionhandlers =
 	ActionHandler(ACTIONS.USEMAGICTOOL, "start_using_tophat"),
 	ActionHandler(ACTIONS.STOPUSINGMAGICTOOL, "stop_using_tophat"),
 	ActionHandler(ACTIONS.CAST_SPELLBOOK, "book"),
+	ActionHandler(ACTIONS.SCYTHE, "scythe"),
+	ActionHandler(ACTIONS.SITON, "start_sitting"),
+
+	ActionHandler(ACTIONS.USE_WEREFORM_SKILL, function(inst)
+		return (inst:HasTag("beaver") and "beaver_tailslap_pre")
+			or (inst:HasTag("weregoose") and "weregoose_takeoff_pre")
+			or nil
+    end),
 }
 
 local events =
 {
+	EventHandler("sg_cancelmovementprediction", function(inst)
+		inst.sg:GoToState("idle", "cancel")
+	end),
     EventHandler("locomote", function(inst)
 		--#HACK for hopping prediction: ignore busy when boathopping... (?_?)
 		if (inst.sg:HasStateTag("busy") or inst:HasTag("busy")) and
@@ -651,19 +667,31 @@ local states =
 
         onenter = function(inst, pushanim)
             inst.entity:SetIsPredictingMovement(false)
-            inst.components.locomotor:Stop()
-            inst.components.locomotor:Clear()
 
-            if pushanim == "cancel" then
-                return
-            elseif inst:HasTag("nopredict") or inst:HasTag("pausepredict") then
+			if pushanim == "cancel" or inst:HasTag("nopredict") or inst:HasTag("pausepredict") then
+				--prediction interrupted by server state
+				inst.components.locomotor:Stop()
+				inst.components.locomotor:Clear()
                 inst:ClearBufferedAction()
                 return
             elseif pushanim == "noanim" then
+				--server confirmed our preview action
+				inst.components.locomotor:Stop()
+				inst.components.locomotor:Clear()
 				ClearCachedServerState(inst)
+				--use timeout for clearing preview bufferedaction
                 inst.sg:SetTimeout(TIMEOUT)
                 return
             end
+
+			--predicted idle state
+			if inst.sg.lasttags and not inst.sg.lasttags["busy"] then
+				inst.components.locomotor:StopMoving()
+			else
+				inst.components.locomotor:Stop()
+				inst.components.locomotor:Clear()
+			end
+			inst:ClearBufferedAction()
 
             --V2C: Only predict looped anims. For idles with a pre, stick with
             --     "idle_loop" and wait for server to trigger the custom anims
@@ -692,8 +720,7 @@ local states =
 			else
                 anim =
                     (inst.replica.inventory ~= nil and inst.replica.inventory:IsHeavyLifting() and "heavy_idle") or
-                    (   inst:GetStormLevel() >= TUNING.SANDSTORM_FULL_LEVEL and
-                        not inst.components.playervision:HasGoggleVision() and
+					(   inst:IsInAnyStormOrCloud() and not inst.components.playervision:HasGoggleVision() and
                         (   inst.AnimState:IsCurrentAnimation("sand_walk_pst") or
                             inst.AnimState:IsCurrentAnimation("sand_walk") or
                             inst.AnimState:IsCurrentAnimation("sand_walk_pre")
@@ -1006,12 +1033,12 @@ local states =
                 elseif not (inst.sg.statemem.riding or
                             inst.sg.statemem.heavy or
                             inst.sg.statemem.iswere or
-                            inst.sg.statemem.sandstorm or
-                            inst:GetStormLevel() < TUNING.SANDSTORM_FULL_LEVEL) then
+							inst.sg.statemem.sandstorm)
+					and inst:IsInAnyStormOrCloud() then
                     inst.sg:GoToState("run")
                 end
             end),
-            EventHandler("sandstormlevel", function(inst, data)
+			EventHandler("stormlevel", function(inst, data)
                 if data.level < TUNING.SANDSTORM_FULL_LEVEL then
                     if inst.sg.statemem.sandstorm then
                         inst.sg:GoToState("run")
@@ -1024,6 +1051,19 @@ local states =
                     inst.sg:GoToState("run")
                 end
             end),
+			EventHandler("miasmalevel", function(inst, data)
+				if data.level < 1 then
+					if inst.sg.statemem.sandstorm then
+						inst.sg:GoToState("run")
+					end
+				elseif not (inst.sg.statemem.riding or
+							inst.sg.statemem.heavy or
+							inst.sg.statemem.iswere or
+							inst.sg.statemem.sandstorm or
+							inst.components.playervision:HasGoggleVision()) then
+					inst.sg:GoToState("run")
+				end
+			end),
             EventHandler("carefulwalking", function(inst, data)
                 if not data.careful then
                     if inst.sg.statemem.careful then
@@ -1105,15 +1145,20 @@ local states =
         events =
         {
             EventHandler("gogglevision", function(inst, data)
-                if not data.enabled and inst:GetStormLevel() >= TUNING.SANDSTORM_FULL_LEVEL then
+				if not data.enabled and inst:IsInAnyStormOrCloud() then
                     inst.sg:GoToState("run")
                 end
             end),
-            EventHandler("sandstormlevel", function(inst, data)
+			EventHandler("stormlevel", function(inst, data)
                 if data.level >= TUNING.SANDSTORM_FULL_LEVEL and not inst.components.playervision:HasGoggleVision() then
                     inst.sg:GoToState("run")
                 end
             end),
+			EventHandler("miasmalevel", function(inst, data)
+				if data.level >= 1 and not inst.components.playervision:HasGoggleVision() then
+					inst.sg:GoToState("run")
+				end
+			end),
             EventHandler("carefulwalking", function(inst, data)
                 if data.careful then
                     inst.sg:GoToState("run")
@@ -1172,15 +1217,20 @@ local states =
         events =
         {
             EventHandler("gogglevision", function(inst, data)
-                if not data.enabled and inst:GetStormLevel() >= TUNING.SANDSTORM_FULL_LEVEL then
+				if not data.enabled and inst:IsInAnyStormOrCloud() then
                     inst.sg:GoToState("run")
                 end
             end),
-            EventHandler("sandstormlevel", function(inst, data)
+			EventHandler("stormlevel", function(inst, data)
                 if data.level >= TUNING.SANDSTORM_FULL_LEVEL and not inst.components.playervision:HasGoggleVision() then
                     inst.sg:GoToState("run")
                 end
             end),
+			EventHandler("miasmalevel", function(inst, data)
+				if data.level >= 1 and not inst.components.playervision:HasGoggleVision() then
+					inst.sg:GoToState("run")
+				end
+			end),
             EventHandler("carefulwalking", function(inst, data)
                 if data.careful then
                     inst.sg:GoToState("run")
@@ -2152,12 +2202,17 @@ local states =
 
     State{
         name = "domediumaction",
-		onenter = function(inst) inst.sg:GoToState("dolongaction") end,
+        onenter = function(inst) inst.sg:GoToState("dolongaction") end,
+    },
+
+    State{
+        name = "dowoodiefastpick",
+        onenter = function(inst) inst.sg:GoToState("dolongaction") end,
     },
 
     State{
         name = "dolongestaction",
-		onenter = function(inst) inst.sg:GoToState("dolongaction") end,
+        onenter = function(inst) inst.sg:GoToState("dolongaction") end,
     },
 
 	State{
@@ -2211,6 +2266,46 @@ local states =
         onexit = function(inst)
             inst.SoundEmitter:KillSound("make_preview")
         end,
+    },
+
+	State{ name = "carvewood_boards", onenter = function(inst) inst.sg:GoToState("carvewood") end },
+    State{
+        name = "carvewood",
+        tags = { "doing", "busy" },
+		server_states = { "carvewood" },
+
+		onenter = function(inst)
+			inst.components.locomotor:Stop()
+			inst.AnimState:PlayAnimation("useitem_pre")
+			inst.AnimState:PushAnimation("useitem_lag", false)
+
+			inst:PerformPreviewBufferedAction()
+			inst.sg:SetTimeout(TIMEOUT)
+		end,
+
+		onupdate = function(inst)
+			if inst.sg:ServerStateMatches() then
+				if inst.entity:FlattenMovementPrediction() then
+					inst.sg:GoToState("idle", "noanim")
+				end
+			elseif inst.bufferedaction == nil then
+				inst.AnimState:PlayAnimation("useitem_pst")
+				inst.sg:GoToState("idle", true)
+			end
+		end,
+
+		timeline =
+		{
+			FrameEvent(7, function(inst)
+				inst.sg:RemoveStateTag("busy")
+			end),
+		},
+
+		ontimeout = function(inst)
+			inst:ClearBufferedAction()
+			inst.AnimState:PlayAnimation("useitem_pst")
+			inst.sg:GoToState("idle", true)
+		end,
     },
 
     State{
@@ -3567,11 +3662,19 @@ local states =
                 end
             elseif inst:HasTag("weremoose") then
                 inst.sg.statemem.ismoose = true
-                inst.AnimState:PlayAnimation(
-                    ((inst.AnimState:IsCurrentAnimation("punch_a") or inst.AnimState:IsCurrentAnimation("punch_c")) and "punch_b") or
-                    (inst.AnimState:IsCurrentAnimation("punch_b") and "punch_c") or
-                    "punch_a"
-                )
+				if inst.AnimState:IsCurrentAnimation("punch_a") or inst.AnimState:IsCurrentAnimation("punch_c") then
+					inst.AnimState:PlayAnimation("punch_b")
+				elseif inst.AnimState:IsCurrentAnimation("punch_b") then
+					if inst:HasTag("weremoosecombo") then
+						inst.sg.statemem.ismoosesmash = true
+						inst.AnimState:PlayAnimation("moose_slam")
+						inst.SoundEmitter:PlaySound("meta2/woodie/weremoose_groundpound", nil, nil, true)
+					else
+						inst.AnimState:PlayAnimation("punch_c")
+					end
+				else
+					inst.AnimState:PlayAnimation("punch_a")
+				end
                 if cooldown > 0 then
                     cooldown = math.max(cooldown, 15 * FRAMES)
                 end
@@ -3618,7 +3721,7 @@ local states =
         timeline =
         {
             TimeEvent(5 * FRAMES, function(inst)
-                if inst.sg.statemem.ismoose then
+                if inst.sg.statemem.ismoose and not inst.sg.statemem.ismoosesmash then
                     inst.SoundEmitter:PlaySound("dontstarve/characters/woodie/moose/punch", nil, nil, true)
                 end
             end),
@@ -3632,6 +3735,15 @@ local states =
             end),
             TimeEvent(7 * FRAMES, function(inst)
                 if inst.sg.statemem.ismoose then
+					if inst.sg.statemem.ismoosesmash then
+						inst:PushMooseSmashShake()
+
+						--V2C: first frame is blank, so no need to worry about forcing instant facing update
+						local x, y, z = inst.Transform:GetWorldPosition()
+						local fx = SpawnPrefab("weremoose_smash_fx")
+						fx.Transform:SetPosition(x, 0, z)
+						fx.Transform:SetRotation(inst.Transform:GetRotation())
+					end
                     inst:ClearBufferedAction()
                     inst.sg:RemoveStateTag("abouttoattack")
                 end
@@ -4251,35 +4363,42 @@ local states =
     --------------------------------------------------------------------------
     --Wormwood
 
-    State{
-        name = "form_log",
-        tags = { "doing", "busy" },
+	State{ name = "form_bush",		onenter = function(inst) inst.sg:GoToState("form_log") end },
+	State{ name = "form_bush2",		onenter = function(inst) inst.sg:GoToState("form_log") end },
+	State{ name = "form_juicy",		onenter = function(inst) inst.sg:GoToState("form_log") end },
+	State{ name = "form_bulb",		onenter = function(inst) inst.sg:GoToState("form_log") end },
+	State{ name = "form_moon",		onenter = function(inst) inst.sg:GoToState("form_log") end },
+	State{ name = "form_monkey",	onenter = function(inst) inst.sg:GoToState("form_log") end },
+
+	State{
+		name = "form_log",
+		tags = { "doing", "busy" },
 		server_states = { "form_log" },
 
-        onenter = function(inst)
-            inst.components.locomotor:Stop()
-            inst.AnimState:PlayAnimation("form_log_pre")
-            inst.AnimState:PushAnimation("form_log_lag", false)
+		onenter = function(inst)
+			inst.components.locomotor:Stop()
+			inst.AnimState:PlayAnimation("form_log_pre")
+			inst.AnimState:PushAnimation("form_log_lag", false)
 
-            inst:PerformPreviewBufferedAction()
-            inst.sg:SetTimeout(TIMEOUT)
-        end,
+			inst:PerformPreviewBufferedAction()
+			inst.sg:SetTimeout(TIMEOUT)
+		end,
 
-        onupdate = function(inst)
+		onupdate = function(inst)
 			if inst.sg:ServerStateMatches() then
-                if inst.entity:FlattenMovementPrediction() then
-                    inst.sg:GoToState("idle", "noanim")
-                end
-            elseif inst.bufferedaction == nil then
-                inst.sg:GoToState("idle")
-            end
-        end,
+				if inst.entity:FlattenMovementPrediction() then
+					inst.sg:GoToState("idle", "noanim")
+				end
+			elseif inst.bufferedaction == nil then
+				inst.sg:GoToState("idle")
+			end
+		end,
 
-        ontimeout = function(inst)
-            inst:ClearBufferedAction()
-            inst.sg:GoToState("idle")
-        end,
-    },
+		ontimeout = function(inst)
+			inst:ClearBufferedAction()
+			inst.sg:GoToState("idle")
+		end,
+	},
 
     State{
         name = "fertilize",
@@ -4340,6 +4459,40 @@ local states =
         ontimeout = function(inst)
             inst:ClearBufferedAction()
             inst.sg:GoToState("idle")
+        end,
+    },
+
+    State{
+        name = "spawn_mutated_creature",
+        tags = { "doing", "busy" },
+		server_states = { "spawn_mutated_creature" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+			inst.AnimState:PlayAnimation("wormwood_cast_spawn_pre")
+			inst.AnimState:PlayAnimation("wormwood_cast_spawn_lag", false)
+
+            inst:PerformPreviewBufferedAction()
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        onupdate = function(inst)
+			if inst.sg:ServerStateMatches() then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+				inst.AnimState:PlayAnimation("wormwood_cast_spawn")
+				inst.AnimState:SetFrame(37)
+				inst.sg:GoToState("idle", true)
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+			inst.AnimState:PlayAnimation("wormwood_cast_spawn")
+			inst.AnimState:SetFrame(37)
+			inst.sg:GoToState("idle", true)
         end,
     },
 
@@ -4545,7 +4698,7 @@ local states =
     State{
         name = "tackle_pre",
         tags = { "busy" },
-		server_states = { "tackle_pre", "tackle_start" },
+		server_states = { "tackle_pre", "tackle_start", "tackle" },
 
         onenter = function(inst)
             inst.components.locomotor:Stop()
@@ -4558,12 +4711,88 @@ local states =
         onupdate = function(inst)
 			if inst.sg:ServerStateMatches() then
                 if inst.entity:FlattenMovementPrediction() then
+					inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+                inst.sg:GoToState("idle")
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle")
+        end,
+    },
+
+    State{
+        name = "beaver_tailslap_pre",
+        tags = { "busy" },
+		server_states = { "beaver_tailslap_pre", "beaver_tailslap" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+            inst.AnimState:PlayAnimation("tail_slap_pre")
+            inst.AnimState:PushAnimation("tail_slap_lag", false)
+            inst:PerformPreviewBufferedAction()
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        onupdate = function(inst)
+            if inst.sg:ServerStateMatches() then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+				inst.AnimState:PlayAnimation("tail_slap")
+				inst.AnimState:SetFrame(21)
+				inst.sg:GoToState("idle", true)
+            end
+        end,
+
+		timeline =
+		{
+			FrameEvent(10, function(inst)
+				inst.sg:RemoveStateTag("busy")
+			end),
+		},
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+			inst.AnimState:PlayAnimation("tail_slap")
+			inst.AnimState:SetFrame(21)
+			inst.sg:GoToState("idle", true)
+        end,
+    },
+
+    State{
+        name = "weregoose_takeoff_pre",
+        tags = { "busy" },
+		server_states = { "weregoose_takeoff_pre", "weregoose_takeoff" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+            inst.AnimState:PlayAnimation("takeoff_pre")
+            inst.AnimState:PushAnimation("takeoff_lag", false)
+            inst:PerformPreviewBufferedAction()
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        onupdate = function(inst)
+            if inst.sg:ServerStateMatches() then
+                if inst.entity:FlattenMovementPrediction() then
                     inst.sg:GoToState("idle", "noanim")
                 end
             elseif inst.bufferedaction == nil then
                 inst.sg:GoToState("idle")
             end
         end,
+
+		timeline =
+		{
+			FrameEvent(10, function(inst)
+				inst.sg:RemoveStateTag("busy")
+			end),
+		},
 
         ontimeout = function(inst)
             inst:ClearBufferedAction()
@@ -4652,18 +4881,20 @@ local states =
         end,
 
         onupdate = function(inst)
-			if inst:HasTag("busy") then
+			if inst.sg:ServerStateMatches() then
                 if inst.entity:FlattenMovementPrediction() then
                     inst.sg:GoToState("idle", "noanim")
                 end
             elseif inst.bufferedaction == nil then
-                inst.sg:GoToState("idle")
+				inst.AnimState:PlayAnimation("useitem_pst")
+				inst.sg:GoToState("idle", true)
             end
         end,
 
         ontimeout = function(inst)
             inst:ClearBufferedAction()
-            inst.sg:GoToState("idle")
+			inst.AnimState:PlayAnimation("useitem_pst")
+			inst.sg:GoToState("idle", true)
         end,
     },
 
@@ -4963,6 +5194,175 @@ local states =
 			inst.entity:SetIsPredictingMovement(true)
 		end,
 	},
+
+	State{
+        name = "scythe",
+		tags = { "busy" },
+        server_states = { "scythe" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+			inst.AnimState:PlayAnimation("scythe_pre")
+			inst.AnimState:PushAnimation("scythe_lag", false)
+
+            inst:PerformPreviewBufferedAction()
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        onupdate = function(inst)
+            if inst.sg:ServerStateMatches() then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+                inst.sg:GoToState("idle")
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle")
+        end,
+    },
+
+	--------------------------------------------------------------------------
+	--Sitting states
+
+	State{
+		name = "start_sitting",
+		tags = { "busy" },
+		server_states = { "start_sitting", "sit_jumpon", "sitting" },
+
+		onenter = function(inst)
+			inst.components.locomotor:Stop()
+			local buffaction = inst:GetBufferedAction()
+			local chair = buffaction ~= nil and buffaction.target or nil
+			local ltd
+			if chair ~= nil and chair:IsValid() then
+				inst.Transform:SetRotation(chair.Transform:GetRotation())
+				ltd = chair:HasTag("limited_chair")
+			end
+			if ltd then
+				inst.Transform:SetPredictedNoFaced()
+				inst.AnimState:PlayAnimation("sit_pre_nofaced")
+				inst.AnimState:PushAnimation("sit_lag_nofaced", false)
+			else
+				inst.AnimState:PlayAnimation("sit_pre")
+				inst.AnimState:PushAnimation("sit_lag", false)
+			end
+			inst:PerformPreviewBufferedAction()
+			inst.sg:SetTimeout(TIMEOUT)
+		end,
+
+		onupdate = function(inst)
+			if inst.sg:ServerStateMatches() then
+				if inst.entity:FlattenMovementPrediction() then
+					inst.sg:GoToState("sitting")
+				end
+			elseif inst.bufferedaction == nil then
+				inst.AnimState:PlayAnimation("sit_off_pst")
+				inst.sg:GoToState("idle", true)
+			end
+		end,
+
+		events =
+		{
+			EventHandler("sg_cancelmovementprediction", function(inst)
+				if inst.sg:ServerStateMatches() then
+					inst.sg:GoToState("sitting")
+					return true
+				end
+			end),
+		},
+
+		ontimeout = function(inst)
+			inst:ClearBufferedAction()
+			inst.AnimState:PlayAnimation("sit_off_pst")
+			inst.sg:GoToState("idle", true)
+		end,
+
+		onexit = function(inst)
+			inst.Transform:ClearPredictedFacingModel()
+		end,
+	},
+
+	State{
+		name = "sitting",
+		tags = { "overridelocomote", "canrotate" },
+		server_states = { "start_sitting", "sit_jumpon", "sitting" }, --for sg_cancelmovementprediction
+
+		onenter = function(inst)
+			inst.entity:SetIsPredictingMovement(false)
+			inst.sg:SetTimeout(TIMEOUT)
+			inst.sg.statemem.rot = inst.Transform:GetRotation()
+		end,
+
+		onupdate = function(inst)
+			if inst.bufferedaction == nil and not inst:HasTag("sitting_on_chair") then
+				inst.sg:GoToState("idle", "noanim")
+			end
+		end,
+
+		ontimeout = function(inst)
+			if inst.bufferedaction ~= nil and inst.bufferedaction.ispreviewing then
+				inst:ClearBufferedAction()
+				inst.sg:GoToState("idle")
+			end
+		end,
+
+		events =
+		{
+			EventHandler("sg_cancelmovementprediction", function(inst)
+				return inst.sg:ServerStateMatches()
+			end),
+			EventHandler("locomote", function(inst)
+				if inst.components.locomotor:WantsToMoveForward() then
+					inst.sg:GoToState("stop_sitting", inst.sg.statemem.rot)
+				end
+				return true
+			end),
+		},
+
+		onexit = function(inst)
+			inst.entity:SetIsPredictingMovement(true)
+		end,
+	},
+
+	State{
+		name = "stop_sitting",
+		tags = { "busy" },
+		server_states = { "stop_sitting", "sit_jumpoff" },
+
+		onenter = function(inst, rot)
+			inst.components.playercontroller:RemotePredictOverrideLocomote()
+			if rot ~= nil then
+				inst.Transform:SetRotation(rot)
+			end
+			inst.AnimState:PlayAnimation("sit_off")
+			inst.AnimState:PushAnimation("sit_off_lag", false)
+			inst.sg:SetTimeout(TIMEOUT)
+		end,
+
+		onupdate = function(inst)
+			if inst.sg:ServerStateMatches() then
+				if inst.entity:FlattenMovementPrediction() then
+					inst.sg:GoToState("idle", "noanim")
+				end
+			end
+		end,
+
+		ontimeout = function(inst)
+			inst.components.locomotor:Clear()
+			if inst:HasTag("sitting_on_chair") then
+				inst.AnimState:PlayAnimation("sit"..tostring(math.random(2)).."_loop", true)
+				inst.sg:GoToState("sitting")
+			else
+				inst.AnimState:PlayAnimation("sit_off_pst")
+				inst.sg:GoToState("idle", true)
+			end
+		end,
+	},
+	--------------------------------------------------------------------------
 }
 
 local hop_timelines =

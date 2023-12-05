@@ -43,6 +43,7 @@ local prefabs_forest =
 
 local prefabs_atrium =
 {
+    "shadowheart",
     "fossil_piece",
     "fossilspike",
     "fossilspike2",
@@ -388,12 +389,25 @@ end
 
 --------------------------------------------------------------------------
 
+local function GetRepairedAtriumChatterLines(inst, strtbl)
+    local stargate = inst.components.entitytracker:GetEntity("stargate")
+
+    if stargate ~= nil and
+        stargate.components.charliecutscene ~= nil and
+        stargate.components.charliecutscene:IsGateRepaired() and
+        STRINGS[strtbl.."_ATRIUM_REPAIRED"] ~= nil
+    then
+        return strtbl.."_ATRIUM_REPAIRED"
+    end
+end
+
 local function BattleCry(combat, target)
     local strtbl =
         target ~= nil and
         target:HasTag("player") and
         "STALKER_PLAYER_BATTLECRY" or
         "STALKER_BATTLECRY"
+
     return strtbl, math.random(#STRINGS[strtbl])
 end
 
@@ -403,6 +417,9 @@ local function AtriumBattleCry(combat, target)
         target:HasTag("player") and
         "STALKER_ATRIUM_PLAYER_BATTLECRY" or
         "STALKER_ATRIUM_BATTLECRY"
+
+    strtbl = GetRepairedAtriumChatterLines(combat.inst, strtbl) or strtbl
+
     return strtbl, math.random(#STRINGS[strtbl])
 end
 
@@ -414,6 +431,9 @@ end
 -- STRINGS.STALKER_ATRIUM_DEATHCRY
 local function AtriumBattleChatter(inst, id, forcetext)
     local strtbl = "STALKER_ATRIUM_"..string.upper(id)
+
+    strtbl = GetRepairedAtriumChatterLines(inst, strtbl) or strtbl
+
     inst.components.talker:Chatter(strtbl, math.random(#STRINGS[strtbl]), 2, forcetext)
 end
 
@@ -1003,20 +1023,21 @@ local function trackattackers(inst,data)
 end
 
 local function AtriumOnDeath(inst,data)
+    if not inst:IsAtriumDecay() then
+        trackattackers(inst, data)
 
-    trackattackers(inst,data)
-    for ID, data in pairs(inst.attackerUSERIDs) do
-        for i, player in ipairs(AllPlayers) do
-            if player.userid == ID then 
-                SendRPCToClient(CLIENT_RPC.UpdateAccomplishment, player.userid, "fuelweaver_killed")
-                break
+        for ID, data in pairs(inst.attackerUSERIDs) do
+            for i, player in ipairs(AllPlayers) do
+                if player.userid == ID then 
+                    SendRPCToClient(CLIENT_RPC.UpdateAccomplishment, player.userid, "fuelweaver_killed")
+                    break
+                end
             end
         end
-    end
 
-    if not CheckAtriumDecay(inst) then
         SetMusicLevel(inst, 3)
     end
+
     if inst.miniontask ~= nil then
         inst.miniontask:Cancel()
         inst.miniontask = nil
@@ -1277,6 +1298,7 @@ local function common_fn(bank, build, shadowsize, canfight, atriumstalker)
     inst.AnimState:SetBuild("stalker_shadow_build")
     inst.AnimState:AddOverrideBuild(build)
     inst.AnimState:PlayAnimation("idle", true)
+    inst.scrapbook_overridebuild = build
 
     inst:AddTag("epic")
     inst:AddTag("monster")

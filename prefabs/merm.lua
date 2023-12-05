@@ -168,7 +168,12 @@ end
 local MERM_TAGS = { "merm" }
 local MERM_IGNORE_TAGS = { "FX", "NOCLICK", "DECOR", "INLIMBO", "player" }
 local function MermSort(a, b) -- Better than bubble!
-    return a.components.follower:GetLoyaltyPercent() < b.components.follower:GetLoyaltyPercent()
+    local ap = a.components.follower:GetLoyaltyPercent()
+    local bp = b.components.follower:GetLoyaltyPercent()
+    if ap == bp then
+        return a.GUID < b.GUID
+    end
+    return ap < bp
 end
 local function GetOtherMerms(inst, radius, maxcount)
     local x, y, z = inst.Transform:GetWorldPosition()
@@ -244,9 +249,7 @@ local function ShouldAcceptItem(inst, item, giver)
 end
 
 local function DoCheer_Act(inst)
-    if inst.sg ~= nil and not inst.sg:HasStateTag("busy") then
-        inst.sg:GoToState("cheer")
-    end
+    inst:PushEvent("cheer")
 end
 local function DoCheer(inst)
     inst:DoTaskInTime(math.random()*SLIGHTDELAY, DoCheer_Act)

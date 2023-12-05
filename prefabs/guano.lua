@@ -61,6 +61,8 @@ local function fn()
     inst.AnimState:PlayAnimation("dump")
     inst.AnimState:PushAnimation("idle")
 
+    --inst.pickupsound = "squidgy"
+
     MakeInventoryFloatable(inst, "med", 0.1, 0.73)
     MakeDeployableFertilizerPristine(inst)
 
@@ -73,6 +75,8 @@ local function fn()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.scrapbook_anim = "idle"
 
     inst:AddComponent("inspectable")
 

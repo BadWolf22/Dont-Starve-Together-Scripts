@@ -45,6 +45,13 @@ function fns.IsNearDanger(inst, hounded_ok)
         nil, nil, nopigdanger and DANGER_NOPIG_ONEOF_TAGS or DANGER_ONEOF_TAGS) ~= nil
 end
 
+--V2C: Things to explicitly hide mouseover Attack command when not Force Attacking.
+--     e.g. other players' shadow creatures
+--NOTE: Normally, non-hostile creatures still show "Attack" when you mouseover.
+function fns.TargetForceAttackOnly(inst, target)
+	return target.HostileToPlayerTest ~= nil and target:HasTag("shadowcreature") and not target:HostileToPlayerTest(inst)
+end
+
 function fns.SetGymStartState(inst)
     inst.Transform:SetNoFaced()
 
@@ -254,29 +261,22 @@ local function GetMoistureRateScale(inst)
     end
 end
 
-local function GetStormLevel(inst)
-    return inst.player_classified ~= nil and inst.player_classified.stormlevel:value() / 7 or 0
+local function GetStormLevel(inst, stormtype)
+	return inst.player_classified ~= nil
+		and (stormtype == nil or stormtype == inst.player_classified.stormtype:value())
+		and inst.player_classified.stormlevel:value() / 7
+		or 0
 end
 
-local function GetMoonstormLevel(inst)
+fns.IsInMiasma = function(inst)
+	return inst.player_classified ~= nil and inst.player_classified.isinmiasma:value()
+end
 
-    pos = { x = pos.x, y = pos.z }
-
-    local depth = math.huge
-    local node_edges = TheWorld.topology.nodes[node_index].validedges
-    for _, edge_index in ipairs(node_edges) do
-        local edge_nodes = TheWorld.topology.edgeToNodes[edge_index]
-        local other_node_index = edge_nodes[1] ~= node_index and edge_nodes[1] or edge_nodes[2]
-        if not _active_moonstorm_nodes[other_node_index] then
-            local point_indices = TheWorld.topology.flattenedEdges[edge_index]
-            local node1 = { x = TheWorld.topology.flattenedPoints[point_indices[1]][1], y = TheWorld.topology.flattenedPoints[point_indices[1]][2] }
-            local node2 = { x = TheWorld.topology.flattenedPoints[point_indices[2]][1], y = TheWorld.topology.flattenedPoints[point_indices[2]][2] }
-
-            depth = math.min(depth, DistPointToSegmentXYSq(pos, node1, node2))
-        end
-    end
-
-    return depth
+fns.IsInAnyStormOrCloud = function(inst)
+	return inst.player_classified ~= nil
+		and (	inst.player_classified.stormlevel:value() / 7 >= TUNING.SANDSTORM_FULL_LEVEL or
+				inst.player_classified.isinmiasma:value()
+			)
 end
 
 local function IsCarefulWalking(inst)
@@ -313,7 +313,7 @@ end
 
 local function DropWetTool(inst, data)
     --Tool slip.
-    if inst.components.moisture:GetSegs() < 4 or inst:HasTag("stronggrip") then
+	if inst.components.moisture:GetSegs() < 4 or inst:HasTag("stronggrip") or inst.components.rainimmunity ~= nil then
         return
     end
 
@@ -413,9 +413,23 @@ end
 --Audio events
 --------------------------------------------------------------------------
 
+local PICKUPSOUNDS = {
+    ["wood"] = "aqol/new_test/wood",
+    ["gem"] = "aqol/new_test/gem",
+    ["cloth"] = "aqol/new_test/cloth",
+    ["metal"] = "aqol/new_test/metal",
+    ["rock"] = "aqol/new_test/rock",
+    ["vegetation_firm"] = "aqol/new_test/vegetation_firm",
+    ["vegetation_grassy"] = "aqol/new_test/vegetation_grassy",    
+    ["squidgy"] = "aqol/new_test/squidgy",
+    ["grainy"] = "aqol/new_test/grainy",
+    ["DEFAULT_FALLBACK"] = "dontstarve/HUD/collect_resource",
+}
+
 local function OnGotNewItem(inst, data)
     if data.slot ~= nil or data.eslot ~= nil or data.toactiveitem ~= nil then
-        TheFocalPoint.SoundEmitter:PlaySound("dontstarve/HUD/collect_resource")
+        local sound = data.item and data.item.pickupsound or "DEFAULT_FALLBACK"
+        TheFocalPoint.SoundEmitter:PlaySound(inst._PICKUPSOUNDS[sound])
     end
 end
 
@@ -562,10 +576,11 @@ end
 function fns.ArmorBroke(inst, data)
     if data.armor ~= nil then
         local sameArmor = inst.components.inventory:FindItem(function(item)
-            return item.prefab == data.armor.prefab
+			return item.prefab == data.armor.prefab and item.components.equippable ~= nil
         end)
         if sameArmor ~= nil then
-            inst.components.inventory:Equip(sameArmor)
+			local force_ui_anim = data.armor.components.armor.keeponfinished
+			inst.components.inventory:Equip(sameArmor, nil, nil, force_ui_anim)
         end
     end
 end
@@ -574,6 +589,7 @@ end
 
 local function RegisterActivePlayerEventListeners(inst)
     --HUD Audio events
+    inst._PICKUPSOUNDS = PICKUPSOUNDS -- NOTES(JBK): For client mods to get access to.
     inst:ListenForEvent("gotnewitem", OnGotNewItem)
     inst:ListenForEvent("equip", OnEquip)
 end
@@ -642,11 +658,13 @@ end
 local function AddActivePlayerComponents(inst)
     inst:AddComponent("hudindicatorwatcher")
     inst:AddComponent("playerhearing")
+	inst:AddComponent("raindomewatcher")
 end
 
 local function RemoveActivePlayerComponents(inst)
     inst:RemoveComponent("hudindicatorwatcher")
     inst:RemoveComponent("playerhearing")
+	inst:RemoveComponent("raindomewatcher")
 end
 
 local function ActivateHUD(inst)
@@ -738,6 +756,7 @@ local function ActivatePlayer(inst)
     inst:PushEvent("playeractivated")
     TheWorld:PushEvent("playeractivated", inst)
     inst:PostActivateHandshake(POSTACTIVATEHANDSHAKE.CTS_LOADED)
+    inst:DoPeriodicTask(TUNING.SCRAPBOOK_UPDATERATE, ex_fns.UpdateScrapbook)
 
     TheCamera:LockDistance(false)
 
@@ -778,9 +797,10 @@ local function OnPlayerJoined(inst)
 end
 
 local function OnCancelMovementPrediction(inst)
-    inst.components.locomotor:Clear()
-    inst:ClearBufferedAction()
-    inst.sg:GoToState("idle", "cancel")
+	--Use stategraph event logic, but triggered instantly instead of buffering.
+	--NOTE: not just calling inst.sg:GoToState("idle", "cancel") because an event
+	--      allows states to override the handler.
+	inst.sg:HandleEvent("sg_cancelmovementprediction")
 end
 
 local function EnableMovementPrediction(inst, enable)
@@ -1353,7 +1373,9 @@ end
 --------------------------------------------------------------------------
 
 local function DoEffects(pet)
-    SpawnPrefab(pet:HasTag("flying") and "spawn_fx_small_high" or "spawn_fx_small").Transform:SetPosition(pet.Transform:GetWorldPosition())
+    if not pet.no_spawn_fx then
+        SpawnPrefab(pet:HasTag("flying") and "spawn_fx_small_high" or "spawn_fx_small").Transform:SetPosition(pet.Transform:GetWorldPosition())
+    end
 end
 
 local function OnSpawnPet(inst, pet)
@@ -1633,6 +1655,13 @@ local function OnLunarPortalMax(inst)
     end
 end
 
+local function OnShadowPortalMax(inst)
+    if ThePlayer ~= nil and ThePlayer == inst then
+        ThePlayer:PushEvent("startflareoverlay", {r=0.8, g=0.2, b=0.2})
+        inst:DoTaskInTime(2, function() inst.components.talker:Say(GetString(inst, "ANNOUNCE_SHADOW_RIFT_MAX")) end)
+    end
+end
+
 
 local function OnHermitMusic(inst)
     if ThePlayer ~= nil and  ThePlayer == inst then
@@ -1690,6 +1719,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         Asset("ANIM", "anim/player_actions_cowbell.zip"),
         Asset("ANIM", "anim/player_actions_reversedeath.zip"),
         Asset("ANIM", "anim/player_actions_cannon.zip"),
+		Asset("ANIM", "anim/player_actions_scythe.zip"),
 
         Asset("ANIM", "anim/player_boat.zip"),
         Asset("ANIM", "anim/player_boat_plank.zip"),
@@ -1710,6 +1740,24 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         Asset("ANIM", "anim/player_teleport.zip"),
         Asset("ANIM", "anim/wilson_fx.zip"),
         Asset("ANIM", "anim/player_one_man_band.zip"),
+		Asset("ANIM", "anim/player_sit.zip"),
+		Asset("ANIM", "anim/player_sit_nofaced.zip"),
+		Asset("ANIM", "anim/player_sit_transition.zip"),
+		--sitting emotes
+		Asset("ANIM", "anim/player_sit_angry.zip"),
+		Asset("ANIM", "anim/player_sit_facepalm.zip"),
+		Asset("ANIM", "anim/player_sit_fistshake.zip"),
+		Asset("ANIM", "anim/player_sit_flex.zip"),
+		Asset("ANIM", "anim/player_sit_happy.zip"),
+		Asset("ANIM", "anim/player_sit_kiss.zip"),
+		Asset("ANIM", "anim/player_sit_laugh.zip"),
+		Asset("ANIM", "anim/player_sit_no.zip"),
+		Asset("ANIM", "anim/player_sit_rude.zip"),
+		Asset("ANIM", "anim/player_sit_sad.zip"),
+		Asset("ANIM", "anim/player_sit_sleepy.zip"),
+		Asset("ANIM", "anim/player_sit_toast.zip"),
+		Asset("ANIM", "anim/player_sit_wave.zip"),
+		--
 
         Asset("ANIM", "anim/player_slurtle_armor.zip"),
         Asset("ANIM", "anim/player_staff.zip"),
@@ -1902,6 +1950,8 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         inst.GetMaxMoisture = GetMaxMoisture -- Didn't want to make moisture a networked component
         inst.GetMoistureRateScale = GetMoistureRateScale -- Didn't want to make moisture a networked component
         inst.GetStormLevel = GetStormLevel -- Didn't want to make stormwatcher a networked component
+		inst.IsInMiasma = fns.IsInMiasma -- Didn't want to make miasmawatcher a networked component
+		inst.IsInAnyStormOrCloud = fns.IsInAnyStormOrCloud -- Use this instead of GetStormLevel, to include things like Miasma clouds
         inst.IsCarefulWalking = IsCarefulWalking -- Didn't want to make carefulwalking a networked component
         inst.EnableMovementPrediction = EnableMovementPrediction
         inst.EnableBoatCamera = fns.EnableBoatCamera
@@ -2021,6 +2071,8 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         inst.AnimState:Show("HAIR")
         inst.AnimState:Show("HEAD")
         inst.AnimState:Hide("HEAD_HAT")
+		inst.AnimState:Hide("HEAD_HAT_NOHELM")
+		inst.AnimState:Hide("HEAD_HAT_HELM")
 
         inst.AnimState:OverrideSymbol("fx_wipe", "wilson_fx", "fx_wipe")
         inst.AnimState:OverrideSymbol("fx_liquid", "wilson_fx", "fx_liquid")
@@ -2127,6 +2179,8 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
 
 		inst.isplayer = true
 
+		inst.TargetForceAttackOnly = fns.TargetForceAttackOnly
+
         if common_postinit ~= nil then
             common_postinit(inst)
         end
@@ -2160,6 +2214,8 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         inst._hermit_music = net_event(inst.GUID, "localplayer._hermit_music")
         inst._underleafcanopy = net_bool(inst.GUID, "localplayer._underleafcanopy","underleafcanopydirty")
         inst._lunarportalmax = net_event(inst.GUID, "localplayer._lunarportalmax")
+        inst._shadowportalmax = net_event(inst.GUID, "localplayer._shadowportalmax")
+        inst._skilltreeactivatedany = net_event(inst.GUID, "localplayer._skilltreeactivatedany")
 
         if IsSpecialEventActive(SPECIAL_EVENTS.YOTB) then
             inst.yotb_skins_sets = net_shortint(inst.GUID, "player.yotb_skins_sets")
@@ -2169,6 +2225,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         if not TheNet:IsDedicated() then
             inst:ListenForEvent("localplayer._winters_feast_music", OnWintersFeastMusic)
             inst:ListenForEvent("localplayer._lunarportalmax", OnLunarPortalMax)
+            inst:ListenForEvent("localplayer._shadowportalmax", OnShadowPortalMax)
             inst:ListenForEvent("localplayer._hermit_music", OnHermitMusic)
 
             inst:AddComponent("hudindicatable")
@@ -2265,6 +2322,9 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
 		inst:AddComponent("damagetyperesist")
 		inst:AddComponent("damagetypebonus")
 
+        inst:AddComponent("planardamage")
+        inst:AddComponent("planardefense")
+
         local gamemode = TheNet:GetServerGameMode()
         if gamemode == "lavaarena" then
             event_server_data("lavaarena", "prefabs/player_common").master_postinit(inst)
@@ -2306,6 +2366,8 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         inst:AddComponent("stormwatcher")
         inst:AddComponent("sandstormwatcher")
         inst:AddComponent("moonstormwatcher")
+		inst:AddComponent("miasmawatcher")
+        inst:AddComponent("acidlevel")
         inst:AddComponent("carefulwalker")
 
         if IsSpecialEventActive(SPECIAL_EVENTS.HALLOWED_NIGHTS) then

@@ -51,6 +51,40 @@ local MIN_LIFETIME = 1
 
 --------------------------------------------------------------------------
 
+local function GetPooledFx(prefab, pool)
+	local fx = table.remove(pool.ents)
+	if fx ~= nil then
+		fx:ReturnToScene()
+		fx:RestartFx()
+	else
+		fx = SpawnPrefab(prefab)
+		fx.pool = pool
+	end
+	return fx
+end
+
+local function ClearPoolEnts(ents)
+	for i = 1, #ents do
+		ents[i]:Remove()
+		ents[i] = nil
+	end
+end
+
+local function SpawnRaindropAtXZ(inst, x, z, fastforward)
+	local raindrop = GetPooledFx("raindrop", inst.raindrop_pool)
+	raindrop.Transform:SetPosition(x, 0, z)
+	if fastforward ~= nil then
+		raindrop.AnimState:FastForward(fastforward)
+	end
+end
+
+local function OnRemoveEntity(inst)
+	ClearPoolEnts(inst.raindrop_pool.ents)
+	inst.raindrop_pool.valid = false
+end
+
+--------------------------------------------------------------------------
+
 local function fn()
     local inst = CreateEntity()
 
@@ -80,6 +114,8 @@ local function fn()
 
     -----------------------------------------------------
 
+	inst.raindrop_pool = { valid = true, ents = {} }
+
     local rng = math.random
     local tick_time = TheSim:GetTickTime()
 
@@ -99,53 +135,123 @@ local function fn()
     local dx = math.cos(angle * DEGREES)
     effect:SetAcceleration(0, dx, -9.80, 1 )
 
-    local function emit_fn()
+	local function emit_fn(x, z, left_sx, right_sx, bottom_sy)
         local vy = -1 + UnitRand() * -2
         local vz = 0
         local vx = dx
-
         local lifetime = MIN_LIFETIME + (MAX_LIFETIME - MIN_LIFETIME) * UnitRand()
         local px, py, pz = emitter_shape()
+		local px1 = x + px
+		local pz1 = z + pz
 
-        effect:AddRotatingParticle(
-            0,                  -- the only emitter
-            lifetime,           -- lifetime
-            px, py, pz,         -- position
-            vx, vy, vz,         -- velocity
-            angle, 0            -- angle, angular_velocity
-        )
+		if not IsUnderRainDomeAtXZ(px1, pz1) then
+			if bottom_sy ~= nil then
+				local psx, psy = TheSim:GetScreenPos(px1, 0, pz1)
+				if psy < bottom_sy and psx > left_sx and psx < right_sx then
+					return --skip
+				end
+			end
+			effect:AddRotatingParticle(
+				0,                  -- the only emitter
+				lifetime,           -- lifetime
+				px, py, pz,         -- position
+				vx, vy, vz,         -- velocity
+				angle, 0            -- angle, angular_velocity
+			)
+		end
     end
 
     local raindrop_offset = CreateDiscEmitter(20)
 
     local map = TheWorld.Map
 
+	local last_domes = nil
+	local last_domes_ticks = 0
+
     local function updateFunc(fastforward)
-        while inst.num_particles_to_emit > 0 do
-            emit_fn()
-            inst.num_particles_to_emit = inst.num_particles_to_emit - 1
-        end
+		local x, y, z = inst.Transform:GetWorldPosition()
+
+		if inst.num_particles_to_emit > 0 then
+			local left_sx, right_sx, bottom_sy
+			local under_domes = GetRainDomesAtXZ(x, z)
+			if #under_domes > 0 then
+				left_sx, bottom_sy = TheSim:GetScreenPos(x, 0, z)
+				left_sx, right_sx = math.huge, -math.huge
+				local right_vec = TheCamera:GetRightVec()
+				for i, v in ipairs(under_domes) do
+					local r = 16--v.components.raindome.radius
+					local rvx = right_vec.x * r
+					local rvz = right_vec.z * r
+					local x1, y1, z1 = v.Transform:GetWorldPosition()
+					local x2 = TheSim:GetScreenPos(x1 + rvx, 0, z1 + rvz)
+					right_sx = math.max(right_sx, x2)
+					x2 = TheSim:GetScreenPos(x1 - rvx, 0, z1 - rvz)
+					left_sx = math.min(left_sx, x2)
+				end
+			end
+
+			while inst.num_particles_to_emit > 0 do
+				emit_fn(x, z, left_sx, right_sx, bottom_sy)
+				inst.num_particles_to_emit = inst.num_particles_to_emit - 1
+			end
+		end
 
         while inst.num_splashes_to_emit > 0 do
-            local x, y, z = inst.Transform:GetWorldPosition()
             local dx, dz = raindrop_offset()
 
-            x = x + dx
-            z = z + dz
+			local x1 = x + dx
+			local z1 = z + dz
+			local domes = GetRainDomesAtXZ(x1, z1)
+			if #domes > 0 then
+				last_domes = domes
+				last_domes_ticks = 30
+			elseif map:IsPassableAtPoint(x1, 0, z1) then
+				SpawnRaindropAtXZ(inst, x1, z1, fastforward)
+			end
 
-            if map:IsPassableAtPoint(x, y, z) then
-                local raindrop = SpawnPrefab("raindrop")
-                raindrop.Transform:SetPosition(x, y, z)
+			--Extra raindrop for domes
+			if last_domes ~= nil then
+				for i = #last_domes, 1, -1 do
+					local dome = last_domes[i]
+					local r = dome.components.raindome ~= nil and dome.components.raindome.radius or 0
+					if r > 0 and dome:IsValid() then
+						local theta = math.random() * PI2
+						for i = 1, 2 do
+							if i > 1 then
+								theta = theta + PI * (.5 + math.random())
+							end
+							local x2, y2, z2 = dome.Transform:GetWorldPosition()
+							x1 = x2 + math.cos(theta) * r
+							z1 = z2 - math.sin(theta) * r
+							if map:IsPassableAtPoint(x1, 0, z1) and not IsUnderRainDomeAtXZ(x1, z1) then
+								SpawnRaindropAtXZ(inst, x1, z1, fastforward)
+							end
+						end
+					elseif #last_domes > 1 then
+						table.remove(last_domes, i)
+					else
+						last_domes = nil
+						last_domes_ticks = 0
+					end
+				end
+				if last_domes_ticks > 1 then
+					last_domes_ticks = last_domes_ticks - 1
+				else
+					last_domes = nil
+					last_domes_ticks = 0
+				end
+			end
 
-                if fastforward then
-                    raindrop.AnimState:FastForward(fastforward)
-                end
-            end
             inst.num_splashes_to_emit = inst.num_splashes_to_emit - 1
         end
 
         inst.num_particles_to_emit = inst.num_particles_to_emit + inst.particles_per_tick
-        inst.num_splashes_to_emit = inst.num_splashes_to_emit + inst.splashes_per_tick
+
+		if inst.splashes_per_tick > 0 then
+			inst.num_splashes_to_emit = inst.num_splashes_to_emit + inst.splashes_per_tick
+		else
+			ClearPoolEnts(inst.raindrop_pool.ents)
+		end
     end
 
     EmitterManager:AddEmitter(inst, nil, updateFunc)
@@ -159,6 +265,8 @@ local function fn()
             effect:FastForward(0, dt)
         end
     end
+
+	inst.OnRemoveEntity = OnRemoveEntity
 
     return inst
 end

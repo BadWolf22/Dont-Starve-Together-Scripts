@@ -11,6 +11,7 @@ local LootDropper = Class(function(self, inst)
     self.chanceloottable = nil
 
     self.trappable = true
+    self.droprecipeloot = true
 
     self.lootfn = nil
     self.flingtargetpos = nil
@@ -197,16 +198,75 @@ function LootDropper:GenerateLoot()
         end
     end
 
-    local recipe = AllRecipes[self.inst.prefab]
-    if recipe then
-        local recipeloot = self:GetRecipeLoot(recipe)
-        for k,v in ipairs(recipeloot) do
-            table.insert(loots, v)
+    if self.droprecipeloot then
+        local recipe = AllRecipes[self.inst.prefab]
+        if recipe then
+            local recipeloot = self:GetRecipeLoot(recipe)
+            for k,v in ipairs(recipeloot) do
+                table.insert(loots, v)
+            end
         end
     end
 
     if self.inst:HasTag("burnt") and math.random() < .4 then
         table.insert(loots, "charcoal") -- Add charcoal to loot for burnt structures
+    end
+
+    return loots
+end
+
+function LootDropper:GetAllPossibleLoot(setuploot)
+    local loots = {}
+
+    -- NOTES(DiogoW): We don't want to run lootsetupfn if this function is not called for debugging purposes or for creating scrapbook data.
+    if setuploot and self.lootsetupfn then
+        self:lootsetupfn()
+    end
+
+    if self.randomhauntedloot then
+        for k,v in pairs(self.randomhauntedloot) do
+            loots[v.prefab] = true
+        end
+    end
+
+    if self.randomloot then
+        for k,v in pairs(self.randomloot) do
+            loots[v.prefab] = true
+        end
+    end
+
+    if self.chanceloot then
+        for k,v in pairs(self.chanceloot) do
+            loots[v.prefab] = true
+        end
+    end
+
+    if self.chanceloottable then
+        local loot_table = LootTables[self.chanceloottable]
+        if loot_table then
+            for i, entry in ipairs(loot_table) do
+                local prefab = entry[1]
+                loots[prefab] = true
+            end
+        end
+    end
+
+    if not self.droppingchanceloot and self.ifnotchanceloot then
+        for k,v in pairs(self.ifnotchanceloot) do
+            loots[v.prefab] = true
+        end
+    end
+
+    if self.loot then
+        for k, prefab in ipairs(self.loot) do
+            loots[prefab] = true
+        end
+    end
+
+    local wintersfeast_loot = self.GetWintersFeastOrnaments ~= nil and self.GetWintersFeastOrnaments(self.inst) or TUNING.WINTERS_FEAST_TREE_DECOR_LOOT[string.upper(self.inst.prefab)] or nil
+
+    if wintersfeast_loot ~= nil and wintersfeast_loot.special ~= nil then
+        loots[wintersfeast_loot.special] = true
     end
 
     return loots
@@ -276,7 +336,7 @@ function LootDropper:SpawnLootPrefab( lootprefab, pt, linked_skinname, skin_id, 
                 if self.inst.components.inventoryitem ~= nil then
                     loot.components.inventoryitem:InheritMoisture(self.inst.components.inventoryitem:GetMoisture(), self.inst.components.inventoryitem:IsWet())
                 else
-                    loot.components.inventoryitem:InheritMoisture(TheWorld.state.wetness, TheWorld.state.iswet)
+					loot.components.inventoryitem:InheritWorldWetnessAtTarget(self.inst)
                 end
             end
 

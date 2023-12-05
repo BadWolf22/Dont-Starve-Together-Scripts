@@ -37,6 +37,7 @@ return{
             NOTALLOWED = "Alas! It doth not go there!",
             EMPTY = "It requireth materials.",
             MISMATCH = "Alas! 'Tis the wrong plans.",
+            NOTREADY = "'Tis no time for pleasantries!",
         },
 		RUMMAGE =
 		{
@@ -206,7 +207,7 @@ return{
 			--MapSpotRevealer/messagebottle
 			MESSAGEBOTTLEMANAGER_NOT_FOUND = "This is nary the time nor place.",--Likely trying to read messagebottle treasure map in caves
 
-            STASH_MAP_NOT_FOUND = "'Tis a map with no directions.",-- Likely trying to read stash map  in world without stash
+            STASH_MAP_NOT_FOUND = "'Tis a map with no directions.",-- Likely trying to read stash map  in world without stash                  
         },
         WRAPBUNDLE =
         {
@@ -521,6 +522,10 @@ return{
 	ANNOUNCE_HUNT_BEAST_NEARBY = "Hush... The creature is near.",
 	ANNOUNCE_HUNT_LOST_TRAIL = "I've lost the tracks.",
 	ANNOUNCE_HUNT_LOST_TRAIL_SPRING = "It's too muddy for trailing.",
+    ANNOUNCE_HUNT_START_FORK = "A battle lies at the end of this trail. Onward!",
+    ANNOUNCE_HUNT_SUCCESSFUL_FORK = "My quarry will not suspect my presence...",
+    ANNOUNCE_HUNT_WRONG_FORK = "My warrior instincts are telling me something is not right...",
+    ANNOUNCE_HUNT_AVOID_FORK = "Perhaps I shall start with an easier prey.",
 	ANNOUNCE_INV_FULL = "I'm carrying all I can!",
 	ANNOUNCE_KNOCKEDOUT = "Ugh, my head.",
 	ANNOUNCE_LOWRESEARCH = "That wasn't very exciting.",
@@ -886,6 +891,34 @@ return{
 	ANNOUNCE_TOOL_TOOWEAK = "This meager tool hath not the strength to break it.",
 
     ANNOUNCE_LUNAR_RIFT_MAX = "Something doth shine like a beacon in the distance.",
+    ANNOUNCE_SHADOW_RIFT_MAX = "Hark! 'Tis a most unnatural light!",
+
+    ANNOUNCE_SCRAPBOOK_FULL = "I hath already completed my tome.",
+
+    ANNOUNCE_CHAIR_ON_FIRE = "This is fine.",
+
+    ANNOUNCE_COACH = 
+    {
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+    },
+    ANNOUNCE_WOLFGANG_WIMPY_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_MIGHTY_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_BEGIN_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_END_COACHING = "only_used_by_wolfgang",
+    ANNOUNCE_WOLFGANG_NOTEAM = 
+    {
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+        "only_used_by_wolfgang",
+    },
 
 	BATTLECRY =
 	{
@@ -1800,6 +1833,10 @@ return{
         CHESSPIECE_GUARDIANPHASE3 = "You fought well, Champion of Mani.",
         CHESSPIECE_EYEOFTERROR = "I shall feast my eyes upon this trophy!",
         CHESSPIECE_TWINSOFTERROR = "A battle I shan't soon forget.",
+        CHESSPIECE_DAYWALKER = "The beast proved himself to be a worthy adversary!",
+        CHESSPIECE_DEERCLOPS_MUTATED = "T'was an unnatural thing. Slaying it was a kindness.",
+        CHESSPIECE_WARG_MUTATED = "T'was no match for my spear.",
+        CHESSPIECE_BEARGER_MUTATED = "May the beast now be at peace.",
 
         CHESSJUNK1 = "It's only a pile of fallen warriors.",
         CHESSJUNK2 = "More fallen mechanical warriors.",
@@ -2176,6 +2213,7 @@ return{
 		KNIGHT = "I taste a battle on the breeze!",
 		KOALEFANT_SUMMER = "Dearest creature... I am going to eat you.",
 		KOALEFANT_WINTER = "Poor unsuspecting meat beast.",
+		KOALEFANT_CARCASS = "This creature is no more.",
 		KRAMPUS = "You don't scare me, goat!",
 		KRAMPUS_SACK = "The sack itself is the present.",
 		LEIF = "That is an ancient woodland being.",
@@ -2951,6 +2989,8 @@ return{
 		WALL_WOOD_ITEM = "A mediocre fortification.",
 		WALL_MOONROCK = "Wholly impregnable, a worthy fortification!",
 		WALL_MOONROCK_ITEM = "Our fortress shall be impenetrable!",
+		WALL_DREADSTONE = "These fortifications will strike fear into my enemies' hearts!",
+		WALL_DREADSTONE_ITEM = "Fashioned from cursed stone.",
 		FENCE = "Tis not my kind of fencing.",
         FENCE_ITEM = "Not for fortification. Merely the farm.",
         FENCE_GATE = "A tiny replica of Valhalla's gates.",
@@ -4417,6 +4457,10 @@ return{
         BIRD_MUTANT_SPITTER = "You think you can challenge me, winged fiend?",
 
         WAGSTAFF_NPC = "Hail stranger! Are ye friend or foe?",
+
+        WAGSTAFF_NPC_MUTATIONS = "'Twas my pleasure dispatching that beast.",
+        WAGSTAFF_NPC_WAGPUNK = "The man doth make haste.",
+
         ALTERGUARDIAN_CONTAINED = "It's ferrying this warrior's soul to the next realm.",
 
         WAGSTAFF_TOOL_1 = "Mayhaps this is what I seek.",
@@ -4529,6 +4573,9 @@ return{
         DUMBBELL_GEM = "My friend, if you want to be fighting fit you must join me in combat!",
         POTATOSACK = "I have no use for a sack of non-meats.",
 
+        DUMBBELL_HEAT = "Training in comfort.",
+        DUMBBELL_REDGEM = "My ally wields a strange weapon, indeed.",
+        DUMBBELL_BLUEGEM = "My ally wields a strange weapon, indeed.",
 
         TERRARIUMCHEST =
 		{
@@ -4552,6 +4599,26 @@ return{
         SHIELDOFTERROR ="Why cower behind a shield when you can strike with it!",
         TWINOFTERROR1 = "Do thine worst, foul metal fiend!",
         TWINOFTERROR2 = "Do thine worst, foul metal fiend!",
+
+		-- Cult of the Lamb
+		COTL_TRINKET = "A crown of ill omen.",
+		TURF_COTL_GOLD = "The land is covered in riches!",
+		TURF_COTL_BRICK = "Sturdy bricks.",
+		COTL_TABERNACLE_LEVEL1 =
+		{
+			LIT = "An altar to a wee fluffy beastie.",
+			GENERIC = "The flame must be lit!",
+		},
+		COTL_TABERNACLE_LEVEL2 =
+		{
+			LIT = "The beastie's power grows.",
+			GENERIC = "The flame must be lit!",
+		},
+		COTL_TABERNACLE_LEVEL3 =
+		{
+			LIT = "Hail to the golden beast!",
+			GENERIC = "The flame must be lit!",
+		},
 
         -- Year of the Catcoon
         CATTOY_MOUSE = "T'would make for excellent target practice!",
@@ -4782,6 +4849,7 @@ return{
 		LUNAR_FORGE = "I shall forge weapons to rival the gods themselves!",
 		LUNAR_FORGE_KIT = "The forge must be built, forthwith!",
 
+		LUNARPLANT_KIT = "Even the sturdiest armor will sometimes need repairs.",
 		ARMOR_LUNARPLANT = "Armor crafted from a fallen foe.",
 		LUNARPLANTHAT = "A formidable helm, burning with an unearthly flame!",
 		BOMB_LUNARPLANT = "I have made the plant's power my own.",
@@ -4790,7 +4858,171 @@ return{
 		PICKAXE_LUNARPLANT = "Neither stone nor structure shall stand in my way!",
 		SHOVEL_LUNARPLANT = "The ground stands no chance against me.",
 
+		BROKEN_FORGEDITEM = "'Tis battered, but not lost!",
+
         PUNCHINGBAG = "Alas, 'tis not a very lively sparring partner.",
+
+        -- Rifts 2
+        SHADOWRIFT_PORTAL = "A chasm to Hel itself.",
+
+		SHADOW_FORGE = "It doth conjure powerful, accursed things...",
+		SHADOW_FORGE_KIT = "Dare I toy with such a thing?",
+
+        FUSED_SHADELING = "'Tis naught but a pest to be crushed beneath my boot!",
+        FUSED_SHADELING_BOMB = "'Tis small, but lively!",
+
+		VOIDCLOTH = "Remnants of a fallen foe.",
+		VOIDCLOTH_KIT = "Even the sturdiest armor will sometimes need repairs.",
+		VOIDCLOTHHAT = "I despise the thought of hiding one's face in combat.",
+		ARMOR_VOIDCLOTH = "This garb invites madness...",
+
+        VOIDCLOTH_UMBRELLA = "A shield against the elements.",
+        VOIDCLOTH_SCYTHE = "A formidable weapon against non-meats.",
+
+		SHADOWTHRALL_HANDS = "To arms, fiend!",
+		SHADOWTHRALL_HORNS = "All thou shall taste is the bite of my spear!",
+		SHADOWTHRALL_WINGS = "Thou art swift, but not swift enough!",
+
+        CHARLIE_NPC = "At last, you reveal yourself!",
+        CHARLIE_HAND = "It seeks an offering.",
+
+        NITRE_FORMATION = "A boon from the burning rain.",
+        DREADSTONE_STACK = "It hails from a place deeper and darker than even here.",
+        
+        SCRAPBOOK_PAGE = "From whence hath you come, mysterious page?",
+
+        LEIF_IDOL = "Tribute to an ancient woodland being.",
+        WOODCARVEDHAT = "A helm of the forest.",
+        WALKING_STICK = "Carved with a fine blade, by a skilled hand.",
+
+        IPECACSYRUP = "'Tis a most sickly-smelling syrup.",
+        BOMB_LUNARPLANT_WORMWOOD = "Ha! Look how my plant ally's power grows!", -- Unused
+        WORMWOOD_MUTANTPROXY_CARRAT =
+        {
+        	DEAD = "It has breathed its last.",
+        	GENERIC = "Vegetables are not to be trusted!",
+        	HELD = "I have you now, wicked vegetable.",
+        	SLEEPING = "A deceptive vegetable with no honor.",
+        },
+        WORMWOOD_MUTANTPROXY_LIGHTFLIER = "Light the way, noble insect.",
+		WORMWOOD_MUTANTPROXY_FRUITDRAGON =
+		{
+			GENERIC = "Meat impostor!",
+			RIPE = "I have no need for your fake meat.",
+			SLEEPING = "Grabbest thy shut eye!",
+		},
+
+        SUPPORT_PILLAR_SCAFFOLD = "The building hath commenced!",
+        SUPPORT_PILLAR = "This noble pillar hath withstood much for our sakes.",
+        SUPPORT_PILLAR_COMPLETE = "A glorious monument to our resilience!",
+        SUPPORT_PILLAR_BROKEN = "We shall rebuild!",
+
+		SUPPORT_PILLAR_DREADSTONE_SCAFFOLD = "The building hath commenced!",
+		SUPPORT_PILLAR_DREADSTONE = "This noble pillar hath withstood much for our sakes.",
+		SUPPORT_PILLAR_DREADSTONE_COMPLETE = "'Twould withstand Ragnarok.",
+		SUPPORT_PILLAR_DREADSTONE_BROKEN = "How the mighty have fallen.",
+
+        WOLFGANG_WHISTLE = "My ally will get our forces fighting fit!",
+
+        -- Rifts 3
+
+        MUTATEDDEERCLOPS = "The beast hath been changed by strange magicks!",
+        MUTATEDWARG = "It is possessed by angry spirits!",
+        MUTATEDBEARGER = "The beast seeks vengeance!",
+
+        LUNARFROG = "This frog hath seen too much.",
+
+        DEERCLOPSCORPSE =
+        {
+            GENERIC  = "It fought bravely.",
+            BURNING  = "May thine spirit be released to Valhalla.",
+            REVIVING = "What's this? The fight is not over!",
+        },
+
+        WARGCORPSE =
+        {
+            GENERIC  = "The creature is slain.",
+            BURNING  = "Thou art worthy of a Viking funeral.",
+            REVIVING = "The beast's spirit will not be put to rest!",
+        },
+
+        BEARGERCORPSE =
+        {
+            GENERIC  = "Thou were a worthy foe.",
+            BURNING  = "May we meet again in Valhalla.",
+            REVIVING = "There's still fight left in the creature!",
+        },
+
+        BEARGERFUR_SACK = "It will preserve the freshness of my kills.",
+        HOUNDSTOOTH_BLOWPIPE = "A beautiful ranged weapon. Fit for a coward.",
+        DEERCLOPSEYEBALL_SENTRYWARD =
+        {
+            GENERIC = "The cold doth sooth me.",    -- Enabled.
+            NOEYEBALL = "Where art thou, cursed eye?",  -- Disabled.
+        },
+        DEERCLOPSEYEBALL_SENTRYWARD_KIT = "Fear not the heat, I shall build this posthaste.",
+
+        SECURITY_PULSE_CAGE = "'Tis a trap!",
+        SECURITY_PULSE_CAGE_FULL = "It burns bright like the sword of Surtr.",
+
+		CARPENTRY_STATION =
+        {
+            GENERIC = "A carpenter's saw is merely another blade for me to master!",
+            BURNT = "It seems my training hath come to an abrupt end.",
+        },
+
+        WOOD_TABLE = -- Shared between the round and square tables.
+        {
+            GENERIC = "No sorrier sight than a bare table. Let us plunder!",
+            HAS_ITEM = "Not the most impressive piece of loot.",
+            BURNT = "The gods need not more tables.",
+        },
+
+        WOOD_CHAIR =
+        {
+            GENERIC = "A warrior doth not sit.",
+            OCCUPIED = "On your feet, soldier!",
+            BURNT = "The gods hath no need for chairs.",
+        },
+
+        DECOR_CENTERPIECE = "Pretty... useless.",
+        DECOR_LAMP = "A warrior hath no need for light!",
+        DECOR_FLOWERVASE =
+        {
+            GENERIC = "Saveth them for my funeral.",
+            EMPTY = "Empty. Shall we use it for target practice?",
+            WILTED = "Beauty fades. Glory is forever.",
+            FRESHLIGHT = "It burns bright.",
+            OLDLIGHT = "The light wanes.",
+        },
+        DECOR_PICTUREFRAME =
+        {
+            GENERIC = "The work of a child, no doubt.",
+            UNDRAWN = "I shall paint it with the blood of mine enemies.",
+        },
+        DECOR_PORTRAITFRAME = "A fallen comrade?",
+
+        PHONOGRAPH = "A mechanical songstress.",
+        RECORD = "T'would be a kindness to keep it from reaching the ears of my ally.",
+        RECORD_CREEPYFOREST = "Music is nourishment for thy soul!",
+        RECORD_DANGER = "Let us play a rousing war song!",
+        RECORD_DAWN = "Thy melody is most soothing.",
+        RECORD_DRSTYLE = "The musicians play with such passion!",
+        RECORD_DUSK = "Thy melody is most soothing.",
+        RECORD_EFS = "Doth the tempo not make one's heart race with excitement?",
+        RECORD_END = "The showstopper!",
+        RECORD_MAIN = "Music is nourishment for thy soul!",
+        RECORD_WORKTOBEDONE = "Music is nourishment for thy soul!",
+
+        ARCHIVE_ORCHESTRINA_MAIN = "What if I just stab it?",
+
+        WAGPUNKHAT = "This helm doth be possessed by the spirit of a cunning warrior.",
+        ARMORWAGPUNK = "It grants the wearer a fleetness of foot to rival Hermod himself.",
+        WAGSTAFF_MACHINERY = "Be these the remains of a sacked outpost?",
+        WAGPUNK_BITS = "What use would a warrior have for such leavings?",
+        WAGPUNKBITS_KIT = "How may one kill with this?",
+
+        WAGSTAFF_MUTATIONS_NOTE = "Save it for the scholars!",
     },
 
     DESCRIBE_GENERIC = "It is an artifact of this realm.",

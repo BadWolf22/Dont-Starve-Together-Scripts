@@ -330,13 +330,17 @@ local PICKUP_CANT_TAGS = {
     "minesprung", "mineactive", "catchable",
     "fire", "light", "spider", "cursed", "paired", "bundle",
     "heatrock", "deploykititem", "boatbuilder", "singingshell",
-    "archive_lockbox", "simplebook",
+    "archive_lockbox", "simplebook", "furnituredecor",
     -- Pickables
     "flower", "gemsocket", "structure",
     -- Either
     "donotautopick",
 }
-local function FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, ispickable, worker)
+local function FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, ispickable, worker, extra_filter)
+    if extra_filter ~= nil and not extra_filter(worker, v, owner) then
+        return false
+    end
+    
     if AllBuilderTaggedRecipes[v.prefab] then
         return false
     end
@@ -383,10 +387,11 @@ local function FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, po
     if ba ~= nil and ba.target == v and (ba.action == ACTIONS.PICKUP or ba.action == ACTIONS.CHECKTRAP or ba.action == ACTIONS.PICK) then
         return false
     end
+
     return v, ispickable
 end
 -- This function looks for an item on the ground that could be ACTIONS.PICKUP (or ACTIONS.CHECKTRAP if a trap) by the owner and subsequently put into the owner's inventory.
-function FindPickupableItem(owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, worker)
+function FindPickupableItem(owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, worker, extra_filter)
     if owner == nil or owner.components.inventory == nil then
         return nil
     end
@@ -405,7 +410,7 @@ function FindPickupableItem(owner, radius, furthestfirst, positionoverride, igno
     for i = istart, iend, idiff do
         local v = ents[i]
         local ispickable = v:HasTag("pickable")
-        if FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, ispickable, worker) then
+        if FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, ispickable, worker, extra_filter) then
             return v, ispickable
         end
     end
@@ -440,13 +445,14 @@ function CanEntitySeeInStorm(inst)
     return inst ~= nil and inst:IsValid() and _CanEntitySeeInStorm(inst)
 end
 
-local function _GetEntityStormLevel(inst)
-    --NOTE: GetStormLevel is available on players on server
-    --      and clients, but only accurate for local players.
-    --      stormwatcher is a server-side component.
-    return (inst.GetStormLevel ~= nil and inst:GetStormLevel())
-        or (inst.components.stormwatcher ~= nil and inst.components.stormwatcher.sandstormlevel)
-        or 0
+local function _IsEntityInAnyStormOrCloud(inst)
+	--NOTE: IsInAnyStormOrCloud is available on players on server and clients, but only accurate for local players.
+	if inst.IsInAnyStormOrCloud ~= nil then
+		return inst:IsInAnyStormOrCloud()
+	end
+	-- stormwatcher and miasmawatcher are a server-side components.
+	return (inst.components.stormwatcher ~= nil and inst.components.stormwatcher:GetStormLevel() >= TUNING.SANDSTORM_FULL_LEVEL)
+		or (inst.components.miasmawatcher ~= nil and inst.components.miasmawatcher:IsInMiasma())
 end
 
 function CanEntitySeePoint(inst, x, y, z)
@@ -455,7 +461,7 @@ function CanEntitySeePoint(inst, x, y, z)
         and (not inst.components.inkable or not inst.components.inkable.inked)
         and (TheSim:GetLightAtPoint(x, y, z) > TUNING.DARK_CUTOFF or
             _CanEntitySeeInDark(inst))
-        and (_GetEntityStormLevel(inst) < TUNING.SANDSTORM_FULL_LEVEL or
+		and (not _IsEntityInAnyStormOrCloud(inst) or
             _CanEntitySeeInStorm(inst) or
             inst:GetDistanceSqToPoint(x, y, z) < TUNING.SANDSTORM_VISION_RANGE_SQ)
 end
@@ -606,3 +612,126 @@ function GetInventoryItemAtlas(imagename, no_fallback)
 	end
 	return atlas
 end
+
+----------------------------------------------------------------------------------------------
+
+local scrapbookIconAtlasLookup = {}
+
+function RegisterScrapbookIconAtlas(atlas, imagename)
+	if atlas ~= nil and imagename ~= nil then
+		if scrapbookIconAtlasLookup[imagename] ~= nil then
+			if scrapbookIconAtlasLookup[imagename] ~= atlas then
+				print("RegisterScrapbookIconAtlas: Image '" .. imagename .. "' is already registered to atlas '" .. atlas .."'")
+			end
+		else
+			scrapbookIconAtlasLookup[imagename] = atlas
+		end
+	end
+end
+
+function GetScrapbookIconAtlas_Internal(imagename)
+    local images1 = "images/scrapbook_icons1.xml"
+    local images2 = "images/scrapbook_icons2.xml"
+    local images3 = "images/scrapbook_icons3.xml"
+    return TheSim:AtlasContains(images1, imagename) and images1
+            or TheSim:AtlasContains(images2, imagename) and images2
+            or TheSim:AtlasContains(images3, imagename) and images3
+            or nil
+end
+
+function GetScrapbookIconAtlas(imagename)
+	local atlas = scrapbookIconAtlasLookup[imagename]
+	if atlas then
+		return atlas
+	end
+
+    atlas = GetScrapbookIconAtlas_Internal(imagename)
+
+	if atlas ~= nil then
+		scrapbookIconAtlasLookup[imagename] = atlas
+	end
+
+	return atlas
+end
+
+----------------------------------------------------------------------------------------------
+
+local skillTreeBGAtlasLookup = {}
+
+function RegisterSkilltreeBGAtlas(atlas, imagename)
+	if atlas ~= nil and imagename ~= nil then
+		if skillTreeBGAtlasLookup[imagename] ~= nil then
+			if skillTreeBGAtlasLookup[imagename] ~= atlas then
+				print("RegisterSkilltreeBGAtlas: Image '" .. imagename .. "' is already registered to atlas '" .. atlas .."'")
+			end
+		else
+			skillTreeBGAtlasLookup[imagename] = atlas
+		end
+	end
+end
+
+function GetSkilltreeBG_Internal(imagename)
+    local images1 = "images/skilltree2.xml"
+    local images2 = "images/skilltree3.xml"
+    return TheSim:AtlasContains(images1, imagename) and images1
+            or TheSim:AtlasContains(images2, imagename) and images2
+            or nil
+end
+
+function GetSkilltreeBG(imagename)
+	local atlas = skillTreeBGAtlasLookup[imagename]
+	if atlas then
+		return atlas
+	end
+
+    atlas = GetSkilltreeBG_Internal(imagename)
+
+	if atlas ~= nil then
+		skillTreeBGAtlasLookup[imagename] = atlas
+	end
+
+	return atlas
+end
+
+local skillTreeIconsAtlasLookup = {}
+
+function RegisterSkilltreeIconsAtlas(atlas, imagename)
+	if atlas ~= nil and imagename ~= nil then
+		if skillTreeIconsAtlasLookup[imagename] ~= nil then
+			if skillTreeIconsAtlasLookup[imagename] ~= atlas then
+				print("RegisterSkilltreeIconsAtlas: Image '" .. imagename .. "' is already registered to atlas '" .. atlas .."'")
+			end
+		else
+			skillTreeIconsAtlasLookup[imagename] = atlas
+		end
+	end
+end
+
+function GetSkilltreeIconAtlas_Internal(imagename)
+    return "images/skilltree_icons.xml"
+
+    -- NOTES(DiogoW): For future!
+
+    -- local images1 = "images/skilltree_icons1.xml"
+    -- local images2 = "images/skilltree_icons2.xml"
+    -- return TheSim:AtlasContains(images1, imagename) and images1
+    --         or TheSim:AtlasContains(images2, imagename) and images2
+    --         or nil
+end
+
+function GetSkilltreeIconAtlas(imagename)
+	local atlas = skillTreeIconsAtlasLookup[imagename]
+	if atlas then
+		return atlas
+	end
+
+    atlas = GetSkilltreeIconAtlas_Internal(imagename)
+
+	if atlas ~= nil then
+		skillTreeIconsAtlasLookup[imagename] = atlas
+	end
+
+	return atlas
+end
+
+----------------------------------------------------------------------------------------------
