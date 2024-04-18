@@ -236,6 +236,7 @@ local function mosquito()
     inst:ListenForEvent("attacked", OnAttacked)
 
     MakeFeedableSmallLivestock(inst, TUNING.TOTAL_DAY_TIME * 2, OnPickedUp, OnDropped)
+    inst.incineratesound = inst.sounds.death
 
     return inst
 end

@@ -117,7 +117,12 @@ function PlayerActionPicker:GetSceneActions(useitem, right)
         useitem:HasTag("inspectable") and
         (self.inst.sg == nil or self.inst.sg:HasStateTag("moving") or self.inst.sg:HasStateTag("idle")) and
         (self.inst:HasTag("moving") or self.inst:HasTag("idle")) then
-        sorted_acts = self:SortActionList({ ACTIONS.WALKTO }, useitem)
+
+		--@V2C: #FORGE_AOE_RCLICK *searchable*
+		--      -Forge used to strip ALL r.click actions, so now we manually strip WALKTO action.
+		if not right or (self.inst.components.playercontroller ~= nil and not self.inst.components.playercontroller:HasAOETargeting()) then
+			sorted_acts = self:SortActionList({ ACTIONS.WALKTO }, useitem)
+		end
     end
 
     return sorted_acts
@@ -361,7 +366,10 @@ function PlayerActionPicker:GetRightClickActions(position, target, spellbook)
             actions = self:GetEquippedItemActions(target, equipitem, true)
 
             --strip out all other actions for weapons with right click special attacks
-            if equipitem.components.aoetargeting ~= nil then
+			--@V2C: #FORGE_AOE_RCLICK *searchable*
+			--      -Forge used to strip all r.click actions even before starting aoe targeting.
+			--if equipitem.components.aoetargeting ~= nil then
+			if equipitem.components.aoetargeting and self.inst.components.playercontroller:IsAOETargeting() then
                 return (#actions <= 0 or actions[1].action == ACTIONS.CASTAOE) and actions or {}
             end
         end
@@ -422,7 +430,11 @@ function PlayerActionPicker:DoGetMouseActions(position, target, spellbook)
         end
 
         isaoetargeting = self.inst.components.playercontroller:IsAOETargeting()
-        wantsaoetargeting = not isaoetargeting and self.inst.components.playercontroller:HasAOETargeting()
+		--@V2C: #FORGE_AOE_RCLICK *searchable*
+		--      -Forge used to strip all r.click actions to force r.click to start aoe targeting no matter what.
+		--      -Now we only want to start aoe targeting if there are no other meaningful actions.
+		--      -GetRightClickActions will naturally return nil in that case now.
+		--wantsaoetargeting = not isaoetargeting and self.inst.components.playercontroller:HasAOETargeting()
 
 		if isaoetargeting then
 			position = self.inst.components.playercontroller:GetAOETargetingPos()

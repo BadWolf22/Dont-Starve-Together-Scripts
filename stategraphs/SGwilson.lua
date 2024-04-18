@@ -333,6 +333,7 @@ local function ConfigureRunState(inst)
         inst.sg.statemem.riding = true
         inst.sg.statemem.groggy = inst:HasTag("groggy")
         inst.sg:AddStateTag("nodangle")
+		inst.sg:AddStateTag("noslip")
 
         local mount = inst.components.rider:GetMount()
         inst.sg.statemem.ridingwoby = mount and mount:HasTag("woby")
@@ -340,8 +341,14 @@ local function ConfigureRunState(inst)
     elseif inst.components.inventory:IsHeavyLifting() then
         inst.sg.statemem.heavy = true
 		inst.sg.statemem.heavy_fast = inst.components.mightiness ~= nil and inst.components.mightiness:IsMighty()
+		inst.sg:AddStateTag("noslip")
+	elseif inst:IsChannelCasting() then
+		inst.sg.statemem.channelcast = true
+		inst.sg.statemem.channelcastitem = inst:IsChannelCastingItem()
     elseif inst:HasTag("wereplayer") then
         inst.sg.statemem.iswere = true
+		inst.sg:AddStateTag("noslip")
+
         if inst:HasTag("weremoose") then
             if inst:HasTag("groggy") then
                 inst.sg.statemem.moosegroggy = true
@@ -365,6 +372,7 @@ local function ConfigureRunState(inst)
         inst.sg.statemem.groggy = true
     elseif inst:IsCarefulWalking() then
         inst.sg.statemem.careful = true
+		inst.sg:AddStateTag("noslip")
     else
         inst.sg.statemem.normal = true
         inst.sg.statemem.normalwonkey = inst:HasTag("wonkey") or nil
@@ -374,6 +382,8 @@ end
 local function GetRunStateAnim(inst)
     return ((inst.sg.statemem.heavy and inst.sg.statemem.heavy_fast) and "heavy_walk_fast")
         or (inst.sg.statemem.heavy and "heavy_walk")
+		or (inst.sg.statemem.channelcastitem and "channelcast_walk")
+		or (inst.sg.statemem.channelcast and "channelcast_oh_walk")
         or (inst.sg.statemem.sandstorm and "sand_walk")
         or ((inst.sg.statemem.groggy or inst.sg.statemem.moosegroggy or inst.sg.statemem.goosegroggy) and "idle_walk")
         or (inst.sg.statemem.careful and "careful_walk")
@@ -441,6 +451,77 @@ local function DoMimeAnimations(inst)
     for k = 1, math.random(2) do
         inst.AnimState:PushAnimation("mime"..tostring(math.random(13)), false)
     end
+end
+
+local function SetPocketRummageMem(inst, item)
+	inst.sg.mem.pocket_rummage_item = item
+end
+
+local function ClosePocketRummageMem(inst, item)
+	if item == nil then
+		item = inst.sg.mem.pocket_rummage_item
+	elseif item ~= inst.sg.mem.pocket_rummage_item then
+		return
+	end
+	if item then
+		inst.sg.mem.pocket_rummage_item = nil
+
+		if item.components.inventoryitem and
+			item.components.inventoryitem:GetGrandOwner() == inst and
+			item.components.container
+		then
+			item.components.container:Close(inst)
+		end
+	end
+end
+
+--Call this when exiting a "keep_pocket_rummage" state
+local function CheckPocketRummageMem(inst)
+	local item = inst.sg.mem.pocket_rummage_item
+	if item then
+		if not (item.components.container and
+				item.components.container:IsOpenedBy(inst) and
+				item.components.inventoryitem and
+				item.components.inventoryitem:GetGrandOwner() == inst)
+		then
+			SetPocketRummageMem(inst, nil)
+		else
+			local stayopen = inst.sg.statemem.keep_pocket_rummage_mem_onexit
+			if not stayopen and inst.sg.statemem.is_going_to_action_state then
+				local buffaction = inst:GetBufferedAction()
+				if buffaction and
+					(	buffaction.action == ACTIONS.BUILD or
+						(	buffaction.invobject and
+							buffaction.invobject.components.inventoryitem and
+							buffaction.invobject.components.inventoryitem:IsHeldBy(item)
+						)
+					)
+				then
+					stayopen = true
+				end
+			end
+			if not stayopen then
+				ClosePocketRummageMem(inst)
+			end
+		end
+	end
+end
+
+local function TryResumePocketRummage(inst)
+	local item = inst.sg.mem.pocket_rummage_item
+	if item then
+		if item.components.container and
+			item.components.container:IsOpenedBy(inst) and
+			item.components.inventoryitem and
+			item.components.inventoryitem:GetGrandOwner() == inst
+		then
+			inst.sg.statemem.keep_pocket_rummage_mem_onexit = true
+			inst.sg:GoToState("start_pocket_rummage", item)
+			return true
+		end
+		inst.sg.mem.pocket_rummage_item = nil
+	end
+	return false
 end
 
 local actionhandlers =
@@ -548,7 +629,7 @@ local actionhandlers =
 				or "book"
         end),
     ActionHandler(ACTIONS.MAKEBALLOON, "makeballoon"),
-    ActionHandler(ACTIONS.DEPLOY, "doshortaction"),
+	ActionHandler(ACTIONS.DEPLOY, function(inst, action) return action.invobject and action.invobject.components.complexprojectile and "throw_deploy" or "doshortaction" end),
     ActionHandler(ACTIONS.DEPLOY_TILEARRIVE, "doshortaction"),
     ActionHandler(ACTIONS.STORE, "doshortaction"),
     ActionHandler(ACTIONS.DROP,
@@ -577,6 +658,7 @@ local actionhandlers =
     ActionHandler(ACTIONS.PICK,
         function(inst, action)
             return
+				(action.target and action.target:HasTag("noquickpick") and "dolongaction") or
                 (inst:HasTag("farmplantfastpicker") and action.target ~= nil and action.target:HasTag("farm_plant") and "domediumaction") or
 				(inst.components.rider ~= nil and inst.components.rider:IsRiding() and (
 					(inst:HasTag("woodiequickpicker") and "dowoodiefastpick") or
@@ -651,7 +733,17 @@ local actionhandlers =
             return (inst.components.rider ~= nil and inst.components.rider:IsRiding() and "domediumaction")
                 or "doshortaction"
         end),
-    ActionHandler(ACTIONS.RUMMAGE, "doshortaction"),
+	ActionHandler(ACTIONS.RUMMAGE,
+		function(inst, action)
+			return action.invobject
+				and action.invobject:HasTag("portablestorage")
+				and action.invobject.components.container
+				and (	action.invobject.components.container:IsOpenedBy(inst) and
+						"stop_pocket_rummage" or
+						"start_pocket_rummage"
+					)
+				or "doshortaction"
+		end),
     ActionHandler(ACTIONS.BAIT, "doshortaction"),
     ActionHandler(ACTIONS.HEAL, "dolongaction"),
     ActionHandler(ACTIONS.SEW, "dolongaction"),
@@ -739,7 +831,8 @@ local actionhandlers =
                         (action.invobject:HasTag("blowdart") and "blowdart_special") or
                         (action.invobject:HasTag("throw_line") and "throw_line") or
 						(action.invobject:HasTag("book") and (inst:HasTag("canrepeatcast") and "book_repeatcast" or "book")) or
-                        (action.invobject:HasTag("parryweapon") and "parry_pre")
+                        (action.invobject:HasTag("parryweapon") and "parry_pre") or
+						(action.invobject:HasTag("willow_ember") and (inst:HasTag("canrepeatcast") and "repeatcastspellmind" or "castspellmind"))
                     )
                 or "castspell"
         end),
@@ -811,6 +904,18 @@ local actionhandlers =
 			end
 			return projectile ~= nil and projectile:HasTag("keep_equip_toss") and "throw_keep_equip" or "throw"
 		end),
+        ActionHandler(ACTIONS.TOSS_MAP,
+            function(inst, action)
+                local projectile = action.invobject
+                if projectile == nil then
+                    --for Special action TOSS, we can also use equipped item.
+                    projectile = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+                    if projectile ~= nil and not projectile:HasTag("special_action_toss") then
+                        projectile = nil
+                    end
+                end
+                return projectile ~= nil and projectile:HasTag("keep_equip_toss") and "throw_keep_equip" or "throw"
+            end),
     ActionHandler(ACTIONS.UNPIN, "doshortaction"),
     ActionHandler(ACTIONS.CATCH, "catch_pre"),
 
@@ -888,6 +993,8 @@ local actionhandlers =
                 return "startchanneling"
             end
         end),
+	ActionHandler(ACTIONS.START_CHANNELCAST, "start_channelcast"),
+	ActionHandler(ACTIONS.STOP_CHANNELCAST, "stop_channelcast"),
     ActionHandler(ACTIONS.REVIVE_CORPSE, "revivecorpse"),
     ActionHandler(ACTIONS.DISMANTLE, "dolongaction"),
     ActionHandler(ACTIONS.TACKLE, "tackle_pre"),
@@ -971,7 +1078,13 @@ local actionhandlers =
     ActionHandler(ACTIONS.PLANTREGISTRY_RESEARCH, "dolongaction"),
     ActionHandler(ACTIONS.ASSESSPLANTHAPPINESS, "dolongaction"),
     ActionHandler(ACTIONS.ADDCOMPOSTABLE, "give"),
-    ActionHandler(ACTIONS.WAX, "dolongaction"),
+    ActionHandler(ACTIONS.WAX,
+        function(inst, action)
+            return
+                action.invobject ~= nil and action.invobject:HasTag("waxspray") and "spray_wax"
+                or "dolongaction"
+        end
+    ),
 
     ActionHandler(ACTIONS.USEITEMON, function(inst, action)
         if action.invobject == nil then
@@ -982,6 +1095,11 @@ local actionhandlers =
             return "dolongaction"
         end
     end),
+
+    ActionHandler(ACTIONS.USEITEM, function(inst, action)        
+        return "doaction"
+    end),
+
     ActionHandler(ACTIONS.STOPUSINGITEM, "dolongaction"),
     ActionHandler(ACTIONS.YOTB_STARTCONTEST, "doshortaction"),
     ActionHandler(ACTIONS.YOTB_UNLOCKSKIN, "dolongaction"),
@@ -1032,6 +1150,8 @@ local actionhandlers =
 			or (inst:HasTag("weregoose") and "weregoose_takeoff_pre")
 			or nil
     end),
+
+    ActionHandler(ACTIONS.INCINERATE, "doshortaction"),
 }
 
 local events =
@@ -1065,8 +1185,16 @@ local events =
                 inst.sg:GoToState("run_stop")
             end
         elseif not is_moving and should_move then
+			--V2C: Added "dir" param so we don't have to add "canrotate" to all interruptible states
+			if data and data.dir then
+				inst.components.locomotor:SetMoveDir(data.dir)
+			end
             inst.sg:GoToState("run_start")
-        elseif data.force_idle_state and not (is_moving or should_move or inst.sg:HasStateTag("idle") or inst:HasTag("is_furling"))  then
+        elseif data.force_idle_state and not (is_moving or should_move or inst.sg:HasStateTag("idle") or inst:HasTag("is_furling")) then
+			--V2C: Added "dir" param so we don't have to add "canrotate" to all interruptible states
+			if data and data.dir then
+				inst.components.locomotor:SetMoveDir(data.dir)
+			end
             inst.sg:GoToState("idle")
         end
     end),
@@ -1111,6 +1239,7 @@ local events =
                     inst.sg:GoToState("parry_hit", {
                         timeleft = inst.sg.statemem.task ~= nil and GetTaskRemaining(inst.sg.statemem.task) or inst.sg.statemem.parrytime,
                         pushing = data.attacker ~= nil and data.attacker.sg ~= nil and data.attacker.sg:HasStateTag("pushing"),
+                        isshield = inst.sg.statemem.isshield,
                     })
                 end
 			elseif inst.sg:HasStateTag("devoured") then
@@ -1196,6 +1325,7 @@ local events =
                         (inst.sg.statemem.timeleft ~= nil and math.max(0, inst.sg.statemem.timeleft + inst.sg.statemem.timeleft0 - GetTime())) or
                         inst.sg.statemem.parrytime,
                     knockbackdata = data,
+                    isshield = inst.sg.statemem.isshield,
                 })
             else
                 inst.sg:GoToState((data.forcelanded or inst.components.inventory:EquipHasTag("heavyarmor") or inst:HasTag("heavybody")) and "knockbacklanded" or "knockback", data)
@@ -1224,6 +1354,12 @@ local events =
 	EventHandler("devoured", function(inst, data)
 		if not inst.components.health:IsDead() and data ~= nil and data.attacker ~= nil and data.attacker:IsValid() then
 			inst.sg:GoToState("devoured", data.attacker)
+		end
+	end),
+
+	EventHandler("feetslipped", function(inst)
+		if inst.sg:HasStateTag("running") and not inst.sg:HasStateTag("noslip") then
+			inst.sg:GoToState("slip")
 		end
 	end),
 
@@ -1620,6 +1756,12 @@ local events =
             end
         end
     end),
+
+	EventHandler("ms_closeportablestorage", function(inst, data)
+		if data and data.item then
+			ClosePocketRummageMem(inst, data.item)
+		end
+	end),
 
     CommonHandlers.OnHop(),
 }
@@ -2683,7 +2825,7 @@ local states =
             if inst.components.drownable ~= nil and inst.components.drownable:ShouldDrown() then
                 inst.sg:GoToState("sink_fast")
                 return
-            end
+			end
 
             inst.sg.statemem.ignoresandstorm = true
 
@@ -2701,7 +2843,7 @@ local states =
 			if inst.sg.mem.queuetalk_timeout ~= nil then
 				local remaining_talk_time = inst.sg.mem.queuetalk_timeout - GetTime()
 				inst.sg.mem.queuetalk_timeout = nil
-				if not inst:HasTag("ignoretalking") and not pushanim then
+				if not (pushanim or inst:HasTag("ignoretalking")) then
 					if remaining_talk_time > 1 then
 						if not inst:HasTag("mime") then
 							inst.sg:GoToState("talk")
@@ -2746,6 +2888,16 @@ local states =
             elseif inst.components.inventory:IsHeavyLifting() then
                 table.insert(anims, "heavy_idle")
                 dofunny = false
+			elseif inst:IsChannelCasting() then
+				inst.sg.statemem.channelcast = true
+				inst.sg.statemem.channelcastitem = inst:IsChannelCastingItem()
+				if inst.sg.lasttags and inst.sg.lasttags["keepchannelcasting"] then
+					--Came from a state that isn't channeling item specific
+					--so it would've animated back to regular idle instead.
+					table.insert(anims, inst.sg.statemem.channelcastitem and "channelcast_idle_pre" or "channelcast_oh_idle_pre")
+				end
+				table.insert(anims, inst.sg.statemem.channelcastitem and "channelcast_idle" or "channelcast_oh_idle")
+				dofunny = false
             else
                 inst.sg.statemem.ignoresandstorm = false
 				if inst:IsInAnyStormOrCloud() and not inst.components.playervision:HasGoggleVision() then
@@ -2831,6 +2983,12 @@ local states =
 					elseif not (inst.sg.statemem.sandstorm or inst.components.playervision:HasGoggleVision()) then
 						inst.sg:GoToState("idle")
 					end
+				end
+			end),
+			EventHandler("stopchannelcast", function(inst)
+				if inst.sg.statemem.channelcast and not inst:IsChannelCasting() then
+					inst.AnimState:PlayAnimation(inst.sg.statemem.channelcastitem and "channelcast_idle_pst" or "channelcast_oh_idle_pst")
+					inst.sg:GoToState("idle", true)
 				end
 			end),
         },
@@ -4022,9 +4180,11 @@ local states =
         tags = { "preparrying", "busy", "nomorph" },
 
         onenter = function(inst)
+            inst.sg.statemem.isshield = inst.bufferedaction ~= nil and inst.bufferedaction.invobject ~= nil and inst.bufferedaction.invobject:HasTag("shield")
+
             inst.components.locomotor:Stop()
-            inst.AnimState:PlayAnimation("parry_pre")
-            inst.AnimState:PushAnimation("parry_loop", true)
+            inst.AnimState:PlayAnimation(inst.sg.statemem.isshield and "shieldparry_pre"  or "parry_pre")
+            inst.AnimState:PushAnimation(inst.sg.statemem.isshield and "shieldparry_loop" or "parry_loop", true)
             inst.sg:SetTimeout(inst.AnimState:GetCurrentAnimationLength())
             --V2C: using animover results in a slight hang on last frame of parry_pre
 
@@ -4083,9 +4243,9 @@ local states =
                 --Transfer talk task to parry_idle state
                 local talktask = inst.sg.statemem.talktask
                 inst.sg.statemem.talktask = nil
-                inst.sg:GoToState("parry_idle", { duration = inst.sg.statemem.parrytime, pauseframes = 30, talktask = talktask })
+                inst.sg:GoToState("parry_idle", { duration = inst.sg.statemem.parrytime, pauseframes = 30, talktask = talktask, isshield = inst.sg.statemem.isshield })
             else
-                inst.AnimState:PlayAnimation("parry_pst")
+                inst.AnimState:PlayAnimation(inst.sg.statemem.isshield and "shieldparry_pst"  or "parry_pst")
                 inst.sg:GoToState("idle", true)
             end
         end,
@@ -4103,24 +4263,26 @@ local states =
         tags = { "notalking", "parrying", "nomorph" },
 
         onenter = function(inst, data)
+            inst.sg.statemem.isshield = data ~= nil and data.isshield
+
             inst.components.locomotor:Stop()
 
             if data ~= nil and data.duration ~= nil then
                 if data.duration > 0 then
                     inst.sg.statemem.task = inst:DoTaskInTime(data.duration, function(inst)
                         inst.sg.statemem.task = nil
-                        inst.AnimState:PlayAnimation("parry_pst")
+                        inst.AnimState:PlayAnimation(inst.sg.statemem.isshield and "shieldparry_pst"  or "parry_pst")
                         inst.sg:GoToState("idle", true)
                     end)
                 else
-                    inst.AnimState:PlayAnimation("parry_pst")
+                    inst.AnimState:PlayAnimation(inst.sg.statemem.isshield and "shieldparry_pst"  or "parry_pst")
                     inst.sg:GoToState("idle", true)
                     return
                 end
             end
 
             if not inst.AnimState:IsCurrentAnimation("parry_loop") then
-                inst.AnimState:PushAnimation("parry_loop", true)
+                inst.AnimState:PlayAnimation(inst.sg.statemem.isshield and "shieldparry_loop" or "parry_loop", true)
             end
 
             --Transferred over from parry_pre so it doesn't cut off abrubtly
@@ -4175,10 +4337,12 @@ local states =
         tags = { "parrying", "parryhit", "nomorph", "busy", "nopredict" },
 
         onenter = function(inst, data)
+            inst.sg.statemem.isshield = data ~= nil and data.isshield
+
             inst.components.locomotor:Stop()
             inst:ClearBufferedAction()
 
-            inst.AnimState:PlayAnimation("parryblock")
+            inst.AnimState:PlayAnimation(inst.sg.statemem.isshield and "shieldparryblock" or "parryblock")
             inst.SoundEmitter:PlaySound("dontstarve/wilson/hit")
 
             local stun_frames = data ~= nil and data.pushing and 6 or 4
@@ -4203,7 +4367,11 @@ local states =
                 inst.sg:GoToState("idle")
             else
                 inst.sg.statemem.parrying = true
-                inst.sg:GoToState("parry_idle", inst.sg.statemem.timeleft ~= nil and { duration = math.max(0, inst.sg.statemem.timeleft + inst.sg.statemem.timeleft0 - GetTime()) } or nil)
+                inst.sg:GoToState("parry_idle",
+                    inst.sg.statemem.timeleft ~= nil and { duration = math.max(0, inst.sg.statemem.timeleft + inst.sg.statemem.timeleft0 - GetTime()), isshield = inst.sg.statemem.isshield }
+                    or inst.sg.statemem.isshield and { isshield = inst.sg.statemem.isshield }
+                    or nil
+                )
             end
         end,
 
@@ -4219,10 +4387,12 @@ local states =
         tags = { "parrying", "parryhit", "busy", "nopredict", "nomorph" },
 
         onenter = function(inst, data)
+            inst.sg.statemem.isshield = data ~= nil and data.isshield
+
             inst.components.locomotor:Stop()
             inst:ClearBufferedAction()
 
-            inst.AnimState:PlayAnimation("parryblock")
+            inst.AnimState:PlayAnimation(inst.sg.statemem.isshield and "shieldparryblock" or "parryblock")
             inst.SoundEmitter:PlaySound("dontstarve/wilson/hit")
 
             if data ~= nil then
@@ -4278,7 +4448,11 @@ local states =
                 inst.sg:GoToState("idle")
             else
                 inst.sg.statemem.parrying = true
-                inst.sg:GoToState("parry_idle", inst.sg.statemem.timeleft ~= nil and { duration = math.max(0, inst.sg.statemem.timeleft + inst.sg.statemem.timeleft0 - GetTime()) } or nil)
+                inst.sg:GoToState("parry_idle",
+                    inst.sg.statemem.timeleft ~= nil and { duration = math.max(0, inst.sg.statemem.timeleft + inst.sg.statemem.timeleft0 - GetTime()), isshield = inst.sg.statemem.isshield }
+                    or inst.sg.statemem.isshield and { isshield = inst.sg.statemem.isshield }
+                    or nil
+                )
             end
         end,
 
@@ -4667,7 +4841,7 @@ local states =
 
     State{
         name = "eat",
-        tags = { "busy", "nodangle" },
+		tags = { "busy", "nodangle", "keep_pocket_rummage" },
 
         onenter = function(inst, foodinfo)
             inst.components.locomotor:Stop()
@@ -4738,6 +4912,7 @@ local states =
             TimeEvent(70 * FRAMES, function(inst)
                 inst.SoundEmitter:KillSound("eating")
             end),
+			FrameEvent(94, TryResumePocketRummage),
         },
 
         events =
@@ -4769,12 +4944,13 @@ local states =
             if inst.sg.statemem.soulfx ~= nil then
                 inst.sg.statemem.soulfx:Remove()
             end
+			CheckPocketRummageMem(inst)
         end,
     },
 
     State{
         name = "quickeat",
-        tags = { "busy" },
+		tags = { "busy", "keep_pocket_rummage" },
 
         onenter = function(inst, foodinfo)
             inst.components.locomotor:Stop()
@@ -4827,6 +5003,8 @@ local states =
 			FrameEvent(21, function(inst)
 				if inst.sg.statemem.queued_post_eat_state ~= nil then
 					inst.sg:GoToState(inst.sg.statemem.queued_post_eat_state)
+				else
+					TryResumePocketRummage(inst)
 				end
 			end),
         },
@@ -4857,12 +5035,13 @@ local states =
             if inst.sg.statemem.feed ~= nil and inst.sg.statemem.feed:IsValid() then
                 inst.sg.statemem.feed:Remove()
             end
+			CheckPocketRummageMem(inst)
         end,
     },
 
     State{
         name = "refuseeat",
-        tags = { "busy", "pausepredict" },
+		tags = { "busy", "pausepredict", "keep_pocket_rummage" },
 
         onenter = function(inst)
             inst.components.locomotor:Stop()
@@ -4889,11 +5068,10 @@ local states =
                 inst.sg:RemoveStateTag("busy")
                 inst.sg:RemoveStateTag("pausepredict")
             end),
+			FrameEvent(74, TryResumePocketRummage),
         },
 
-        ontimeout = function(inst)
-			StopTalkSound(inst)
-        end,
+		ontimeout = StopTalkSound,
 
         events =
         {
@@ -4904,7 +5082,10 @@ local states =
             end),
         },
 
-        onexit = StopTalkSound,
+		onexit = function(inst)
+			StopTalkSound(inst)
+			CheckPocketRummageMem(inst)
+		end,
     },
 
     State{
@@ -5380,9 +5561,10 @@ local states =
         onenter = function(inst, noanim)
             if not noanim then
                 inst.AnimState:PlayAnimation(
-                    inst.components.inventory:IsHeavyLifting() and
-                    not inst.components.rider:IsRiding() and
-                    "heavy_dial_loop" or
+					(inst.components.inventory:IsHeavyLifting() and not inst.components.rider:IsRiding() and "heavy_dial_loop") or
+					(inst:IsChannelCasting() and (
+						inst:IsChannelCastingItem() and "channelcast_idle_dial_loop" or "channelcast_oh_idle_dial_loop"
+					)) or
                     "dial_loop",
                     true)
             end
@@ -5743,7 +5925,7 @@ local states =
 
     State{
         name = "doshortaction",
-        tags = { "doing", "busy" },
+		tags = { "doing", "busy", "keepchannelcasting" },
 
         onenter = function(inst, silent)
             inst.components.locomotor:Stop()
@@ -5789,6 +5971,7 @@ local states =
 
     State{
         name = "dosilentshortaction",
+		tags = { "keepchannelcasting" },
 
         onenter = function(inst)
             inst.sg:GoToState("doshortaction", true)
@@ -6068,7 +6251,7 @@ local states =
 
     State{
         name = "dolongaction",
-        tags = { "doing", "busy", "nodangle" },
+		tags = { "doing", "busy", "nodangle", "keep_pocket_rummage" },
 
         onenter = function(inst, timeout)
             if timeout == nil then
@@ -6088,7 +6271,7 @@ local states =
                     StartActionMeter(inst, timeout)
                 end
                 if inst.bufferedaction.target ~= nil and inst.bufferedaction.target:IsValid() then
-                    inst.bufferedaction.target:PushEvent("startlongaction")
+                    inst.bufferedaction.target:PushEvent("startlongaction", inst)
                 end
             end
         end,
@@ -6115,7 +6298,9 @@ local states =
         {
             EventHandler("animqueueover", function(inst)
                 if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
+					if not TryResumePocketRummage(inst) then
+						inst.sg:GoToState("idle")
+					end
                 end
             end),
         },
@@ -6129,13 +6314,14 @@ local states =
             (inst.components.playercontroller == nil or inst.components.playercontroller.lastheldaction ~= inst.bufferedaction) then
                 inst:ClearBufferedAction()
             end
+			CheckPocketRummageMem(inst)
         end,
     },
 
     State{name = "carvewood_boards", onenter = function(inst) inst.sg:GoToState("carvewood", 1) end},
     State{
         name = "carvewood",
-        tags = { "doing", "busy", "nodangle" },
+		tags = { "doing", "busy", "nodangle", "keep_pocket_rummage" },
 
         onenter = function(inst, timeout)
             local timeout = timeout or 1.5
@@ -6174,7 +6360,9 @@ local states =
         {
             EventHandler("animqueueover", function(inst)
                 if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
+					if not TryResumePocketRummage(inst) then
+						inst.sg:GoToState("idle")
+					end
                 end
             end),
         },
@@ -6186,6 +6374,7 @@ local states =
             (inst.components.playercontroller == nil or inst.components.playercontroller.lastheldaction ~= inst.bufferedaction) then
                 inst:ClearBufferedAction()
             end
+			CheckPocketRummageMem(inst)
         end,
     },
 
@@ -6453,7 +6642,7 @@ local states =
 
     State{
         name = "makeballoon",
-        tags = { "doing", "busy", "nodangle" },
+		tags = { "doing", "busy", "nodangle", "keep_pocket_rummage" },
 
         onenter = function(inst, timeout)
             inst.sg.statemem.action = inst.bufferedaction
@@ -6483,7 +6672,9 @@ local states =
         {
             EventHandler("animqueueover", function(inst)
                 if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
+					if not TryResumePocketRummage(inst) then
+						inst.sg:GoToState("idle")
+					end
                 end
             end),
         },
@@ -6494,6 +6685,7 @@ local states =
             (inst.components.playercontroller == nil or inst.components.playercontroller.lastheldaction ~= inst.bufferedaction) then
                 inst:ClearBufferedAction()
             end
+			CheckPocketRummageMem(inst)
         end,
     },
 
@@ -8014,6 +8206,54 @@ local states =
     },
 
 	State{
+		name = "throw_deploy",
+		tags = { "doing", "busy" },
+
+		onenter = function(inst)
+			inst.components.locomotor:Stop()
+			inst.AnimState:PlayAnimation("useitem_dir_pre") --8 frames
+			inst.AnimState:PushAnimation("deploytoss_pre")
+			inst.AnimState:PushAnimation("deploytoss", false)
+
+			local buffaction = inst:GetBufferedAction()
+			if buffaction then
+				if buffaction.pos then
+					inst:ForceFacePoint(buffaction:GetActionPoint():Get())
+				end
+				local deployable = buffaction.invobject and buffaction.invobject.components.deployable or nil
+				local override = deployable and deployable.deploytoss_symbol_override or nil
+				if override then
+					inst.AnimState:OverrideSymbol("swap_deploytoss_object", override.build, override.symbol)
+				end
+			end
+		end,
+
+		timeline =
+		{
+			FrameEvent(15, function(inst)
+				inst:PerformBufferedAction()
+			end),
+			FrameEvent(22, function(inst)
+				inst.sg:GoToState("idle", true)
+			end),
+		},
+
+		events =
+		{
+			EventHandler("equip", function(inst, data)
+				inst.sg:GoToState("idle")
+			end),
+			EventHandler("unequip", function(inst, data)
+				inst.sg:GoToState("idle")
+			end),
+		},
+
+		onexit = function(inst)
+			inst.AnimState:ClearOverrideSymbol("swap_deploytoss_object")
+		end,
+	},
+
+	State{
 		name = "throw_keep_equip",
 		tags = { "busy" },
 
@@ -8460,10 +8700,10 @@ local states =
 									not inst.components.combat:IsAlly(v)
 								then
 									if v.components.planarentity ~= nil then
-										inst.components.planardamage:SetBaseDamage(TUNING.SKILLS.WOODIE.MOOSE_SMASH_PLANAR_DAMAGE)
+										inst.components.planardamage:AddBonus(inst, TUNING.SKILLS.WOODIE.MOOSE_SMASH_PLANAR_DAMAGE, "weremoose_smash")
 									end
 									inst.components.combat:DoAttack(v)
-									inst.components.planardamage:SetBaseDamage(0)
+									inst.components.planardamage:RemoveBonus(inst, "weremoose_smash")
 								end
 							end
 						end
@@ -8801,7 +9041,7 @@ local states =
         end,
 
         onupdate = function(inst)
-            if inst.sg.statemem.normalwonkey and inst.components.locomotor:GetTimeMoving() >= TUNING.WONKEY_TIME_TO_RUN then
+			if inst.sg.statemem.normalwonkey and not inst.sg.statemem.channelcast and inst.components.locomotor:GetTimeMoving() >= TUNING.WONKEY_TIME_TO_RUN then
                 inst.sg:GoToState("run_monkey_start")
                 return
             end
@@ -8855,8 +9095,11 @@ local states =
             end),
 
             --groggy
+			--channelcast
             TimeEvent(1 * FRAMES, function(inst)
-                if inst.sg.statemem.groggy then
+				if inst.sg.statemem.groggy or
+					inst.sg.statemem.channelcast
+				then
                     DoRunSounds(inst)
                     DoFoleySounds(inst)
                 elseif inst.sg.statemem.goose then
@@ -8867,7 +9110,9 @@ local states =
             end),
             TimeEvent(12 * FRAMES, function(inst)
                 if inst.sg.statemem.groggy or
-                    inst.sg.statemem.sandstorm then
+					inst.sg.statemem.channelcast or
+					inst.sg.statemem.sandstorm
+				then
                     DoRunSounds(inst)
                     DoFoleySounds(inst)
                 end
@@ -9265,7 +9510,7 @@ local states =
 
     State{
         name = "item_hat",
-        tags = { "idle" },
+		tags = { "idle", "keepchannelcasting" },
 
         onenter = function(inst)
             inst.components.locomotor:StopMoving()
@@ -9284,7 +9529,7 @@ local states =
 
     State{
         name = "item_in",
-        tags = { "idle", "nodangle" },
+		tags = { "idle", "nodangle", "keepchannelcasting" },
 
         onenter = function(inst)
             inst.components.locomotor:StopMoving()
@@ -9311,7 +9556,7 @@ local states =
 
     State{
         name = "item_out",
-        tags = { "idle", "nodangle" },
+		tags = { "idle", "nodangle", "keepchannelcasting" },
 
         onenter = function(inst)
             inst.components.locomotor:StopMoving()
@@ -9363,6 +9608,34 @@ local states =
             inst.components.locomotor:Stop()
             inst.AnimState:PlayAnimation("light_fire")
             inst.AnimState:PushAnimation("light_fire_pst", false)
+        end,
+
+        timeline =
+        {
+            TimeEvent(13 * FRAMES, function(inst)
+                inst:PerformBufferedAction()
+            end),
+        },
+
+        events =
+        {
+            EventHandler("animqueueover", function(inst)
+                if inst.AnimState:AnimDone() then
+                    inst.sg:GoToState("idle")
+                end
+            end),
+        },
+    },
+
+    State{
+        name = "spray_wax",
+        tags = { "waxing" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+            inst.AnimState:PlayAnimation("light_fire")
+            inst.AnimState:PushAnimation("light_fire_pst", false)
+            inst.SoundEmitter:PlaySound("qol/wax_spray/spritz")
         end,
 
         timeline =
@@ -9663,14 +9936,18 @@ local states =
 
     State{
         name = "hit",
-        tags = { "busy", "pausepredict" },
+		tags = { "busy", "pausepredict", "keepchannelcasting" },
 
         onenter = function(inst, frozen)
             ForceStopHeavyLifting(inst)
             inst.components.locomotor:Stop()
             inst:ClearBufferedAction()
 
-            inst.AnimState:PlayAnimation("hit")
+			inst.AnimState:PlayAnimation(
+				inst:IsChannelCasting() and (
+					inst:IsChannelCastingItem() and "channelcast_hit" or "channelcast_oh_hit"
+				) or "hit"
+			)
 
             if frozen == "noimpactsound" then
                 frozen = nil
@@ -9690,6 +9967,11 @@ local states =
         end,
 
         ontimeout = function(inst)
+			--V2C: -removing the tag now, since this is actually a supported "channeling_item"
+			--      state (i.e. has custom anim)
+			--     -the state enters with the tag though, to cheat having to create a separate
+			--      hit state for channeling items
+			inst.sg:RemoveStateTag("keepchannelcasting")
             inst.sg:GoToState("idle", true)
         end,
 
@@ -9899,7 +10181,7 @@ local states =
                     StartActionMeter(inst, timeout)
                 end
                 if inst.bufferedaction.target ~= nil and inst.bufferedaction.target:IsValid() then
-                    inst.bufferedaction.target:PushEvent("startlongaction")
+					inst.bufferedaction.target:PushEvent("startlongaction", inst)
                 end
             end
 			if inst.components.mightiness then
@@ -12704,6 +12986,103 @@ local states =
         end,
     },
 
+	State{
+		name = "repeatcastspellmind",
+		onenter = function(inst)
+			inst.sg:GoToState("castspellmind", true)
+		end,
+	},
+
+    State{
+        name = "castspellmind",
+		tags = { "doing", "busy", "canrotate" },
+
+		onenter = function(inst, repeatcast)
+            inst.SoundEmitter:PlaySound("meta3/willow/pyrokinetic_activate")
+
+			if repeatcast then
+				inst.AnimState:PlayAnimation("pyrocast")
+				inst.sg.statemem.repeatcast = true
+			else
+				inst.AnimState:PlayAnimation("pyrocast_pre") --4 frames
+				inst.AnimState:PushAnimation("pyrocast", false)
+			end
+            inst.components.locomotor:Stop()
+
+			local item = inst.bufferedaction and (inst.bufferedaction.target or inst.bufferedaction.invobject) or nil
+			if item.components.aoetargeting and not (item.components.spellbook and item.components.spellbook:HasSpellFn()) then
+				inst.sg.statemem.canrepeatcast = item.components.aoetargeting:CanRepeatCast()
+			elseif inst.components.playercontroller then
+				inst.components.playercontroller:Enable(false)
+			end
+        end,
+
+        timeline =
+		{
+			FrameEvent(11, function(inst)
+				if inst.sg.statemem.repeatcast then
+					--V2C: NOTE! if we're teleporting ourself, we may be forced to exit state here!
+					if not inst:PerformBufferedAction() then
+						inst.sg.statemem.canrepeatcast = false
+						inst:RemoveTag("canrepeatcast")
+					elseif inst:IsChannelCasting() then
+						--V2C: didn't add this on enter state since we DO want to
+						--     cancel previous channelcasting
+						inst.sg:AddStateTag("keepchannelcasting")
+						inst.sg:GoToState("idle")
+					end
+				end
+			end),
+			FrameEvent(16, function(inst)
+				if inst.sg.statemem.repeatcast then
+					inst.sg:RemoveStateTag("busy")
+					if inst.sg.statemem.canrepeatcast then
+						inst:AddTag("canrepeatcast")
+					end
+				end
+			end),
+			--
+			FrameEvent(15, function(inst)
+				if not inst.sg.statemem.repeatcast then
+					--V2C: NOTE! if we're teleporting ourself, we may be forced to exit state here!
+					if not inst:PerformBufferedAction() then
+						inst.sg.statemem.canrepeatcast = false
+						inst:RemoveTag("canrepeatcast")
+					elseif inst:IsChannelCasting() then
+						--V2C: didn't add this on enter state since we DO want to
+						--     cancel previous channelcasting
+						inst.sg:AddStateTag("keepchannelcasting")
+						inst.sg:GoToState("idle")
+					end
+				end
+            end),
+			FrameEvent(20, function(inst)
+				if not inst.sg.statemem.repeatcast then
+					inst.sg:RemoveStateTag("busy")
+					if inst.sg.statemem.canrepeatcast then
+						inst:AddTag("canrepeatcast")
+					end
+				end
+            end),
+        },
+
+        events =
+        {
+            EventHandler("animqueueover", function(inst)
+                if inst.AnimState:AnimDone() then
+                    inst.sg:GoToState("idle")
+                end
+            end),
+        },
+
+        onexit = function(inst)
+            if inst.components.playercontroller ~= nil then
+                inst.components.playercontroller:Enable(true)
+			end
+			inst:RemoveTag("canrepeatcast")
+        end,
+    },
+
     State{
         name = "quicktele",
         tags = { "doing", "busy", "canrotate" },
@@ -12856,13 +13235,64 @@ local states =
                 inst.AnimState:PlayAnimation("lunge_pst")
                 inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon")
                 local pos = inst:GetPosition()
+				local dir
                 if pos.x ~= data.targetpos.x or pos.z ~= data.targetpos.z then
-                    inst:ForceFacePoint(data.targetpos:Get())
+					dir = inst:GetAngleToPoint(data.targetpos)
+					inst.Transform:SetRotation(dir)
                 end
                 if data.weapon.components.aoeweapon_lunge:DoLunge(inst, pos, data.targetpos) then
-                    inst.SoundEmitter:PlaySound("dontstarve/common/lava_arena/fireball")
-                    inst.Physics:Teleport(data.targetpos.x, 0, data.targetpos.z)
-                    if not data.skipflash then
+                    inst.SoundEmitter:PlaySound(data.weapon.components.aoeweapon_lunge.sound or "dontstarve/common/lava_arena/fireball")
+
+					--Make sure we don't land directly on world boundary, where
+					--physics may end up popping in the wrong direction to void
+					local x, z = data.targetpos.x, data.targetpos.z
+					if dir then
+						local theta = dir * DEGREES
+						local cos_theta = math.cos(theta)
+						local sin_theta = math.sin(theta)
+						local x1, z1
+						local map = TheWorld.Map
+						if not map:IsPassableAtPoint(x, 0, z) then
+							--scan for nearby land in case we were slightly off
+							--adjust position slightly toward valid ground
+							if map:IsPassableAtPoint(x + 0.1 * cos_theta, 0, z - 0.1 * sin_theta) then
+								x1 = x + 0.5 * cos_theta
+								z1 = z - 0.5 * sin_theta
+							elseif map:IsPassableAtPoint(x - 0.1 * cos_theta, 0, z + 0.1 * sin_theta) then
+								x1 = x - 0.5 * cos_theta
+								z1 = z + 0.5 * sin_theta
+							end
+						else
+							--scan to make sure we're not just on the edge of land, could result in popping to the wrong side
+							--adjust position slightly away from invalid ground
+							if not map:IsPassableAtPoint(x + 0.1 * cos_theta, 0, z - 0.1 * sin_theta) then
+								x1 = x - 0.4 * cos_theta
+								z1 = z + 0.4 * sin_theta
+							elseif not map:IsPassableAtPoint(x - 0.1 * cos_theta, 0, z + 0.1 * sin_theta) then
+								x1 = x + 0.4 * cos_theta
+								z1 = z - 0.4 * sin_theta
+							end
+						end
+
+						if x1 and map:IsPassableAtPoint(x1, 0, z1) then
+							x, z = x1, z1
+						end
+					end
+
+					--V2C: -physics doesn't resolve correctly if we teleport from
+					--      one point colliding with world to another point still
+					--      colliding with world.
+					--     -#HACK use mass change to force physics refresh.
+					local mass = inst.Physics:GetMass()
+					if mass > 0 then
+						inst.sg.statemem.restoremass = mass
+						inst.Physics:SetMass(mass + 1)
+					end
+					inst.Physics:Teleport(x, 0, z)
+
+                    -- aoeweapon_lunge:DoLunge can get us out of the state!
+                    -- And then, if onexit is run before this: bugs!
+                    if not data.skipflash and inst.sg.currentstate == "combat_lunge" then
                         inst.components.bloomer:PushBloom("lunge", "shaders/anim.ksh", -2)
                         inst.components.colouradder:PushColour("lunge", 1, 1, 0, 0)
                         inst.sg.statemem.flash = 1
@@ -12883,6 +13313,12 @@ local states =
 
         timeline =
         {
+			FrameEvent(8, function(inst)
+				if inst.sg.statemem.restoremass ~= nil then
+					inst.Physics:SetMass(inst.sg.statemem.restoremass)
+					inst.sg.statemem.restoremass = nil
+				end
+			end),
             TimeEvent(12 * FRAMES, function(inst)
                 inst.components.bloomer:PopBloom("lunge")
             end),
@@ -12898,6 +13334,9 @@ local states =
         },
 
         onexit = function(inst)
+			if inst.sg.statemem.restoremass ~= nil then
+				inst.Physics:SetMass(inst.sg.statemem.restoremass)
+			end
             inst.components.bloomer:PopBloom("lunge")
             inst.components.colouradder:PopColour("lunge")
         end,
@@ -15111,6 +15550,30 @@ local states =
         },
     },
 
+	--Basically an "instant" action but with animation if you were idle
+	State{
+		name = "start_channelcast",
+
+		onenter = function(inst)
+			inst.components.locomotor:Stop()
+			inst:PerformBufferedAction()
+			inst.AnimState:PlayAnimation(inst:IsChannelCastingItem() and "channelcast_idle_pre" or "channelcast_oh_idle_pre")
+			inst.sg:GoToState("idle", true)
+		end,
+	},
+
+	--Basically an "instant" action but with animation if you were idle
+	State{
+		name = "stop_channelcast",
+
+		onenter = function(inst)
+			inst.components.locomotor:Stop()
+			inst.AnimState:PlayAnimation(inst:IsChannelCastingItem() and "channelcast_idle_pst" or "channelcast_oh_idle_pst")
+			inst:PerformBufferedAction()
+			inst.sg:GoToState("idle", true)
+		end,
+	},
+
     State{
         name = "till_start",
         tags = { "doing", "busy" },
@@ -15481,9 +15944,6 @@ local states =
 
             if data.warpback_data ~= nil then
                 inst.Physics:Teleport(data.warpback_data.dest_x, data.warpback_data.dest_y, data.warpback_data.dest_z)
-                if TheWorld and TheWorld.components.walkableplatformmanager then -- NOTES(JBK): Workaround for teleporting too far causing the client to lose sync.
-                    TheWorld.components.walkableplatformmanager:PostUpdate(0)
-                end
             end
             inst:PushEvent("onwarpback", data.warpback_data)
 
@@ -15824,9 +16284,6 @@ local states =
             local dest = data and data.dest or nil
             if dest ~= nil then
                 inst.Physics:Teleport(dest:Get())
-                if TheWorld and TheWorld.components.walkableplatformmanager then -- NOTES(JBK): Workaround for teleporting too far causing the client to lose sync.
-                    TheWorld.components.walkableplatformmanager:PostUpdate(0)
-                end
             else
                 dest = inst:GetPosition()
             end
@@ -15890,7 +16347,7 @@ local states =
 
 	State{
 		name = "form_log",
-		tags = { "doing", "busy", "nocraftinginterrupt", "nomorph" },
+		tags = { "doing", "busy", "nocraftinginterrupt", "nomorph", "keep_pocket_rummage" },
 
 		onenter = function(inst, product)
 			inst.components.locomotor:Stop()
@@ -15928,6 +16385,7 @@ local states =
 			FrameEvent(58, function(inst)
 				inst.sg:RemoveStateTag("busy")
 			end),
+			FrameEvent(62, TryResumePocketRummage),
 		},
 
 		events =
@@ -15946,12 +16404,13 @@ local states =
 				inst:ClearBufferedAction()
 			end
 			inst.AnimState:ClearOverrideSymbol("wood_splinter")
+			CheckPocketRummageMem(inst)
 		end,
 	},
 
     State{
         name = "fertilize",
-        tags = { "doing", "busy", "nomorph", "self_fertilizing" },
+		tags = { "doing", "busy", "nomorph", "self_fertilizing", "keep_pocket_rummage" },
 
         onenter = function(inst)
             inst.sg.statemem.fast = inst.components.skilltreeupdater:IsActivated("wormwood_quick_selffertilizer")
@@ -15980,7 +16439,9 @@ local states =
             end),
             FrameEvent(52, function(inst)
                 if inst.sg.statemem.fast then
-                    inst.sg:RemoveStateTag("busy")
+					if not TryResumePocketRummage(inst) then
+						inst.sg:RemoveStateTag("busy")
+					end
                 end
             end),
 
@@ -15999,6 +16460,11 @@ local states =
                     inst.sg:RemoveStateTag("busy")
                 end
             end),
+			FrameEvent(92, function(inst)
+				if not inst.sg.statemem.fast then
+					TryResumePocketRummage(inst)
+				end
+			end),
         },
 
         events =
@@ -16012,12 +16478,13 @@ local states =
 
         onexit = function(inst)
             inst.SoundEmitter:KillSound("rub")
+			CheckPocketRummageMem(inst)
         end,
     },
 
     State{
         name = "fertilize_short",
-        tags = { "doing", "busy", "nomorph", "self_fertilizing" },
+		tags = { "doing", "busy", "nomorph", "self_fertilizing", "keep_pocket_rummage" },
 
         onenter = function(inst)
             inst.components.locomotor:Stop()
@@ -16040,6 +16507,7 @@ local states =
             TimeEvent(33 * FRAMES, function(inst)
                 inst.sg:RemoveStateTag("busy")
             end),
+			FrameEvent(35, TryResumePocketRummage),
         },
 
         events =
@@ -16053,12 +16521,13 @@ local states =
 
         onexit = function(inst)
             inst.SoundEmitter:KillSound("rub")
+			CheckPocketRummageMem(inst)
         end,
     },
 
     State{
         name = "spawn_mutated_creature",
-        tags = { "doing", "busy", "nocraftinginterrupt", "nomorph" },
+		tags = { "doing", "busy", "nocraftinginterrupt", "nomorph", "keep_pocket_rummage" },
 
         onenter = function(inst)
             inst.components.locomotor:Stop()
@@ -16078,6 +16547,7 @@ local states =
 			FrameEvent(38, function(inst)
                 inst.sg:RemoveStateTag("busy")
             end),
+			FrameEvent(42, TryResumePocketRummage),
         },
 
         events =
@@ -16094,54 +16564,8 @@ local states =
                     (not inst.components.playercontroller or inst.components.playercontroller.lastheldaction ~= inst.bufferedaction) then
                 inst:ClearBufferedAction()
             end
+			CheckPocketRummageMem(inst)
         end,
-    },
-
-    State{
-        name = "mooncap_cloud",
-        tags = { "busy", "yawn", "pausepredict", "nointerrupt" },
-
-        onenter = function(inst, data)
-            ForceStopHeavyLifting(inst)
-            inst.components.locomotor:Stop()
-            inst:ClearBufferedAction()
-
-            if inst.components.playercontroller then
-                inst.components.playercontroller:RemotePausePrediction()
-            end
-
-            inst.AnimState:PlayAnimation("yawn")
-        end,
-
-        timeline =
-        {
-            TimeEvent(0.1, function(inst)
-                local mount = inst.components.rider:GetMount()
-                if mount and mount.sounds and mount.sounds.yell then
-                    inst.SoundEmitter:PlaySound(mount.sounds.yell)
-                end
-            end),
-            TimeEvent(15 * FRAMES, function(inst)
-				inst.sg:RemoveStateTag("nointerrupt")
-                DoYawnSound(inst)
-				local cloud = SpawnPrefab("sleepcloud_lunar")
-				cloud.Transform:SetPosition(inst.Transform:GetWorldPosition())
-				cloud:SetOwner(inst)
-            end),
-			FrameEvent(55, function(inst)
-				inst.sg:RemoveStateTag("busy")
-				inst.sg:RemoveStateTag("pausepredict")
-			end),
-        },
-
-        events =
-        {
-            EventHandler("animover", function(inst)
-                if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
-                end
-            end),
-        },
     },
 
     --------------------------------------------------------------------------
@@ -16149,7 +16573,7 @@ local states =
 
     State{
         name = "sing_pre",
-        tags = { "busy", "nointerrupt" },
+		tags = { "busy", "nointerrupt", "keep_pocket_rummage" },
 
         onenter = function(inst)
             inst.components.locomotor:Stop()
@@ -16169,35 +16593,50 @@ local states =
                         if singinginspiration:IsSongActive(songdata) then
                             inst:ClearBufferedAction()
                             inst.components.talker:Say(GetActionFailString(inst, "SING_FAIL", "SAMESONG"))
-                            inst.sg:GoToState("idle")
-                        elseif singinginspiration:CanAddSong(songdata) then
-                            inst.sg:GoToState("sing")
-                        else
-                            inst.sg:GoToState("cantsing")
+							if not TryResumePocketRummage(inst) then
+								inst.sg:GoToState("idle")
+							end
+						else
+							inst.sg.statemem.keep_pocket_rummage_mem_onexit = true
+							if singinginspiration:CanAddSong(songdata, buffaction.invobject) then
+								inst.sg:GoToState("sing")
+							else
+								inst.sg:GoToState("cantsing")
+							end
                         end
-                    else
+					elseif not TryResumePocketRummage(inst) then
                         inst.sg:GoToState("idle")
                     end
                 end
             end),
         },
+
+		onexit = CheckPocketRummageMem,
     },
 
     State{
         name = "sing_fail",
-        tags = { "busy" },
+		tags = { "busy", "keep_pocket_rummage" },
 
         onenter = function(inst)
             inst:PerformBufferedAction()
 
-            inst.sg:GoToState("idle")
+			if not TryResumePocketRummage(inst) then
+				inst.sg:GoToState("idle")
+			end
+			--V2C: BAD! (code AFTER leaving state)
+			--     Probably because they wanted talk to happen with "idle" state tag.
+			--     Will just leave this one since talking is not that dangerous.
+			--     PLEASE DO NOT COPY
             inst.components.talker:Say(GetActionFailString(inst, "SING_FAIL", "SAMESONG"))
         end,
+
+		onexit = CheckPocketRummageMem,
     },
 
     State{
         name = "sing",
-        tags = { "busy", "nointerrupt" },
+		tags = { "busy", "nointerrupt", "keep_pocket_rummage" },
 
         onenter = function(inst)
             local buffaction = inst:GetBufferedAction()
@@ -16228,6 +16667,7 @@ local states =
                 inst.sg:RemoveStateTag("busy")
                 inst.sg:RemoveStateTag("nointerrupt")
             end),
+			FrameEvent(42, TryResumePocketRummage),
         },
 
         events =
@@ -16238,22 +16678,38 @@ local states =
                 end
             end),
         },
+
+		onexit = CheckPocketRummageMem,
     },
 
     State{
         name = "cantsing",
-        tags = {},
+		tags = { "keep_pocket_rummage" },
 
         onenter = function(inst)
+            local buffaction = inst:GetBufferedAction()
+            local restricted_tag = buffaction and buffaction.invobject.songdata and buffaction.invobject.songdata.RESTRICTED_TAG or nil
+
             inst:ClearBufferedAction()
 
-            inst.components.talker:Say(GetString(inst, "ANNOUNCE_NOINSPIRATION"), nil, true)
+            local failstring =
+                restricted_tag ~= nil and
+                not inst:HasTag(restricted_tag) and
+                "ANNOUNCE_NOTSKILLEDENOUGH" or
+                "ANNOUNCE_NOINSPIRATION"
+
+            inst.components.talker:Say(GetString(inst, failstring), nil, true)
 
             inst.AnimState:PlayAnimation("sing_fail", false)
 
             inst.SoundEmitter:PlaySound("dontstarve_DLC001/characters/wathgrithr/fail")
         end,
 
+		timeline =
+		{
+			FrameEvent(34, TryResumePocketRummage),
+		},
+
         events =
         {
             EventHandler("animover", function(inst)
@@ -16261,9 +16717,10 @@ local states =
                     inst.sg:GoToState("idle")
                 end
             end),
-        }
-    },
+		},
 
+		onexit = CheckPocketRummageMem,
+    },
 
     --------------------------------------------------------------------------
     -- sail anims
@@ -18421,7 +18878,12 @@ local states =
 			if not inst.sg.statemem.isphysicstoggle then
 				ToggleOffPhysics(inst)
 			end
-			inst.components.locomotor:Stop()
+			local buffaction = inst:GetBufferedAction()
+			if buffaction == nil or buffaction.action == ACTIONS.WALKTO then
+				inst.components.locomotor:Stop()
+				inst.components.locomotor:Clear()
+				inst:ClearBufferedAction()
+			end
 			inst.sg.statemem.chair = chair
 			inst.sg.statemem.rot = inst.Transform:GetRotation()
 			inst.Transform:SetRotation(chair.Transform:GetRotation())
@@ -18505,7 +18967,7 @@ local states =
 				ToggleOffPhysics(inst)
 			end
 			inst.sg.statemem.chair = chair
-			inst.components.locomotor:Stop()
+			inst.components.locomotor:StopMoving()
 			inst.AnimState:SetBankAndPlayAnimation("wilson", "sit_jump_off")
 			local radius = inst:GetPhysicsRadius(0) + chair:GetPhysicsRadius(0)
 			if radius > 0 then
@@ -18586,7 +19048,391 @@ local states =
 			end),
 		},
 	},
+
 	--------------------------------------------------------------------------
+	--Slipping states
+
+	State{
+		name = "slip",
+		tags = { "busy", "nopredict", "nomorph", "jumping", "overridelocomote" },
+
+		onenter = function(inst)
+			ForceStopHeavyLifting(inst)
+			inst.components.locomotor:Stop()
+			inst:ClearBufferedAction()
+
+			if inst.components.slipperyfeet then
+				inst.components.slipperyfeet:SetCurrent(0)
+			end
+
+			inst.AnimState:PlayAnimation("slip_pre")
+			inst.AnimState:PushAnimation("slip_loop", false)
+			inst.SoundEmitter:PlaySound("dontstarve/movement/iceslab_slipping")
+
+			inst.sg.statemem.speed = inst.components.locomotor:GetRunSpeed()
+			inst.Physics:SetMotorVel(inst.sg.statemem.speed * 0.6, 0, 0)
+
+			inst.player_classified.busyremoteoverridelocomote:set(true)
+			inst.sg.statemem.trackcontrol = true
+		end,
+
+		onupdate = function(inst)
+			if inst.sg.statemem.trackcontrol then
+				if inst.HUD then
+					local deadzone = TUNING.CONTROLLER_DEADZONE_RADIUS
+					if math.abs(TheInput:GetAnalogControlValue(CONTROL_MOVE_RIGHT) - TheInput:GetAnalogControlValue(CONTROL_MOVE_LEFT)) >= deadzone or
+						math.abs(TheInput:GetAnalogControlValue(CONTROL_MOVE_UP) - TheInput:GetAnalogControlValue(CONTROL_MOVE_DOWN)) >= deadzone
+					then
+						if inst.sg.statemem.checkfall then
+							inst.sg.statemem.slipping = true
+							inst.sg:GoToState("slip_fall", inst.sg.statemem.speed * 0.25)
+							return
+						end
+						inst.sg.statemem.controltick = GetTick()
+					end
+				end
+
+				if inst.sg.statemem.trystoptracking and GetTick() - inst.sg.statemem.controltick > 10 then
+					inst.sg.statemem.trackcontrol = false
+				end
+			end
+		end,
+
+		timeline =
+		{
+			FrameEvent(6, function(inst) inst.Physics:SetMotorVel(inst.sg.statemem.speed * 0.3, 0, 0) end),
+			FrameEvent(10, function(inst) inst.SoundEmitter:PlaySound("dontstarve/movement/iceslab_slipping") end),
+			FrameEvent(12, function(inst) inst.Physics:SetMotorVel(inst.sg.statemem.speed * 0.25, 0, 0) end),
+			FrameEvent(18, function(inst) inst.Physics:SetMotorVel(inst.sg.statemem.speed * 0.2, 0, 0) end),
+
+			FrameEvent(18, function(inst)
+				inst.sg.statemem.checkfall = true
+			end),
+			FrameEvent(20, function(inst)
+				if inst.sg.statemem.controltick then
+					inst.sg.statemem.trystoptracking = true
+				else
+					inst.sg.statemem.trackcontrol = false
+				end
+				inst.SoundEmitter:PlaySound("dontstarve/movement/iceslab_slipping", nil, 0.5)
+			end),
+		},
+
+		events =
+		{
+			EventHandler("locomote", function(inst, data)
+				if inst.sg.statemem.trackcontrol and data and data.remoteoverridelocomote or inst.components.locomotor:WantsToMoveForward() then
+					if inst.sg.statemem.checkfall then
+						inst.sg.statemem.slipping = true
+						inst.sg:GoToState("slip_fall", inst.sg.statemem.speed * 0.25)
+						return
+					end
+					inst.sg.statemem.controltick = GetTick()
+				end
+				return true
+			end),
+			EventHandler("animqueueover", function(inst)
+				if inst.AnimState:AnimDone() then
+					inst.sg.statemem.slipping = true
+					inst.sg:GoToState("slip_pst", inst.sg.statemem.speed)
+				end
+			end),
+		},
+
+		onexit = function(inst)
+			if not inst.sg.statemem.slipping then
+				inst.Physics:SetMotorVel(0, 0, 0)
+				inst.Physics:Stop()
+			end
+			inst.player_classified.busyremoteoverridelocomote:set(false)
+		end,
+	},
+
+	State{
+		name = "slip_pst",
+		tags = { "busy", "nopredict", "nomorph", "jumping" },
+
+		onenter = function(inst, speed)
+			inst.AnimState:PlayAnimation("slip_pst")
+			inst.sg.statemem.speed = speed or inst.components.locomotor:GetRunSpeed()
+			inst.Physics:SetMotorVel(inst.sg.statemem.speed * 0.15, 0, 0)
+		end,
+
+		timeline =
+		{
+			FrameEvent(2, function(inst) inst.Physics:SetMotorVel(inst.sg.statemem.speed * 0.1, 0, 0) end),
+		},
+
+		events =
+		{
+			EventHandler("animover", function(inst)
+				if inst.AnimState:AnimDone() then
+					inst.sg:GoToState("idle")
+				end
+			end),
+		},
+
+		onexit = function(inst)
+			inst.Physics:SetMotorVel(0, 0, 0)
+			inst.Physics:Stop()
+		end,
+	},
+
+	State{
+		name = "slip_fall",
+		tags = { "busy", "nopredict", "nomorph", "jumping" },
+
+		onenter = function(inst, speed)
+			ForceStopHeavyLifting(inst)
+			inst.components.locomotor:Stop()
+			inst:ClearBufferedAction()
+
+			if inst.components.slipperyfeet then
+				inst.components.slipperyfeet:SetCurrent(0)
+			end
+
+			inst.AnimState:PlayAnimation("slip_fall_pre")
+			inst.SoundEmitter:PlaySound("dontstarve/movement/slip_fall_whoop")
+
+			if speed then
+				inst.sg.statemem.speed = speed
+				inst.Physics:SetMotorVel(speed * 0.8, 0, 0)
+			end
+		end,
+
+		timeline =
+		{
+			FrameEvent(10, function(inst) inst.SoundEmitter:PlaySound("dontstarve/movement/slip_fall_thud") end),
+			FrameEvent(11, function(inst)
+				DoHurtSound(inst)
+				if inst.sg.statemem.speed then
+					inst.Physics:SetMotorVel(inst.sg.statemem.speed * 0.64, 0, 0)
+				end
+			end),
+			--held 2 frames on purpose =P
+			FrameEvent(13, function(inst)
+				if inst.sg.statemem.speed then
+					inst.Physics:SetMotorVel(inst.sg.statemem.speed * 0.32, 0, 0)
+				end
+			end),
+			FrameEvent(14, function(inst)
+				if inst.sg.statemem.speed then
+					inst.Physics:SetMotorVel(inst.sg.statemem.speed * 0.16, 0, 0)
+				end
+			end),
+			FrameEvent(15, function(inst)
+				if inst.sg.statemem.speed then
+					inst.Physics:SetMotorVel(inst.sg.statemem.speed * 0.08, 0, 0)
+				end
+			end),
+			FrameEvent(16, function(inst)
+				if inst.sg.statemem.speed then
+					inst.Physics:SetMotorVel(inst.sg.statemem.speed * 0.04, 0, 0)
+				end
+			end),
+			FrameEvent(17, function(inst)
+				if inst.sg.statemem.speed then
+					inst.Physics:SetMotorVel(0, 0, 0)
+					inst.Physics:Stop()
+				end
+			end),
+		},
+
+		events =
+		{
+			EventHandler("animover", function(inst)
+				if inst.AnimState:AnimDone() then
+					inst.sg:GoToState("slip_fall_loop")
+				end
+			end),
+		},
+
+		onexit = function(inst)
+			if inst.sg.statemem.speed then
+				inst.Physics:SetMotorVel(0, 0, 0)
+				inst.Physics:Stop()
+			end
+		end,
+	},
+
+	State{
+		name = "slip_fall_loop",
+		tags = { "busy", "nomorph", "overridelocomote" },
+
+		onenter = function(inst)
+			ForceStopHeavyLifting(inst)
+			inst.components.locomotor:Stop()
+			inst:ClearBufferedAction()
+
+			if inst.components.slipperyfeet then
+				inst.components.slipperyfeet:SetCurrent(0)
+			end
+
+			inst.AnimState:PlayAnimation("slip_fall_idle")
+
+			inst.player_classified.busyremoteoverridelocomote:set(true)
+		end,
+
+		onupdate = function(inst)
+			if inst.HUD then
+				local deadzone = TUNING.CONTROLLER_DEADZONE_RADIUS
+				if math.abs(TheInput:GetAnalogControlValue(CONTROL_MOVE_RIGHT) - TheInput:GetAnalogControlValue(CONTROL_MOVE_LEFT)) >= deadzone or
+					math.abs(TheInput:GetAnalogControlValue(CONTROL_MOVE_UP) - TheInput:GetAnalogControlValue(CONTROL_MOVE_DOWN)) >= deadzone
+				then
+					inst.sg:GoToState("slip_fall_pst")
+				end
+			end
+		end,
+
+		events =
+		{
+			EventHandler("locomote", function(inst, data)
+				if data ~= nil and data.remoteoverridelocomote or inst.components.locomotor:WantsToMoveForward() then
+					inst.sg:GoToState("slip_fall_pst")
+				end
+				return true
+			end),
+			EventHandler("animover", function(inst)
+				if inst.AnimState:AnimDone() then
+					inst.sg:GoToState("slip_fall_pst")
+				end
+			end),
+		},
+
+		onexit = function(inst)
+			inst.player_classified.busyremoteoverridelocomote:set(false)
+		end,
+	},
+
+	State{
+		name = "slip_fall_pst",
+		tags = { "busy", "nomorph" },
+
+		onenter = function(inst)
+			inst.AnimState:PlayAnimation("slip_fall_pst")
+		end,
+
+		timeline =
+		{
+			FrameEvent(6, function(inst) PlayFootstep(inst, 0.6) end),
+			FrameEvent(12, function(inst)
+				inst.sg:GoToState("idle", true)
+			end),
+		},
+	},
+
+	State{
+		name = "start_pocket_rummage",
+		tags = { "doing", "busy", "nodangle", "keep_pocket_rummage" },
+
+		onenter = function(inst, resume_item)
+			inst.components.locomotor:Stop()
+			inst.SoundEmitter:PlaySound("dontstarve/wilson/make_trap", "make")
+			inst.AnimState:PlayAnimation("build_pre")
+			inst.AnimState:PushAnimation("build_loop")
+
+			if resume_item then
+				if resume_item ~= inst.sg.mem.pocket_rummage_item then
+					ClosePocketRummageMem(inst)
+				end
+				inst.sg.statemem.item = resume_item
+				inst.sg:RemoveStateTag("busy")
+			else
+				ClosePocketRummageMem(inst)
+				inst.sg.statemem.action = inst:GetBufferedAction()
+				inst.sg.statemem.item = inst.sg.statemem.action and inst.sg.statemem.action.invobject or nil
+				inst.components.inventory:ReturnActiveActionItem(inst.sg.statemem.item)
+			end
+		end,
+
+		onupdate = function(inst)
+			local item = inst.sg.mem.pocket_rummage_item
+			if item and
+				not (item.components.container and
+					item.components.container:IsOpenedBy(inst) and
+					item.components.inventoryitem and
+					item.components.inventoryitem:GetGrandOwner() == inst)
+			then
+				SetPocketRummageMem(inst, nil)
+				inst.sg:GoToState("stop_pocket_rummage", true)
+			end
+		end,
+
+		timeline =
+		{
+			FrameEvent(6, function(inst)
+				inst.sg:RemoveStateTag("busy")
+				inst:PerformBufferedAction()
+
+				local item = inst.sg.statemem.item
+				if item and
+					item.components.container and
+					item.components.container:IsOpenedBy(inst) and
+					item.components.inventoryitem and
+					item.components.inventoryitem:GetGrandOwner() == inst
+				then
+					SetPocketRummageMem(inst, item)
+				else
+					SetPocketRummageMem(inst, nil)
+					inst.sg:GoToState("stop_pocket_rummage", true)
+				end
+			end),
+		},
+
+		events =
+		{
+			EventHandler("ontalk", OnTalk_Override),
+			EventHandler("donetalking", OnDoneTalking_Override),
+			EventHandler("equip", function(inst) inst.sg:GoToState("idle") end),
+			EventHandler("unequip", function(inst) inst.sg:GoToState("idle") end),
+		},
+
+		onexit = function(inst)
+			inst.SoundEmitter:KillSound("make")
+			CancelTalk_Override(inst)
+
+			CheckPocketRummageMem(inst)
+
+			if inst.bufferedaction == inst.sg.statemem.action and
+				not (inst.components.playercontroller and inst.components.playercontroller.lastheldaction == inst.bufferedaction)
+			then
+				inst:ClearBufferedAction()
+			end
+		end,
+	},
+
+	State{
+		name = "stop_pocket_rummage",
+		tags = { "doing", "nodangle" },
+
+		onenter = function(inst, ignoreaction)
+			inst.components.locomotor:Stop()
+			inst.AnimState:PlayAnimation("build_pst")
+
+			ClosePocketRummageMem(inst)
+
+			if not ignoreaction then
+				--V2C: Clear, don't perform. Make sure we only do closing here.
+				--     The RUMMAGE action might reopen if it was closed already.
+				inst:ClearBufferedAction()
+			end
+		end,
+
+		events =
+		{
+			EventHandler("ontalk", OnTalk_Override),
+			EventHandler("donetalking", OnDoneTalking_Override),
+			EventHandler("equip", function(inst) inst.sg:GoToState("idle") end),
+			EventHandler("unequip", function(inst) inst.sg:GoToState("idle") end),
+			EventHandler("animover", function(inst)
+				if inst.AnimState:AnimDone() then
+					inst.sg:GoToState("idle")
+				end
+			end),
+		},
+
+		onexit = CancelTalk_Override,
+	},
 }
 
 local hop_timelines =

@@ -66,6 +66,7 @@ local prefabs =
     "monstermeat",
     "silk",
     "spider_web_spit",
+    "spider_web_spit_acidinfused",
     "moonspider_spike",
     
     "spider_mutate_fx",
@@ -428,6 +429,8 @@ local function MakeWeapon(inst)
         weapon:AddComponent("inventoryitem")
         weapon.persists = false
         weapon.components.inventoryitem:SetOnDroppedFn(weapon.Remove)
+
+        weapon.projectiledelay = 2.5 * FRAMES
         
         weapon:AddComponent("equippable")
         weapon:AddTag("nosteal")
@@ -518,6 +521,38 @@ local function OnPickup(inst)
         inst.components.homeseeker:SetHome(nil)
         inst:RemoveComponent("homeseeker")
     end
+end
+
+local function Spitter_OnAcidInfuse(inst)
+    if inst.weapon == nil then
+        return
+    end
+
+    inst.weapon.components.weapon:SetProjectile("spider_web_spit_acidinfused")
+end
+
+local function Spitter_OnAcidUninfuse(inst)
+    if inst.weapon == nil then
+        return
+    end
+
+    inst.weapon.components.weapon:SetProjectile("spider_web_spit")
+end
+
+local function SoundPath(inst, event)
+    local creature = "spider"
+    if inst:HasTag("spider_healer") then
+        return "webber1/creatures/spider_cannonfodder/" .. event
+    elseif inst:HasTag("spider_moon") then
+        return "turnoftides/creatures/together/spider_moon/" .. event
+    elseif inst:HasTag("spider_warrior") then
+        creature = "spiderwarrior"
+    elseif inst:HasTag("spider_hider") or inst:HasTag("spider_spitter") then
+        creature = "cavespider"
+    else
+        creature = "spider"
+    end
+    return "dontstarve/creatures/" .. creature .. "/" .. event
 end
 
 local DIET = { FOODTYPE.MEAT }
@@ -657,6 +692,12 @@ local function create_common(bank, build, tag, common_init, extra_data)
     inst.components.sanityaura.aurafn = CalcSanityAura
 
     ------------------
+
+    inst:AddComponent("acidinfusible")
+    inst.components.acidinfusible:SetFXLevel(1)
+    inst.components.acidinfusible:SetMultipliers(TUNING.ACID_INFUSION_MULT.STRONGER)
+
+    ------------------
     
     MakeFeedableSmallLivestock(inst, TUNING.SPIDER_PERISH_TIME)
     MakeHauntablePanic(inst)
@@ -680,6 +721,10 @@ local function create_common(bank, build, tag, common_init, extra_data)
 
     inst:WatchWorldState("iscaveday", OnIsCaveDay)
     OnIsCaveDay(inst, TheWorld.state.iscaveday)
+    
+    inst.SoundPath = SoundPath
+
+    inst.incineratesound = SoundPath(inst, "die")
 
     inst.build = build
     inst.SetHappyFace = (extra_data and extra_data.SetHappyFaceFn) or SetHappyFace
@@ -775,6 +820,9 @@ local function create_spitter()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.components.acidinfusible:SetOnInfuseFn(Spitter_OnAcidInfuse)
+    inst.components.acidinfusible:SetOnUninfuseFn(Spitter_OnAcidUninfuse)
 
     inst.components.health:SetMaxHealth(TUNING.SPIDER_SPITTER_HEALTH)
 

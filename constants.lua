@@ -11,6 +11,7 @@ DEGREES = PI/180
 RADIANS = 180/PI
 FRAMES = 1/30
 TILE_SCALE = 4
+MAXUINT = 4294967295
 
 RESOLUTION_X = 1280
 RESOLUTION_Y = 720
@@ -18,6 +19,8 @@ RESOLUTION_Y = 720
 PLAYER_REVEAL_RADIUS = 30.0 -- NOTES(JBK): Keep in sync with MiniMapRenderer.cpp!
 PLAYER_CAMERA_SEE_DISTANCE = 40.0 -- NOTES(JBK): Based off of an approximation of the maximum default camera distance before seeing clouds and is the screen diagonal.
 PLAYER_CAMERA_SEE_DISTANCE_SQ = PLAYER_CAMERA_SEE_DISTANCE * PLAYER_CAMERA_SEE_DISTANCE -- Helper.
+PLAYER_CAMERA_SHOULD_SNAP_DISTANCE = 20.0 -- NOTES(JBK): This is an approximate distance traveled where the camera should snap and fade out to not cause disorientations.
+PLAYER_CAMERA_SHOULD_SNAP_DISTANCE_SQ = PLAYER_CAMERA_SHOULD_SNAP_DISTANCE * PLAYER_CAMERA_SHOULD_SNAP_DISTANCE -- Helper.
 
 MAX_FE_SCALE = 3 --Default if you don't call SetMaxPropUpscale
 MAX_HUD_SCALE = 1.25
@@ -190,6 +193,18 @@ CONTROL_INV_14 = 80
 CONTROL_INV_15 = 81
 
 CONTROL_START_EMOJI = 82
+
+-- extra menu controls that should have been above but it's too late to add them now
+CONTROL_MENU_BACK = 83
+CONTROL_MENU_START = 84
+CONTROL_MENU_L2 = 85
+CONTROL_MENU_R2 = 86
+
+CONTROL_OPEN_COMMAND_WHEEL = 87
+
+-- controller targetting
+CONTROL_TARGET_LOCK = 88
+CONTROL_TARGET_CYCLE = 89
 
 CONTROL_CUSTOM_START = 100
 
@@ -683,10 +698,13 @@ TERRAFORM_IMMUNE = {}
 GROUND_FLOORING = {} --These tiles are flooring (stuff shouldn't grow on them)
 GROUND_HARD = {} --not plantable
 GROUND_ROADWAYS = {} -- Player speed boosting enabled.
+GROUND_NOGROUNDOVERLAYS = {} -- Stops rendering of snow or water etc overlays this table is immutable after initialization or engine crashes may occur.
+GROUND_ISTEMPTILE = {} -- Tiles that are temporarily placed as a layer using the undertile component.
 
 FALLOFF_IDS = {
     FALLOFF = 1,
     DOCK_FALLOFF = 2,
+    OCEANICE_FALLOFF = 3,
 }
 
 GROUND_CREEP_IDS = {
@@ -758,8 +776,9 @@ SPECIAL_EVENTS =
     YOTB = "year_of_the_beefalo",
     YOT_CATCOON = "year_of_the_catcoon",
     YOTR = "year_of_the_bunnyman",
+    YOTD = "year_of_the_dragonfly",
 }
-WORLD_SPECIAL_EVENT = SPECIAL_EVENTS.HALLOWED_NIGHTS
+WORLD_SPECIAL_EVENT = SPECIAL_EVENTS.NONE
 --WORLD_SPECIAL_EVENT = IS_BETA and SPECIAL_EVENTS.NONE or SPECIAL_EVENTS.YOTR
 WORLD_EXTRA_EVENTS = {}
 
@@ -787,6 +806,7 @@ IS_YEAR_OF_THE_SPECIAL_EVENTS =
     [SPECIAL_EVENTS.YOTB] = true,
 	[SPECIAL_EVENTS.YOT_CATCOON] = true,
     [SPECIAL_EVENTS.YOTR] = true,
+    [SPECIAL_EVENTS.YOTD] = true,
 }
 
 
@@ -861,6 +881,13 @@ SPECIAL_EVENT_MUSIC =
     {
         bank = "music_frontend_yotg.fsb",
         sound = "dontstarve/music/music_FE_yotg",
+    },
+
+    --year of the dragonfly
+    [SPECIAL_EVENTS.YOTD] =
+    {
+        bank = "music.fsb",
+        sound = "dontstarve/music/music_FE_boatrace",
     },
 
 	-- crow carnival
@@ -1051,7 +1078,8 @@ end
 FE_MUSIC =
     (FESTIVAL_EVENT_MUSIC[WORLD_FESTIVAL_EVENT] ~= nil and FESTIVAL_EVENT_MUSIC[WORLD_FESTIVAL_EVENT].sound) or
     (SPECIAL_EVENT_MUSIC[WORLD_SPECIAL_EVENT] ~= nil and SPECIAL_EVENT_MUSIC[WORLD_SPECIAL_EVENT].sound) or
-    "dontstarve/music/music_FE_riftsthree"
+    "dontstarve/music/music_FE_junkyardhog"
+    --"dontstarve/music/music_FE_riftsthree"
     --"dontstarve/music/music_FE_survivorsguideone"
     --"dontstarve/music/music_FE_shadowrift"
     --"dontstarve/music/music_FE_lunarrift"
@@ -1067,6 +1095,22 @@ FE_MUSIC =
     --"dontstarve/music/music_FE_wanda"
     --"terraria1/common/music_main_eot"
 
+
+---------------------------------------------------------
+-- Pickup sounds for in game events.
+PICKUPSOUNDS = {
+    ["wood"] = "aqol/new_test/wood",
+    ["gem"] = "aqol/new_test/gem",
+    ["cloth"] = "aqol/new_test/cloth",
+    ["metal"] = "aqol/new_test/metal",
+    ["rock"] = "aqol/new_test/rock",
+    ["vegetation_firm"] = "aqol/new_test/vegetation_firm",
+    ["vegetation_grassy"] = "aqol/new_test/vegetation_grassy",    
+    ["squidgy"] = "aqol/new_test/squidgy",
+    ["grainy"] = "aqol/new_test/grainy",
+    ["DEFAULT_FALLBACK"] = "dontstarve/HUD/collect_resource",
+	["NONE"] = nil, --reserved
+}
 
 ---------------------------------------------------------
 NUM_HALLOWEENCANDY = 14
@@ -1116,6 +1160,7 @@ TECH =
     BEEFOFFERING_THREE = { BEEFOFFERING = 3 },
     CATCOONOFFERING_THREE = { CATCOONOFFERING = 3 },
     RABBITOFFERING_THREE = { RABBITOFFERING = 3 },
+    DRAGONOFFERING_THREE = { DRAGONOFFERING = 3 },
 
     MADSCIENCE_ONE = { MADSCIENCE = 1 },
 	CARNIVAL_PRIZESHOP_ONE = { CARNIVAL_PRIZESHOP = 1 },
@@ -1146,6 +1191,7 @@ TECH =
     YOTB = { SCIENCE = 10 }, -- ApplySpecialEvent() will change this from lost to 0
     YOT_CATCOON = { SCIENCE = 10 }, -- ApplySpecialEvent() will change this from lost to 0
     YOTR = { SCIENCE = 10 }, -- ApplySpecialEvent() will change this from lost to 0
+    YOTD = { SCIENCE = 10 }, -- ApplySpecialEvent() will change this from lost to 0
 
     LOST = { MAGIC = 10, SCIENCE = 10, ANCIENT = 10 },
 
@@ -1450,7 +1496,8 @@ ANIM_SORT_ORDER =
 {
 	OCEAN_UNDERWATER = 0,
 	OCEAN_WAVES = 1,
-	OCEAN_BOAT = 2,
+	OCEAN_WHIRLPORTAL = 1,
+	OCEAN_BOAT = 2, -- Keep at 2.
     OCEAN_BOAT_BUMPERS = 3,
 	OCEAN_SKYSHADOWS = 4,
 }
@@ -1783,6 +1830,8 @@ UPGRADETYPES =
     SPIDER = "spider",
     WATERPLANT = "waterplant",
     MAST = "mast",
+    SPEAR_LIGHTNING = "spear_lightning",
+    CHEST = "chest",
 }
 
 LOCKTYPE =
@@ -1802,6 +1851,7 @@ FUELTYPE =
     PIGTORCH = "PIGTORCH",
     CHEMICAL = "CHEMICAL",
     WORMLIGHT = "WORMLIGHT",
+    LIGHTER = "LIGHTER",
 }
 
 OCCUPANTTYPE =
@@ -1822,6 +1872,7 @@ FOODTYPE =
     BERRY = "BERRY", --hack for smallbird; berries are actually part of veggie
     RAW = "RAW", -- things which some animals can eat off the ground, but players need to cook
     BURNT = "BURNT", --For lavae.
+    NITRE = "NITRE", -- For acidbats; they are part of elemental.
     ROUGHAGE = "ROUGHAGE",
 	WOOD = "WOOD",
     GOODIES = "GOODIES",
@@ -1926,31 +1977,43 @@ TECH_SKILLTREE_BUILDER_TAG_OWNERS =
     gem_alchemistI = "wilson",
     gem_alchemistII = "wilson",
     gem_alchemistIII = "wilson",
-    ore_alchemistI = "wilson",
-    ore_alchemistII = "wilson",
-    ore_alchemistIII = "wilson",
     ick_alchemistI = "wilson",
     ick_alchemistII = "wilson",
     ick_alchemistIII = "wilson",
-    skill_wilson_allegiance_shadow = "wilson",
+    ore_alchemistI = "wilson",
+    ore_alchemistII = "wilson",
+    ore_alchemistIII = "wilson",
     skill_wilson_allegiance_lunar = "wilson",
+    skill_wilson_allegiance_shadow = "wilson",
 
-    wolfgang_dumbbell_crafting = "wolfgang",
     wolfgang_coach = "wolfgang",
+    wolfgang_dumbbell_crafting = "wolfgang",
 
     woodcarver1 = "woodie",
     woodcarver2 = "woodie",
     woodcarver3 = "woodie",
 
-    syrupcrafter = "wormwood",
-    saplingcrafter = "wormwood",
     berrybushcrafter = "wormwood",
-    juicyberrybushcrafter = "wormwood",
-    reedscrafter = "wormwood",
-    lureplantcrafter = "wormwood",
     carratcrafter = "wormwood",
-    lightfliercrafter = "wormwood",
     fruitdragoncrafter = "wormwood",
+    juicyberrybushcrafter = "wormwood",
+    lightfliercrafter = "wormwood",
+    lureplantcrafter = "wormwood",
+    reedscrafter = "wormwood",
+    saplingcrafter = "wormwood",
+    syrupcrafter = "wormwood",
+    lunarplant_husk_crafter = "wormwood",
+
+    battlesongcontainermaker = "wathgrithr",
+    battlesonginstantrevivemaker = "wathgrithr",
+    battlesonglunaralignedmaker = "wathgrithr",
+    battlesongshadowalignedmaker = "wathgrithr",
+    saddlewathgrithrmaker = "wathgrithr",
+    spearwathgrithrlightningmaker = "wathgrithr",
+    wathgrithrimprovedhatmaker = "wathgrithr",
+    wathgrithrshieldmaker = "wathgrithr",
+
+    fire_mastery_1 = "willow",
 }
 
 -- IngredientMod must be one of the following values
@@ -2122,6 +2185,33 @@ PLANTREGISTRYUICOLOURS = {
 MAX_CHAT_INPUT_LENGTH = 150
 MAX_WRITEABLE_LENGTH = 200
 
+-- Used by exportprefabs to identify which "npcchatflairs" images to recognize.
+DST_NPCCHATTERLIST =
+{
+    "none", -- Default chatter/image name
+
+    "daywalker",
+    "daywalker_scrap",
+    "hermitcrab",
+    "sharkboi",
+    "stalker",
+    "wagstaff",
+}
+
+CHATPRIORITIES =
+{
+    -- Messages sent with priority 0 should never appear in chat history.
+    NOCHAT = 0,
+
+    LOW = 1,
+    HIGH = 2,
+
+    -- Keep this the highest value in the table.
+    -- Do not use this value for any messages, unless
+    -- it is desperately needed to be seen irrelevant of user settings.
+    MAX = 3,
+}
+
 --Bit flags, currently supports up to 8
 --Server may use these for things that clients need to know about
 --other clients whose player entities may or may not be available
@@ -2192,6 +2282,7 @@ WORMHOLETYPE =
 {
     WORM = 0,
     TENTAPILLAR = 1,
+    OCEANWHIRLPORTAL = 2,
 }
 
 -- Houndwarning level
@@ -2612,6 +2703,11 @@ SPECIAL_SCRAPBOOK_PAGES_LOOKUP =
     ]]
 }
 
+BERNIEALLEGIANCE ={
+    SHADOW = 1,
+    LUNAR = 2,
+}
+
 SPECIAL_SCRAPBOOK_PAGES = {}
 
 for i, data in ipairs(SPECIAL_SCRAPBOOK_PAGES_LOOKUP) do
@@ -2625,4 +2721,9 @@ LOADING_SCREEN_CONTROLLER_ID_LOOKUP =
     [CONTROL_ACTION] = CONTROL_CONTROLLER_ACTION,
     [CONTROL_FORCE_INSPECT] = CONTROL_INSPECT,
     [CONTROL_SHOW_PLAYER_STATUS] = CONTROL_MENU_MISC_4,
+}
+
+-- Constants to reduce network overhead.
+CLIENTAUTHORITATIVESETTINGS = {
+    PLATFORMHOPDELAY = 0,
 }

@@ -28,7 +28,9 @@ local function ConfigurePlayerLocomotor(inst)
     inst.components.locomotor:SetFasterOnCreep(inst:HasTag("spiderwhisperer"))
     inst.components.locomotor:SetTriggersCreep(not inst:HasTag("spiderwhisperer"))
     inst.components.locomotor:SetAllowPlatformHopping(true)
+	inst.components.locomotor:EnableHopDelay(true)
 	inst.components.locomotor.hop_distance_fn = GetHopDistance
+	inst.components.locomotor.pusheventwithdirection = true
 end
 
 local function ConfigureGhostLocomotor(inst)
@@ -39,6 +41,7 @@ local function ConfigureGhostLocomotor(inst)
     inst.components.locomotor.fasteronroad = false
     inst.components.locomotor:SetTriggersCreep(false)
     inst.components.locomotor:SetAllowPlatformHopping(false)
+	inst.components.locomotor.pusheventwithdirection = true
 end
 
 --------------------------------------------------------------------------
@@ -217,6 +220,8 @@ local function CommonActualRez(inst)
     inst:AddComponent("grogginess")
     inst.components.grogginess:SetResistance(3)
     inst.components.grogginess:SetKnockOutTest(ShouldKnockout)
+
+	inst:AddComponent("slipperyfeet")
 
     inst.components.moisture:ForceDry(false, inst)
 
@@ -549,6 +554,7 @@ local function CommonPlayerDeath(inst)
     inst:RemoveComponent("propagator")
 
     inst:RemoveComponent("grogginess")
+	inst:RemoveComponent("slipperyfeet")
 
     inst.components.moisture:ForceDry(true, inst)
 
@@ -872,6 +878,39 @@ local function StopStageActing(inst)
     end
 end
 
+local function SynchronizeOneClientAuthoritativeSetting(inst, variable, value)
+    inst:SetClientAuthoritativeSetting(variable, value)
+    if not TheWorld.ismastersim then
+        SendRPCToServer(RPC.SetClientAuthoritativeSetting, variable, value)
+    end
+end
+
+local function SynchronizeAllClientAuthoritativeSettings(inst)
+    -- NOTES(JBK): We have client settings data that the server should know about because of the server only components.
+    inst:SynchronizeOneClientAuthoritativeSetting(CLIENTAUTHORITATIVESETTINGS.PLATFORMHOPDELAY, Profile:GetBoatHopDelay())
+end
+
+local function SetClientAuthoritativeSetting(inst, variable, value)
+    -- NOTES(JBK): Check passed in variables here using common RPC checks.
+    -- Do not trust the data in here at all it could be anything.
+    -- This function can be run on both client and server to store the information onto the player entity.
+    -- If there are too many variables later add a component and refactor.
+    if not checkuint(variable) then
+        return
+    end
+
+    if variable == CLIENTAUTHORITATIVESETTINGS.PLATFORMHOPDELAY then
+        if not checkuint(value) then
+            return
+        end
+        if value ~= TUNING.PLATFORM_HOP_DELAY_TICKS then
+            inst.forced_platformhopdelay = value
+        else
+            inst.forced_platformhopdelay = nil
+        end
+    end
+end
+
 local function OnPostActivateHandshake_Client(inst, state) -- NOTES(JBK): Use PostActivateHandshake.
     --print("[OPA_C]", state)
     if state <= inst._PostActivateHandshakeState_Client or state > POSTACTIVATEHANDSHAKE.READY then -- Forward unique states only.
@@ -882,6 +921,7 @@ local function OnPostActivateHandshake_Client(inst, state) -- NOTES(JBK): Use Po
 
     if state == POSTACTIVATEHANDSHAKE.CTS_LOADED then
         TheSkillTree:OPAH_DoBackup()
+        SynchronizeAllClientAuthoritativeSettings(inst) -- Make this the last call for this if block.
     elseif state == POSTACTIVATEHANDSHAKE.STC_SENDINGSTATE then
         inst:PostActivateHandshake(POSTACTIVATEHANDSHAKE.READY)
     elseif state == POSTACTIVATEHANDSHAKE.READY then
@@ -977,6 +1017,8 @@ return
     StopStageActing             = StopStageActing,
     OnPostActivateHandshake_Client = OnPostActivateHandshake_Client,
     OnPostActivateHandshake_Server = OnPostActivateHandshake_Server,
+    SetClientAuthoritativeSetting = SetClientAuthoritativeSetting,
+    SynchronizeOneClientAuthoritativeSetting = SynchronizeOneClientAuthoritativeSetting,
     PostActivateHandshake       = PostActivateHandshake,
     OnClosePopups               = OnClosePopups,
     UpdateScrapbook             = UpdateScrapbook,

@@ -138,7 +138,9 @@ CRAFTING_FILTERS.CHARACTER.recipes =
 
 	-- Wathgrithr / Wigfrid
 	"spear_wathgrithr",
+	"spear_wathgrithr_lightning",
 	"wathgrithrhat",
+	"wathgrithr_improvedhat",
 	"battlesong_durability",
 	"battlesong_healthgain",
 	"battlesong_sanitygain",
@@ -146,6 +148,12 @@ CRAFTING_FILTERS.CHARACTER.recipes =
 	"battlesong_fireresistance",
 	"battlesong_instant_taunt",
 	"battlesong_instant_panic",
+	"battlesong_instant_revive",
+	"battlesong_lunaraligned",
+	"battlesong_shadowaligned",
+	"battlesong_container",
+	"saddle_wathgrithr",
+	"wathgrithr_shield",
 
 	-- Walter
 	"slingshot",
@@ -224,8 +232,6 @@ CRAFTING_FILTERS.CHARACTER.recipes =
 	"livinglog",
 	"armor_bramble",
 	"trap_bramble",
-    "lunarplant_wormwoodhat",
-    "armor_lunarplant_wormwood",
     "wormwood_sapling",
     "wormwood_berrybush",
     "wormwood_berrybush2",
@@ -236,6 +242,7 @@ CRAFTING_FILTERS.CHARACTER.recipes =
 	"wormwood_carrat",
 	"wormwood_lightflier",
 	"wormwood_fruitdragon",
+	"armor_lunarplant_husk",
 
 	-- Wanda
 	"pocketwatch_dismantler",
@@ -292,7 +299,7 @@ CRAFTING_FILTERS.SPECIAL_EVENT.recipes =
 	"yotb_beefaloshrine",
 	"yot_catcoonshrine",
 	"yotr_rabbitshrine",
-
+	"yotd_dragonshrine",
 
 }
 
@@ -325,6 +332,7 @@ CRAFTING_FILTERS.CRAFTING_STATION.recipes =
 	"moonrockidol",
 	"multiplayer_portal_moonrock_constr_plans",
 	"lunar_forge_kit",
+	"moon_mushroomhat",
 
 	----MOON_ALTAR-----
 	"moonglassaxe",
@@ -355,6 +363,7 @@ CRAFTING_FILTERS.CRAFTING_STATION.recipes =
 	"voidcloth_umbrella",
 	"voidcloth_scythe",
 	"voidcloth_kit",
+	"beeswax_spray",
 
 	-- Hermit Crab
 	"hermitshop_hermit_bundle_shells",
@@ -436,6 +445,7 @@ CRAFTING_FILTERS.CRAFTING_STATION.recipes =
 	"chesspiece_deerclops_mutated_builder",
 	"chesspiece_warg_mutated_builder",
 	"chesspiece_bearger_mutated_builder",
+	"chesspiece_yotd_builder",
 
 	-- wintersfeastoven
 	"wintercooking_berrysauce",
@@ -464,6 +474,21 @@ CRAFTING_FILTERS.CRAFTING_STATION.recipes =
 	"halloween_experiment_volatile",
 	"halloween_experiment_moon",
 	"halloween_experiment_root",
+
+    -- Year of the Dragon
+    "dragonboat_pack",
+    "boatrace_start_throwable_deploykit",
+    "boatrace_checkpoint_throwable_deploykit",
+	"boatrace_seastack_throwable_deploykit",
+    "dragonboat_kit",
+    "yotd_steeringwheel_item",
+    "yotd_oar",
+    "yotd_anchor_item",
+    "mast_yotd_item",
+	"boat_bumper_yotd_kit",
+    "mastupgrade_lamp_item_yotd",
+    "yotd_boatpatch_proxy",
+	"chesspiece_yotd_sketch",
 
 	-- Year of the Rabbit
 	"yotr_fightring_kit",
@@ -673,6 +698,7 @@ CRAFTING_FILTERS.PROTOTYPERS.recipes =
 	"yotb_beefaloshrine",
 	"yot_catcoonshrine",
 	"yotr_rabbitshrine",
+	"yotd_dragonshrine",
 }
 
 CRAFTING_FILTERS.REFINE.recipes =
@@ -702,12 +728,14 @@ CRAFTING_FILTERS.WEAPONS.recipes =
 	"winona_catapult",
 	"spear",
 	"spear_wathgrithr",
+	"spear_wathgrithr_lightning",
 	"boomerang",
 	"hambat",
 	"batbat",
 	"whip",
 	"nightstick",
 	"nightsword",
+	"wathgrithr_shield",
 	"sleepbomb",
 	"blowdart_pipe",
 	"blowdart_fire",
@@ -739,12 +767,14 @@ CRAFTING_FILTERS.ARMOUR.recipes =
 	"woodcarvedhat",
 	"footballhat",
 	"wathgrithrhat",
+	"wathgrithr_improvedhat",
 	"cookiecutterhat",
 	"beehat",
 	"armordreadstone",
 	"dreadstonehat",
 	"armorwagpunk",
 	"wagpunkhat",
+	"wathgrithr_shield",
 }
 
 CRAFTING_FILTERS.CLOTHING.recipes =
@@ -808,6 +838,7 @@ CRAFTING_FILTERS.RESTORATION.recipes =
     "wx78module_bee",
 
 	"healingsalve",
+	"healingsalve_acid",
 	"bandage",
 	"tillweedsalve",
 	"compostwrap",
@@ -922,6 +953,7 @@ CRAFTING_FILTERS.SEAFARING.recipes =
 
 	"boat_bumper_kelp_kit",
 	"boat_bumper_shell_kit",
+	"boat_bumper_yotd_kit",
 
 	"boat_cannon_kit",
 	"cannonball_rock_item",
@@ -930,6 +962,7 @@ CRAFTING_FILTERS.SEAFARING.recipes =
 
 	"mastupgrade_lamp_item",
 	"mastupgrade_lightningrod_item",
+    "mastupgrade_lamp_item_yotd",
 
 	"fish_box",
 	"winch",
@@ -955,11 +988,13 @@ CRAFTING_FILTERS.CONTAINERS.recipes =
 	"seedpouch",
 	"candybag",
 	"treasurechest",
+    "chestupgrade_stacksize",
 	"dragonflychest",
 	"magician_chest",
 	"icebox",
 	"saltbox",
 	"fish_box",
+	"battlesong_container",
 }
 
 CRAFTING_FILTERS.STRUCTURES.recipes =
@@ -975,6 +1010,7 @@ CRAFTING_FILTERS.STRUCTURES.recipes =
 	"yotb_beefaloshrine",
 	"yot_catcoonshrine",
 	"yotr_rabbitshrine",
+	"yotd_dragonshrine",
 
 	"researchlab",
 	"researchlab2",
@@ -1048,7 +1084,8 @@ CRAFTING_FILTERS.STRUCTURES.recipes =
 	"wall_hay_item",
 	"wall_wood_item",
 	"wall_stone_item",
-	"wall_moonrock_item",
+	"wall_scrap_item",
+	"wall_moonrock_item",	
 	"wall_dreadstone_item",
 
 	"homesign",
@@ -1108,6 +1145,7 @@ CRAFTING_FILTERS.RIDING.recipes =
 	"saddlehorn",
 	"saddle_basic",
 	"saddle_war",
+	"saddle_wathgrithr",
 	"saddle_race",
 	"beefalo_groomer",
 }
@@ -1220,7 +1258,8 @@ CRAFTING_FILTERS.DECOR.recipes =
 	"wall_hay_item",
 	"wall_wood_item",
 	"wall_stone_item",
-	"wall_moonrock_item",
+	"wall_scrap_item",
+	"wall_moonrock_item",	
 	"wall_dreadstone_item",
 
 	"pirate_flag_pole",

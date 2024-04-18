@@ -32,7 +32,7 @@ local function processloot(inst, stash)
         return
     end
     -- Pirate Stash Crash Debugging
-    print("Stashing:", inst, inst.prefab, inst:IsValid())
+    --print("Stashing:", inst, inst.prefab, inst:IsValid())
     stash:stashloot(inst)
 end
 
@@ -76,33 +76,35 @@ end
 local function setpirateboat(boat)
     boat:AddComponent("boatcrew")
     boat:AddComponent("vanish_on_sleep")
-	boat.components.vanish_on_sleep.vanishfn = function(boat)
-		if boat.components.walkableplatform ~= nil then
-			for ent in pairs(boat.components.walkableplatform:GetEntitiesOnPlatform()) do
-				local container = ent.components.container
-				if container ~= nil then
-					for i = 1, container.numslots do
-						local item = container.slots[i]
-						if item ~= nil then
-							--V2C: DropItem(item) does not drop whole stack
-							--container:DropItem(item)
-							container:DropItemBySlot(i)
-							stashloot(item)
-						end
-					end
-				end
-				if ent.components.inventoryitem ~= nil then
-					stashloot(ent)
-				elseif ent:HasTag("pirate") then
-					stashloot(ent)
-					ent:Remove()
-				elseif ent.components.health ~= nil then
-					ent.components.health:Kill()
-				else
-					ent:Remove()
-				end
-			end
-		end
+	boat.components.vanish_on_sleep.vanishfn = function(boat_inner)
+        if not boat_inner.components.walkableplatform then
+            return
+        end
+
+        for ent in pairs(boat_inner.components.walkableplatform:GetEntitiesOnPlatform()) do
+            local container = ent.components.container
+            if container ~= nil then
+                for i = 1, container.numslots do
+                    local item = container.slots[i]
+                    if item ~= nil then
+                        --V2C: DropItem(item) does not drop whole stack
+                        --container:DropItem(item)
+						item = container:DropItemBySlot(i, nil, true)
+                        stashloot(item)
+                    end
+                end
+            end
+            if ent.components.inventoryitem ~= nil then
+                stashloot(ent)
+            elseif ent:HasTag("pirate") then
+                stashloot(ent)
+                ent:Remove()
+            elseif ent.components.health ~= nil then
+                ent.components.health:Kill()
+            else
+                ent:Remove()
+            end
+        end
     end
     boat:ListenForEvent("spawnnewboatleak", hitbycannon)
 end
@@ -773,7 +775,7 @@ function self:LoadPostPass(newents, savedata)
         for k,v in ipairs(savedata.shipdatas) do
             local shipdata = {}
             if v.boat then
-                local boat = newents[v.boat].entity
+                local boat = newents[v.boat] and newents[v.boat].entity or nil
                 if boat then
                     shipdata.boat = boat
                     setpirateboat(boat)
@@ -789,7 +791,7 @@ function self:LoadPostPass(newents, savedata)
             end
             shipdata.crew = {}
             for i,crew in ipairs(v.crew) do
-                local crewmember = newents[crew].entity
+                local crewmember = newents[crew] and newents[crew].entity or nil
                 if crewmember then
                     table.insert(shipdata.crew,crewmember)
                     setcrewmember(crewmember,shipdata.boat)

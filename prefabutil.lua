@@ -11,7 +11,7 @@ function MakePlacer(name, bank, build, anim, onground, snap, metersnap, scale, f
 
         inst.entity:AddTransform()
         inst.entity:AddAnimState()
-        if anim ~= nil then
+        if anim then
             inst.AnimState:SetBank(bank)
             inst.AnimState:SetBuild(build)
             inst.AnimState:PlayAnimation(anim, true)
@@ -28,13 +28,14 @@ function MakePlacer(name, bank, build, anim, onground, snap, metersnap, scale, f
             inst.Transform:SetEightFaced()
         end
 
-        inst:AddComponent("placer")
-        inst.components.placer.snaptogrid = snap
-        inst.components.placer.snap_to_meters = metersnap
-        inst.components.placer.fixedcameraoffset = fixedcameraoffset
-        inst.components.placer.onground = onground
+        local placer = inst:AddComponent("placer")
+        placer.snaptogrid = snap
+        placer.snap_to_meters = metersnap
+        placer.fixedcameraoffset = fixedcameraoffset
+        placer.onground = onground
+
         -- If the user clicks when the placement is invalid this gets called
-        inst.components.placer.onfailedplacement = onfailedplacement
+        placer.onfailedplacement = onfailedplacement
 
         if offset ~= nil then
             inst.components.placer.offset = offset
@@ -48,7 +49,7 @@ function MakePlacer(name, bank, build, anim, onground, snap, metersnap, scale, f
             inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
         end
 
-        if postinit_fn ~= nil then
+        if postinit_fn then
             postinit_fn(inst)
         end
 
@@ -101,6 +102,10 @@ function MakeDeployableKitItem(name, prefab_to_deploy, bank, build, anim, assets
             inst:AddTag("usedeployspacingasoffset")
         end
 
+		if deployable_data.common_postinit then
+			deployable_data.common_postinit(inst)
+		end
+
 		inst.entity:SetPristine()
 
 		if not TheWorld.ismastersim then
@@ -125,13 +130,20 @@ function MakeDeployableKitItem(name, prefab_to_deploy, bank, build, anim, assets
 		end
 
 		inst._prefab_to_deploy = prefab_to_deploy
-		inst:AddComponent("deployable")
-		inst.components.deployable.ondeploy = deployablekititem_ondeploy
+		local deployable = inst:AddComponent("deployable")
+		deployable.ondeploy = deployablekititem_ondeploy
         if deployable_data.deploymode then
-            inst.components.deployable:SetDeployMode(deployable_data.deploymode)
+            deployable:SetDeployMode(deployable_data.deploymode)
         end
         if deployable_data.deployspacing then
-			inst.components.deployable:SetDeploySpacing(deployable_data.deployspacing)
+			deployable:SetDeploySpacing(deployable_data.deployspacing)
+		end
+
+		deployable.restrictedtag = deployable_data.restrictedtag
+		deployable:SetUseGridPlacer(deployable_data.usegridplacer)
+
+		if deployable_data.deploytoss_symbol_override then
+			deployable:SetDeployTossSymbolOverride(deployable_data.deploytoss_symbol_override)
 		end
 
 		if burnable and burnable.fuelvalue then

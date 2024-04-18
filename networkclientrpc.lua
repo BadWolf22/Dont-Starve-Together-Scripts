@@ -374,6 +374,17 @@ local RPC_HANDLERS =
 		end
 	end,
 
+	StrafeFacing = function(player, dir)
+		if not checknumber(dir) then
+			printinvalid("StrafeFacing", player)
+			return
+		end
+		local locomotor = player.components.locomotor
+		if locomotor and not (player.sg and player.sg:HasStateTag("busy")) then
+			locomotor:OnStrafeFacingChanged(dir)
+		end
+	end,
+
     StartHop = function(player, x, z, platform, has_platform)
         if not (checknumber(x) and
                 checknumber(z) and
@@ -795,9 +806,9 @@ local RPC_HANDLERS =
             printinvalid("SetMovementPredictionEnabled", player)
             return
         end
-        local pc = player.components.playercontroller
-        if pc ~= nil then
-            player.components.playercontroller:OnRemoteToggleMovementPrediction(enabled)
+		local playercontroller = player.components.playercontroller
+		if playercontroller then
+			playercontroller:OnRemoteToggleMovementPrediction(enabled)
         end
     end,
 
@@ -960,9 +971,9 @@ local RPC_HANDLERS =
             printinvalid("DoActionOnMap PARAMS", player)
             return
         end
-        local pc = player.components.playercontroller
-        if pc then
-            pc:OnMapAction(action, Vector3(x, 0, z))
+		local playercontroller = player.components.playercontroller
+		if playercontroller then
+			playercontroller:OnMapAction(action, Vector3(x, 0, z))
         end
     end,
 
@@ -1021,6 +1032,11 @@ local RPC_HANDLERS =
         if inst.OnScrapbookDataTaught then
             inst:OnScrapbookDataTaught(player, response)
         end
+    end,
+
+    SetClientAuthoritativeSetting = function(player, variable, value)
+        -- NOTES(JBK): Check passed in variables in the callback not in the RPC here.
+        player:SetClientAuthoritativeSetting(variable, value)
     end,
 
     -- NOTES(JBK): RPC limit is at 128, with 1-127 usable.
@@ -1101,6 +1117,16 @@ local CLIENT_RPC_HANDLERS =
 
     UpdateAccomplishment = function(name)
         TheGenericKV:SetKV(name, "1")
+    end,
+
+    UpdateCountAccomplishment = function(name, maxvalue)
+        local current = tonumber(TheGenericKV:GetKV(name) or 0)
+
+        if maxvalue ~= nil and current >= maxvalue then
+            return
+        end
+
+        TheGenericKV:SetKV(name, tostring(current + 1))
     end,
 
     SetSkillActivatedState = function(skill_rpc_id, isunlocked)
@@ -1196,6 +1222,10 @@ local SHARD_RPC_HANDLERS =
 
     ResyncWorldSettings = function(shardid)
         Shard_SyncWorldSettings(shardid, true)
+    end,
+
+    SyncBossDefeated = function(shardid, bossprefab) -- NOTES(JBK): This should not be called often enough to warrant a lookup table for bossprefab as an enum.
+        Shard_SyncBossDefeated(bossprefab, shardid)
     end,
 }
 

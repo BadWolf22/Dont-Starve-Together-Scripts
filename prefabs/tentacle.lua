@@ -99,6 +99,7 @@ local function fn()
     inst:AddTag("wet")
     inst:AddTag("WORM_DANGER")
 	inst:AddTag("tentacle")
+    inst:AddTag("NPCcanaggro")
 
     inst.entity:SetPristine()
 
@@ -127,6 +128,10 @@ local function fn()
     inst:AddComponent("inspectable")
     inst:AddComponent("lootdropper")
     inst.components.lootdropper:SetChanceLootTable('tentacle')
+
+    inst:AddComponent("acidinfusible")
+    inst.components.acidinfusible:SetFXLevel(1)
+    inst.components.acidinfusible:SetMultipliers(TUNING.ACID_INFUSION_MULT.BERSERKER)
 
     inst:SetStateGraph("SGtentacle")
 

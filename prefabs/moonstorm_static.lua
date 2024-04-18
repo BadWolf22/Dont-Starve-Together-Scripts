@@ -120,7 +120,7 @@ local function itemfn()
 
     inst.AnimState:SetBank("static_contained")
     inst.AnimState:SetBuild("static_ball_contained")
-    inst.AnimState:PlayAnimation("finish_idle")
+    inst.AnimState:PlayAnimation("finish_idle", true)
 
     inst:AddTag("moonstorm_static")
 
@@ -137,6 +137,9 @@ local function itemfn()
     inst.SoundEmitter:PlaySound("moonstorm/common/static_ball_contained/finished_idle_LP","loop")
 
     inst:AddComponent("tradable")
+
+    inst:AddComponent("upgrader")
+    inst.components.upgrader.upgradetype = UPGRADETYPES.SPEAR_LIGHTNING
 
     inst:AddComponent("inspectable")
 

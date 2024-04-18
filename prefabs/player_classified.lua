@@ -233,9 +233,7 @@ local function OnEntityReplicated(inst)
     else
         inst._parent:AttachClassified(inst)
         for i, v in ipairs({ "builder", "combat", "health", "hunger", "rider", "sanity" }) do
-            if inst._parent.replica[v] ~= nil then
-                inst._parent.replica[v]:AttachClassified(inst)
-            end
+			inst._parent:TryAttachClassifiedToReplicaComponent(inst, v)
         end
         for i, v in ipairs({ "playercontroller", "playervoter", "boatcannonuser" }) do
             if inst._parent.components[v] ~= nil then
@@ -624,6 +622,12 @@ local function OnPausePredictionFramesDirty(inst)
     end
 end
 
+fns.OnIsStrafingDirty = function(inst)
+	if inst._parent then
+		inst._parent:PushEvent(inst.isstrafing:value() and "startstrafing" or "stopstrafing")
+	end
+end
+
 local function OnIsCarefulWalkingDirty(inst)
     if inst._parent ~= nil then
         inst._parent:PushEvent("carefulwalking", { careful = inst.iscarefulwalking:value() })
@@ -805,6 +809,16 @@ local function OnPlayerCameraDirty(inst)
     end
 end
 
+function fns.OnPlayerCameraExtraDistDirty(inst)
+    if inst._parent == nil or inst._parent.HUD == nil then
+        return
+    end
+
+    if inst.cameraextramaxdist:value() then
+        TheCamera:SetExtraMaxDistance(inst.cameraextramaxdist:value())
+    end
+end
+
 fns.OnYotbSkinDirty = function(inst)
     if inst._parent ~= nil and inst._parent.HUD ~= nil then
         if inst.hasyotbskin:value() then
@@ -862,6 +876,24 @@ local function OnPlayerMinimapCenter(inst)
     end
 end
 
+local function DoMinimapClose(inst)
+    local player = inst._parent
+
+    if player ~= nil and player.HUD ~= nil then
+        player.HUD.controls:HideMap()
+    end
+end
+
+local function OnPlayerMinimapClose(inst)
+    if inst._parent ~= nil and inst._parent.HUD ~= nil then
+        if TheWorld.ismastersim then
+            DoMinimapClose(inst)
+        else
+            inst:DoTaskInTime(0, DoMinimapClose)
+        end
+    end
+end
+
 local function OnPlayerFadeDirty(inst)
     if inst._parent ~= nil and inst._parent.HUD ~= nil then
         local iswhite = inst.fadetime:value() >= 32
@@ -884,6 +916,8 @@ local function OnWormholeTravelDirty(inst)
             TheFocalPoint.SoundEmitter:PlaySound("dontstarve/common/teleportworm/travel")
         elseif inst._parent.player_classified.wormholetravelevent:value() == WORMHOLETYPE.TENTAPILLAR then
             TheFocalPoint.SoundEmitter:PlaySound("dontstarve/cave/tentapiller_hole_travel")
+        elseif inst._parent.player_classified.wormholetravelevent:value() == WORMHOLETYPE.OCEANWHIRLPORTAL then
+            TheFocalPoint.SoundEmitter:PlaySound("meta3/whirlpool/whirlpool_travel")
         end
     end
 end
@@ -1024,6 +1058,7 @@ local function RegisterNetListeners_local(inst)
     inst:ListenForEvent("bufferedbuildsdirty", OnBufferedBuildsDirty)
     inst:ListenForEvent("isperformactionsuccessdirty", OnIsPerformActionSuccessDirty)
     inst:ListenForEvent("pausepredictionframesdirty", OnPausePredictionFramesDirty)
+	inst:ListenForEvent("isstrafingdirty", fns.OnIsStrafingDirty)
     inst:ListenForEvent("iscarefulwalkingdirty", OnIsCarefulWalkingDirty)
     inst:ListenForEvent("isghostmodedirty", OnGhostModeDirty)
     inst:ListenForEvent("actionmeterdirty", OnActionMeterDirty)
@@ -1054,8 +1089,10 @@ local function RegisterNetListeners_common(inst)
     inst:ListenForEvent("yotbskindirty", fns.OnYotbSkinDirty)
     inst:ListenForEvent("ismounthurtdirty", OnMountHurtDirty)
     inst:ListenForEvent("playercameradirty", OnPlayerCameraDirty)
+    inst:ListenForEvent("playercameraextradistdirty", fns.OnPlayerCameraExtraDistDirty)
     inst:ListenForEvent("playercamerasnap", OnPlayerCameraSnap)
     inst:ListenForEvent("playerminimapcenter", OnPlayerMinimapCenter)
+    inst:ListenForEvent("playerminimapclose", OnPlayerMinimapClose)
     inst:ListenForEvent("playerfadedirty", OnPlayerFadeDirty)
     inst:ListenForEvent("wormholetraveldirty", OnWormholeTravelDirty)
     inst:ListenForEvent("leader.makefriend", OnMakeFriendEvent)
@@ -1110,6 +1147,7 @@ function fns.OnInitialDirtyStates(inst)
             inst._oldmoisture = inst.moisture:value()
             UpdateAnimOverrideSanity(inst._parent)
         end
+		fns.OnIsStrafingDirty(inst)
     end
 
     OnStormLevelDirty(inst)
@@ -1279,6 +1317,7 @@ local function fn()
     --Player camera variables
     inst.cameradistance = net_smallbyte(inst.GUID, "playercamera.distance", "playercameradirty")
     inst.iscamerazoomed = net_bool(inst.GUID, "playercamera.iscamerazoomed", "playercameradirty")
+    inst.cameraextramaxdist = net_smallbyte(inst.GUID, "playercamera.extramaxdist", "playercameraextradistdirty")
     inst.camerasnap = net_bool(inst.GUID, "playercamera.snap", "playercamerasnap")
     inst.camerashakemode = net_tinybyte(inst.GUID, "playercamera.shakemode", "playercamerashake")
     inst.camerashaketime = net_byte(inst.GUID, "playercamera.shaketime")
@@ -1287,6 +1326,7 @@ local function fn()
 
     --Player minimap variables
     inst.minimapcenter = net_bool(inst.GUID, "playerminimap.center", "playerminimapcenter")
+    inst.minimapclose = net_bool(inst.GUID, "playerminimap.close", "playerminimapclose")
 
     --Player front end variables
     inst.isfadein = net_bool(inst.GUID, "frontend.isfadein", "playerfadedirty")
@@ -1390,12 +1430,17 @@ local function fn()
     inst.runspeed:set(TUNING.WILSON_RUN_SPEED)
     inst.externalspeedmultiplier:set(1)
 	inst.busyremoteoverridelocomote = net_bool(inst.GUID, "locomotor.busyremoteoverridelocomote")
+	inst.isstrafing = net_bool(inst.GUID, "locomotor.isstrafing", "isstrafingdirty")
 
     --CarefulWalking variables
     inst.iscarefulwalking = net_bool(inst.GUID, "carefulwalking.careful", "iscarefulwalkingdirty")
 
     --BoatCannonUser variables
     inst.cannon = net_entity(inst.GUID, "boatcannonuser.cannon", "cannondirty")
+
+	--ChannelCaster variables
+	inst.ischannelcasting = net_bool(inst.GUID, "channelcaster.ishcannelcasting")
+	inst.ischannelcastingitem = net_bool(inst.GUID, "channelcaster.ischannelcastingitem")
 
     --Morgue variables
     inst.isdeathbypk = net_bool(inst.GUID, "morgue.isdeathbypk", "morguedirty")

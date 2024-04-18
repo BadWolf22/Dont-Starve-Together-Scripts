@@ -250,7 +250,7 @@ local function spawnash(inst)
     ash.Transform:SetPosition(x, y, z)
 
     if inst.components.stackable ~= nil then
-        ash.components.stackable.stacksize = math.min(ash.components.stackable.maxsize, inst.components.stackable.stacksize)
+		ash.components.stackable:SetStackSize(math.min(ash.components.stackable.maxsize, inst.components.stackable.stacksize))
     end
 
     inst:PushEvent("detachchild")
@@ -348,7 +348,7 @@ local function OnEntityWake(inst)
     end)
 end
 
-local function OnLongAction(inst)
+local function OnLongAction(inst)--, doer)
     inst.Physics:Stop()
     inst.components.blowinwind:Stop()
     inst:RemoveEventCallback("animover", startmoving)

@@ -51,6 +51,7 @@ function Spawner:OnRemoveFromEntity()
         self.inst:RemoveEventCallback("ontrapped", self._onchildkilled, self.child)
         self.inst:RemoveEventCallback("death", self._onchildkilled, self.child)
         self.inst:RemoveEventCallback("detachchild", self._onchildkilled, self.child)
+        self.inst:RemoveEventCallback("onremove", self._onchildkilled, self.child)
     end
     if self.task ~= nil then
         self.task:Cancel()
@@ -176,9 +177,19 @@ end
 
 function Spawner:TakeOwnership(child)
     if self.child ~= child then
+        if self.child then
+            self.inst:RemoveEventCallback("ontrapped", self._onchildkilled, self.child)
+            self.inst:RemoveEventCallback("death", self._onchildkilled, self.child)
+            self.inst:RemoveEventCallback("detachchild", self._onchildkilled, self.child)
+            self.inst:RemoveEventCallback("onremove", self._onchildkilled, self.child)
+            if self.child.components.knownlocations ~= nil then
+                self.child.components.knownlocations:ForgetLocation("home")
+            end
+        end
         self.inst:ListenForEvent("ontrapped", self._onchildkilled, child)
         self.inst:ListenForEvent("death", self._onchildkilled, child)
         self.inst:ListenForEvent("detachchild", self._onchildkilled, child)
+        self.inst:ListenForEvent("onremove", self._onchildkilled, child)
         if child.components.knownlocations ~= nil then
             child.components.knownlocations:RememberLocation("home", self.inst:GetPosition())
         end
@@ -222,7 +233,6 @@ function Spawner:ReleaseChild()
                 self.onspawnedfn(self.inst,child)
             end
         end
-        
     end
 
     if self:IsOccupied() then
@@ -287,9 +297,6 @@ function Spawner:GoHome(child)
         if child.components.burnable ~= nil and child.components.burnable:IsBurning() then
             child.components.burnable:Extinguish()
         end
-
-        --if child.components.health ~= nil and child.components.health:IsHurt() then
-        --end
 
         if child.components.homeseeker ~= nil then
             child:RemoveComponent("homeseeker")

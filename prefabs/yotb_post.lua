@@ -54,12 +54,6 @@ local function onhit(inst, worker)
     inst.AnimState:PushAnimation("idle", true)
 end
 
-local function onbuilt(inst)
-    inst.AnimState:PlayAnimation("place")
-    inst.SoundEmitter:PlaySound("yotb_2021/common/hitching_post/place")
-    inst.AnimState:PushAnimation("idle", true)
-end
-
 local function onburnt(inst)
     inst.AnimState:PlayAnimation("burnt", true)
 end
@@ -287,6 +281,9 @@ local function rugfn()
     inst.AnimState:SetOrientation( ANIM_ORIENTATION.OnGround )
     inst.AnimState:SetLayer( LAYER_BACKGROUND )
     inst.AnimState:SetSortOrder( 3 )
+
+    inst:AddTag("DECOR")
+    inst:AddTag("NOCLICK")
 
     inst.entity:SetPristine()
 

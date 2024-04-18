@@ -347,6 +347,7 @@ local redpouch_yotc =
         inst:SetPrefabNameOverride("redpouch")
     end,
 }
+
 local yotc_seedpacket_loots =
 {
 	set1 =
@@ -395,6 +396,20 @@ local redpouch_yotr =
     end,
     common_postinit = function(inst, setupdata)
         inst:SetPrefabNameOverride("redpouch")
+    end,
+}
+
+local redpouch_yotd =
+{
+    common_postinit = function(inst, setupdata)
+        inst:SetPrefabNameOverride("redpouch")
+
+        MakeInventoryFloatable(inst, nil, 0.15)
+    end,
+    master_postinit = function(inst, setupdata)
+        inst.wet_prefix = STRINGS.WET_PREFIX.POUCH
+
+        inst.components.inventoryitem:SetSinks(false)
     end,
 }
 
@@ -481,6 +496,8 @@ local hermit_bundle =
     end,
 }
 
+local HERMIT_BUNDLE_SHELLS_SHELL_COUNT = 8
+
 local hermit_bundle_shells =
 {
     master_postinit = function(inst, setupdata)
@@ -490,14 +507,7 @@ local hermit_bundle_shells =
         inst:SetPrefabNameOverride("hermit_bundle")
     end,
     lootfn = function(inst, doer)
-        local loots = {}
-        local r = 0
-
-        table.insert(loots, weighted_random_choice(hermit_bundle_shell_loots))
-        table.insert(loots, weighted_random_choice(hermit_bundle_shell_loots))
-        table.insert(loots, weighted_random_choice(hermit_bundle_shell_loots))
-        table.insert(loots, weighted_random_choice(hermit_bundle_shell_loots))
-        return loots
+        return weighted_random_choices(hermit_bundle_shell_loots, HERMIT_BUNDLE_SHELLS_SHELL_COUNT)
     end,
 }
 
@@ -562,6 +572,7 @@ local wetpouch =
 return MakeContainer("bundle_container", "ui_bundle_2x2"),
 	MakeContainer("construction_container", "ui_construction_4x1"),
 	MakeContainer("construction_repair_container", "ui_construction_4x1", "repairconstructionsite"),
+	MakeContainer("construction_rebuild_container", "ui_construction_4x1", "rebuildconstructionsite"),
     --"bundle", "bundlewrap"
     MakeBundle("bundle", false, nil, { "waxpaper" }),
     MakeWrap("bundle", "bundle_container", nil, false),
@@ -575,6 +586,7 @@ return MakeContainer("bundle_container", "ui_bundle_2x2"),
     MakeBundle("redpouch_yotb", false, nil, nil, true, redpouch_yotb),
     MakeBundle("redpouch_yot_catcoon", false, nil, nil, true, redpouch_yot_catcoon),
     MakeBundle("redpouch_yotr",        false, nil, nil, true, redpouch_yotr),
+    MakeBundle("redpouch_yotd",        false, nil, nil, true, redpouch_yotd),
 	MakeBundle("yotc_seedpacket", true, nil, nil, true, yotc_seedpacket),
 	MakeBundle("yotc_seedpacket_rare", true, nil, nil, true, yotc_seedpacket_rare),
 	MakeBundle("carnival_seedpacket", true, nil, nil, true, carnival_seedpacket),

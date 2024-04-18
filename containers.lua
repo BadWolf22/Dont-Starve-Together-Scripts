@@ -412,6 +412,9 @@ end
 params.construction_repair_container = deepcopy(params.construction_container)
 params.construction_repair_container.widget.buttoninfo.text = STRINGS.ACTIONS.APPLYCONSTRUCTION.REPAIR
 
+params.construction_rebuild_container = deepcopy(params.construction_container)
+params.construction_rebuild_container.widget.buttoninfo.text = STRINGS.ACTIONS.APPLYCONSTRUCTION.REBUILD
+
 --------------------------------------------------------------------------
 --[[ enable_shadow_rift_construction_container ]]
 --------------------------------------------------------------------------
@@ -784,6 +787,8 @@ params.treasurechest =
         slotpos = {},
         animbank = "ui_chest_3x3",
         animbuild = "ui_chest_3x3",
+        animbank_upgraded = "ui_chest_upgraded_3x3",
+        animbuild_upgraded = "ui_chest_upgraded_3x3",
         pos = Vector3(0, 200, 0),
         side_align_tip = 160,
     },
@@ -809,8 +814,10 @@ params.quagmire_safe.widget.animbuild = "quagmire_ui_chest_3x3"
 --[[ dragonflychest ]]
 --------------------------------------------------------------------------
 
-params.dragonflychest = params.shadowchester
 params.minotaurchest = params.shadowchester
+params.dragonflychest = deepcopy(params.shadowchester)
+params.dragonflychest.widget.animbank_upgraded = "ui_chester_upgraded_3x4"
+params.dragonflychest.widget.animbuild_upgraded = "ui_chester_upgraded_3x4"
 
 --------------------------------------------------------------------------
 --[[ antlionhat ]]
@@ -1337,7 +1344,7 @@ params.beargerfur_sack =
 for y = 0, 2 do
     for x = 0, 1 do
         table.insert(params.beargerfur_sack.widget.slotpos, Vector3(-163 + (75 * x),   -75 * y + 73,   0))
-        table.insert(params.beargerfur_sack.widget.slotbg, { image = "coooked_food_slot.tex", atlas = "images/hud2.xml" })
+        table.insert(params.beargerfur_sack.widget.slotbg, { image = "preparedfood_slot.tex", atlas = "images/hud2.xml" })
     end
 end
 
@@ -1356,6 +1363,90 @@ params.houndstooth_blowpipe.widget.slotbg = {{ image = "houndstooth_ammo_slot.te
 
 function params.houndstooth_blowpipe.itemtestfn(container, item, slot)
 	return item:HasTag("blowpipeammo")
+end
+
+--------------------------------------------------------------------------
+--[[ battlesong_container ]]
+--------------------------------------------------------------------------
+
+params.battlesong_container =
+{
+    widget =
+    {
+        slotpos = {},
+        slotbg  = {},
+        animbank  = "ui_backpack_2x4",
+        animbuild = "ui_backpack_2x4",
+        pos = Vector3(75, 195, 0),
+        side_align_tip = 160,
+    },
+    type = "chest",
+}
+
+local battlesong_container_bg = { image = "battlesong_slot.tex", atlas = "images/hud2.xml" }
+
+for y = 0, 3 do
+    table.insert(params.battlesong_container.widget.slotpos, Vector3(-162     , -75 * y + 114, 0))
+    table.insert(params.battlesong_container.widget.slotpos, Vector3(-162 + 75, -75 * y + 114, 0))
+
+    table.insert(params.battlesong_container.widget.slotbg, battlesong_container_bg)
+    table.insert(params.battlesong_container.widget.slotbg, battlesong_container_bg)
+end
+
+function params.battlesong_container.itemtestfn(container, item, slot)
+    -- Battlesongs.
+    return item:HasTag("battlesong")
+end
+
+--------------------------------------------------------------------------
+--[[ dragonflyfurnace ]]
+--------------------------------------------------------------------------
+
+params.dragonflyfurnace =
+{
+    widget =
+    {
+        slotpos =
+        {
+            Vector3(-37.5,   32 + 4,  0),
+            Vector3( 37.5,   32 + 4,  0),
+            Vector3(-37.5, -(32 + 4), 0),
+            Vector3( 37.5, -(32 + 4), 0),
+        },
+        slotbg =
+        {
+            { image = "inv_slot_dragonflyfurnace.tex", atlas = "images/hud2.xml" },
+            { image = "inv_slot_dragonflyfurnace.tex", atlas = "images/hud2.xml" },
+            { image = "inv_slot_dragonflyfurnace.tex", atlas = "images/hud2.xml" },
+            { image = "inv_slot_dragonflyfurnace.tex", atlas = "images/hud2.xml" },
+        },
+        animbank = "ui_dragonflyfurnace_2x2",
+        animbuild = "ui_dragonflyfurnace_2x2",
+        pos = Vector3(200, 0, 0),
+        side_align_tip = 120,
+        buttoninfo =
+        {
+            text = STRINGS.ACTIONS.INCINERATE,
+            position = Vector3(0, -100, 0),
+        }
+    },
+    type = "cooker",
+}
+
+function params.dragonflyfurnace.itemtestfn(container, item, slot)
+    return not item:HasTag("irreplaceable")
+end
+
+function params.dragonflyfurnace.widget.buttoninfo.fn(inst, doer)
+    if inst.components.container ~= nil then
+        BufferedAction(doer, inst, ACTIONS.INCINERATE):Do()
+    elseif inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
+        SendRPCToServer(RPC.DoWidgetButtonAction, ACTIONS.INCINERATE.code, inst, ACTIONS.INCINERATE.mod_name)
+    end
+end
+
+function params.dragonflyfurnace.widget.buttoninfo.validfn(inst)
+    return inst.replica.container ~= nil and not inst.replica.container:IsEmpty()
 end
 
 --------------------------------------------------------------------------

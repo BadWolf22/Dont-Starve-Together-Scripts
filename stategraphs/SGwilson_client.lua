@@ -56,6 +56,80 @@ local function DoMountSound(inst, mount, sound)
     end
 end
 
+--------------------------------------------------------------------------
+
+local CheckPreviewChannelCastAction --forward declare
+
+local function StopPreviewChannelCast(inst)
+	if inst.sg.mem.preview_channelcast_task then
+		inst.sg.mem.preview_channelcast_task:Cancel()
+		inst.sg.mem.preview_channelcast_task = nil
+		inst.sg.mem.preview_channelcast_action = nil
+		inst:RemoveEventCallback("performaction", CheckPreviewChannelCastAction)
+		inst.components.locomotor:RemovePredictExternalSpeedMultiplier(inst, "preview_channelcast")
+	end
+end
+
+CheckPreviewChannelCastAction = function(inst)
+	if inst:IsChannelCasting() == (inst.sg.mem.preview_channelcast_action.action == ACTIONS.START_CHANNELCAST) then
+		StopPreviewChannelCast(inst)
+	end
+end
+
+--Used for both START_CHANNELCAST and STOP_CHANNELCAST
+local function StartPreviewChannelCast(inst, buffaction)
+	if buffaction.action == ACTIONS.START_CHANNELCAST then
+		if inst:IsChannelCasting() then
+			StopPreviewChannelCast(inst)
+			return
+		end
+		inst.components.locomotor:SetPredictExternalSpeedMultiplier(inst, "preview_channelcast", TUNING.CHANNELCAST_SPEED_MOD)
+	elseif buffaction.action == ACTIONS.STOP_CHANNELCAST then
+		if not inst:IsChannelCasting() then
+			StopPreviewChannelCast(inst)
+			return
+		end
+		inst.components.locomotor:SetPredictExternalSpeedMultiplier(inst, "preview_channelcast", 1 / TUNING.CHANNELCAST_SPEED_MOD)
+	else
+		StopPreviewChannelCast(inst)
+		return
+	end
+
+	if inst.sg.mem.preview_channelcast_task then
+		inst.sg.mem.preview_channelcast_task:Cancel()
+	else
+		inst:ListenForEvent("performaction", CheckPreviewChannelCastAction)
+	end
+	inst.sg.mem.preview_channelcast_task = inst:DoTaskInTime(TIMEOUT, StopPreviewChannelCast)
+	inst.sg.mem.preview_channelcast_action = buffaction
+end
+
+local function IsChannelCasting(inst)
+	--essentially prediction, since the actions aren't busy w/ lag states
+	local buffaction = inst.sg.mem.preview_channelcast_action
+	if buffaction then
+		return buffaction.action == ACTIONS.START_CHANNELCAST
+		--Don't use "or inst:IsChannelCasting()"
+		--We want to be able to return false here when predicting!
+	end
+	--otherwise return server state
+	return inst:IsChannelCasting()
+end
+
+local function IsChannelCastingItem(inst)
+	--essentially prediction, since the actions aren't busy w/ lag states
+	local buffaction = inst.sg.mem.preview_channelcast_action
+	if buffaction then
+		return buffaction.invobject ~= nil
+		--Don't use "or inst:IsChannelCastingItem()"
+		--We want to be able to return false here when predicting!
+	end
+	--otherwise return server state
+	return inst:IsChannelCastingItem()
+end
+
+--------------------------------------------------------------------------
+
 local function ConfigureRunState(inst)
     if inst.replica.rider ~= nil and inst.replica.rider:IsRiding() then
         inst.sg.statemem.riding = true
@@ -67,6 +141,9 @@ local function ConfigureRunState(inst)
     elseif inst.replica.inventory:IsHeavyLifting() then
         inst.sg.statemem.heavy = true
 		inst.sg.statemem.heavy_fast = inst:HasTag("mightiness_mighty")
+	elseif IsChannelCasting(inst) then
+		inst.sg.statemem.channelcast = true
+		inst.sg.statemem.channelcastitem = IsChannelCastingItem(inst)
     elseif inst:HasTag("wereplayer") then
         inst.sg.statemem.iswere = true
         if inst:HasTag("weremoose") then
@@ -101,6 +178,8 @@ end
 local function GetRunStateAnim(inst)
     return ((inst.sg.statemem.heavy and inst.sg.statemem.heavy_fast) and "heavy_walk_fast")
 		or (inst.sg.statemem.heavy and "heavy_walk")
+		or (inst.sg.statemem.channelcastitem and "channelcast_walk")
+		or (inst.sg.statemem.channelcast and "channelcast_oh_walk")
         or (inst.sg.statemem.sandstorm and "sand_walk")
         or ((inst.sg.statemem.groggy or inst.sg.statemem.moosegroggy or inst.sg.statemem.goosegroggy) and "idle_walk")
         or (inst.sg.statemem.careful and "careful_walk")
@@ -206,7 +285,7 @@ local actionhandlers =
 					or "book"
         end),
 	ActionHandler(ACTIONS.MAKEBALLOON, "dolongaction"),
-    ActionHandler(ACTIONS.DEPLOY, "doshortaction"),
+	ActionHandler(ACTIONS.DEPLOY, function(inst, action) return action.invobject and action.invobject:HasTag("projectile") and "throw_deploy" or "doshortaction" end),
     ActionHandler(ACTIONS.DEPLOY_TILEARRIVE, "doshortaction"),
     ActionHandler(ACTIONS.STORE, "doshortaction"),
     ActionHandler(ACTIONS.DROP,
@@ -230,7 +309,8 @@ local actionhandlers =
     ActionHandler(ACTIONS.OPEN_CRAFTING, "dostandingaction"),
     ActionHandler(ACTIONS.PICK,
         function(inst, action)
-			return (inst:HasTag("farmplantfastpicker") and action.target:HasTag("farm_plant") and "domediumaction")
+			return (action.target:HasTag("noquickpick") and "dolongaction")
+				or (inst:HasTag("farmplantfastpicker") and action.target:HasTag("farm_plant") and "domediumaction")
 				or (inst.replica.rider ~= nil and inst.replica.rider:IsRiding() and (
 						(inst:HasTag("woodiequickpicker") and "dowoodiefastpick") or
 						"dolongaction"
@@ -287,7 +367,16 @@ local actionhandlers =
             return (inst.replica.rider ~= nil and inst.replica.rider:IsRiding() and "domediumaction")
                 or "doshortaction"
         end),
-    ActionHandler(ACTIONS.RUMMAGE, "doshortaction"),
+	ActionHandler(ACTIONS.RUMMAGE,
+		function(inst, action)
+			if action.invobject and action.invobject:HasTag("portablestorage") then
+				local container = action.invobject.replica.container
+				if container then
+					return container:IsOpenedBy(inst) and "stop_pocket_rummage" or "start_pocket_rummage"
+				end
+			end
+			return "doshortaction"
+		end),
     ActionHandler(ACTIONS.BAIT, "doshortaction"),
     ActionHandler(ACTIONS.HEAL, "dolongaction"),
     ActionHandler(ACTIONS.SEW, "dolongaction"),
@@ -367,7 +456,8 @@ local actionhandlers =
                         (action.invobject:HasTag("blowdart") and "blowdart_special") or
                         (action.invobject:HasTag("throw_line") and "throw_line") or
                         (action.invobject:HasTag("book") and "book") or
-                        (action.invobject:HasTag("parryweapon") and "parry_pre")
+						(action.invobject:HasTag("parryweapon") and "parry_pre") or
+						(action.invobject:HasTag("willow_ember") and "castspellmind")
                     )
                 or "castspell"
         end),
@@ -433,6 +523,18 @@ local actionhandlers =
 			end
 			return projectile ~= nil and projectile:HasTag("keep_equip_toss") and "throw_keep_equip" or "throw"
 		end),
+        ActionHandler(ACTIONS.TOSS_MAP,
+            function(inst, action)
+                local projectile = action.invobject
+                if projectile == nil then
+                    --for Special action TOSS, we can also use equipped item.
+                    projectile = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+                    if projectile ~= nil and not projectile:HasTag("special_action_toss") then
+                        projectile = nil
+                    end
+                end
+                return projectile ~= nil and projectile:HasTag("keep_equip_toss") and "throw_keep_equip" or "throw"
+            end),
     ActionHandler(ACTIONS.UNPIN, "doshortaction"),
     ActionHandler(ACTIONS.CATCH, "catch_pre"),
     ActionHandler(ACTIONS.CHANGEIN, "usewardrobe"),
@@ -496,6 +598,8 @@ local actionhandlers =
                 return "startchanneling"
             end
         end),
+	ActionHandler(ACTIONS.START_CHANNELCAST, "start_channelcast"),
+	ActionHandler(ACTIONS.STOP_CHANNELCAST, "stop_channelcast"),
     ActionHandler(ACTIONS.REVIVE_CORPSE, "dolongaction"),
     ActionHandler(ACTIONS.DISMANTLE, "dolongaction"),
     ActionHandler(ACTIONS.TACKLE, "tackle_pre"),
@@ -558,7 +662,13 @@ local actionhandlers =
     ActionHandler(ACTIONS.PLANTREGISTRY_RESEARCH, "dolongaction"),
     ActionHandler(ACTIONS.ASSESSPLANTHAPPINESS, "dolongaction"),
     ActionHandler(ACTIONS.ADDCOMPOSTABLE, "give"),
-    ActionHandler(ACTIONS.WAX, "dolongaction"),
+    ActionHandler(ACTIONS.WAX,
+        function(inst, action)
+            return
+                action.invobject ~= nil and action.invobject:HasTag("waxspray") and "spray_wax"
+                or "dolongaction"
+        end
+    ),
 
     ActionHandler(ACTIONS.USEITEMON, function(inst, action)
         if action.invobject == nil then
@@ -618,6 +728,8 @@ local actionhandlers =
 			or (inst:HasTag("weregoose") and "weregoose_takeoff_pre")
 			or nil
     end),
+
+    ActionHandler(ACTIONS.INCINERATE, "doshortaction"),
 }
 
 local events =
@@ -625,7 +737,7 @@ local events =
 	EventHandler("sg_cancelmovementprediction", function(inst)
 		inst.sg:GoToState("idle", "cancel")
 	end),
-    EventHandler("locomote", function(inst)
+	EventHandler("locomote", function(inst, data)
 		--#HACK for hopping prediction: ignore busy when boathopping... (?_?)
 		if (inst.sg:HasStateTag("busy") or inst:HasTag("busy")) and
 			not (inst.sg:HasStateTag("boathopping") or inst:HasTag("boathopping")) then
@@ -652,6 +764,14 @@ local events =
         elseif is_moving and not should_move then
             inst.sg:GoToState("run_stop")
         elseif not is_moving and should_move then
+			--V2C: Added "dir" param so we don't have to add "canrotate" to all interruptible states
+			if data and data.dir then
+				if inst.components.locomotor then
+					inst.components.locomotor:SetMoveDir(data.dir)
+				else
+					inst.Transform:SetRotation(data.dir)
+				end
+			end
             inst.sg:GoToState("run_start")
         end
     end),
@@ -661,6 +781,13 @@ local events =
 
 local states =
 {
+	State{
+		name = "init",
+		onenter = function(inst)
+			inst.sg:GoToState(inst:HasTag("sitting_on_chair") and "sitting" or "idle")
+		end,
+	},
+
     State{
         name = "idle",
         tags = { "idle", "canrotate" },
@@ -720,6 +847,9 @@ local states =
 			else
                 anim =
                     (inst.replica.inventory ~= nil and inst.replica.inventory:IsHeavyLifting() and "heavy_idle") or
+					(	IsChannelCasting(inst) and
+						(IsChannelCastingItem(inst) and "channelcast_idle" or "channelcast_oh_idle")
+					) or
 					(   inst:IsInAnyStormOrCloud() and not inst.components.playervision:HasGoggleVision() and
                         (   inst.AnimState:IsCurrentAnimation("sand_walk_pst") or
                             inst.AnimState:IsCurrentAnimation("sand_walk") or
@@ -904,16 +1034,21 @@ local states =
             end),
 
             --groggy
+			--channelcast
             TimeEvent(1 * FRAMES, function(inst)
                 if inst.sg.statemem.groggy or
-                    inst.sg.statemem.goose then
+					inst.sg.statemem.channelcast or
+					inst.sg.statemem.goose
+				then
                     DoRunSounds(inst)
                     DoFoleySounds(inst)
                 end
             end),
             TimeEvent(12 * FRAMES, function(inst)
                 if inst.sg.statemem.groggy or
-                    inst.sg.statemem.sandstorm then
+					inst.sg.statemem.channelcast or
+					inst.sg.statemem.sandstorm
+				then
                     DoRunSounds(inst)
                     DoFoleySounds(inst)
                 end
@@ -1420,9 +1555,11 @@ local states =
 		server_states = { "parry_pre", "parry_idle" },
 
         onenter = function(inst)
+            inst.sg.statemem.isshield = inst.bufferedaction ~= nil and inst.bufferedaction.invobject ~= nil and inst.bufferedaction.invobject:HasTag("shield")
+ 
             inst.components.locomotor:Stop()
-            inst.AnimState:PlayAnimation("parry_pre")
-            inst.AnimState:PushAnimation("parry_loop", true)
+            inst.AnimState:PlayAnimation(inst.sg.statemem.isshield and "shieldparry_pre"  or "parry_pre")
+            inst.AnimState:PushAnimation(inst.sg.statemem.isshield and "shieldparry_loop" or "parry_pre", true)
 
             inst:PerformPreviewBufferedAction()
             inst.sg:SetTimeout(TIMEOUT)
@@ -1434,14 +1571,14 @@ local states =
                     inst.sg:GoToState("idle", "noanim")
                 end
             elseif inst.bufferedaction == nil then
-                inst.AnimState:PlayAnimation("parry_pst")
+                inst.AnimState:PlayAnimation(inst.sg.statemem.isshield and "shieldparry_pst"  or "parry_pst")
                 inst.sg:GoToState("idle", true)
             end
         end,
 
         ontimeout = function(inst)
             inst:ClearBufferedAction()
-            inst.AnimState:PlayAnimation("parry_pst")
+            inst.AnimState:PlayAnimation(inst.sg.statemem.isshield and "shieldparry_pst"  or "parry_pst")
             inst.sg:GoToState("idle", true)
         end,
     },
@@ -1755,6 +1892,39 @@ local states =
         name = "catchonfire",
         tags = { "igniting" },
 		server_states = { "catchonfire" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+			if not inst.sg:ServerStateMatches() then
+                inst.AnimState:PlayAnimation("light_fire")
+            end
+
+            inst:PerformPreviewBufferedAction()
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        onupdate = function(inst)
+			if inst.sg:ServerStateMatches() then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+                inst.AnimState:PlayAnimation("light_fire_pst")
+                inst.sg:GoToState("idle", true)
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.AnimState:PlayAnimation("light_fire_pst")
+            inst.sg:GoToState("idle", true)
+        end,
+    },
+
+    State{
+        name = "spray_wax",
+        tags = { "waxing" },
+		server_states = { "spray_wax" },
 
         onenter = function(inst)
             inst.components.locomotor:Stop()
@@ -2984,6 +3154,45 @@ local states =
 
         onupdate = function(inst)
 			if inst.sg:ServerStateMatches() then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+                inst.sg:GoToState("idle")
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle")
+        end,
+    },
+    
+    State{
+        name = "castspellmind",
+        tags = { "doing", "busy", "canrotate" },
+		server_states = { "castspellmind" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+
+			if inst:HasTag("canrepeatcast") and inst.entity:FlattenMovementPrediction() then
+				inst:PerformPreviewBufferedAction()
+				inst.sg:GoToState("idle", "noanim")
+				return
+			end
+
+            inst.AnimState:PlayAnimation("pyrocast_pre")
+			inst.AnimState:PushAnimation("pyrocast_lag", false)
+
+            inst.SoundEmitter:PlaySound("meta3/willow/pyrokinetic_activate")
+
+            inst:PerformPreviewBufferedAction()
+            inst.sg:SetTimeout(TIMEOUT)
+        end,
+
+        onupdate = function(inst)
+            if inst.sg:ServerStateMatches() then
                 if inst.entity:FlattenMovementPrediction() then
                     inst.sg:GoToState("idle", "noanim")
                 end
@@ -4243,6 +4452,87 @@ local states =
         end,
     },
 
+	--Basically an "instant" action but with animation if you were idle
+	State{
+		name = "start_channelcast",
+		tags = { "idle", "canrotate" },
+
+		onenter = function(inst)
+			inst.components.locomotor:Stop()
+			if inst.bufferedaction then
+				inst:PerformPreviewBufferedAction()
+				StartPreviewChannelCast(inst, inst.bufferedaction)
+			end
+			if IsChannelCastingItem(inst) then
+				inst.sg.statemem.channelcastitem = true
+				inst.AnimState:PlayAnimation("channelcast_idle_pre")
+				inst.AnimState:PushAnimation("channelcast_idle")
+			else
+				inst.AnimState:PlayAnimation("channelcast_oh_idle_pre")
+				inst.AnimState:PushAnimation("channelcast_oh_idle")
+			end
+			inst.sg:SetTimeout(TIMEOUT)
+		end,
+
+		onupdate = function(inst)
+			if inst:IsChannelCasting() then
+				if inst.entity:FlattenMovementPrediction() then
+					StopPreviewChannelCast(inst)
+					inst.sg:GoToState("idle", "noanim")
+				end
+			elseif inst.bufferedaction == nil then
+				inst.AnimState:PlayAnimation(inst.sg.statemem.channelcastitem and "channelcast_idle_pst" or "channelcast_oh_idle_pst")
+				inst.sg:GoToState("idle", true)
+			end
+		end,
+
+		ontimeout = function(inst)
+			inst:ClearBufferedAction()
+			inst.AnimState:PlayAnimation(inst.sg.statemem.channelcastitem and "channelcast_idle_pst" or "channelcast_oh_idle_pst")
+			inst.sg:GoToState("idle", true)
+		end,
+	},
+
+	--Basically an "instant" action but with animation if you were idle
+	State{
+		name = "stop_channelcast",
+		tags = { "idle", "canrotate" },
+
+		onenter = function(inst)
+			inst.components.locomotor:Stop()
+			if inst.bufferedaction then
+				inst:PerformPreviewBufferedAction()
+				StartPreviewChannelCast(inst, inst.bufferedaction)
+			end
+			if IsChannelCastingItem(inst) then
+				inst.sg.statemem.channelcastitem = true
+				inst.AnimState:PlayAnimation("channelcast_idle_pst")
+			else
+				inst.AnimState:PlayAnimation("channelcast_oh_idle_pst")
+			end
+			inst.AnimState:PushAnimation("idle_loop")
+			inst.sg:SetTimeout(TIMEOUT)
+		end,
+
+		onupdate = function(inst)
+			if not inst:IsChannelCasting() then
+				if inst.entity:FlattenMovementPrediction() then
+					StopPreviewChannelCast(inst)
+					inst.sg:GoToState("idle", "noanim")
+				end
+			elseif inst.bufferedaction == nil then
+				inst.AnimState:PlayAnimation(inst.sg.statemem.channelcastitem and "channelcast_idle_pre" or "channelcast_oh_idle_pre")
+				inst.sg:GoToState("idle", true)
+			end
+		end,
+
+		ontimeout = function(inst)
+			inst:ClearBufferedAction()
+			inst.AnimState:PlayAnimation(inst.sg.statemem.channelcastitem and "channelcast_idle_pre" or "channelcast_oh_idle_pre")
+			inst.sg:GoToState("idle", true)
+		end,
+	},
+
     State{
         name = "till_start",
         tags = { "doing", "busy" },
@@ -4899,6 +5189,44 @@ local states =
     },
 
 	State{
+		name = "throw_deploy",
+		server_states = { "throw_deploy" },
+		forward_server_states = true,
+		onenter = function(inst) inst.sg:GoToState("use_inventory_item_dir_busy") end,
+	},
+
+	State{
+		name = "use_inventory_item_dir_busy", --directional version with facings
+		tags = { "doing", "busy" },
+
+		onenter = function(inst)
+			inst.components.locomotor:Stop()
+			inst.AnimState:PlayAnimation("useitem_dir_pre")
+			inst.AnimState:PushAnimation("useitem_dir_lag", false)
+
+			inst:PerformPreviewBufferedAction()
+			inst.sg:SetTimeout(TIMEOUT)
+		end,
+
+		onupdate = function(inst)
+			if inst.sg:ServerStateMatches() then
+				if inst.entity:FlattenMovementPrediction() then
+					inst.sg:GoToState("idle", "noanim")
+				end
+			elseif inst.bufferedaction == nil then
+				inst.AnimState:PlayAnimation("useitem_dir_pst")
+				inst.sg:GoToState("idle", true)
+			end
+		end,
+
+		ontimeout = function(inst)
+			inst:ClearBufferedAction()
+			inst.AnimState:PlayAnimation("useitem_pst")
+			inst.sg:GoToState("idle", true)
+		end,
+	},
+
+	State{
 		name = "bedroll",
 		server_states = { "bedroll" },
 		forward_server_states = true,
@@ -5241,6 +5569,7 @@ local states =
 			if chair ~= nil and chair:IsValid() then
 				inst.Transform:SetRotation(chair.Transform:GetRotation())
 				ltd = chair:HasTag("limited_chair")
+				inst.sg.statemem.chair = chair
 			end
 			if ltd then
 				inst.Transform:SetPredictedNoFaced()
@@ -5257,7 +5586,7 @@ local states =
 		onupdate = function(inst)
 			if inst.sg:ServerStateMatches() then
 				if inst.entity:FlattenMovementPrediction() then
-					inst.sg:GoToState("sitting")
+					inst.sg:GoToState("sitting", inst.sg.statemem.chair)
 				end
 			elseif inst.bufferedaction == nil then
 				inst.AnimState:PlayAnimation("sit_off_pst")
@@ -5269,7 +5598,7 @@ local states =
 		{
 			EventHandler("sg_cancelmovementprediction", function(inst)
 				if inst.sg:ServerStateMatches() then
-					inst.sg:GoToState("sitting")
+					inst.sg:GoToState("sitting", inst.sg.statemem.chair)
 					return true
 				end
 			end),
@@ -5291,14 +5620,16 @@ local states =
 		tags = { "overridelocomote", "canrotate" },
 		server_states = { "start_sitting", "sit_jumpon", "sitting" }, --for sg_cancelmovementprediction
 
-		onenter = function(inst)
+		onenter = function(inst, chair)
 			inst.entity:SetIsPredictingMovement(false)
 			inst.sg:SetTimeout(TIMEOUT)
+			inst.sg.statemem.chair = chair --can be nil, coming from "init"
 			inst.sg.statemem.rot = inst.Transform:GetRotation()
 		end,
 
 		onupdate = function(inst)
 			if inst.bufferedaction == nil and not inst:HasTag("sitting_on_chair") then
+				inst.sg.statemem.not_interrupted = true
 				inst.sg:GoToState("idle", "noanim")
 			end
 		end,
@@ -5306,6 +5637,7 @@ local states =
 		ontimeout = function(inst)
 			if inst.bufferedaction ~= nil and inst.bufferedaction.ispreviewing then
 				inst:ClearBufferedAction()
+				inst.sg.statemem.not_interrupted = true
 				inst.sg:GoToState("idle")
 			end
 		end,
@@ -5313,10 +5645,14 @@ local states =
 		events =
 		{
 			EventHandler("sg_cancelmovementprediction", function(inst)
-				return inst.sg:ServerStateMatches()
+				if inst.sg:ServerStateMatches() then
+					return true
+				end
+				inst.sg.statemem.not_interrupted = true
 			end),
 			EventHandler("locomote", function(inst)
 				if inst.components.locomotor:WantsToMoveForward() then
+					inst.sg.statemem.not_interrupted = true
 					inst.sg:GoToState("stop_sitting", inst.sg.statemem.rot)
 				end
 				return true
@@ -5325,6 +5661,33 @@ local states =
 
 		onexit = function(inst)
 			inst.entity:SetIsPredictingMovement(true)
+			if not inst.sg.statemem.not_interrupted then
+				--V2C: -Assume we got here by predicting an instant action that pops
+				--      you off the chair.
+				--     -SetBank on clients is BAD!!!! But....
+				--     -This one is to remove flicker without refactoring how all
+				--      non-sitting actions work from sitting.
+				--     -The drawback is that if that action fails, then the
+				--      player becomes invisible (we've popped off the chair to
+				--      predict the animation while server still has us sitting).
+				--     -In that case, it "should" recover if the client moves around
+				--      enough to force themselves off the chair on the server as well.
+				inst.AnimState:SetBank("wilson")
+				local chair = inst.sg.statemem.chair
+				local radius = inst:GetPhysicsRadius(0) + (chair and chair:IsValid() and chair:GetPhysicsRadius(0) or 0.25)
+				if radius > 0 then
+					local x, y, z = inst.Transform:GetWorldPosition()
+					local x1, y1, z1 = chair.Transform:GetWorldPosition()
+					if x == x1 and z == z1 then
+						local rot = inst.Transform:GetRotation() * DEGREES
+						x = x1 + radius * math.cos(rot)
+						z = z1 - radius * math.sin(rot)
+						if TheWorld.Map:IsPassableAtPoint(x, 0, z, true) then
+							inst.Physics:Teleport(x, 0, z)
+						end
+					end
+				end
+			end
 		end,
 	},
 
@@ -5338,6 +5701,12 @@ local states =
 			if rot ~= nil then
 				inst.Transform:SetRotation(rot)
 			end
+			local buffaction = inst:GetBufferedAction()
+			if buffaction == nil or buffaction.action == ACTIONS.WALKTO then
+				inst.components.locomotor:Stop()
+				inst.components.locomotor:Clear()
+				inst:ClearBufferedAction()
+			end
 			inst.AnimState:PlayAnimation("sit_off")
 			inst.AnimState:PushAnimation("sit_off_lag", false)
 			inst.sg:SetTimeout(TIMEOUT)
@@ -5346,7 +5715,7 @@ local states =
 		onupdate = function(inst)
 			if inst.sg:ServerStateMatches() then
 				if inst.entity:FlattenMovementPrediction() then
-					inst.sg:GoToState("idle", "noanim")
+					inst.sg:GoToState("sit_jumpoff")
 				end
 			end
 		end,
@@ -5362,7 +5731,150 @@ local states =
 			end
 		end,
 	},
+
+	State{
+		name = "sit_jumpoff",
+		tags = { "busy" },
+		server_states = { "stop_sitting", "sit_jumpoff" },
+
+		onenter = function(inst)
+			inst.entity:SetIsPredictingMovement(false)
+			inst.components.locomotor:StopMoving()
+		end,
+
+		onupdate = function(inst)
+			if not inst.sg:ServerStateMatches() then
+				inst.sg:GoToState(inst:HasTag("idle") and "stop_sitting_pst" or "idle")
+			end
+		end,
+
+		events =
+		{
+			EventHandler("sg_cancelmovementprediction", function(inst)
+				if inst.sg:ServerStateMatches() then
+					return true
+				elseif inst:HasTag("idle") then
+					inst.sg:GoToState("stop_sitting_pst")
+					return true
+				end
+			end),
+		},
+
+		onexit = function(inst)
+			inst.entity:SetIsPredictingMovement(true)
+		end,
+	},
+
+	State{
+		name = "stop_sitting_pst",
+		tags = { "idle", "overridelocomote" },
+		server_states = { "stop_sitting_pst" },
+
+		onenter = function(inst)
+			if not inst.AnimState:IsCurrentAnimation("sit_off_pst") or inst.AnimState:GetCurrentAnimationFrame() >= 3 then
+				inst.sg:GoToState("idle")
+				return
+			end
+			inst.entity:SetIsPredictingMovement(false)
+			inst.components.locomotor:StopMoving()
+		end,
+
+		onupdate = function(inst)
+			if not inst.AnimState:IsCurrentAnimation("sit_off_pst") or inst.AnimState:GetCurrentAnimationFrame() >= 3 then
+				inst.sg:GoToState("idle")
+			end
+		end,
+
+		events =
+		{
+			EventHandler("locomote", function(inst)
+				return true
+			end),
+		},
+
+		onexit = function(inst)
+			inst.entity:SetIsPredictingMovement(true)
+		end,
+	},
+
 	--------------------------------------------------------------------------
+
+	State{
+		name = "start_pocket_rummage",
+		tags = { "doing", "busy" },
+		server_states = { "start_pocket_rummage" },
+
+		onenter = function(inst)
+			inst.components.locomotor:Stop()
+			inst.SoundEmitter:PlaySound("dontstarve/wilson/make_trap", "make_preview")
+			inst.AnimState:PlayAnimation("build_pre")
+			inst.AnimState:PushAnimation("build_loop")
+
+			inst:PerformPreviewBufferedAction()
+			inst.sg:SetTimeout(TIMEOUT)
+		end,
+
+		timeline =
+		{
+			FrameEvent(6, function(inst)
+				inst.sg:RemoveStateTag("busy")
+			end),
+		},
+
+		onupdate = function(inst)
+			if inst.sg:ServerStateMatches() then
+				if inst.entity:FlattenMovementPrediction() then
+					inst.sg:GoToState("idle", "noanim")
+				end
+			elseif inst.bufferedaction == nil then
+				inst.AnimState:PlayAnimation("build_pst")
+				inst.sg:GoToState("idle", true)
+			end
+		end,
+
+		ontimeout = function(inst)
+			inst:ClearBufferedAction()
+			inst.AnimState:PlayAnimation("build_pst")
+			inst.sg:GoToState("idle", true)
+		end,
+
+		onexit = function(inst)
+			inst.SoundEmitter:KillSound("make_preview")
+		end,
+	},
+
+	State{
+		name = "stop_pocket_rummage",
+		tags = { "doing" },
+		server_states = { "stop_pocket_rummage" },
+
+		onenter = function(inst)
+			inst.components.locomotor:Stop()
+			inst.AnimState:PlayAnimation("build_pst")
+			inst.AnimState:PushAnimation("idle_loop")
+			inst:PerformPreviewBufferedAction()
+			inst.sg:SetTimeout(TIMEOUT)
+		end,
+
+		onupdate = function(inst)
+			if inst.sg:ServerStateMatches() then
+				if inst.entity:FlattenMovementPrediction() then
+					inst.sg:GoToState("idle", "noanim")
+				end
+			elseif inst.bufferedaction == nil then
+				inst.AnimState:PlayAnimation("build_pre")
+				inst.AnimState:PushAnimation("build_loop")
+				inst.sg:GoToState("idle", "noanim")
+			end
+		end,
+
+		ontimeout = function(inst)
+			inst:ClearBufferedAction()
+			inst.AnimState:PlayAnimation("build_pre")
+			inst.AnimState:PushAnimation("build_loop")
+			inst.sg:GoToState("idle", "noanim")
+		end,
+	},
 }
 
 local hop_timelines =
@@ -5385,4 +5897,4 @@ local hop_anims =
 CommonStates.AddHopStates(states, true, hop_anims, hop_timelines, "turnoftides/common/together/boat/jump_on", nil, {start_embarking_pre_frame = 4*FRAMES})
 CommonStates.AddRowStates(states, true)
 
-return StateGraph("wilson_client", states, events, "idle", actionhandlers)
+return StateGraph("wilson_client", states, events, "init", actionhandlers)

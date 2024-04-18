@@ -67,6 +67,7 @@ return{
 			KITCOON_HIDEANDSEEK_ONE_GAME_PER_DAY = "If we play any more, it's gonna be a chore.",
             MANNEQUIN_EQUIPSWAPFAILED = "Oh what a shame, I thought it would suit you.",
             PILLOWFIGHT_NO_HANDPILLOW = "A pillow must be promptly procured.",
+            NOTMYBERNIE = "Willow! What are you doin' while your bruin causes such ruin?",
 		},
 		OPEN_CRAFTING =
 		{
@@ -84,7 +85,7 @@ return{
             NO_RACERS = "Now that's quite the trick, invisible racing Carrats!",
         },
 
-		DISMANTLE =
+		DISMANTLE = 
 		{
 			COOKING = "I'm afraid the pot is far too hot!",
 			INUSE = "Another soul has use of it right now.",
@@ -395,6 +396,10 @@ return{
 		CASTAOE =
 		{
 --fallback to speech_wilson.lua 			NO_MAX_SANITY = "only_used_by_waxwell",
+            NOT_ENOUGH_EMBERS = "only_used_by_willow",
+            NO_TARGETS = "only_used_by_willow",
+            CANT_SPELL_MOUNTED = "only_used_by_willow",
+            SPELL_ON_COOLDOWN = "only_used_by_willow", 
 		},
     },
 
@@ -518,6 +523,7 @@ return{
 	ANNOUNCE_HIGHRESEARCH = "My brain's grown three sizes this day!",
 	ANNOUNCE_HOUNDS = "The beasts are baying!",
 	ANNOUNCE_WORMS = "Something approaches from beneath!",
+    ANNOUNCE_ACIDBATS = "That sounds like bats.",
 	ANNOUNCE_HUNGRY = "Oh no, I'm hungry again.",
 	ANNOUNCE_HUNT_BEAST_NEARBY = "I love a game of hide and seek!",
 	ANNOUNCE_HUNT_LOST_TRAIL = "You win this round!",
@@ -797,8 +803,10 @@ return{
 	},
 
 --fallback to speech_wilson.lua     ANNOUNCE_NOINSPIRATION = "only_used_by_wathgrithr",
+--fallback to speech_wilson.lua     ANNOUNCE_NOTSKILLEDENOUGH = "only_used_by_wathgrithr",
 --fallback to speech_wilson.lua     ANNOUNCE_BATTLESONG_INSTANT_TAUNT_BUFF = "only_used_by_wathgrithr",
 --fallback to speech_wilson.lua     ANNOUNCE_BATTLESONG_INSTANT_PANIC_BUFF = "only_used_by_wathgrithr",
+--fallback to speech_wilson.lua     ANNOUNCE_BATTLESONG_INSTANT_REVIVE_BUFF = "only_used_by_wathgrithr",
 
 --fallback to speech_wilson.lua     ANNOUNCE_WANDA_YOUNGTONORMAL = "only_used_by_wanda",
 --fallback to speech_wilson.lua     ANNOUNCE_WANDA_NORMALTOOLD = "only_used_by_wanda",
@@ -902,6 +910,8 @@ return{
 
     ANNOUNCE_CHAIR_ON_FIRE = "This is fine.",
 
+    ANNOUNCE_HEALINGSALVE_ACIDBUFF_DONE = "Oh what a pain, I'm not safe from acid rain!",
+
     ANNOUNCE_COACH = 
     {
         "only_used_by_wolfgang",
@@ -924,6 +934,10 @@ return{
         "only_used_by_wolfang",
         "only_used_by_wolfang",
     },
+
+    ANNOUNCE_YOTD_NOBOATS = "Me and the start are too far apart.",
+    ANNOUNCE_YOTD_NOCHECKPOINTS = "Whoopsie! I'll make a point to check first.",
+    ANNOUNCE_YOTD_NOTENOUGHBOATS = "I should make space, so someone can join the race.",
 
 	BATTLECRY =
 	{
@@ -1439,18 +1453,25 @@ return{
         {
             GENERIC = "A massive mushroom! Did I quaff a shrinking potion?",
             BLOOM = "Delightfully disgusting!",
+            ACIDCOVERED = "Me thinks it stinks.",
         },
         MUSHTREE_MEDIUM =
         {
             GENERIC = "A massive mushroom! Did I quaff a shrinking potion?",
             BLOOM = "How wonderfully un-wonderful!",
+            ACIDCOVERED = "Me thinks it stinks.",
         },
         MUSHTREE_SMALL =
         {
             GENERIC = "A massive mushroom! Did I quaff a shrinking potion?",
             BLOOM = "Hyuyu! How wretched!",
+            ACIDCOVERED = "Me thinks it stinks.",
         },
-        MUSHTREE_TALL_WEBBED = "She's shy so she's wearing her veil.",
+        MUSHTREE_TALL_WEBBED =
+        {
+            GENERIC = "She's shy so she's wearing her veil.",
+            ACIDCOVERED = "Me thinks it stinks.",
+        },
         SPORE_TALL =
         {
             GENERIC = "Dazzling!",
@@ -1931,7 +1952,11 @@ return{
 		DRAGONFLY = "Fear me! I'm a scary imp!",
 		ARMORDRAGONFLY = "Ooo, I've always wanted to be scaly.",
 		DRAGON_SCALES = "I prefer fur to scales.",
-		DRAGONFLYCHEST = "Chest to impress.",
+		DRAGONFLYCHEST =
+		{
+			GENERIC = "Chest to impress.",
+            UPGRADED_STACKSIZE = "Scaled-up storage, hyuyu!",
+		},
 		DRAGONFLYFURNACE =
 		{
 			HAMMERED = "It lost its glamor to the hammer.",
@@ -2581,6 +2606,7 @@ return{
 		SILK = "A present from the spider's ilk.",
 		SKELETON = "The soul is long gone.",
 		SCORCHED_SKELETON = "Someone had a whoopsie.",
+        SKELETON_NOTPLAYER = "Love to stay and chew the fat, but you seem lacking of that.",
 		SKULLCHEST = "Let me take a peek inside!", --removed
 		SMALLBIRD =
 		{
@@ -2697,8 +2723,11 @@ return{
 		{
 			GENERIC = "A storage place for bits and bobs.",
 			BURNT = "Oh no, our treasure!",
+            UPGRADED_STACKSIZE = "There's room to spare for things in there.",
 		},
 		TREASURECHEST_TRAP = "What have we here?",
+        CHESTUPGRADE_STACKSIZE = "Now that's bending the rules a little, hyuyu!", -- Describes the kit upgrade item.
+		COLLAPSEDCHEST = "Infinite space, gone without a trace?",
 		SACRED_CHEST =
 		{
 			GENERIC = "Ooohoohoo, it's probably cursed!",
@@ -2997,6 +3026,8 @@ return{
 		WALL_MOONROCK_ITEM = "It's of no use there on the ground.",
 		WALL_DREADSTONE = "To keep you out, or keep me in?",
 		WALL_DREADSTONE_ITEM = "It's of no use there on the ground.",
+        WALL_SCRAP = "Who would have thunk? A wall of junk.",
+        WALL_SCRAP_ITEM = "Who would have thunk? A wall of junk.",
 		FENCE = "To keep you out, or keep me in?",
         FENCE_ITEM = "It's of no use there on the ground.",
         FENCE_GATE = "For temporary visiting.",
@@ -3879,7 +3910,7 @@ return{
         SPICE_SUGAR = "A saccharine collection of liquefied confection.",
         SPICE_CHILI = "I'll spike some mortal's food. Hyuyu!",
         SPICE_SALT = "Careful with that stuff!",
-        MONSTERTARTARE = "Monster flesh that's very fresh. ",
+        MONSTERTARTARE = "Monster flesh that's very fresh.",
         FRESHFRUITCREPES = "Fruits and berries put to bed.",
         FROGFISHBOWL = "I'd rather have a nice fresh soul.",
         POTATOTORNADO = "I think I remember when I used to eat food. Maybe.",
@@ -4107,6 +4138,7 @@ return{
         DUSTMERINGUE = "Hyuyuyu! The pranks I could pull with these!",
 
         SHROOMCAKE = "There's no room in my stomach, I'm afraid.",
+        SHROOMBAIT = "As sure as the oozing, this'll have you snoozing.",
 
         NIGHTMAREGROWTH = "Methinks we'd best be on our way!",
 
@@ -4598,7 +4630,7 @@ return{
 
         FROZENBANANADAIQUIRI = "Don't the mortals like to innovate? Hyuyu.",
         BUNNYSTEW = "Are mortals attracted to this smell?",
-        MILKYWHITES = "This loot from our fight does not bring delight. ",
+        MILKYWHITES = "This loot from our fight does not bring delight.",
 
         CRITTER_EYEOFTERROR = "I'm glad we could make amends, my ocular friend!",
 
@@ -4837,6 +4869,12 @@ return{
 			GENERIC = "A terrible fate, to be locked in this state.",
 			EXPOSED = "Why hide this stone inside?",
 		},
+		DAYWALKER2 =
+		{
+			GENERIC = "Freed indeed.",
+			BURIED = "Just my luck to find him stuck… again.",
+			HOSTILE = "Not to belabor, but you've a pattern of behavior.",
+		},
 		ARMORDREADSTONE = "All blows will be blocked by this armor of rock.",
 		DREADSTONEHAT = "A stone fortress for my brain.",
 
@@ -5029,6 +5067,87 @@ return{
         WAGPUNKBITS_KIT = "An automatic mechanical mechanic? Fantastic!",
 
         WAGSTAFF_MUTATIONS_NOTE = "The writings of a visionary, or the ravings of a madman? Who's to say!",
+
+        -- Meta 3
+
+        BATTLESONG_INSTANT_REVIVE = "Singing is good for the soul.",
+
+        WATHGRITHR_IMPROVEDHAT = "One horn must do if not born with two.",
+        SPEAR_WATHGRITHR_LIGHTNING = "That is a shockingly good point.",
+
+        BATTLESONG_CONTAINER = "I've been told I can carry a tune.",
+
+        SADDLE_WATHGRITHR = "That'll be the saddle to ride cattle into battle, hyuyu!",
+
+        WATHGRITHR_SHIELD = "She'll wield this shield on the battlefield.",
+
+        BATTLESONG_SHADOWALIGNED = "Singing is good for the soul.",
+        BATTLESONG_LUNARALIGNED = "Singing is good for the soul.",
+
+		SHARKBOI = "That's one cool customer, hyuyu!",
+        BOOTLEG = "Hyuyu! Who cobbled this together?",
+        OCEANWHIRLPORTAL = "Oooh goodie! A watery vortex for little ol' Wortox!",
+
+        EMBERLIGHT = "Aren't you a bit big for a will-o'-the-wisp?",
+        WILLOW_EMBER = "only_used_by_willow",
+
+        -- Year of the Dragon
+        YOTD_DRAGONSHRINE =
+        {
+            GENERIC = "What delightful surprises are you hoarding?",
+            EMPTY = "Rumble and grumble, it wants charcoal!",
+            BURNT = "Someone went and started the fun without me!",
+        },
+
+        DRAGONBOAT_KIT = "Whereabouts to set this boat afloat?",
+        DRAGONBOAT_PACK = "A fully-stocked boat, ready to float!",
+
+        BOATRACE_CHECKPOINT = "There's a point in need of checking!",
+        BOATRACE_CHECKPOINT_THROWABLE_DEPLOYKIT = "Where should I place the next stop for the race?",
+        BOATRACE_START = "The fun has just begun!",
+        BOATRACE_START_THROWABLE_DEPLOYKIT = "Shall I get started?",
+
+        BOATRACE_PRIMEMATE = "A challenger, I see. You won't catch me!",
+        BOATRACE_SPECTATOR_DRAGONLING = "Clap! Clap if you believe in me!",
+
+        YOTD_STEERINGWHEEL = "I'll give the wheel a spin and see if I win!",
+        YOTD_STEERINGWHEEL_ITEM = "I can see the appeal of a steering wheel.",
+        YOTD_OAR = "I'll win today, even if I must claw my way. Hyuyu!",
+        YOTD_ANCHOR = "Dipped in gold, now dropped in the drink.",
+        YOTD_ANCHOR_ITEM = "Such funny ship things I could build.",
+        MAST_YOTD = "Sails of shimmering scales.",
+        MAST_YOTD_ITEM = "A mast to sail the ocean vast.",
+        BOAT_BUMPER_YOTD = "Ever been bitten by a boat before?",
+        BOAT_BUMPER_YOTD_KIT = "But idle hands are such good playthings!",
+        BOATRACE_SEASTACK = "Buoy ahoy!",
+        BOATRACE_SEASTACK_THROWABLE_DEPLOYKIT = "Hyuyu, a bouncing baby buoy!",
+        BOATRACE_SEASTACK_MONKEY = "Buoy ahoy!",
+        BOATRACE_SEASTACK_MONKEY_THROWABLE_DEPLOYKIT = "Hyuyu, a bouncing baby buoy!",
+        MASTUPGRADE_LAMP_YOTD = "How kind to share your bright glare!",
+        MASTUPGRADE_LAMP_ITEM_YOTD = "A light to lead us through the night.",
+        WALKINGPLANK_YOTD = "A last resort, dressed up for sport.",
+        CHESSPIECE_YOTD = "From hot to stone cold.",
+
+        -- Rifts / Meta QoL
+
+        HEALINGSALVE_ACID = "It'll heal, seal, even congeal! Get Slimy Salve today! What a steal!",
+
+        BEESWAX_SPRAY = "A frightful fragrance for freezing flora!",
+        WAXED_PLANT = "It's kept fresh with fear.", -- Used for all waxed plants, from farm plants to trees.
+
+        STORAGE_ROBOT = {
+            GENERIC = "Ol' Kramps would love this.",
+            BROKEN = "It either starts, or we harvest for parts!",
+        },
+
+        SCRAP_MONOCLEHAT = "My my, that distant look in your eye!",
+        SCRAPHAT = "A piece of scrap, fashioned into a cap!",
+
+        FENCE_JUNK = "A metal fence for our defense.",
+        JUNK_PILE = "Could it hide a surprise inside?",
+        JUNK_PILE_BIG = "I won't fall for that, hyuyu!",
+
+        ARMOR_LUNARPLANT_HUSK = "Prickly plant protection, perfection!",
     },
 
     DESCRIBE_GENERIC = "Ooo, a mystery!",

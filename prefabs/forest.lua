@@ -24,6 +24,7 @@ local assets =
     Asset("IMAGE", "images/colour_cubes/moonstorm_cc.tex"),
 
     Asset("ANIM", "anim/snow.zip"),
+    Asset("ANIM", "anim/acidglob.zip"),
     Asset("ANIM", "anim/lightning.zip"),
 
     Asset("SOUND", "sound/forest_stream.fsb"),
@@ -271,7 +272,6 @@ local prefabs =
     "sculpture_bishop",
     "sculpture_rook",
     "statue_marble",
-    "eyeplant",
     "lureplant",
     "purpleamulet",
     "monkey",
@@ -426,6 +426,7 @@ local prefabs =
     "terrarium",
 
     -- Pirates
+    "boat_pirate",
     "powder_monkey",
     "prime_mate",
     "monkeyisland_center",
@@ -463,13 +464,27 @@ local prefabs =
     "scrapbook_page",
 
     -- Rifts 3
-    "phonograph",
-
-    "armorwagpunk",
-    "wagpunkhat",
     "wagstaff_machinery",
     "lunarfrog",
     "scrapbook_page_special",
+
+    --
+    "boat_ice",
+    "oceanice_damage",
+    "degrade_fx_ice",
+	"sharkboi",
+    "icefishing_hole",
+    "sharkboi_ice_hazard",
+
+    -- Year of the Dragon
+
+
+    -- Rifts / Meta QoL
+
+    --"fishbone_shadow",
+    "fence_junk",
+    "junk_pile",
+    "junk_pile_big",
 }
 
 local FISH_DATA = require("prefabs/oceanfishdef")
@@ -586,6 +601,7 @@ local function master_postinit(inst)
 
     inst:AddComponent("carnivalevent")
 
+    inst:AddComponent("yotd_raceprizemanager")
     inst:AddComponent("yotc_raceprizemanager")
     inst:AddComponent("yotb_stagemanager")
 
@@ -596,10 +612,15 @@ local function master_postinit(inst)
     inst:AddComponent("riftspawner")
     inst:AddComponent("lunarthrall_plantspawner")
 
+    inst:AddComponent("oceanicemanager")
+    inst:AddComponent("sharkboimanager") -- Needs oceanicemanager.
+
     inst:AddComponent("lunarhailmanager")
     inst:AddComponent("lunarriftmutationsmanager")
 
     inst:AddComponent("wagpunk_manager")
+
+    inst:AddComponent("forestdaywalkerspawner")
 
     if METRICS_ENABLED then
         inst:AddComponent("worldoverseer")

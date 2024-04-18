@@ -1,6 +1,5 @@
 local PREFABS =
 {
-
     --["statue_marble"] = true,
     ["statue_marble_muse"] = true,
     ["statue_marble_pawn"] = true,
@@ -180,7 +179,7 @@ local PREFABS =
     ["eel_cooked"] = true,
     --["hareball"]=true,
     ["pickaxe"] = true,
-    ["chesspiece_carrat"] = true,
+    --["chesspiece_carrat"] = true,   -- Its sketch is only available during a specific Chinese new year.
     ["powcake"] = true,
     ["slingshot"] = true,
     ["baconeggs"] = true,
@@ -199,16 +198,15 @@ local PREFABS =
     ["portablecookpot_item"] = true,
     ["grass_umbrella"] = true,
     ["turf_mosaic_red"] = true,
-    ["lucky_goldnugget"] = true,
     ["turf_monkey_ground"] = true,
     ["halloween_ornament_6"] = true,
     ["chesspiece_klaus"] = true,
     ["slingshotammo_gold"] = true,
-    ["chesspiece_claywarg"] = true,
+    --["chesspiece_claywarg"] = true,  -- Its sketch is only available during a specific Chinese new year.
     ["balloonspeed"] = true,
     ["hotchili"] = true,
     ["winter_ornament_plain2"] = true,
-    ["chesspiece_kitcoon"] = true,
+    --["chesspiece_kitcoon"] = true,   -- Its sketch is only available during a specific Chinese new year.
     ["opalpreciousgem"] = true,
     ["slingshotammo_marble"] = true,
     ["asparagus_seeds"] = true,
@@ -238,8 +236,8 @@ local PREFABS =
     ["book_web"] = true,
     ["blowdart_yellow"] = true,
     ["leafymeatsouffle"] = true,
-    ["chesspiece_manrabbit"] = true,
-    ["chesspiece_clayhound"] = true,
+    --["chesspiece_manrabbit"] = true,  -- Its sketch is only available during a specific Chinese new year.
+    --["chesspiece_clayhound"] = true,  -- Its sketch is only available during a specific Chinese new year.
     ["chesspiece_anchor"] = true,
     ["chesspiece_minotaur"] = true,
     ["multitool_axe_pickaxe"] = true,
@@ -349,7 +347,7 @@ local PREFABS =
     ["horrorfuel"] = true,
     ["battlesong_sanitygain"] = true,
     ["costume_tree_body"] = true,
-    ["chesspiece_catcoon"] = true,
+    --["chesspiece_catcoon"] = true,   -- Its sketch is only available during a specific Chinese new year.
     ["footballhat"] = true,
     ["mapscroll"] = true,
     ["goldenshovel"] = true,
@@ -612,7 +610,7 @@ local PREFABS =
     ["wagstaff_tool_2"] = true,
     ["trinket_38"] = true,
     ["rocks"] = true,
-    ["chesspiece_beefalo"] = true,
+    --["chesspiece_beefalo"] = true,   -- Its sketch is only available during a specific Chinese new year.
     ["pinecone"] = true,
     ["firenettles"] = true,
     ["oceanfishingbobber_goose"] = true,
@@ -620,7 +618,6 @@ local PREFABS =
     ["glommerflower"] = true,
     ["dock_kit"] = true,
     ["watermelon_oversized"] = true,
-    ["miniboatlantern"] = true,
     ["freshfruitcrepes"] = true,
     ["boat_magnet_beacon"] = true,
     ["turf_fungus_green"] = true,
@@ -648,6 +645,7 @@ local PREFABS =
     ["wx78_scanner_item"] = true,
     ["turf_archive"] = true,
     ["red_mushroomhat"] = true,
+    ["moon_mushroomhat"] = true,
     ["winter_ornament_boss_krampus"] = true,
     ["wx78module_bee"] = true,
     ["sewing_kit"] = true,
@@ -1580,7 +1578,6 @@ local PREFABS =
     ["driftwood_tall"] = true,
     ["driftwood_small1"] = true,
     ["wall_dreadstone_item"] = true,
-    ["ruinsrelic_chair"] = true,
     ["mushtree_tall_webbed"] = true,
     ["koalefant_winter"] = true,
     ["support_pillar"] = true,
@@ -1616,6 +1613,16 @@ local PREFABS =
     ["ipecacsyrup"] = true,
     ["lunarplant_kit"] = true,
     ["voidcloth_kit"] = true,
+
+    -- Shared Chinese New Year event items
+
+    ["dragonheadhat"] = true,
+    ["dragonbodyhat"] = true,
+    ["dragontailhat"] = true,
+    ["redlantern"] = true,
+    ["lucky_goldnugget"] = true,
+    ["firecrackers"] = true,
+    ["miniboatlantern"] = true,
 
     -- Cotl
 
@@ -1661,6 +1668,49 @@ local PREFABS =
     ["chesspiece_warg_mutated"] = true,
     ["chesspiece_bearger_mutated"] = true,
 
+    -- Meta 3
+
+    ["battlesong_container"] = true,
+    ["battlesong_instant_revive"] = true,
+    ["battlesong_lunaraligned"] = true,
+    ["battlesong_shadowaligned"] = true,
+    ["saddle_wathgrithr"] = true,
+    ["wathgrithr_shield"] = true,
+    ["spear_wathgrithr_lightning_charged"] = true,
+    ["spear_wathgrithr_lightning"] = true,
+    ["wathgrithr_improvedhat"] = true,
+
+    ["emberlight"] = true,
+    ["willow_ember"] = true,
+
+    ["sharkboi"] = true,
+    ["sharkboi_icespike"] = true,
+    
+    ["bootleg"] = true,
+    ["oceanwhirlportal"] = true,
+
+    ["winter_ornament_boss_daywalker"] = true,
+    ["winter_ornament_shadowthralls"] = true,
+    ["winter_ornament_boss_mutateddeerclops"] = true,
+    ["winter_ornament_boss_mutatedbearger"] = true,
+    ["winter_ornament_boss_mutatedwarg"] = true,
+
+    -- Rifts / Meta QoL
+
+    ["beeswax_spray"] = true,
+    ["chestupgrade_stacksize"] = true,
+    ["daywalker2"] = true,
+    ["fence_junk"] = true,
+    ["healingsalve_acid"] = true,
+    ["junk_pile_big"] = true,
+    ["junk_pile"] = true,
+    ["storage_robot"] = true,
+    ["wall_scrap_item"] = true,
+    ["wall_scrap"] = true,
+    ["skeleton_notplayer"] = true,
+    ["scrap_monoclehat"] = true,
+    ["scraphat"] = true,
+    ["armor_lunarplant_husk"] = true,
 
     --[[POI]]
     ["charlie_stage_post"] = true,

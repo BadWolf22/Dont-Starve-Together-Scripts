@@ -162,7 +162,7 @@ ActionHandler = Class(
         self.action = action
 
         if type(state) == "string" then
-            self.deststate = function(inst) return state end
+            self.deststate = function(_) return state end
         else
             self.deststate = state
         end
@@ -605,8 +605,8 @@ function StateGraphInstance:HasStateTag(tag)
 end
 
 function StateGraphInstance:HasAnyStateTag(...)
-	for _, tag in ipairs({...}) do
-		if self.tags[tag] then
+	for i = 1, select("#", ...) do
+		if self.tags[select(i, ...)] then
             return true
         end
     end

@@ -79,14 +79,21 @@ end
 --[[ Basic skin functions ]]
 --------------------------------------------------------------------------
 --Note(Peter): If you use basic_init_fn/basic_clear_fn and won't have a default bank, then you'll need to set swap data in MakeInventoryFloatable
-function basic_init_fn( inst, build_name, def_build )
+function basic_init_fn( inst, build_name, def_build, filter_fn )
     if inst.components.placer == nil and not TheWorld.ismastersim then
         return
     end
 
     inst.AnimState:SetSkin(build_name, def_build)
     if inst.components.inventoryitem ~= nil then
-        inst.components.inventoryitem:ChangeImageName(inst:GetSkinName())
+        local skin_name = inst:GetSkinName()
+        if filter_fn then
+            skin_name = filter_fn(skin_name)
+        end
+        if inst.components.container ~= nil and inst.components.container:IsOpen() then
+            skin_name = skin_name .. "_open"
+        end
+        inst.components.inventoryitem:ChangeImageName(skin_name)
     end
 
     if inst.components.floater ~= nil then
@@ -234,6 +241,31 @@ spear_clear_fn = function(inst) basic_clear_fn(inst, "swap_spear" ) end
 
 spear_wathgrithr_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "swap_spear_wathgrithr" ) end
 spear_wathgrithr_clear_fn = function(inst) basic_clear_fn(inst, "swap_spear_wathgrithr" ) end
+spear_wathgrithr_lightning_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "spear_wathgrithr_lightning" ) end
+spear_wathgrithr_lightning_clear_fn = function(inst) basic_clear_fn(inst, "spear_wathgrithr_lightning" ) end
+local function RemoveChargedFrom(input)
+    return input:gsub("_charged", "")
+end
+
+spear_wathgrithr_lightning_charged_init_fn = function(inst, build_name)
+    basic_init_fn( inst, build_name, "spear_wathgrithr_lightning", RemoveChargedFrom )
+
+    if not TheWorld.ismastersim then
+        return
+    end
+
+    inst:SetFxOwner(inst._fxowner)
+end
+
+spear_wathgrithr_lightning_charged_clear_fn = function(inst)
+    basic_clear_fn(inst, "spear_wathgrithr_lightning" )
+
+    if not TheWorld.ismastersim then
+        return
+    end
+
+    inst:SetFxOwner(inst._fxowner)
+end
 
 reskin_tool_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "reskin_tool" ) end
 reskin_tool_clear_fn = function(inst) basic_clear_fn(inst, "reskin_tool" ) end
@@ -489,8 +521,26 @@ rainhat_clear_fn = function(inst) basic_clear_fn(inst, "hat_rain" ) end
 minerhat_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "hat_miner" ) end
 minerhat_clear_fn = function(inst) basic_clear_fn(inst, "hat_miner" ) end
 
-footballhat_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "hat_football" ) end
-footballhat_clear_fn = function(inst) basic_clear_fn(inst, "hat_football" ) end
+footballhat_init_fn = function(inst, build_name, opentop)
+    basic_init_fn(inst, build_name, "hat_football")
+
+    if opentop then
+        inst:AddTag("open_top_hat")
+    end
+
+    if not TheWorld.ismastersim then
+        return
+    end
+
+    AddSkinSounds(inst)
+end
+footballhat_clear_fn = function(inst)
+    basic_clear_fn(inst, "hat_football")
+
+    inst:RemoveTag("open_top_hat")
+
+    RemoveSkinSounds(inst)
+end
 
 featherhat_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "hat_feather" ) end
 featherhat_clear_fn = function(inst) basic_clear_fn(inst, "hat_feather" ) end
@@ -553,22 +603,56 @@ arrowsign_post_init_fn = function(inst, build_name) basic_init_fn( inst, build_n
 arrowsign_post_clear_fn = function(inst) basic_clear_fn(inst, "sign_arrow_post" ) end
 
 treasurechest_init_fn = function(inst, build_name)
-    basic_init_fn( inst, build_name, "treasure_chest" )
-
-    if not TheWorld.ismastersim then
+    if inst.components.placer then
+        basic_init_fn(inst, build_name, "treasure_chest") -- NOTES(JBK): Chests can not be built as upgraded form.
         return
+    elseif not TheWorld.ismastersim then
+        return
+    end
+
+    if inst._chestupgrade_stacksize then
+        basic_init_fn(inst, build_name:gsub("treasurechest_", "treasurechest_upgraded_"), "treasure_chest_upgraded")
+    else
+        basic_init_fn(inst, build_name, "treasure_chest")
     end
 
     AddSkinSounds(inst)
 end
 treasurechest_clear_fn = function(inst)
-    basic_clear_fn(inst, "treasure_chest" )
+    if inst._chestupgrade_stacksize then
+        basic_clear_fn(inst, "treasure_chest_upgraded")
+    else
+        basic_clear_fn(inst, "treasure_chest")
+    end
 
     RemoveSkinSounds(inst)
 end
 
-dragonflychest_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "dragonfly_chest" ) end
-dragonflychest_clear_fn = function(inst) basic_clear_fn(inst, "dragonfly_chest" ) end
+dragonflychest_init_fn = function(inst, build_name)
+    if inst.components.placer then
+        basic_init_fn(inst, build_name, "dragonfly_chest") -- NOTES(JBK): Chests can not be built as upgraded form.
+        return
+    elseif not TheWorld.ismastersim then
+        return
+    end
+
+    if inst._chestupgrade_stacksize then
+        basic_init_fn(inst, build_name:gsub("dragonflychest_", "dragonflychest_upgraded_"), "dragonfly_chest_upgraded")
+    else
+        basic_init_fn(inst, build_name, "dragonfly_chest")
+    end
+
+    AddSkinSounds(inst)
+end
+dragonflychest_clear_fn = function(inst)
+    if inst._chestupgrade_stacksize then
+        basic_clear_fn(inst, "dragonfly_chest_upgraded")
+    else
+        basic_clear_fn(inst, "dragonfly_chest")
+    end
+
+    RemoveSkinSounds(inst)
+end
 
 wardrobe_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "wardrobe" ) end
 wardrobe_clear_fn = function(inst) basic_clear_fn(inst, "wardrobe" ) end
@@ -904,7 +988,6 @@ wathgrithrhat_init_fn = function(inst, build_name, opentop)
 
     if opentop then
         inst:AddTag("open_top_hat")
-        inst.components.equippable:SetOnEquip(inst._skinfns.opentop_onequip)
     end
     
     if not TheWorld.ismastersim then
@@ -917,7 +1000,26 @@ wathgrithrhat_clear_fn = function(inst)
     basic_clear_fn(inst, "hat_wathgrithr" )
 
     inst:RemoveTag("open_top_hat")
-    inst.components.equippable:SetOnEquip(inst._skinfns.simple_onequip)
+
+    RemoveSkinSounds(inst)
+end
+wathgrithr_improvedhat_init_fn = function(inst, build_name, opentop)
+    basic_init_fn( inst, build_name, "hat_wathgrithr_improved" )
+
+    if opentop then
+        inst:AddTag("open_top_hat")
+    end
+    
+    if not TheWorld.ismastersim then
+        return
+    end
+    
+    AddSkinSounds(inst)
+end
+wathgrithr_improvedhat_clear_fn = function(inst)
+    basic_clear_fn(inst, "hat_wathgrithr_improved" )
+
+    inst:RemoveTag("open_top_hat")
 
     RemoveSkinSounds(inst)
 end
@@ -1823,9 +1925,18 @@ function bernie_big_init_fn(inst, build_name)
         return
     end
     inst.AnimState:SetSkin(build_name, "bernie_build")
+    if inst.SetBernieSkinBuild ~= nil then
+        inst:SetBernieSkinBuild(build_name)
+    else
+        inst.AnimState:SetBuild("bernie_build")
+    end
 end
 function bernie_big_clear_fn(inst)
-    inst.AnimState:SetBuild("bernie_build")
+    if inst.ClearBernieSkinBuild ~= nil then
+        inst:ClearBernieSkinBuild()
+    else
+        inst.AnimState:SetBuild("bernie_build")
+    end
 end
 
 --------------------------------------------------------------------------
@@ -2190,7 +2301,6 @@ local function lantern_off(inst)
             fx._lastpos = fx._lastpos or fx:GetPosition()
             fx.entity:SetParent(nil)
             if fx.Follower ~= nil then
-            	print("THIS ONE")
                 fx.Follower:StopFollowing()
             end
             fx.Transform:SetPosition(fx._lastpos:Get())

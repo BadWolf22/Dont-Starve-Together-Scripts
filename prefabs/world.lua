@@ -144,6 +144,9 @@ local prefabs =
     "turf_desertdirt",
 
     "skeleton",
+    "skeleton_notplayer",
+    "skeleton_notplayer_1",
+    "skeleton_notplayer_2",
     "insanityrock",
     "sanityrock",
     "basalt",
@@ -426,6 +429,9 @@ function MakeWorld(name, customprefabs, customassets, common_postinit, master_po
         --Initialize map
         for i, data in ipairs(GroundTiles.ground) do
             local tile_id, layer_properties = unpack(data)
+            if GROUND_NOGROUNDOVERLAYS[tile_id] then
+                TileGroupManager:SetNoGroundOverlays(tile_id) -- NOTES(JBK): Do not call this after the map finalizes a crashing race condition may occur!
+            end
             local handle = MapLayerManager:CreateRenderLayer(
                 tile_id, --embedded map array value
                 layer_properties.atlas or resolvefilepath(GroundAtlas(layer_properties.name)),

@@ -128,9 +128,19 @@ local TRIGGERED_DANGER_MUSIC =
 		"dontstarve/music/music_epicfight_daywalker",
 	},
 
+	daywalker2 =
+	{
+		"dontstarve/music/music_epicfight_junkyardhog",
+	},
+
 	gestaltmutant =
 	{
 		"dontstarve/music/music_epicfight_gestalt_mutants",
+	},
+
+	sharkboi =
+	{
+		"dontstarve/music/music_epicfight_sharkboy",
 	},
 
     default =
@@ -157,6 +167,8 @@ local BUSYTHEMES = {
     STAGEPLAY_MYSTERIOUS = 14,
     STAGEPLAY_DRAMATIC = 15,
     PILLOWFIGHT = 16,
+    RIDEOFTHEVALKYRIE = 17,
+    BOATRACE = 18,
 }
 
 --------------------------------------------------------------------------
@@ -410,6 +422,22 @@ local function StartPillowFightMusic(player)
     StartBusyTheme(player, BUSYTHEMES.PILLOWFIGHT, "yotr_2023/common/music_pillowfight", 2)
 end
 
+local function StartRideoftheValkyrieMusic(player)
+    if _dangertask or _pirates_near then
+        return
+    end
+
+    StartBusyTheme(player, BUSYTHEMES.RIDEOFTHEVALKYRIE, "dontstarve/music/music_wigfrid_valkyrie", 2)
+end
+
+local function StartBoatRaceMusic(player)
+    if _dangertask or _pirates_near then
+        return
+    end
+
+    StartBusyTheme(player, BUSYTHEMES.BOATRACE, "dontstarve/music/music_boatrace", 2)
+end
+
 local function ExtendBusy()
     if _busytask ~= nil then
         _extendtime = math.max(_extendtime, GetTime() + 10)
@@ -651,6 +679,8 @@ local function StartPlayerListeners(player)
     inst:ListenForEvent("playcarnivalmusic", StartCarnivalMusic, player)
     inst:ListenForEvent("stageplaymusic", StartStageplayMusic, player)
     inst:ListenForEvent("playpillowfightmusic", StartPillowFightMusic, player)
+    inst:ListenForEvent("playrideofthevalkyrie", StartRideoftheValkyrieMusic, player)
+    inst:ListenForEvent("playboatracemusic", StartBoatRaceMusic, player)
 end
 
 local function StopPlayerListeners(player)
@@ -672,6 +702,8 @@ local function StopPlayerListeners(player)
     inst:RemoveEventCallback("playcarnivalmusic", StartCarnivalMusic, player)
     inst:RemoveEventCallback("stageplaymusic", StartStageplayMusic, player)
     inst:RemoveEventCallback("playpillowfightmusic", StartPillowFightMusic, player)
+    inst:RemoveEventCallback("playrideofthevalkyrie", StartRideoftheValkyrieMusic, player)
+    inst:RemoveEventCallback("playboatracemusic", StartBoatRaceMusic, player)
 end
 
 local function OnPhase(inst, phase)
@@ -762,6 +794,7 @@ local function OnEnableDynamicMusic(inst, enable)
             StopDanger()
             StopBusy()
             _soundemitter:KillSound("busy")
+            _busytheme = nil
             _isbusydirty = true
         end
         _isenabled = enable

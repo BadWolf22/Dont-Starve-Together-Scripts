@@ -6,7 +6,8 @@ local function CanCastFishingNetAtPoint(thrower, target_x, target_z)
     local min_throw_distance = 2
     local thrower_x, thrower_y, thrower_z = thrower.Transform:GetWorldPosition()
 
-    if TheWorld.Map:IsOceanAtPoint(target_x, 0, target_z) and VecUtil_LengthSq(target_x - thrower_x, target_z - thrower_z) > min_throw_distance * min_throw_distance then
+    local isoceanactionable = TheWorld.Map:IsOceanAtPoint(target_x, 0, target_z) or FindVirtualOceanEntity(target_x, 0, target_z) ~= nil
+    if isoceanactionable and VecUtil_LengthSq(target_x - thrower_x, target_z - thrower_z) > min_throw_distance * min_throw_distance then
         return true
     end
 	return false
@@ -87,7 +88,7 @@ end
 local function GetFishingAction(doer, fishing_target)
 	if doer:HasTag("fishing_idle") then
 		if fishing_target ~= nil and not fishing_target:HasTag("projectile") then
-			if fishing_target:HasTag("oceachfishing_catchable") then -- not fishing_target:HasTag("partiallyhooked") then
+			if fishing_target:HasTag("oceanfishing_catchable") then -- not fishing_target:HasTag("partiallyhooked") then
 				if fishing_target:HasTag("fishinghook") then
 					return ACTIONS.OCEAN_FISHING_STOP
 				else
@@ -259,8 +260,12 @@ local COMPONENT_ACTIONS =
             end
         end,
 
-        constructionsite = function(inst, doer, actions)
-            if not inst:HasTag("burnt") and not inst:HasTag("smolder") and (not inst:HasTag("fire") or inst:HasTag("campfire")) then
+		constructionsite = function(inst, doer, actions, right)
+			if not right and inst:HasTag("pickable") then
+				--V2C: -pickable and constructionsite actions conflict
+				--     -not normal for constructionsites to have other actions, but collapsedchest does now
+				return
+			elseif not inst:HasTag("burnt") and not inst:HasTag("smolder") and (not inst:HasTag("fire") or inst:HasTag("campfire")) then
 				local constructionsite = inst.replica.constructionsite
 				if constructionsite:IsEnabled() then
 					table.insert(actions,
@@ -390,12 +395,18 @@ local COMPONENT_ACTIONS =
             end
         end,
 
-        inspectable = function(inst, doer, actions)
+		inspectable = function(inst, doer, actions, right)
             if inst ~= doer and
                 (doer.CanExamine == nil or doer:CanExamine()) and
                 (doer.sg == nil or (doer.sg:HasStateTag("idle") and not doer.sg:HasStateTag("moving") or doer.sg:HasStateTag("channeling"))) and
                 (doer:HasTag("idle") and not doer:HasTag("moving") or doer:HasTag("channeling")) then
                 --Check state graph as well in case there is movement prediction
+
+				--@V2C: #FORGE_AOE_RCLICK *searchable*
+				--      -Forge used to strip ALL r.click actions, so now we manually strip LOOKAT action.
+				if right and doer.components.playercontroller and doer.components.playercontroller:HasAOETargeting() then
+					return
+				end
                 table.insert(actions, ACTIONS.LOOKAT)
             end
         end,
@@ -839,6 +850,18 @@ local COMPONENT_ACTIONS =
                 table.insert(actions, ACTIONS.TAKEITEM)
             end
         end,
+
+        incinerator = function(inst, doer, actions, right)
+            if not inst:HasTag("burnt") and not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding()) then
+                if right and 
+                    inst.replica.container ~= nil and
+                    not inst.replica.container:IsEmpty() and
+                    inst.replica.container:IsOpenedBy(doer)
+                then
+                    table.insert(actions, ACTIONS.INCINERATE)
+                end
+            end
+        end,
     },
 
     USEITEM = --args: inst, doer, target, actions, right
@@ -1122,7 +1145,7 @@ local COMPONENT_ACTIONS =
 		end,
 
         healer = function(inst, doer, target, actions)
-            if target.replica.health ~= nil and target.replica.health:CanHeal() then
+            if target.replica.health ~= nil and (target.replica.health:CanHeal() or inst:HasTag("healerbuffs")) then
                 table.insert(actions, ACTIONS.HEAL)
             end
         end,
@@ -1536,7 +1559,7 @@ local COMPONENT_ACTIONS =
         end,
 
         wax = function(inst, doer, target, actions)
-            if target:HasTag("waxable") then
+            if target:HasTag("waxable") and (target:HasTag("needswaxspray") == inst:HasTag("waxspray")) then
                 table.insert(actions, ACTIONS.WAX)
             end
         end,
@@ -1612,11 +1635,17 @@ local COMPONENT_ACTIONS =
     {
         aoespell = function(inst, doer, pos, actions, right, target)
 			if right then
+				if doer.HUD and doer.components.playercontroller and not doer.components.playercontroller:IsAOETargeting() then
+					--@V2C: #FORGE_AOE_RCLICK *searchable*
+					--      -Forge used to strip all r.click actions even before starting aoe targeting,
+					--       so this early out was not needed until now.
+					return
+				end
 				local inventory = doer.replica.inventory
 				if inventory ~= nil and inventory:GetActiveItem() ~= nil then
 					return
 				end
-				local alwayspassable, allowwater, deployradius
+				local alwayspassable, allowwater, deployradius, allowriding
 				local aoetargeting = inst.components.aoetargeting
 				if aoetargeting ~= nil then
 					if not aoetargeting:IsEnabled() then
@@ -1625,8 +1654,12 @@ local COMPONENT_ACTIONS =
 					alwayspassable = aoetargeting.alwaysvalid
 					allowwater = aoetargeting.allowwater
 					deployradius = aoetargeting.deployradius
+					allowriding = aoetargeting.allowriding
 				end
-				if TheWorld.Map:CanCastAtPoint(pos, alwayspassable, allowwater, deployradius) then
+
+				local isriding = not allowriding and doer.replica.rider ~= nil and doer.replica.rider:IsRiding()
+
+				if not isriding and TheWorld.Map:CanCastAtPoint(pos, alwayspassable, allowwater, deployradius) then
 					table.insert(actions, ACTIONS.CASTAOE)
 				end
 			end
@@ -1640,9 +1673,10 @@ local COMPONENT_ACTIONS =
         end,
 
         complexprojectile = function(inst, doer, pos, actions, right, target)
-            if right and not TheWorld.Map:IsGroundTargetBlocked(pos)
+            if right and (not TheWorld.Map:IsGroundTargetBlocked(pos) or (inst:HasTag("complexprojectile_showoceanaction") and TheWorld.Map:IsOceanAtPoint(pos.x, 0, pos.z)))
+                and (inst.CanTossInWorld == nil or inst:CanTossInWorld(doer, pos))
 				and not (inst.replica.equippable ~= nil and (inst.replica.equippable:IsRestricted(doer) or inst.replica.equippable:ShouldPreventUnequipping()))
-				and not inst:HasTag("special_action_toss") then
+				and not (inst:HasTag("special_action_toss") or inst:HasTag("deployable")) then
 				table.insert(actions, ACTIONS.TOSS)
             end
         end,
@@ -1655,7 +1689,7 @@ local COMPONENT_ACTIONS =
                 elseif inst.replica.inventoryitem:CanDeploy(pos, nil, doer, (doer.components.playercontroller ~= nil and doer.components.playercontroller.deployplacer ~= nil) and doer.components.playercontroller.deployplacer.Transform:GetRotation() or 0) then
                     if inst:HasTag("tile_deploy") then
                         table.insert(actions, ACTIONS.DEPLOY_TILEARRIVE)
-                    else
+					elseif not (inst.CanTossInWorld and inst:HasTag("projectile") and not inst:CanTossInWorld(doer, pos)) then
                         table.insert(actions, ACTIONS.DEPLOY)
                     end
                 end
@@ -1782,14 +1816,27 @@ local COMPONENT_ACTIONS =
 			end
         end,
 
-        complexprojectile = function(inst, doer, target, actions, right)
-            if right and
-                not (doer.components.playercontroller ~= nil and doer.components.playercontroller.isclientcontrollerattached) and
-                not TheWorld.Map:IsGroundTargetBlocked(target:GetPosition()) and
-				(inst.replica.equippable == nil or not inst.replica.equippable:IsRestricted(doer) and not inst.replica.equippable:ShouldPreventUnequipping()) and
-				not inst:HasTag("special_action_toss") then
+		channelcastable = function(inst, doer, target, actions, right)
+			if target == doer and doer.IsChannelCasting then
+				if not doer:IsChannelCasting() then
+					table.insert(actions, ACTIONS.START_CHANNELCAST)
+				elseif doer:IsChannelCastingItem() then
+					--don't give stop action when we're using off-hand channelcast
+					table.insert(actions, ACTIONS.STOP_CHANNELCAST)
+				end
+			end
+		end,
 
-                table.insert(actions, ACTIONS.TOSS)
+        complexprojectile = function(inst, doer, target, actions, right)
+            if right and not (doer.components.playercontroller ~= nil and doer.components.playercontroller.isclientcontrollerattached) then
+                local targetpos = target:GetPosition()
+                if not TheWorld.Map:IsGroundTargetBlocked(targetpos) and
+                    (inst.CanTossInWorld == nil or inst:CanTossInWorld(doer, targetpos)) and
+                    (inst.replica.equippable == nil or not inst.replica.equippable:IsRestricted(doer) and not inst.replica.equippable:ShouldPreventUnequipping()) and
+					not (inst:HasTag("special_action_toss") or inst:HasTag("deployable")) then
+
+                    table.insert(actions, ACTIONS.TOSS)
+                end
             end
         end,
 
@@ -1949,26 +1996,37 @@ local COMPONENT_ACTIONS =
         end,
 
         weapon = function(inst, doer, target, actions, right)
-            if not right
-                and doer.replica.combat ~= nil
+            if  doer.replica.combat ~= nil
                 and (inst:HasTag("projectile") or inst:HasTag("rangedweapon") or not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding()))
-				and not inst:HasTag("outofammo") then
+				and not inst:HasTag("outofammo")
+            then
                 if doer.replica.combat:CanExtinguishTarget(target, inst) or
-                    doer.replica.combat:CanLightTarget(target, inst) then
+                    (right and doer.replica.combat:CanLightTarget(target, inst))
+                then
                     table.insert(actions, ACTIONS.ATTACK)
-                elseif not (target:HasTag("wall") or target:HasTag("mustforceattack"))
+
+                elseif not right
+                    and not (target:HasTag("wall") or target:HasTag("mustforceattack"))
 					and not (doer.TargetForceAttackOnly ~= nil and doer:TargetForceAttackOnly(target))
                     and target.replica.combat ~= nil
                     and doer.replica.combat:CanTarget(target)
                     and target.replica.combat:CanBeAttacked(doer)
-                    and not doer.replica.combat:IsAlly(target) then
+                    and not doer.replica.combat:IsAlly(target)
+                then
                     if target:HasTag("mole") and inst:HasTag("hammer") then
                         table.insert(actions, ACTIONS.ATTACK)
                     elseif not (doer:HasTag("player") and target:HasTag("player"))
-                        and not (inst:HasTag("tranquilizer") and not target:HasTag("sleeper")) then
+                        and not (inst:HasTag("tranquilizer") and not target:HasTag("sleeper"))
+                    then
                         table.insert(actions, ACTIONS.ATTACK)
                     end
                 end
+            end
+        end,
+
+        wax = function(inst, doer, target, actions, right)
+            if right and target:HasTag("waxable") and (target:HasTag("needswaxspray") == inst:HasTag("waxspray")) then
+                table.insert(actions, ACTIONS.WAX)
             end
         end,
     },
@@ -1997,15 +2055,30 @@ local COMPONENT_ACTIONS =
             end
         end,
 
+		channelcastable = function(inst, doer, actions)
+			if doer.IsChannelCasting then
+				if not doer:IsChannelCasting() then
+					table.insert(actions, ACTIONS.START_CHANNELCAST)
+				elseif doer:IsChannelCastingItem() then
+					--don't give stop action when we're using off-hand channelcast
+					table.insert(actions, ACTIONS.STOP_CHANNELCAST)
+				end
+			end
+		end,
+
         container = function(inst, doer, actions)
             if not inst:HasTag("burnt") then
                 local container = inst.replica.container
-                if container:CanBeOpened() and
-                    doer.replica.inventory ~= nil and
-                    not (container:IsSideWidget() and
-                        doer.components.playercontroller ~= nil and
-                        doer.components.playercontroller.isclientcontrollerattached) then
-                    table.insert(actions, ACTIONS.RUMMAGE)
+				if container:CanBeOpened() then
+					local inventory = doer.replica.inventory
+					if inventory and
+						inventory:GetActiveItem() ~= inst and
+						not (container:IsSideWidget() and
+							doer.components.playercontroller and
+							doer.components.playercontroller.isclientcontrollerattached)
+					then
+						table.insert(actions, ACTIONS.RUMMAGE)
+					end
                 end
             end
 		end,
@@ -2077,7 +2150,7 @@ local COMPONENT_ACTIONS =
         end,
 
         healer = function(inst, doer, actions)
-            if doer.replica.health ~= nil and doer.replica.health:CanHeal() then
+            if doer.replica.health ~= nil and (doer.replica.health:CanHeal() or inst:HasTag("healerbuffs")) then
                 table.insert(actions, ACTIONS.HEAL)
             end
         end,
@@ -2226,7 +2299,7 @@ local COMPONENT_ACTIONS =
                 --if this is needed in the future, don't copy the code, write either a client component, or a replica.
                 local cansing = false
                 if doer.components.singinginspiration then
-                    cansing = songdata.INSTANT or not doer.components.singinginspiration:IsSongActive(songdata)
+                    cansing = songdata.INSTANT or not doer.components.singinginspiration:IsSongActive(songdata, inst)
                 else
                     local issongactive = false
                     if doer.player_classified then
@@ -2261,6 +2334,7 @@ local COMPONENT_ACTIONS =
             end
         end,
 
+        -- NOTES(DiogoW): Keep in sync with AOESpell:CanCast
 		spellbook = function(inst, doer, actions)
 			--spellbook exists on clients too
 			if doer.HUD ~= nil and doer.HUD:GetCurrentOpenSpellBook() == inst then
@@ -2335,12 +2409,19 @@ local COMPONENT_ACTIONS =
             end
         end,
 
-        useableitem = function(inst, doer, actions)
+        useableitem = function(inst, doer, actions)        
             if not inst:HasTag("inuse") and
                 inst.replica.equippable ~= nil and
                 inst.replica.equippable:IsEquipped() and
                 doer.replica.inventory ~= nil and
                 doer.replica.inventory:IsOpenedBy(doer) then
+                table.insert(actions, ACTIONS.USEITEM)
+            end
+        end,
+
+        toggleableitem = function(inst, doer, actions)    
+            local inventoryitem = inst.replica.inventoryitem
+            if inventoryitem ~= nil and inventoryitem:IsGrandOwner(doer) then
                 table.insert(actions, ACTIONS.USEITEM)
             end
         end,

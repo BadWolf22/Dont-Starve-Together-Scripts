@@ -24,6 +24,7 @@ local InkOver = require "widgets/inkover"
 local WagpunkUI = require "widgets/wagpunkui"
 local GogglesOver = require "widgets/gogglesover"
 local NutrientsOver = require "widgets/nutrientsover"
+local ScrapMonocleOver = require "widgets/scrapmonocleover"
 local BatOver = require "widgets/batover"
 local FlareOver = require "widgets/flareover"
 local EndOfMatchPopup = require "widgets/redux/endofmatchpopup"
@@ -171,6 +172,7 @@ function PlayerHud:CreateOverlays(owner)
 
     self.gogglesover = self.overlayroot:AddChild(GogglesOver(owner, self.storm_overlays))
     self.nutrientsover = self.overlayroot:AddChild(NutrientsOver(owner))
+    self.scrapmonocleover = self.overlayroot:AddChild(ScrapMonocleOver(owner))
     self.bloodover = self.overlayroot:AddChild(BloodOver(owner))
     self.beefbloodover = self.overlayroot:AddChild(BeefBloodOver(owner))
     self.iceover = self.overlayroot:AddChild(IceOver(owner))
@@ -187,6 +189,7 @@ function PlayerHud:CreateOverlays(owner)
     self.clouds:SetClickable(false)
     self.clouds:SetHAnchor(ANCHOR_MIDDLE)
     self.clouds:SetVAnchor(ANCHOR_MIDDLE)
+    self.clouds:SetScaleMode(SCALEMODE_FIXEDSCREEN_NONDYNAMIC)
     self.clouds:GetAnimState():SetBank("clouds_ol")
     self.clouds:GetAnimState():SetBuild("clouds_ol")
     self.clouds:GetAnimState():PlayAnimation("idle", true)
@@ -1030,7 +1033,7 @@ function PlayerHud:OpenSpellWheel(invobject, items, radius, focus_radius)
 			end
 		end
 	end
-	self.controls.spellwheel:SetScale(TheFrontEnd:GetHUDScale())
+	self.controls.spellwheel:SetScale(TheFrontEnd:GetProportionalHUDScale()) --instead of GetHUDScale(), because parent already has SCALEMODE_PROPORTIONAL
 	self.controls.spellwheel:SetItems(itemscpy, radius, focus_radius)
 	self.controls.spellwheel:Open()
 	local old = self.controls.spellwheel.invobject

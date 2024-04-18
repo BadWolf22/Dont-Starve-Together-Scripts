@@ -168,7 +168,7 @@ function FindSafeSpawnLocation(x, y, z)
 end
 
 function FindNearbyLand(position, range)
-    local finaloffset = FindValidPositionByFan(math.random() * 2 * PI, range or 8, 8, function(offset)
+    local finaloffset = FindValidPositionByFan(math.random() * TWOPI, range or 8, 8, function(offset)
         local x, z = position.x + offset.x, position.z + offset.z
         return TheWorld.Map:IsAboveGroundAtPoint(x, 0, z)
             and not TheWorld.Map:IsPointNearHole(Vector3(x, 0, z))
@@ -181,7 +181,7 @@ function FindNearbyLand(position, range)
 end
 
 function FindNearbyOcean(position, range)
-    local finaloffset = FindValidPositionByFan(math.random() * 2 * PI, range or 8, 8, function(offset)
+    local finaloffset = FindValidPositionByFan(math.random() * TWOPI, range or 8, 8, function(offset)
         local x, z = position.x + offset.x, position.z + offset.z
         return TheWorld.Map:IsOceanAtPoint(x, 0, z)
             and not TheWorld.Map:IsPointNearHole(Vector3(x, 0, z))
@@ -196,7 +196,7 @@ end
 function GetRandomInstWithTag(tag, inst, radius)
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, y, z, radius, type(tag) == "string" and { tag } or tag)
-    return #ents > 0 and ents[math.random(1, #ents)] or nil
+    return (#ents > 0 and ents[math.random(1, #ents)]) or nil
 end
 
 function GetClosestInstWithTag(tag, inst, radius)
@@ -208,8 +208,8 @@ end
 function DeleteCloseEntsWithTag(tag, inst, radius)
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, y, z, radius, type(tag) == "string" and { tag } or tag)
-    for i, v in ipairs(ents) do
-        v:Remove()
+    for _, ent in ipairs(ents) do
+        ent:Remove()
     end
 end
 
@@ -474,8 +474,11 @@ function CanEntitySeeTarget(inst, target)
     return CanEntitySeePoint(inst, x, y, z)
 end
 
-function SpringCombatMod(amount)
-    return TheWorld.state.isspring and amount * TUNING.SPRING_COMBAT_MOD or amount
+function SpringCombatMod(amount, forced) -- NOTES(JBK): This is an amplification modifier to increase damage.
+    return (forced or TheWorld.state.isspring) and amount * TUNING.SPRING_COMBAT_MOD or amount
+end
+function SpringGrowthMod(amount, forced) -- NOTES(JBK): This is a reduction modifier to reduce timer durations.
+    return (forced or TheWorld.state.isspring) and amount * TUNING.SPRING_GROWTH_MODIFIER or amount
 end
 
 function TemporarilyRemovePhysics(obj, time)
@@ -494,6 +497,9 @@ function ErodeAway(inst, erode_time)
 
     if inst.DynamicShadow ~= nil then
         inst.DynamicShadow:Enable(false)
+    end
+    if inst.components.floater ~= nil then
+        inst.components.floater:Erode(time_to_erode)
     end
 
     inst:StartThread(function()
@@ -614,6 +620,31 @@ function GetInventoryItemAtlas(imagename, no_fallback)
 end
 
 ----------------------------------------------------------------------------------------------
+function GetMinimapAtlas_Internal(imagename)
+    local images1 = "minimap/minimap_data1.xml"
+    local images2 = "minimap/minimap_data2.xml"
+    return TheSim:AtlasContains(images1, imagename) and images1
+            or TheSim:AtlasContains(images2, imagename) and images2
+            or nil
+end
+
+local minimapAtlasLookup = {}
+function GetMinimapAtlas(imagename)
+	local atlas = minimapAtlasLookup[imagename]
+	if atlas then
+		return atlas
+	end
+
+    atlas = GetMinimapAtlas_Internal(imagename)
+
+	if atlas ~= nil then
+		minimapAtlasLookup[imagename] = atlas
+	end
+
+	return atlas
+end
+
+----------------------------------------------------------------------------------------------
 
 local scrapbookIconAtlasLookup = {}
 
@@ -673,8 +704,10 @@ end
 function GetSkilltreeBG_Internal(imagename)
     local images1 = "images/skilltree2.xml"
     local images2 = "images/skilltree3.xml"
+    local images3 = "images/skilltree4.xml"
     return TheSim:AtlasContains(images1, imagename) and images1
             or TheSim:AtlasContains(images2, imagename) and images2
+            or TheSim:AtlasContains(images3, imagename) and images3
             or nil
 end
 

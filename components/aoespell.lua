@@ -28,7 +28,15 @@ function AOESpell:CanCast(doer, pos)
 		return false
 	end
 
-	local alwayspassable, allowwater, deployradius
+	-- NOTES(DiogoW): Keep in sync with COMPONENT_ACTIONS.INVENTORY.spellbook
+	if self.inst.components.spellbook ~= nil and (
+		not self.inst.components.spellbook:CanBeUsedBy(doer) or
+		self.inst:HasTag("fueldepleted")
+	) then
+		return false
+	end
+
+	local alwayspassable, allowwater, deployradius, allowriding
 	local aoetargeting = self.inst.components.aoetargeting
 	if aoetargeting then
 		if not aoetargeting:IsEnabled() then
@@ -37,7 +45,13 @@ function AOESpell:CanCast(doer, pos)
 		alwayspassable = aoetargeting.alwaysvalid
 		allowwater = aoetargeting.allowwater
 		deployradius = aoetargeting.deployradius
+		allowriding = aoetargeting.allowriding
 	end
+
+	if not allowriding and doer.components.rider ~= nil and doer.components.rider:IsRiding() then
+		return false
+	end
+
 	return TheWorld.Map:CanCastAtPoint(pos, alwayspassable, allowwater, deployradius)
 end
 
