@@ -213,8 +213,9 @@ function ServerIsFasterOnGroundTile(self, ground_tile)
 		local mount = rider ~= nil and rider:IsRiding() and rider:GetMount() or nil
 		if mount ~= nil then
 			return mount.components.locomotor ~= nil and mount.components.locomotor.faster_on_tiles[ground_tile]
-		end
-		return self.faster_on_tiles[ground_tile] == true
+        else
+		    return self.faster_on_tiles[ground_tile] == true
+        end
 	end
 
 	return false
@@ -226,8 +227,9 @@ function ClientIsFasterOnGroundTile(self, ground_tile)
 		local mount = rider ~= nil and rider:IsRiding() and rider:GetMount() or nil
 		if mount ~= nil then
 			return mount:HasTag("turfrunner_"..tostring(ground_tile))
-		end
-		return self.inst:HasTag("turfrunner_"..tostring(ground_tile))
+        else
+		    return self.inst:HasTag("turfrunner_"..tostring(ground_tile))
+        end
 	end
 
 	return false
@@ -344,7 +346,7 @@ function LocoMotor:OnRemoveFromEntity()
     if self.ismastersim then
         self.inst:RemoveTag("locomotor")
 
-		for ground_tile, _ in pairs(self.faster_on_tiles) do
+		for ground_tile in pairs(self.faster_on_tiles) do
 			self.inst:RemoveTag("turfrunner_"..tostring(ground_tile))
 		end
     end
@@ -512,18 +514,14 @@ end
 function LocoMotor:SetFasterOnGroundTile(ground_tile, is_faster)
 	if self.ismastersim then
 		self.faster_on_tiles[ground_tile] = is_faster
-		if is_faster then
-			self.inst:AddTag("turfrunner_"..tostring(ground_tile))
-		else
-			self.inst:RemoveTag("turfrunner_"..tostring(ground_tile))
-		end
+        self.inst:AddOrRemoveTag("turfrunner_"..tostring(ground_tile), is_faster)
 	end
 end
 
 function LocoMotor:UpdateGroundSpeedMultiplier()
     local x, y, z = self.inst.Transform:GetWorldPosition()
     local oncreep = TheWorld.GroundCreep:OnCreep(x, y, z)
-    
+
     if oncreep and self.triggerscreep then
         -- if this ever needs to happen when self.enablegroundspeedmultiplier is set, need to move the check for self.enablegroundspeedmultiplier above
         if not self.wasoncreep then
@@ -536,7 +534,7 @@ function LocoMotor:UpdateGroundSpeedMultiplier()
             self.wasoncreep = true
         end
         self.groundspeedmultiplier = self.slowmultiplier
-    else 
+    else
         if self.wasoncreep and self.triggerscreep then
             self.inst:PushEvent("walkoffcreep")
         end
@@ -546,7 +544,7 @@ function LocoMotor:UpdateGroundSpeedMultiplier()
         self.groundspeedmultiplier = (self:IsFasterOnGroundTile(current_ground_tile) or 
                                      (self:FasterOnRoad() and ((RoadManager ~= nil and RoadManager:IsOnRoad(x, 0, z)) or GROUND_ROADWAYS[current_ground_tile])) or
                                      (oncreep and self:FasterOnCreep()))
-									 and self.fastmultiplier 
+									 and self.fastmultiplier
 									 or 1
     end
 end
@@ -713,18 +711,38 @@ function LocoMotor:PreviewAction(bufferedaction, run, try_instant)
 		if self.inst.sg:HasStateTag("overridelocomote") then
 			self.inst:PreviewBufferedAction(bufferedaction)
 		else
-			self:Stop()
-			if bufferedaction.target ~= nil then
-				self:FaceMovePoint(bufferedaction.target.Transform:GetWorldPosition())
-			end
-			if not self.inst.sg:HasStateTag("idle") then
-				local idle_anim = self.inst:HasTag("playerghost") and "idle" or "idle_loop"
-				if not self.inst.AnimState:IsCurrentAnimation(idle_anim) then
-					self.inst.AnimState:PlayAnimation(idle_anim, true)
+			local closeinspect = false
+			if bufferedaction.target then
+				if CLOSEINSPECTORUTIL.CanCloseInspect(self.inst, bufferedaction.target) then
+					closeinspect = true
+					self:GoToEntity(bufferedaction.target, bufferedaction, run)
+				end
+			elseif action_pos then
+				if CLOSEINSPECTORUTIL.CanCloseInspect(self.inst, action_pos) then
+					closeinspect = true
+					self:GoToPoint(nil, bufferedaction, run)
 				end
 			end
-			self.inst:PreviewBufferedAction(bufferedaction)
-			self.inst.sg:GoToState("idle", "noanim")
+			if not closeinspect then
+				self:Stop()
+
+				--V2C: since LOOKAT now has an action handler for closeinspect support,
+				--     we can use options.instant to bypass it during preview.
+				--     see EntityScript:PreviewBufferedAction
+				bufferedaction.options.instant = true
+
+				if bufferedaction.target ~= nil then
+					self:FaceMovePoint(bufferedaction.target.Transform:GetWorldPosition())
+				end
+				if not self.inst.sg:HasStateTag("idle") then
+					local idle_anim = self.inst:HasTag("playerghost") and "idle" or "idle_loop"
+					if not self.inst.AnimState:IsCurrentAnimation(idle_anim) then
+						self.inst.AnimState:PlayAnimation(idle_anim, true)
+					end
+				end
+				self.inst:PreviewBufferedAction(bufferedaction)
+				self.inst.sg:GoToState("idle", "noanim")
+			end
 		end
     elseif bufferedaction.forced then
         if action_pos ~= nil then
@@ -802,12 +820,26 @@ function LocoMotor:PushAction(bufferedaction, run, try_instant)
         end
     elseif bufferedaction.action == ACTIONS.LOOKAT and
         self.inst.components.playercontroller ~= nil then
-        local pos = self.inst.components.playercontroller:GetRemotePredictPosition()
-        if pos ~= nil and not self.inst.components.playercontroller.directwalking then
-            self:GoToPoint(pos, bufferedaction, run)
-        else
-            self.inst:PushBufferedAction(bufferedaction)
-        end
+		local closeinspect = false
+		if bufferedaction.target then
+			if CLOSEINSPECTORUTIL.CanCloseInspect(self.inst, bufferedaction.target) then
+				closeinspect = true
+				self:GoToEntity(bufferedaction.target, bufferedaction, run)
+			end
+		elseif action_pos then
+			if CLOSEINSPECTORUTIL.CanCloseInspect(self.inst, action_pos) then
+				closeinspect = true
+				self:GoToPoint(nil, bufferedaction, run)
+			end
+		end
+		if not closeinspect then
+			local pos = self.inst.components.playercontroller:GetRemotePredictPosition()
+			if pos and not self.inst.components.playercontroller.directwalking then
+				self:GoToPoint(pos, bufferedaction, run)
+			else
+				self.inst:PushBufferedAction(bufferedaction)
+			end
+		end
     elseif bufferedaction.forced then
         if bufferedaction.action.rangecheckfn ~= nil and
             not bufferedaction.action.rangecheckfn(bufferedaction.doer, bufferedaction.target) then
@@ -870,11 +902,13 @@ function LocoMotor:GoToEntity(target, bufferedaction, run)
     elseif bufferedaction ~= nil and bufferedaction.distance ~= nil then
         --NOTE: use actual physics (ignoring physicsradiusoverride)
         --      as fallback if bufferedaction.distance is too small
-        arrive_dist = ARRIVE_STEP + (target.Physics ~= nil and target.Physics:GetRadius() or 0) + (self.inst.Physics ~= nil and self.inst.Physics:GetRadius() or 0)
+		local owner = target.components.inventoryitem and target.components.inventoryitem:GetGrandOwner() or target
+		arrive_dist = ARRIVE_STEP + (owner.Physics and owner.Physics:GetRadius() or 0) + self.inst.Physics:GetRadius()
         arrive_dist = math.max(arrive_dist, bufferedaction.distance)
 
     else
-        arrive_dist = ARRIVE_STEP + target:GetPhysicsRadius(0) + self.inst:GetPhysicsRadius(0)
+		local owner = target.components.inventoryitem and target.components.inventoryitem:GetGrandOwner() or target
+		arrive_dist = ARRIVE_STEP + owner:GetPhysicsRadius(0) + self.inst:GetPhysicsRadius(0)
 
         local extra_arrive_dist = (bufferedaction ~= nil and bufferedaction.action ~= nil and bufferedaction.action.extra_arrive_dist) or nil
         if extra_arrive_dist ~= nil then
@@ -1244,6 +1278,21 @@ function LocoMotor:StartHopping(x,z,target_platform)
     self.time_before_next_hop_is_allowed = 0.2
 end
 
+function LocoMotor:CheckDrownable()
+    local drownable = self.inst.components.drownable
+    if drownable then
+        local fallingreason = drownable:GetFallingReason()
+        if fallingreason == FALLINGREASON.OCEAN then
+            self.inst:PushEvent("onsink")
+            return true
+        elseif fallingreason == FALLINGREASON.VOID then
+            self.inst:PushEvent("onfallinvoid")
+            return true
+        end
+    end
+    return false
+end
+
 function LocoMotor:OnUpdate(dt, arrive_check_only)
     if self.hopping then
         --self:UpdateHopping(dt)
@@ -1519,22 +1568,24 @@ function LocoMotor:OnUpdate(dt, arrive_check_only)
                 end
             end
 
-            if (not can_hop and my_platform == nil and target_platform == nil and not self.inst.sg:HasStateTag("jumping")) and self.inst.components.drownable ~= nil and self.inst.components.drownable:ShouldDrown() then
-                self.inst:PushEvent("onsink")
+            if (not can_hop and my_platform == nil and target_platform == nil and not self.inst.sg:HasStateTag("jumping")) then
+                self:CheckDrownable()
             end
         else
-            local speed_mult = self:GetSpeedMultiplier()
-            local desired_speed = self.isrunning and self:RunSpeed() or self.walkspeed
-            if self.dest and self.dest:IsValid() then
-                local destpos_x, destpos_y, destpos_z = self.dest:GetPoint()
-                local mypos_x, mypos_y, mypos_z = self.inst.Transform:GetWorldPosition()
-                local dsq = distsq(destpos_x, destpos_z, mypos_x, mypos_z)
-                if dsq <= .25 then
-                    speed_mult = math.max(.33, math.sqrt(dsq))
+            if not self:CheckDrownable() then
+                local speed_mult = self:GetSpeedMultiplier()
+                local desired_speed = self.isrunning and self:RunSpeed() or self.walkspeed
+                if self.dest and self.dest:IsValid() then
+                    local destpos_x, destpos_y, destpos_z = self.dest:GetPoint()
+                    local mypos_x, mypos_y, mypos_z = self.inst.Transform:GetWorldPosition()
+                    local dsq = distsq(destpos_x, destpos_z, mypos_x, mypos_z)
+                    if dsq <= .25 then
+                        speed_mult = math.max(.33, math.sqrt(dsq))
+                    end
                 end
-            end
 
-			self:SetMotorSpeed(desired_speed * speed_mult)
+                self:SetMotorSpeed(desired_speed * speed_mult)
+            end
         end
     end
 

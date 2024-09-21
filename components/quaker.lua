@@ -171,7 +171,7 @@ local _GroundDetectionUpdate = _ismastersim and function(debris, override_densit
             debris:PushEvent("detachchild")
             debris:Remove()
         elseif _world.Map:IsPointNearHole(Vector3(x, 0, z)) then
-            if debris.prefab == "mole" or debris.prefab == "rabbit" or debris.prefab == "carrat" then
+            if debris.prefab == "mole" or debris.prefab == "rabbit" or debris.prefab == "rabbitking_lucky" or debris.prefab == "carrat" then
                 debris:PushEvent("detachchild")
                 debris:Remove()
             else
@@ -236,7 +236,7 @@ local _GroundDetectionUpdate = _ismastersim and function(debris, override_densit
 
             if softbounce then
                 local speed = 3.2 + math.random()
-                local angle = math.random() * 2 * PI
+                local angle = math.random() * TWOPI
                 debris.Physics:SetMotorVel(0, 0, 0)
                 debris.Physics:SetVel(
                     speed * math.cos(angle),
@@ -255,6 +255,7 @@ local _GroundDetectionUpdate = _ismastersim and function(debris, override_densit
             if density <= 0 or
                 debris.prefab == "mole" or
                 debris.prefab == "rabbit" or
+                debris.prefab == "rabbitking_lucky" or
                 debris.prefab == "carrat" or
                 not (math.random() < .75 or
                     --NOTE: There will always be at least one found within DENSITYRADIUS, ourself!
@@ -298,7 +299,7 @@ local _GroundDetectionUpdate = _ismastersim and function(debris, override_densit
             end
         end
         debris:PushEvent("stopfalling")
-    elseif debris.prefab == "mole" or debris.prefab == "rabbit" or debris.prefab == "carrat" then
+    elseif debris.prefab == "mole" or debris.prefab == "rabbit" or debris.prefab == "rabbitking_lucky" or debris.prefab == "carrat" then
         --failsafe
         debris:PushEvent("detachchild")
         debris:Remove()
@@ -320,12 +321,27 @@ local SpawnDebris = _ismastersim and function(spawn_point, override_prefab, over
     local prefab = GetDebris(_world.topology.nodes[node_index])
     if prefab ~= nil then
         prefab = override_prefab or prefab
-        local debris = SpawnPrefab(prefab)
+        local debris
+        if prefab == "rabbit" then
+            if math.random() < TUNING.RABBITKING_LUCKY_ODDS_QUAKER then -- This is a lot cheaper to roll than finding a close player do it first.
+                local rabbitkingmanager = TheWorld.components.rabbitkingmanager
+                if rabbitkingmanager and not rabbitkingmanager:ShouldStopActions() then -- Same with this.
+                    local x, y, z = spawn_point:Get()
+                    local player = FindClosestPlayerInRangeSq(x, y, z, TUNING.RABBITKING_TELEPORT_DISTANCE_SQ, true)
+                    if player then
+                        if rabbitkingmanager:CreateRabbitKingForPlayer(player, spawn_point, "lucky", {nopresentation = true,}) then
+                            debris = rabbitkingmanager:GetRabbitKing()
+                        end
+                    end
+                end
+            end
+        end
+        debris = debris or SpawnPrefab(prefab)
         if debris ~= nil then
             debris.entity:SetCanSleep(false)
             debris.persists = false
 
-            if (prefab == "rabbit" or prefab == "mole" or prefab == "carrat") and debris.sg ~= nil then
+            if (prefab == "rabbit" or prefab == "rabbitking_lucky" or prefab == "mole" or prefab == "carrat") and debris.sg ~= nil then
                 _mammalsremaining = _mammalsremaining - 1
                 debris.sg:GoToState("fall")
             end
@@ -357,7 +373,7 @@ end or nil
 local QUAKE_BLOCKER_MUST_TAGS = {"quake_blocker"}
 
 local GetSpawnPoint = _ismastersim and function(pt, rad, minrad)
-    local theta = math.random() * 2 * PI
+    local theta = math.random() * TWOPI
     local radius = math.random() * (rad or TUNING.FROG_RAIN_SPAWN_RADIUS)
 
     minrad = minrad ~= nil and minrad > 0 and minrad * minrad or nil
@@ -657,6 +673,10 @@ function self:SetTagDebris(tile, data)
     if not _ismastersim then return end
 
     _tagdebris[tile] = data
+end
+
+function self:IsQuaking()
+	return _quakesoundintensity:value() > 1 or _miniquakesoundintensity:value()
 end
 
 --------------------------------------------------------------------------

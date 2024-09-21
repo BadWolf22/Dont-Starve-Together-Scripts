@@ -298,6 +298,8 @@ local function empty_loot_function() end
 local function OnSpawnNewBoatLeak(inst, data)
     if data == nil or data.pt == nil then return end
 
+    data.pt.y = 0
+
     local leak = SpawnPrefab("boat_leak")
     leak.Transform:SetPosition(data.pt:Get())
     leak.components.boatleak.isdynamic = true
@@ -335,7 +337,7 @@ local function InstantlyBreakBoat(inst)
         k:PushEvent("onpresink")
     end
 
-    inst.sinkloot()
+    inst:sinkloot()
     if inst.postsinkfn then
         inst:postsinkfn()
     end
@@ -661,6 +663,7 @@ local function item_base_fn(data)
     inst.entity:AddNetwork()
 
     inst:AddTag("boatbuilder")
+	inst:AddTag("deploykititem")
     inst:AddTag("usedeployspacingasoffset")
 
     MakeInventoryPhysics(inst)

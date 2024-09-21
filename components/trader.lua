@@ -31,6 +31,7 @@ local Trader = Class(function(self, inst)
     self.abletoaccepttest = nil
 
     self.acceptstacks = nil
+    --self.acceptsmimics = nil
 
     --V2C: Recommended to explicitly add tags to prefab pristine state
     --On construciton, "trader" tag is added by default
@@ -84,6 +85,10 @@ function Trader:SetOnAccept(fn)
     self.onaccept = fn
 end
 
+function Trader:SetOnRefuse(fn)
+    self.onrefuse = fn
+end
+
 function Trader:SetAcceptStacks()
     self.acceptstacks = true
 end
@@ -94,6 +99,8 @@ function Trader:AbleToAccept(item, giver, count)
 
     if not self.enabled or item == nil then
         return false
+    elseif not self.acceptsmimics and item.components.itemmimic then
+        return false, "ITEMMIMIC"
     elseif self.abletoaccepttest ~= nil then
         return self.abletoaccepttest(self.inst, item, giver, count)
     elseif self.inst.components.health ~= nil and self.inst.components.health:IsDead() then
@@ -141,12 +148,12 @@ function Trader:AcceptGift(giver, item, count)
         self.inst:PushEvent("trade", { giver = giver, item = item })
 
         return true
+    else
+        if self.onrefuse ~= nil then
+            self.onrefuse(self.inst, giver, item)
+        end
+        return false
     end
-
-    if self.onrefuse ~= nil then
-        self.onrefuse(self.inst, giver, item)
-    end
-    return false
 end
 
 function Trader:GetDebugString()

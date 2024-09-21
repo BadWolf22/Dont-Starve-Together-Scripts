@@ -12,7 +12,7 @@ end
 local function OnHammered(inst, worker)
 	local collapse_fx = SpawnPrefab("collapse_small")
 	collapse_fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
-	collapse_fx:SetMaterial("wood")
+	collapse_fx:SetMaterial(inst._burnable and "wood" or "stone")
 
 	inst.components.lootdropper:DropLoot()
 
@@ -64,7 +64,7 @@ local function OnLoad(inst, data)
 	end
 end
 
-local function AddChair(ret, name, bank, build, hasback)
+local function AddChair(ret, name, bank, build, hasback, deploy_smart_radius, burnable, inspection_override)
 	local assets =
 	{
 		Asset("ANIM", "anim/"..build..".zip"),
@@ -128,6 +128,8 @@ local function AddChair(ret, name, bank, build, hasback)
 		inst.entity:AddSoundEmitter()
 		inst.entity:AddNetwork()
 
+		inst:SetDeploySmartRadius(deploy_smart_radius) --recipe min_spacing/2
+
 		MakeObstaclePhysics(inst, 0.25)
 
 		inst.Transform:SetFourFaced()
@@ -148,6 +150,8 @@ local function AddChair(ret, name, bank, build, hasback)
 			return inst
 		end
 
+		inst._burnable = burnable
+
 		if hasback then
 			inst.back = SpawnPrefab(name.."_back")
 			inst.back.entity:SetParent(inst.entity)
@@ -157,7 +161,7 @@ local function AddChair(ret, name, bank, build, hasback)
 		inst.scrapbook_facing  = FACING_DOWN
 
 		inst:AddComponent("inspectable")
-        inst.components.inspectable.nameoverride = "WOOD_CHAIR"
+        inst.components.inspectable.nameoverride = inspection_override
         inst.components.inspectable.getstatus = GetStatus
 
 		inst:AddComponent("lootdropper")
@@ -177,9 +181,11 @@ local function AddChair(ret, name, bank, build, hasback)
 
 		MakeHauntableWork(inst)
 
-		MakeSmallBurnable(inst, nil, nil, true)
-		inst.components.burnable:SetOnBurntFn(OnChairBurnt)
-		MakeSmallPropagator(inst)
+		if burnable then
+			MakeSmallBurnable(inst, nil, nil, true)
+			inst.components.burnable:SetOnBurntFn(OnChairBurnt)
+			MakeSmallPropagator(inst)
+		end
 
 		inst.OnLoad = OnLoad
 		inst.OnSave = OnSave
@@ -192,7 +198,11 @@ local function AddChair(ret, name, bank, build, hasback)
 end
 
 local ret = {}
-AddChair(ret, "wood_chair", "wood_chair", "wood_chair_chair", true)
-AddChair(ret, "wood_stool", "wood_chair", "wood_chair_stool", false)
+
+--       ret,     name,          bank,          build,         hasback, deploy_smart_radius, burnable
+AddChair(ret, "wood_chair",  "wood_chair", "wood_chair_chair",  true,  0.875, true,  "WOOD_CHAIR" )
+AddChair(ret, "wood_stool",  "wood_chair", "wood_chair_stool",  false, 0.875, true,  "WOOD_CHAIR" )
+AddChair(ret, "stone_chair", "wood_chair", "stone_chair",       true,  0.875, false, "STONE_CHAIR")
+AddChair(ret, "stone_stool", "wood_chair", "stone_chair_stool", false, 0.875, false, "STONE_CHAIR")
 
 return unpack(ret)

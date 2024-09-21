@@ -109,6 +109,36 @@ function FindClosestPlayerToInstOnLand(inst, range, isalive)
     return FindClosestPlayerOnLandInRangeSq(x, y, z, range * range, isalive)
 end
 
+local function SortByDistanceSq(a, b)
+    return a.distsq < b.distsq
+end
+function FindPlayersInRangeSqSortedByDistance(x, y, z, rangesq, isalive)
+    local players = {}
+    for _, player in ipairs(AllPlayers) do
+        if (isalive == nil or isalive ~= IsEntityDeadOrGhost(player)) and player.entity:IsVisible() then
+            local distsq = player:GetDistanceSqToPoint(x, y, z)
+            if distsq < rangesq then
+                table.insert(players, {
+                    player = player,
+                    distsq = distsq,
+                })
+            end
+        end
+    end
+    if players[1] then
+        if players[2] then
+            table.sort(players, SortByDistanceSq)
+        end
+        for i = 1, #players do
+            players[i] = players[i].player
+        end
+    end
+    return players
+end
+function FindPlayersInRangeSortedByDistance(x, y, z, range, isalive)
+    return FindPlayersInRangeSqSortedByDistance(x, y, z, range * range, isalive)
+end
+
 function FindPlayersInRangeSq(x, y, z, rangesq, isalive)
     local players = {}
     for i, v in ipairs(AllPlayers) do
@@ -321,6 +351,38 @@ function FindSwimmableOffset(position, start_angle, radius, attempts, check_los,
                             { ignorewalls = ignore_walls ~= false, ignorecreep = true, allowocean = true, ignoreLand = true }))
                     and (customcheckfn == nil or customcheckfn(Vector3(x, y, z)))
             end)
+end
+
+local function NoHoles(pt)
+    return not TheWorld.Map:IsPointNearHole(pt)
+end
+local NO_CHARLIE_TAGS = {"lunacyarea"}
+function FindCharlieRezSpotFor(inst)
+    local x, y, z
+    local nightlightmanager = TheWorld.components.nightlightmanager
+    if nightlightmanager ~= nil then
+        local nightlights = nightlightmanager:GetNightLightsWithFilter(nightlightmanager.Filter_OnlyOutTags, NO_CHARLIE_TAGS)
+        local nightlight = nightlightmanager:FindClosestNightLightFromListToInst(nightlights, inst)
+        if nightlight ~= nil then
+            x, y, z = nightlight.Transform:GetWorldPosition()
+        end
+    end
+    if x == nil then
+        if TheWorld.components.playerspawner ~= nil then
+            x, y, z = TheWorld.components.playerspawner:GetAnySpawnPoint()
+        end
+    end
+    if x == nil then
+        x, y, z = inst.Transform:GetWorldPosition() -- We tried.
+    end
+
+    local theta = math.random() * PI2
+    local offset = FindWalkableOffset(Vector3(x, y, z), theta, 2 + math.random() * 3, 8, false, false, NoHoles, false, false)
+    if offset then
+        x, z = x + offset.x, z + offset.z
+    end
+
+    return x, y, z
 end
 
 local PICKUP_MUST_ONEOF_TAGS = { "_inventoryitem", "pickable" }
@@ -705,9 +767,11 @@ function GetSkilltreeBG_Internal(imagename)
     local images1 = "images/skilltree2.xml"
     local images2 = "images/skilltree3.xml"
     local images3 = "images/skilltree4.xml"
+    local images4 = "images/skilltree5.xml"
     return TheSim:AtlasContains(images1, imagename) and images1
             or TheSim:AtlasContains(images2, imagename) and images2
             or TheSim:AtlasContains(images3, imagename) and images3
+            or TheSim:AtlasContains(images4, imagename) and images4
             or nil
 end
 

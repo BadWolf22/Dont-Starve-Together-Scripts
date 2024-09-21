@@ -1,8 +1,8 @@
 local Instrument = Class(function(self, inst)
     self.inst = inst
     self.range = 15
-    self.onheard = nil
-    self.onplayed = nil
+    --self.onheard = nil
+    --self.onplayed = nil
 end)
 
 function Instrument:SetOnHeardFn(fn)
@@ -13,6 +13,19 @@ function Instrument:SetOnPlayedFn(fn)
     self.onplayed = fn
 end
 
+function Instrument:SetRange(range)
+    self.range = range
+end
+
+function Instrument:SetAssetOverrides(build, symbol, sound)
+    self.override_build = build
+    self.override_symbol = symbol
+    self.override_sound = sound
+end
+function Instrument:GetAssetOverrides()
+    return self.override_build, self.override_symbol, self.override_sound
+end
+
 local NOTAGS = { "FX", "DECOR", "INLIMBO" }
 function Instrument:Play(musician)
     if self.onplayed ~= nil then
@@ -20,10 +33,10 @@ function Instrument:Play(musician)
     end
     if self.onheard ~= nil then
         local x, y, z = musician.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, self.range, nil, NOTAGS)
-        for i, v in ipairs(ents) do
-            if v ~= self.inst then
-                self.onheard(v, musician, self.inst)
+        local listeners = TheSim:FindEntities(x, y, z, self.range, nil, NOTAGS)
+        for _, listener in ipairs(listeners) do
+            if listener ~= self.inst then
+                self.onheard(listener, musician, self.inst)
             end
         end
     end

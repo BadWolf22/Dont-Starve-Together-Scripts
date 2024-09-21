@@ -11,7 +11,7 @@ local AVOID_PLAYER_STOP = 6
 
 local SEE_BAIT_DIST = 20
 local MAX_WANDER_DIST = 20
-
+local FINDFOOD_CANT_TAGS = { "INLIMBO", "outofreach" }
 
 local RabbitBrain = Class(Brain, function(self, inst)
     Brain._ctor(self, inst)
@@ -32,10 +32,11 @@ local function EatFoodAction(inst)
             return i.components.eater:CanEat(item) and
                 item.components.bait and
                 not item:HasTag("planted") and
-                not (item.components.inventoryitem and item.components.inventoryitem:IsHeld()) and
                 item:IsOnPassablePoint() and
                 item:GetCurrentPlatform() == i:GetCurrentPlatform()
-        end)
+		end,
+		nil,
+		FINDFOOD_CANT_TAGS)
     if target then
         local act = BufferedAction(inst, target, ACTIONS.EAT)
         act.validfn = function() return not (target.components.inventoryitem and target.components.inventoryitem:IsHeld()) end
@@ -43,13 +44,16 @@ local function EatFoodAction(inst)
     end
 end
 
-
+local HunterParams = {
+    tags = {"scarytoprey"},
+    notags = {"INLIMBO", "NOCLICK", "rabbitdisguise"},
+}
 function RabbitBrain:OnStart()
     local root = PriorityNode(
     {
 		BrainCommon.PanicTrigger(self.inst),
-        RunAway(self.inst, "scarytoprey", AVOID_PLAYER_DIST, AVOID_PLAYER_STOP),
-        RunAway(self.inst, "scarytoprey", SEE_PLAYER_DIST, STOP_RUN_DIST, nil, true),
+        RunAway(self.inst, HunterParams, AVOID_PLAYER_DIST, AVOID_PLAYER_STOP),
+        RunAway(self.inst, HunterParams, SEE_PLAYER_DIST, STOP_RUN_DIST, nil, true),
         EventNode(self.inst, "gohome",
             DoAction(self.inst, GoHomeAction, "go home", true )),
         WhileNode(function() return not TheWorld.state.isday end, "IsNight",

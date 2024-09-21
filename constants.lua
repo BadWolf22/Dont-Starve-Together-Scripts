@@ -7,6 +7,7 @@ PI = math.pi
 PI2 = PI*2
 TWOPI = PI2
 SQRT2 = math.sqrt(2)
+GOLDENANGLE = PI * (3 - math.sqrt(5))
 DEGREES = PI/180
 RADIANS = 180/PI
 FRAMES = 1/30
@@ -699,12 +700,14 @@ GROUND_FLOORING = {} --These tiles are flooring (stuff shouldn't grow on them)
 GROUND_HARD = {} --not plantable
 GROUND_ROADWAYS = {} -- Player speed boosting enabled.
 GROUND_NOGROUNDOVERLAYS = {} -- Stops rendering of snow or water etc overlays this table is immutable after initialization or engine crashes may occur.
+GROUND_INVISIBLETILES = {} -- Stops rendering of the tile top and skirt but will still have overlays this table is immutable after initialization or engine crashes may occur.
 GROUND_ISTEMPTILE = {} -- Tiles that are temporarily placed as a layer using the undertile component.
 
 FALLOFF_IDS = {
     FALLOFF = 1,
     DOCK_FALLOFF = 2,
     OCEANICE_FALLOFF = 3,
+    INVISIBLE = 4,
 }
 
 GROUND_CREEP_IDS = {
@@ -1078,7 +1081,9 @@ end
 FE_MUSIC =
     (FESTIVAL_EVENT_MUSIC[WORLD_FESTIVAL_EVENT] ~= nil and FESTIVAL_EVENT_MUSIC[WORLD_FESTIVAL_EVENT].sound) or
     (SPECIAL_EVENT_MUSIC[WORLD_SPECIAL_EVENT] ~= nil and SPECIAL_EVENT_MUSIC[WORLD_SPECIAL_EVENT].sound) or
-    "dontstarve/music/music_FE_junkyardhog"
+    "dontstarve/music/music_FE_rifts4"
+    --"dontstarve/music/music_FE_winonawurt"
+    --"dontstarve/music/music_FE_junkyardhog"
     --"dontstarve/music/music_FE_riftsthree"
     --"dontstarve/music/music_FE_survivorsguideone"
     --"dontstarve/music/music_FE_shadowrift"
@@ -1176,6 +1181,8 @@ TECH =
 	HERMITCRABSHOP_FIVE = { HERMITCRABSHOP = 5 },
     HERMITCRABSHOP_SEVEN = { HERMITCRABSHOP = 7 },
 
+    RABBITKINGSHOP_TWO = { RABBITKINGSHOP = 2 },
+
     TURFCRAFTING_ONE = { TURFCRAFTING = 1 },
     TURFCRAFTING_TWO = { TURFCRAFTING = 2 },
 	MASHTURFCRAFTING_TWO = { MASHTURFCRAFTING = 2},
@@ -1207,6 +1214,7 @@ TECH =
 	SHADOWFORGING_TWO = { SHADOWFORGING = 2 },
 
     CARPENTRY_TWO = { CARPENTRY = 2 },
+    CARPENTRY_THREE = { CARPENTRY = 3 },
 }
 
 -- See cell_data.h
@@ -1422,7 +1430,9 @@ RECIPETABS =
 	FISHING =				{ str = "FISHING",				sort = 100, icon = "tab_fishing.tex",			crafting_station = true },
 	WINTERSFEASTCOOKING =	{ str = "WINTERSFEASTCOOKING",	sort = 100, icon = "tab_feast_oven.tex",		crafting_station = true },
     HERMITCRABSHOP =		{ str = "HERMITCRABSHOP",		sort = 100, icon = "tab_hermitcrab_shop.tex",	crafting_station = true, shop = true},
+    RABBITKINGSHOP =		{ str = "RABBITKINGSHOP",		sort = 100, icon = "tab_rabbitking.tex",		crafting_station = true, shop = true, icon_atlas = "images/hud2.xml"},
     TURFCRAFTING =		    { str = "TURFCRAFTING", 		sort = 100, icon = "tab_turfcrafting.tex",      crafting_station = true, icon_atlas = "images/hud2.xml" },
+    CARPENTRY =	    	    { str = "CARPENTRY",			sort = 100, icon = "station_carpentry.tex",     crafting_station = true, icon_atlas = "images/hud2.xml" },
 }
 
 CUSTOM_RECIPETABS =
@@ -1808,6 +1818,7 @@ MATERIALS =
     GEARS = "gears",
     MOONROCK = "moonrock",
     ICE = "ice",
+    CARROT = "carrot",
     SCULPTURE = "sculpture",
     FOSSIL = "fossil",
     MOON_ALTAR = "moon_altar",
@@ -1815,6 +1826,8 @@ MATERIALS =
     SHELL = "shell",
     NIGHTMARE = "nightmare",
 	DREADSTONE = "dreadstone",
+    SALT = "salt",
+    VITAE = "vitae",
 }
 
 FORGEMATERIALS =
@@ -1824,7 +1837,7 @@ FORGEMATERIALS =
     WAGPUNKBITS = "wagpunk_bits",
 }
 
-UPGRADETYPES =
+UPGRADETYPES = -- NOTES(JBK): Keep this table updated in export_accountitems.lua [EAITAB]
 {
     DEFAULT = "default",
     SPIDER = "spider",
@@ -1832,6 +1845,14 @@ UPGRADETYPES =
     MAST = "mast",
     SPEAR_LIGHTNING = "spear_lightning",
     CHEST = "chest",
+}
+
+SPELLTYPES = -- NOTES(JBK): Keep this table updated in export_accountitems.lua [EAITAB]
+{
+    WURT_SHADOW = "wurt_shadow",
+    WURT_LUNAR = "wurt_lunar",
+    SHADOW_SWAMP_BOMB = "shadow_swamp_bomb",
+    LUNAR_SWAMP_BOMB = "lunar_swamp_bomb",
 }
 
 LOCKTYPE =
@@ -1857,6 +1878,18 @@ FUELTYPE =
 OCCUPANTTYPE =
 {
     BIRD = "bird",
+}
+
+VALID_KITCOON_BUILDS = {
+    "kitcoon_forest_build",
+    "kitcoon_savanna_build",
+    "kitcoon_deciduous_build",
+    "kitcoon_marsh_build",
+    "kitcoon_grass_build",
+    "kitcoon_rocky_build",
+    "kitcoon_desert_build",
+    "kitcoon_moon_build",
+    "kitcoon_yot_build", 
 }
 
 FOODTYPE =
@@ -1968,52 +2001,18 @@ TECH_INGREDIENT =
     SCULPTING = "sculpting_material",
 }
 
--- Identifies which builder tags are from which characters' skill trees,
--- so that the crafting menu properly identifies that they're locked behind a skill
--- for your current character.
-TECH_SKILLTREE_BUILDER_TAG_OWNERS =
+-- NOTES(DiogoW): Now DEPRECATED, keeping it around for mods.
+    -- Identifies which builder tags are from which characters' skill trees,
+    -- so that the crafting menu properly identifies that they're locked behind a skill
+    -- for your current character.
+TECH_SKILLTREE_BUILDER_TAG_OWNERS = {}
+
+SKILLTREE_EQUIPPABLE_RESTRICTED_TAGS = 
 {
-    alchemist = "wilson",
-    gem_alchemistI = "wilson",
-    gem_alchemistII = "wilson",
-    gem_alchemistIII = "wilson",
-    ick_alchemistI = "wilson",
-    ick_alchemistII = "wilson",
-    ick_alchemistIII = "wilson",
-    ore_alchemistI = "wilson",
-    ore_alchemistII = "wilson",
-    ore_alchemistIII = "wilson",
-    skill_wilson_allegiance_lunar = "wilson",
-    skill_wilson_allegiance_shadow = "wilson",
-
-    wolfgang_coach = "wolfgang",
-    wolfgang_dumbbell_crafting = "wolfgang",
-
-    woodcarver1 = "woodie",
-    woodcarver2 = "woodie",
-    woodcarver3 = "woodie",
-
-    berrybushcrafter = "wormwood",
-    carratcrafter = "wormwood",
-    fruitdragoncrafter = "wormwood",
-    juicyberrybushcrafter = "wormwood",
-    lightfliercrafter = "wormwood",
-    lureplantcrafter = "wormwood",
-    reedscrafter = "wormwood",
-    saplingcrafter = "wormwood",
-    syrupcrafter = "wormwood",
-    lunarplant_husk_crafter = "wormwood",
-
-    battlesongcontainermaker = "wathgrithr",
-    battlesonginstantrevivemaker = "wathgrithr",
-    battlesonglunaralignedmaker = "wathgrithr",
-    battlesongshadowalignedmaker = "wathgrithr",
-    saddlewathgrithrmaker = "wathgrithr",
-    spearwathgrithrlightningmaker = "wathgrithr",
-    wathgrithrimprovedhatmaker = "wathgrithr",
-    wathgrithrshieldmaker = "wathgrithr",
-
-    fire_mastery_1 = "willow",
+    -- Using quotes for searching purposes.
+    ["inspectacleshatuser"]  = "winona",
+    ["wathgrithrshielduser"] = "wathgrithr",
+    [UPGRADETYPES.SPEAR_LIGHTNING.."_upgradeuser"] = "wathgrithr",
 }
 
 -- IngredientMod must be one of the following values
@@ -2046,6 +2045,12 @@ TOOLACTIONS =
     UNSADDLE = true,
 	REACH_HIGH = true,
 	SCYTHE = true,
+}
+
+FALLINGREASON =
+{
+    OCEAN = "ocean",
+    VOID = "void",
 }
 
 EQUIPMENTSETNAMES =
@@ -2087,6 +2092,12 @@ DEPLOYSPACING =
     LARGE = 5,
 }
 
+--V2C: Deploy spacing is a legacy system where this is actually the distance
+--     between our center point and other objects' center points.
+--     For newer things, half of DEPLOYSPACING_RADIUS is used to indicate our
+--     actual footprint radius, combined with nearby objects that have called
+--     SetDeploySmartRadius (or physics size for inventoryitems) to determine
+--     required deploy spacing.
 DEPLOYSPACING_RADIUS =
 {
     [DEPLOYSPACING.DEFAULT] = 2,
@@ -2296,6 +2307,7 @@ HOUNDWARNINGTYPE =
     LVL2_WORM = 5,
     LVL3_WORM = 6,
     LVL4_WORM = 7,
+    WORM_BOSS = 8,
 }
 
 -- Domestication tendencies
@@ -2622,6 +2634,16 @@ HUNT_ACTIONS = {
     SLEEP = 2,
 }
 
+THRALL_TYPES = {
+    SHADOW = {
+        TRIO = "trio",
+        MOUTH = "mouth",
+    },
+    LUNAR = {
+        PLANT = "plant",
+    },
+}
+
 LOADING_SCREEN_TIP_OPTIONS =
 {
     ALL = 1,
@@ -2723,7 +2745,32 @@ LOADING_SCREEN_CONTROLLER_ID_LOOKUP =
     [CONTROL_SHOW_PLAYER_STATUS] = CONTROL_MENU_MISC_4,
 }
 
+-- The games for inspectacles with netvar inspectacles_game range [0..7]
+INSPECTACLES_GAMES = {
+    NONE = 0,
+    WIRES = 1,
+    --GEARS = 2,
+    --TAPE = 3,
+    FREE1 = 2, -- FIXME(JBK): Adjust the enum for games added.
+    --FREE2 = 5,
+    --FREE3 = 6,
+}
+INSPECTACLES_GAMES_LOOKUP = {}
+for name, i in pairs(INSPECTACLES_GAMES) do
+    INSPECTACLES_GAMES_LOOKUP[i] = name
+end
+
+CHARLIERESIDUE_MAP_ACTIONS = {
+    NONE = 0,
+    WORMHOLE = 1,
+}
+
 -- Constants to reduce network overhead.
 CLIENTAUTHORITATIVESETTINGS = {
     PLATFORMHOPDELAY = 0,
+}
+
+NIGHTSWORD_FX_OFFSETS = {
+    RIGHT = 0.75,-- -1,
+    DOWN = 2.9,-- 2.6,
 }

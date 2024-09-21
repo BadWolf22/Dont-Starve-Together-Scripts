@@ -223,12 +223,19 @@ local actionhandlers =
     ActionHandler(ACTIONS.PICK,
         function(inst, action)
             return action.target ~= nil
-                and action.target.components.pickable ~= nil
-                and (   (action.target.components.pickable.jostlepick and "dojostleaction") or
-                        (action.target.components.pickable.quickpick and "doshortaction") or
-                        (inst:HasTag("fastpicker") and "doshortaction") or
-                        (inst:HasTag("quagmire_fasthands") and "domediumaction") or
-                        "dolongaction"  )
+                and (action.target.components.pickable ~= nil
+                    and (   (action.target.components.pickable.jostlepick and "dojostleaction") or
+                            (action.target.components.pickable.quickpick and "doshortaction") or
+                            (inst:HasTag("fastpicker") and "doshortaction") or
+                            (inst:HasTag("quagmire_fasthands") and "domediumaction") or
+                            "dolongaction"
+                    )
+                ) or (action.target.components.searchable ~= nil
+                    and (   (action.target.components.searchable.jostlesearch and "dojostleaction") or
+                            (action.target.components.searchable.quicksearch and "doshortaction") or
+                            "dolongaction"
+                    )
+                )
                 or nil
         end),
     ActionHandler(ACTIONS.TAKEITEM,
@@ -1934,6 +1941,7 @@ local states =
             DoTalkSound(inst)
             inst.sg:SetTimeout(TUNING.HERMITCRAB.SPEAKTIME - 0.5)
             inst.stoptalktask = inst:DoTaskInTime(2,function()
+                inst.stoptalktask = nil
                 StopTalkSound(inst)
                 inst.AnimState:PlayAnimation("idle")
             end)
@@ -1959,8 +1967,10 @@ local states =
         end,
 
         onexit = function(inst)
-            inst.stoptalktask:Cancel()
-            inst.stoptalktask = nil
+            if inst.stoptalktask ~= nil then
+                inst.stoptalktask:Cancel()
+                inst.stoptalktask = nil
+            end
             StopTalkSound(inst)
         end,
     },

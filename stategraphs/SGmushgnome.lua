@@ -17,7 +17,7 @@ local ANGLES = {
     9 * PI_BY_6,
     10 * PI_BY_6,
     11 * PI_BY_6,
-    2 * PI,
+    TWOPI,
 }
 
 local events =
@@ -70,6 +70,7 @@ local events =
             end
         end
     end),
+    CommonHandlers.OnFallInVoid(),
 }
 
 local function return_to_idle(inst)
@@ -376,6 +377,7 @@ CommonStates.AddSleepExStates(states,
         end),
     },
 })
+CommonStates.AddVoidFallStates(states)
 
 return StateGraph("mushgnome", states, events, "idle", actionhandlers)
 

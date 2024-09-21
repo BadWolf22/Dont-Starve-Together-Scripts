@@ -13,8 +13,6 @@ local prefabs_basic =
     "trunk_winter",
 }
 
-local prefabs_wave = prefabs_basic
-
 local prefabs_clay =
 {
     "redpouch",
@@ -235,7 +233,7 @@ local function TossItems(inst, x, z, minradius, maxradius)
                 x1 = x + dx * range
                 z1 = z + dz * range
             else
-                local angle = 2 * PI * math.random()
+                local angle = TWOPI * math.random()
                 x1 = x + math.cos(angle) * range
                 z1 = z + math.sin(angle) * range
             end
@@ -529,10 +527,8 @@ local function GetStatus(inst)
 end
 
 local function LaunchGooIcing(inst)
-    local theta = math.random() * 2 * PI
-    local r = inst:GetPhysicsRadius(0) + 0.25 + math.sqrt(math.random()) * TUNING.WARG_GINGERBREAD_GOO_DIST_VAR
+    local theta = math.random() * TWOPI
     local x, y, z = inst.Transform:GetWorldPosition()
-    local dest_x, dest_z = math.cos(theta) * r + x, math.sin(theta) * r + z
 
     local goo = SpawnPrefab("warg_gooicing")
     goo.Transform:SetPosition(x, y, z)

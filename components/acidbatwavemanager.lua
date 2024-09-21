@@ -13,7 +13,6 @@ self.inst = inst
 
 -- Constants.
 self.spawn_dist = TUNING.ACIDBATWAVE_SPAWN_DISTANCE
-self.spawn_count = TUNING.ACIDBATWAVE_SPAWN_COUNT
 self.max_target_prefab = TUNING.ACIDBATWAVE_NUMBER_OF_ITEMS_TO_GUARANTEE_WAVE_SPAWN
 self.cooldown_between_waves = TUNING.ACIDBATWAVE_COOLDOWN_BETWEEN_WAVES
 self.time_for_warning = TUNING.ACIDBATWAVE_TIME_FOR_WARNING
@@ -32,14 +31,16 @@ self.OnRemove_Bat = function(bat, data)
     self.acidbats[bat] = nil
 end
 function self:TrackAcidBat(bat)
-    self.acidbats[bat] = true
-    bat:ListenForEvent("onremove", self.OnRemove_Bat)
+    if not self.acidbats[bat] then
+        self.acidbats[bat] = true
+        bat:ListenForEvent("onremove", self.OnRemove_Bat)
+    end
 end
 self.NoHoles = function(pt)
     return not _world.Map:IsPointNearHole(pt)
 end
 function self:GetAcidBatSpawnPoint(pt)
-    local offset = FindWalkableOffset(pt, math.random() * 2 * PI, self.spawn_dist, 12, true, true, self.NoHoles)
+    local offset = FindWalkableOffset(pt, math.random() * TWOPI, self.spawn_dist, 12, true, true, self.NoHoles)
     if offset ~= nil then
         offset.x = offset.x + pt.x
         offset.z = offset.z + pt.z
@@ -51,9 +52,6 @@ end
 self.OnBatReturnToScene = function(bat, player)
     bat:ReturnToScene()
     bat:PushEvent("fly_back")
-    if player:IsValid() then
-        -- NOTES(JBK): The bats are spawned and the player is still there so the player should be a target for stealing nitre if they have it.
-    end
 end
 function self:SpawnAcidBatForPlayerAt(player, pt)
     local bat = SpawnPrefab("bat")

@@ -16,6 +16,12 @@ function Map:RegisterDeployExtraSpacing(spacing)
     DEPLOY_EXTRA_SPACING = math.max(spacing, DEPLOY_EXTRA_SPACING)
 end
 
+--NOTE: this merge the max of this into DEPLOY_EXTRA_SPACING
+--		see EntityScript:SetDeploySmartRadius(radius)
+function Map:RegisterDeploySmartRadius(radius)
+	DEPLOY_EXTRA_SPACING = math.max(radius + DEPLOYSPACING_RADIUS[DEPLOYSPACING.LARGE] / 2, DEPLOY_EXTRA_SPACING)
+end
+
 --NOTE: this is the max of all entities that have custom terraform_extra_spacing
 --      see EntityScript:SetTerraformExtraSpacing(spacing)
 local TERRAFORM_EXTRA_SPACING = 0
@@ -77,6 +83,16 @@ function Map:IsOceanTileAtPoint(x, y, z)
     return TileGroupManager:IsOceanTile(tile)
 end
 
+function Map:IsInvalidTileAtPoint(x, y, z)
+    local tile = self:GetTileAtPoint(x, y, z)
+    return TileGroupManager:IsInvalidTile(tile)
+end
+
+function Map:IsTemporaryTileAtPoint(x, y, z)
+    local tile = self:GetTileAtPoint(x, y, z)
+    return TileGroupManager:IsTemporaryTile(tile)
+end
+
 function Map:IsOceanAtPoint(x, y, z, allow_boats)
     return self:IsOceanTileAtPoint(x, y, z)                             -- Location is in the ocean tile range
         and not self:IsVisualGroundAtPoint(x, y, z)                     -- Location is NOT in the world overhang space
@@ -88,6 +104,7 @@ function Map:IsValidTileAtPoint(x, y, z)
     return not TileGroupManager:IsInvalidTile(tile)
 end
 
+-- Terraform tests
 local TERRAFORMBLOCKER_TAGS = { "terraformblocker" }
 local TERRAFORMBLOCKER_IGNORE_TAGS = { "INLIMBO" }
 function Map:CanTerraformAtPoint(x, y, z)
@@ -105,12 +122,25 @@ function Map:CanTerraformAtPoint(x, y, z)
     return true
 end
 
+function Map:IsTerraformingBlockedByAnObject(tile_x, tile_y)
+    if TERRAFORM_EXTRA_SPACING <= 0 then return false end
+
+    local cx, _, cz = self:GetTileCenterPoint(tile_x, tile_y)
+    for _, blocker in ipairs(TheSim:FindEntities(cx, 0, cz, TERRAFORM_EXTRA_SPACING, TERRAFORMBLOCKER_TAGS, TERRAFORMBLOCKER_IGNORE_TAGS)) do
+        if blocker.entity:IsVisible() and
+                blocker:GetDistanceSqToPoint(cx, 0, cz) < blocker.terraform_extra_spacing * blocker.terraform_extra_spacing then
+            return true
+        end
+    end
+
+    return false
+end
+
 function Map:CanPlowAtPoint(x, y, z)
-    local tile = self:GetTileAtPoint(x, y, z)
     if not self:CanPlantAtPoint(x, y, z) then
         return false
     elseif TERRAFORM_EXTRA_SPACING > 0 then
-        for i, v in ipairs(TheSim:FindEntities(x, 0, z, TERRAFORM_EXTRA_SPACING, TERRAFORMBLOCKER_TAGS, TERRAFORMBLOCKER_IGNORE_TAGS)) do
+        for _, v in ipairs(TheSim:FindEntities(x, 0, z, TERRAFORM_EXTRA_SPACING, TERRAFORMBLOCKER_TAGS, TERRAFORMBLOCKER_IGNORE_TAGS)) do
             if v.entity:IsVisible() and
                 v:GetDistanceSqToPoint(x, 0, z) < v.terraform_extra_spacing * v.terraform_extra_spacing then
                 return false
@@ -124,6 +154,7 @@ function Map:CanPlaceTurfAtPoint(x, y, z)
     return self:GetTileAtPoint(x, y, z) == WORLD_TILES.DIRT
 end
 
+--
 function Map:CanPlantAtPoint(x, y, z)
     local tile = self:GetTileAtPoint(x, y, z)
 
@@ -146,13 +177,14 @@ function Map:IsFarmableSoilAtPoint(x, y, z)
     return self:GetTileAtPoint(x, y, z) == WORLD_TILES.FARMING_SOIL
 end
 
-local DEPLOY_IGNORE_TAGS = { "NOBLOCK", "player", "FX", "INLIMBO", "DECOR", "walkableplatform", "walkableperipheral" }
+local DEPLOY_IGNORE_TAGS = { "NOBLOCK", "player", "FX", "INLIMBO", "DECOR", "walkableplatform", "walkableperipheral", "isdead"}
 
 local DEPLOY_IGNORE_TAGS_NOPLAYER = shallowcopy(DEPLOY_IGNORE_TAGS)
 table.removearrayvalue(DEPLOY_IGNORE_TAGS_NOPLAYER, "player")
 
 local TILLSOIL_IGNORE_TAGS = shallowcopy(DEPLOY_IGNORE_TAGS)
 table.insert(TILLSOIL_IGNORE_TAGS, "soil")
+table.insert(TILLSOIL_IGNORE_TAGS, "merm")
 
 local WALKABLEPERIPHERAL_DEPLOY_IGNORE_TAGS = shallowcopy(DEPLOY_IGNORE_TAGS)
 table.removearrayvalue(WALKABLEPERIPHERAL_DEPLOY_IGNORE_TAGS, "walkableperipheral")
@@ -172,14 +204,12 @@ end
 
 function Map:IsPointNearHole(pt, range)
     range = range or .5
-    for i, v in ipairs(TheSim:FindEntities(pt.x, 0, pt.z, DEPLOY_EXTRA_SPACING + range, HOLE_TAGS)) do
-        local radius = (v._groundhole_outerradius or v:GetPhysicsRadius(0)) + (v._groundhole_rangeoverride or range)
-        local distsq = v:GetDistanceSqToPoint(pt)
+    for _, hole in ipairs(TheSim:FindEntities(pt.x, 0, pt.z, DEPLOY_EXTRA_SPACING + range, HOLE_TAGS)) do
+        local radius = (hole._groundhole_outerradius or hole:GetPhysicsRadius(0)) + (hole._groundhole_rangeoverride or range)
+        local distsq = hole:GetDistanceSqToPoint(pt)
         if distsq < radius * radius then
-            if v._groundhole_innerradius and distsq < v._groundhole_innerradius * v._groundhole_innerradius then
-                return false
-            end
-            return true
+            local hole_innerradius = hole._groundhole_innerradius
+            return (hole_innerradius == nil) or (distsq >= (hole_innerradius * hole_innerradius))
         end
     end
     return false
@@ -187,34 +217,53 @@ end
 
 function Map:IsGroundTargetBlocked(pt, range)
     range = range or .5
-    for i, v in ipairs(TheSim:FindEntities(pt.x, 0, pt.z, math.max(DEPLOY_EXTRA_SPACING, MAX_GROUND_TARGET_BLOCKER_RADIUS) + range, nil, nil, BLOCKED_ONEOF_TAGS)) do
-        local radius = (v.ground_target_blocker_radius or v._groundhole_outerradius or v:GetPhysicsRadius(0)) + (v._groundhole_rangeoverride or range)
-        local distsq = v:GetDistanceSqToPoint(pt.x, 0, pt.z)
+    for _, blocker in ipairs(TheSim:FindEntities(pt.x, 0, pt.z, math.max(DEPLOY_EXTRA_SPACING, MAX_GROUND_TARGET_BLOCKER_RADIUS) + range, nil, nil, BLOCKED_ONEOF_TAGS)) do
+        local radius = (blocker.ground_target_blocker_radius or blocker._groundhole_outerradius or blocker:GetPhysicsRadius(0)) + (blocker._groundhole_rangeoverride or range)
+        local distsq = blocker:GetDistanceSqToPoint(pt.x, 0, pt.z)
         if distsq < radius * radius then
-            if v._groundhole_innerradius and distsq < v._groundhole_innerradius * v._groundhole_innerradius then
-                return false
-            end
-            return true
+            local blocker_innerradius = blocker._groundhole_innerradius
+            return (blocker_innerradius == nil) or (distsq >= (blocker_innerradius * blocker_innerradius))
         end
     end
     return false
 end
 
-local function IsNearOther(other, pt, min_spacing_sq)
+--V2C: keep backward compatible
+--     -original: IsNearOther(other, pt, min_spacing_sq)
+--     -new: -added support for deploy_smart_radius
+--           -supports missing min_spacing param
+local function IsNearOther(other, pt, min_spacing_sq, min_spacing)
     --FindEntities range check is <=, but we want <
-    return other:GetDistanceSqToPoint(pt.x, 0, pt.z) < (other.deploy_extra_spacing ~= nil and math.max(other.deploy_extra_spacing * other.deploy_extra_spacing, min_spacing_sq) or min_spacing_sq)
+	if min_spacing_sq <= 0 and other:HasTag("structure") then
+		--special case (e.g. minisigns use DEPLOYSPACING.NONE)
+		if other.deploy_extra_spacing then
+			min_spacing_sq = other.deploy_extra_spacing * other.deploy_extra_spacing
+		end
+	elseif other.deploy_smart_radius then
+		min_spacing = other.deploy_smart_radius + (min_spacing or math.sqrt(min_spacing_sq)) / 2
+		min_spacing_sq = min_spacing * min_spacing
+	elseif other.deploy_extra_spacing then
+		min_spacing_sq = math.max(other.deploy_extra_spacing * other.deploy_extra_spacing, min_spacing_sq)
+	elseif other.replica.inventoryitem then
+		min_spacing = other:GetPhysicsRadius(0.5) + (min_spacing or math.sqrt(min_spacing_sq)) / 2
+		min_spacing_sq = math.min(min_spacing * min_spacing, min_spacing_sq)
+	end
+	return other:GetDistanceSqToPoint(pt) < min_spacing_sq
 end
 
 function Map:IsDeployPointClear(pt, inst, min_spacing, min_spacing_sq_fn, near_other_fn, check_player, custom_ignore_tags)
     local min_spacing_sq = min_spacing ~= nil and min_spacing * min_spacing or nil
     near_other_fn = near_other_fn or IsNearOther
-    for i, v in ipairs(TheSim:FindEntities(pt.x, 0, pt.z, math.max(DEPLOY_EXTRA_SPACING, min_spacing), nil, (custom_ignore_tags ~= nil and custom_ignore_tags) or (check_player and DEPLOY_IGNORE_TAGS_NOPLAYER) or DEPLOY_IGNORE_TAGS)) do
+    for _, v in ipairs(TheSim:FindEntities(pt.x, 0, pt.z, math.max(DEPLOY_EXTRA_SPACING, min_spacing), nil, (custom_ignore_tags ~= nil and custom_ignore_tags) or (check_player and DEPLOY_IGNORE_TAGS_NOPLAYER) or DEPLOY_IGNORE_TAGS)) do
         if v ~= inst and
             v.entity:IsVisible() and
             v.components.placer == nil and
-            v.entity:GetParent() == nil and
-            near_other_fn(v, pt, min_spacing_sq_fn ~= nil and min_spacing_sq_fn(v) or min_spacing_sq) then
-            return false
+			v.entity:GetParent() == nil
+		then
+			local v_min_spacing_sq = min_spacing_sq_fn and min_spacing_sq_fn(v) or min_spacing_sq
+			if near_other_fn(v, pt, v_min_spacing_sq, (v_min_spacing_sq == min_spacing_sq and min_spacing) or nil) then
+				return false
+			end
         end
     end
     return true
@@ -222,7 +271,12 @@ end
 
 local function IsNearOther2(other, pt, object_size)
     --FindEntities range check is <=, but we want <
-    object_size = object_size + (other.deploy_extra_spacing or 0)
+	object_size = object_size + (
+		other.deploy_smart_radius or
+		other.deploy_extra_spacing or
+		(other.replica.inventoryitem and other:GetPhysicsRadius(0.5)) or
+		0
+	)
     return other:GetDistanceSqToPoint(pt.x, 0, pt.z) < object_size * object_size
 end
 
@@ -254,12 +308,12 @@ function Map:CanDeployPlantAtPoint(pt, inst)
         and self:IsDeployPointClear(pt, inst, inst.replica.inventoryitem ~= nil and inst.replica.inventoryitem:DeploySpacingRadius() or DEPLOYSPACING_RADIUS[DEPLOYSPACING.DEFAULT])
 end
 
-local function IsNearOtherWallOrPlayer(other, pt, min_spacing_sq)
+local function IsNearOtherWallOrPlayer(other, pt, min_spacing_sq, min_spacing)
     if other:HasTag("wall") or other:HasTag("player") then
         local x, y, z = other.Transform:GetWorldPosition()
         return math.floor(x) == math.floor(pt.x) and math.floor(z) == math.floor(pt.z)
     end
-    return IsNearOther(other, pt, min_spacing_sq)
+	return IsNearOther(other, pt, min_spacing_sq, min_spacing)
 end
 
 function Map:CanDeployWallAtPoint(pt, inst)
@@ -313,17 +367,28 @@ function Map:CanDeployMastAtPoint(pt, inst, mouseover)
         and self:IsDeployPointClear(pt, nil, inst.replica.inventoryitem:DeploySpacingRadius())
 end
 
-function Map:CanDeployWalkablePeripheralAtPoint(pt, inst)
-    return self:IsDeployPointClear(pt, nil, inst.replica.inventoryitem:DeploySpacingRadius(), nil, nil, nil, WALKABLEPERIPHERAL_DEPLOY_IGNORE_TAGS)
+local function IsNearOtherWalkablePeripheral(other, pt, min_spacing_sq, min_spacing)
+	return other:HasTag("walkableperipheral") and IsNearOther(other, pt, min_spacing_sq, min_spacing)
 end
 
-local function IsDockNearOtherOnOcean(other, pt, min_spacing_sq)
-    --FindEntities range check is <=, but we want <
-    local min_spacing_sq_resolved = (other.deploy_extra_spacing ~= nil and math.max(other.deploy_extra_spacing * other.deploy_extra_spacing, min_spacing_sq))
-        or min_spacing_sq
-    local ox, oy, oz = other.Transform:GetWorldPosition()
-    return distsq(pt.x, pt.z, ox, oz) < min_spacing_sq_resolved
-        and not TheWorld.Map:IsVisualGroundAtPoint(ox, oy, oz)  -- Throw out any tests for anything that's not in the ocean.
+function Map:CanDeployWalkablePeripheralAtPoint(pt, inst)
+	return self:IsDeployPointClear(pt, nil, inst.replica.inventoryitem:DeploySpacingRadius(), nil, IsNearOtherWalkablePeripheral, nil, WALKABLEPERIPHERAL_DEPLOY_IGNORE_TAGS)
+end
+
+local function IsDockNearOtherOnOcean(other, pt, min_spacing_sq, min_spacing)
+	return IsNearOther(other, pt, min_spacing_sq, min_spacing)
+		and not TheWorld.Map:IsVisualGroundAtPoint(other.Transform:GetWorldPosition())  -- Throw out any tests for anything that's not in the ocean.
+end
+
+function Map:HasAdjacentLandTile(tx, ty) -- Tile coordinates only.
+    for x_off = -1, 1, 1 do
+        for y_off = -1, 1, 1 do
+            if (x_off ~= 0 or y_off ~= 0) and IsLandTile(TheWorld.Map:GetTile(tx + x_off, ty + y_off)) then
+                return true
+            end
+        end
+    end
+    return false
 end
 
 function Map:CanDeployDockAtPoint(pt, inst, mouseover)
@@ -344,8 +409,75 @@ function Map:CanDeployDockAtPoint(pt, inst, mouseover)
         end
     end
 
+    for _, entity_on_tile in ipairs(TheWorld.Map:GetEntitiesOnTileAtPoint(pt.x, 0, pt.z)) do
+        if entity_on_tile:HasTag("dockjammer") then
+            return false
+        end
+    end
+
     return (mouseover == nil or mouseover:HasTag("player"))
         and self:IsDeployPointClear(pt, nil, min_distance_from_entities, nil, IsDockNearOtherOnOcean)
+end
+
+function Map:CanDeployBridgeAtPointWithFilter(pt, inst, mouseover, tilefilterfn)
+    if tilefilterfn then
+        local tile = self:GetTileAtPoint(pt.x, pt.y, pt.z)
+        if not tilefilterfn(self, tile) then
+            return false
+        end
+    end
+
+    local id, index = self:GetTopologyIDAtPoint(pt.x, pt.y, pt.z)
+    if id and (id:find("Archive") or id:find("Labyrinth") or id:find("Atrium")) then
+        return false
+    end
+
+    -- TILE_SCALE is the dimension of a tile; 1.0 is the approximate overhang, but we overestimate for safety.
+    local min_distance_from_entities = (TILE_SCALE/2) + 1.2
+    local min_distance_from_boat = min_distance_from_entities + TUNING.MAX_WALKABLE_PLATFORM_RADIUS
+    local boat_entities = TheSim:FindEntities(pt.x, 0, pt.z, min_distance_from_boat, WALKABLE_PLATFORM_TAGS)
+    for _, v in ipairs(boat_entities) do
+        if v.components.walkableplatform ~= nil and
+                math.sqrt(v:GetDistanceSqToPoint(pt.x, 0, pt.z)) <= (v.components.walkableplatform.platform_radius + min_distance_from_entities) then
+            return false
+        end
+    end
+
+    for _, entity_on_tile in ipairs(TheWorld.Map:GetEntitiesOnTileAtPoint(pt.x, 0, pt.z)) do
+        if entity_on_tile:HasTag("dockjammer") then
+            return false
+        end
+    end
+
+    return (mouseover == nil or mouseover:HasTag("player"))
+        and self:IsDeployPointClear(pt, nil, min_distance_from_entities)
+end
+
+function Map:BridgeFilter_OceanAndVoid(tile)
+    return TileGroupManager:IsOceanTile(tile) or TileGroupManager:IsInvalidTile(tile)
+end
+function Map:BridgeFilter_Void(tile)
+    return TileGroupManager:IsInvalidTile(tile)
+end
+
+function Map:CanDeployRopeBridgeAtPoint(pt, inst, mouseover)
+    if not TheWorld:HasTag("cave") then -- Faster check than the CanDeploy check.
+        return false
+    end
+    return self:CanDeployBridgeAtPointWithFilter(pt, inst, mouseover, self.BridgeFilter_Void)
+end
+function Map:CanDeployVineBridgeAtPoint(pt, inst, mouseover)
+    return self:CanDeployBridgeAtPointWithFilter(pt, inst, mouseover, self.BridgeFilter_OceanAndVoid)
+end
+
+function Map:IsValidTileForRopeBridgeAtPoint(x, y, z)
+    local tile = self:GetTileAtPoint(x, y, z)
+    return self:BridgeFilter_Void(tile)
+end
+
+function Map:IsValidTileForVineBridgeAtPoint(x, y, z)
+    local tile = self:GetTileAtPoint(x, y, z)
+    return self:BridgeFilter_OceanAndVoid(tile)
 end
 
 function Map:IsDockAtPoint(x, y, z)
@@ -668,6 +800,20 @@ function Map:CanCastAtPoint(pt, alwayspassable, allowwater, deployradius)
 		return deployradius == nil or deployradius <= 0 or self:IsDeployPointClear(pt, nil, deployradius, nil, nil, nil, CAST_DEPLOY_IGNORE_TAGS)
 	end
 	return false
+end
+
+function Map:IsInMapBounds(x, y, z)
+    local tx, tz = self:GetTileCoordsAtPoint(x, y, z)
+    if tx < 0 or tz < 0 then
+        return false
+    end
+
+    local w, h = self:GetSize()
+    if tx > w or tz > h then
+        return false
+    end
+
+    return true
 end
 
 function Map:IsTileLandNoDocks(tile)

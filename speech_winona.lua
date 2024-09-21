@@ -2,59 +2,11 @@
 return{
 	ACTIONFAIL =
 	{
-        APPRAISE =
+        GENERIC =
         {
-            NOTNOW = "Guess he ain't got the time right now.",
+            ITEMMIMIC = "I knew it felt funny.",
         },
-        REPAIR =
-        {
-            WRONGPIECE = "That'd clog the assembly line.",
-        },
-        BUILD =
-        {
-            MOUNTED = "Can't assemble anything from up here.",
-            HASPET = "Nah. I'm a one-pet gal.",
-			TICOON = "I'm not lookin' to expand my workforce.",
-        },
-		SHAVE =
-		{
-			AWAKEBEEFALO = "Dirty work's not for broad daylight.",
-			GENERIC = "I'd NEVER misuse a tool.",
-			NOBITS = "Smooth as sheet metal.",
---fallback to speech_wilson.lua             REFUSE = "only_used_by_woodie",
-            SOMEONEELSESBEEFALO = "Nope, I'm not shavin' someone else's beefalo.",
-		},
-		STORE =
-		{
-			GENERIC = "It's full to bursting.",
-			NOTALLOWED = "That's just impractical.",
-			INUSE = "No rush.",
-            NOTMASTERCHEF = "I don't wanna ruin whatever Warly's working on.",
-		},
-        CONSTRUCT =
-        {
-            INUSE = "Aw someone else is building it already.",
-            NOTALLOWED = "Square peg in a round hole.",
-            EMPTY = "I gotta have something to build with.",
-            MISMATCH = "Oops! Wrong plans.",
-            NOTREADY = "Maybe once it's settled down around here!",
-        },
-		RUMMAGE =
-		{
-			GENERIC = "I can't right now.",
-			INUSE = "No rush.",
-            NOTMASTERCHEF = "I don't wanna ruin whatever Warly's working on.",
-		},
-		UNLOCK =
-        {
-        	WRONGKEY = "That ain't right.",
-        },
-		USEKLAUSSACKKEY =
-        {
-        	WRONGKEY = "Hm. Didn't work.",
-        	KLAUS = "Success!",
-			QUAGMIRE_WRONGKEY = "There's another key around here somewhere.",
-        },
+
 		ACTIVATE =
 		{
 			LOCKED_GATE = "Can't get in yet.",
@@ -68,55 +20,138 @@ return{
             MANNEQUIN_EQUIPSWAPFAILED = "Just kiddin'!",
             PILLOWFIGHT_NO_HANDPILLOW = "Err, I think I'm missin' something.",
             NOTMYBERNIE = "Whoa. Take it easy, big fella.",
+            NOTMERM = "Fine. Y'all wait around for Wurt then.",
+            NOKELP = "only_used_by_wurt",
+--fallback to speech_wilson.lua             HASMERMLEADER = "only_used_by_wurt",
 		},
-		OPEN_CRAFTING =
+        APPLYMODULE =
+        {
+            COOLDOWN = "only_used_by_wx78",
+            NOTENOUGHSLOTS = "only_used_by_wx78",
+        },
+        APPRAISE =
+        {
+            NOTNOW = "Guess he ain't got the time right now.",
+        },
+        ATTUNE =
+        {
+            NOHEALTH = "I don't have it in me right now.",
+        },
+        BATHBOMB =
+        {
+            GLASSED = "Can't do that with all this glass in the way.",
+            ALREADY_BOMBED = "That one's already been glitzed up.",
+        },
+        BEDAZZLE =
+        {
+--fallback to speech_wilson.lua             BURNING = "only_used_by_webber",
+--fallback to speech_wilson.lua             BURNT = "only_used_by_webber",
+--fallback to speech_wilson.lua             FROZEN = "only_used_by_webber",
+--fallback to speech_wilson.lua             ALREADY_BEDAZZLED = "only_used_by_webber",
+        },
+        BEGIN_QUEST =
+        {
+            ONEGHOST = "only_used_by_wendy",
+        },
+        BUILD =
+        {
+            MOUNTED = "Can't assemble anything from up here.",
+            HASPET = "Nah. I'm a one-pet gal.",
+			TICOON = "I'm not lookin' to expand my workforce.",
+            BUSY_STATION = "Looks like I gotta wait.",
+        },
+        CARNIVALGAME_FEED =
+        {
+            TOO_LATE = "Shoot! I've gotta be faster next time!",
+        },
+		CAST_POCKETWATCH =
 		{
-            PROFESSIONALCHEF = "I don't wanna ruin whatever Warly's working on.",
-			SHADOWMAGIC = "I don't trust that thing one bit.",
+--fallback to speech_wilson.lua 			GENERIC = "only_used_by_wanda",
+--fallback to speech_wilson.lua 			REVIVE_FAILED = "only_used_by_wanda",
+--fallback to speech_wilson.lua 			WARP_NO_POINTS_LEFT = "only_used_by_wanda",
+--fallback to speech_wilson.lua 			SHARD_UNAVAILABLE = "only_used_by_wanda",
 		},
+		CAST_SPELLBOOK =
+		{
+--fallback to speech_wilson.lua 			NO_TOPHAT = "only_used_by_waxwell",
+		},
+		CASTAOE =
+		{
+--fallback to speech_wilson.lua 			NO_MAX_SANITY = "only_used_by_waxwell",
+            NOT_ENOUGH_EMBERS = "only_used_by_willow",
+            NO_TARGETS = "only_used_by_willow",
+            CANT_SPELL_MOUNTED = "only_used_by_willow",
+            SPELL_ON_COOLDOWN = "only_used_by_willow",
+			NO_BATTERY = "Darn clicker's outta juice.",
+			NO_CATAPULTS = "Looks like I'm outta range.",
+		},
+        CASTSPELL =
+        {
+            TERRAFORM_TOO_SOON = "only_used_by_wurt",
+        },
+        CHANGEIN =
+        {
+            GENERIC = "All a gal needs is a good pair of overalls.",
+            BURNING = "Fire in textiles!",
+            INUSE = "Should I put together another one?",
+            NOTENOUGHHAIR = "I need more hair to work with.",
+            NOOCCUPANT = "It might work better if I had a beefalo hitched up.",
+        },
+        CHARGE_FROM =
+        {
+            NOT_ENOUGH_CHARGE = "only_used_by_wx78",
+            CHARGE_FULL = "only_used_by_wx78",
+        },
+		COMPARE_WEIGHABLE =
+		{
+            FISH_TOO_SMALL = "This one's too shrimpy!",
+            OVERSIZEDVEGGIES_TOO_SMALL = "Nah, this one's not quite up to snuff.",
+		},
+        CONSTRUCT =
+        {
+            INUSE = "Aw someone else is building it already.",
+            NOTALLOWED = "Square peg in a round hole.",
+            EMPTY = "I gotta have something to build with.",
+            MISMATCH = "Oops! Wrong plans.",
+            NOTREADY = "Maybe once it's settled down around here!",
+        },
         COOK =
         {
             GENERIC = "I'm not really in a cooking mood.",
             INUSE = "How's the grub coming?",
             TOOFAR = "I gotta get closer. Or grow longer arms.",
         },
-        START_CARRAT_RACE =
-        {
-            NO_RACERS = "Whoever heard of a race with no racers?",
-        },
-
-		DISMANTLE = 
+		DISMANTLE =
 		{
 			COOKING = "I'm all for striking while the iron's hot, but...",
 			INUSE = "No rush.",
 			NOTEMPTY = "Better clear it out first.",
         },
+        DISMANTLE_POCKETWATCH =
+        {
+--fallback to speech_wilson.lua             ONCOOLDOWN = "only_used_by_wanda",
+        },
+        DRAW =
+        {
+            NOIMAGE = "I'm not much of an artist.",
+        },
+        ENTER_GYM =
+        {
+--fallback to speech_wilson.lua             NOWEIGHT = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             UNBALANCED = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             ONFIRE = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             SMOULDER = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             HUNGRY = "only_used_by_wolfang",
+--fallback to speech_wilson.lua             FULL = "only_used_by_wolfang",
+        },
+        FILL_OCEAN =
+        {
+            UNSUITABLE_FOR_PLANTS = "I've got a hunch that'll be bad for the plants.",
+        },
         FISH_OCEAN =
 		{
 			TOODEEP = "I'll need a tougher rod to reel in one of those whoppers!",
 		},
-        OCEAN_FISHING_POND =
-		{
-			WRONGGEAR = "I think I could just use a regular old rod here.",
-		},
-        --wickerbottom specific action
---fallback to speech_wilson.lua         READ =
---fallback to speech_wilson.lua         {
---fallback to speech_wilson.lua             GENERIC = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOBIRDS = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOWATERNEARBY = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             TOOMANYBIRDS = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             WAYTOOMANYBIRDS = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOFIRES =       "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOSILVICULTURE = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOHORTICULTURE = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOTENTACLEGROUND = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOSLEEPTARGETS = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             TOOMANYBEES = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOMOONINCAVES = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             ALREADYFULLMOON = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua         },
-
         GIVE =
         {
             GENERIC = "That ain't right.",
@@ -127,6 +162,7 @@ return{
             GHOSTHEART = "Some things even I can't fix.",
             NOTGEM = "What sort of worker do you take me for?",
             WRONGGEM = "Nn-nn. That doesn't go there.",
+			NOGENERATORSKILL = "I'm sure it can be done, with the right know-how.",
             NOTSTAFF = "It doesn't fit together like that.",
             MUSHROOMFARM_NEEDSSHROOM = "It doesn't need this.",
             MUSHROOMFARM_NEEDSLOG = "It needs something else.",
@@ -151,6 +187,10 @@ return{
             NOTAMONKEY = "I can't make sense of all yer hollerin'!",
             QUEENBUSY = "I'll wait, she's got work to do.",
         },
+        GIVE_TACKLESKETCH =
+		{
+			DUPLICATE = "I've already tackled this one.",
+        },
         GIVETOPLAYER =
         {
             FULL = "I'll hold on to it for now. They're all loaded up.",
@@ -165,26 +205,44 @@ return{
             SLEEPING = "They're off the clock.",
             BUSY = "They're busy working.",
         },
-        WRITE =
+        HARVEST =
         {
-            GENERIC = "I'm better with my hands than my words.",
-            INUSE = "Workin' hard, or hardly workin'?",
+            DOER_ISNT_MODULE_OWNER = "I just thought the lil guy could use a polish.",
         },
-        DRAW =
+        HEAL =
         {
-            NOIMAGE = "I'm not much of an artist.",
+            NOT_MERM = "Sorry, guess it's specially-made for merms.",
         },
-        CHANGEIN =
+        HERD_FOLLOWERS =
         {
-            GENERIC = "All a gal needs is a good pair of overalls.",
-            BURNING = "Fire in textiles!",
-            INUSE = "Should I put together another one?",
-            NOTENOUGHHAIR = "I need more hair to work with.",
-            NOOCCUPANT = "It might work better if I had a beefalo hitched up.",
+            WEBBERONLY = "Looks like I'm not the boss here.",
         },
-        ATTUNE =
+        HITCHUP =
         {
-            NOHEALTH = "I don't have it in me right now.",
+            NEEDBEEF = "I'd better rustle up a beefalo.",
+            NEEDBEEF_CLOSER = "I gotta coax my beefalo to come closer.",
+            BEEF_HITCHED = "All hitched up.",
+            INMOOD = "It's too ornery to hitch up.",
+        },
+		LOOKAT = --fail strings for close inspection
+		{
+			-- Winona specific
+			ROSEGLASSES_INVALID = "No signs of Charlie.",
+			ROSEGLASSES_COOLDOWN = "Let's take a breather.",
+            ROSEGLASSES_DISMISS = "Drat, I lost the trail!",
+            ROSEGLASSES_STUMPED = "Hmm... I can't tell if Charlie's been here.",
+			--
+		},
+        LOWER_SAIL_FAIL =
+        {
+            "Pretty sure that ain't how that's supposed to go.",
+            "One more time, nice an' easy...",
+            "C'mon now, work with me here!",
+        },
+        MARK =
+        {
+            ALREADY_MARKED = "This one looks like a winner!",
+            NOT_PARTICIPANT = "Guess I'll wait for the next round.",
         },
         MOUNT =
         {
@@ -192,27 +250,18 @@ return{
             INUSE = "Only one to a beef, hey?",
 			SLEEPING = "Up and at 'em, big guy!",
         },
-        SADDLE =
+        OCEAN_FISHING_POND =
+		{
+			WRONGGEAR = "I think I could just use a regular old rod here.",
+		},
+		OPEN_CRAFTING =
+		{
+            PROFESSIONALCHEF = "I don't wanna ruin whatever Warly's working on.",
+			SHADOWMAGIC = "I don't trust that thing one bit.",
+		},
+        PICK =
         {
-            TARGETINCOMBAT = "It's a bit preoccupied.",
-        },
-        TEACH =
-        {
-            --Recipes/Teacher
-            KNOWN = "Pfft. A baby could assemble those.",
-            CANTLEARN = "That's above my pay grade.",
-
-            --MapRecorder/MapExplorer
-            WRONGWORLD = "That ain't gonna work here.",
-
-			--MapSpotRevealer/messagebottle
-			MESSAGEBOTTLEMANAGER_NOT_FOUND = "It's kinda hard to read in here...",--Likely trying to read messagebottle treasure map in caves
-
-            STASH_MAP_NOT_FOUND = "I can't make heads or monkey tails of it. Ha!",-- Likely trying to read stash map  in world without stash                  
-        },
-        WRAPBUNDLE =
-        {
-            EMPTY = "I can't wrap up thin air.",
+            NOTHING_INSIDE = "Well that was pointless.",
         },
         PICKUP =
         {
@@ -227,67 +276,10 @@ return{
 --fallback to speech_wilson.lua 			NO_HEAVY_LIFTING = "only_used_by_wanda",
             FULL_OF_CURSES = "I'll be keepin' my distance.",
         },
-        SLAUGHTER =
-        {
-            TOOFAR = "It's well outta my reach.",
-        },
-        REPLATE =
-        {
-            MISMATCH = "I always get my dishes mixed up.",
-            SAMEDISH = "It's on a dish already.",
-        },
-        SAIL =
-        {
-        	REPAIR = "In my professional opinion, she don't need repairin'.",
-        },
-        ROW_FAIL =
-        {
-            BAD_TIMING0 = "Gotta keep a steady pace, like on the ol' assembly line!",
-            BAD_TIMING1 = "I'll get the hang of this!",
-            BAD_TIMING2 = "Shoot, I'm sure there's a knack to this.",
-        },
-        LOWER_SAIL_FAIL =
-        {
-            "Pretty sure that ain't how that's supposed to go.",
-            "One more time, nice an' easy...",
-            "C'mon now, work with me here!",
-        },
-        BATHBOMB =
-        {
-            GLASSED = "Can't do that with all this glass in the way.",
-            ALREADY_BOMBED = "That one's already been glitzed up.",
-        },
-		GIVE_TACKLESKETCH =
-		{
-			DUPLICATE = "We already got these schematics.",
-		},
-		COMPARE_WEIGHABLE =
-		{
-            FISH_TOO_SMALL = "This one's too shrimpy!",
-            OVERSIZEDVEGGIES_TOO_SMALL = "Nah, this one's not quite up to snuff.",
-		},
-        BEGIN_QUEST =
-        {
-            ONEGHOST = "only_used_by_wendy",
-        },
-		TELLSTORY =
-		{
-			GENERIC = "only_used_by_walter",
---fallback to speech_wilson.lua 			NOT_NIGHT = "only_used_by_walter",
---fallback to speech_wilson.lua 			NO_FIRE = "only_used_by_walter",
-		},
-        SING_FAIL =
-        {
---fallback to speech_wilson.lua             SAMESONG = "only_used_by_wathgrithr",
-        },
         PLANTREGISTRY_RESEARCH_FAIL =
         {
             GENERIC = "I know about all there is to know about that one.",
             FERTILIZER = "Yeah, I think I've got the gist.",
-        },
-        FILL_OCEAN =
-        {
-            UNSUITABLE_FOR_PLANTS = "I've got a hunch that'll be bad for the plants.",
         },
         POUR_WATER =
         {
@@ -296,6 +288,113 @@ return{
         POUR_WATER_GROUNDTILE =
         {
             OUT_OF_WATER = "Everybody take five while I go find some more water!",
+        },
+        --wickerbottom specific action
+--fallback to speech_wilson.lua         READ =
+--fallback to speech_wilson.lua         {
+--fallback to speech_wilson.lua             GENERIC = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOBIRDS = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOWATERNEARBY = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             TOOMANYBIRDS = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             WAYTOOMANYBIRDS = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOFIRES =       "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOSILVICULTURE = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOHORTICULTURE = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOTENTACLEGROUND = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOSLEEPTARGETS = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             TOOMANYBEES = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOMOONINCAVES = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             ALREADYFULLMOON = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua         },
+		REMOTE_TELEPORT =
+		{
+			NOSKILL = "Huh. I ain't familiar with this model.",
+			NODEST = "It's not gonna work without a receiving end.",
+		},
+        REMOVEMODULES =
+        {
+            NO_MODULES = "only_used_by_wx78",
+        },
+        REPAIR =
+        {
+            WRONGPIECE = "That'd clog the assembly line.",
+        },
+        REPLATE =
+        {
+            MISMATCH = "I always get my dishes mixed up.",
+            SAMEDISH = "It's on a dish already.",
+        },
+        ROW_FAIL =
+        {
+            BAD_TIMING0 = "Gotta keep a steady pace, like on the ol' assembly line!",
+            BAD_TIMING1 = "I'll get the hang of this!",
+            BAD_TIMING2 = "Shoot, I'm sure there's a knack to this.",
+        },
+		RUMMAGE =
+		{
+			GENERIC = "I can't right now.",
+			INUSE = "No rush.",
+            NOTMASTERCHEF = "I don't wanna ruin whatever Warly's working on.",
+            NOTAMERM = "Nah. I know where I ain't welcome.",
+		},
+        SADDLE =
+        {
+            TARGETINCOMBAT = "It's a bit preoccupied.",
+        },
+		SHAVE =
+		{
+			AWAKEBEEFALO = "Dirty work's not for broad daylight.",
+			GENERIC = "I'd NEVER misuse a tool.",
+			NOBITS = "Smooth as sheet metal.",
+--fallback to speech_wilson.lua             REFUSE = "only_used_by_woodie",
+            SOMEONEELSESBEEFALO = "Nope, I'm not shavin' someone else's beefalo.",
+		},
+        SING_FAIL =
+        {
+--fallback to speech_wilson.lua             SAMESONG = "only_used_by_wathgrithr",
+        },
+        SLAUGHTER =
+        {
+            TOOFAR = "It's well outta my reach.",
+        },
+        START_CARRAT_RACE =
+        {
+            NO_RACERS = "Whoever heard of a race with no racers?",
+        },
+		STORE =
+		{
+			GENERIC = "It's full to bursting.",
+			NOTALLOWED = "That's just impractical.",
+			INUSE = "No rush.",
+            NOTMASTERCHEF = "I don't wanna ruin whatever Warly's working on.",
+		},
+        TEACH =
+        {
+            --Recipes/Teacher
+            KNOWN = "Pfft. A baby could assemble those.",
+            CANTLEARN = "That's above my pay grade.",
+
+            --MapRecorder/MapExplorer
+            WRONGWORLD = "That ain't gonna work here.",
+
+			--MapSpotRevealer/messagebottle
+			MESSAGEBOTTLEMANAGER_NOT_FOUND = "It's kinda hard to read in here...",--Likely trying to read messagebottle treasure map in caves
+
+            STASH_MAP_NOT_FOUND = "I can't make heads or monkey tails of it. Ha!",-- Likely trying to read stash map  in world without stash                  
+        },
+		TELLSTORY =
+		{
+			GENERIC = "only_used_by_walter",
+--fallback to speech_wilson.lua 			NOT_NIGHT = "only_used_by_walter",
+--fallback to speech_wilson.lua 			NO_FIRE = "only_used_by_walter",
+		},
+		UNLOCK =
+        {
+            WRONGKEY = "That ain't right.",
+        },
+        UPGRADE =
+        {
+--fallback to speech_wilson.lua             BEDAZZLED = "only_used_by_webber",
         },
         USEITEMON =
         {
@@ -306,17 +405,20 @@ return{
             BEEF_BELL_ALREADY_USED = "I'm pretty sure that's someone else's beefalo.",
             BEEF_BELL_HAS_BEEF_ALREADY = "I've already got a beefalo, thanks.",
         },
-        HITCHUP =
+		USEKLAUSSACKKEY =
         {
-            NEEDBEEF = "I'd better rustle up a beefalo.",
-            NEEDBEEF_CLOSER = "I gotta coax my beefalo to come closer.",
-            BEEF_HITCHED = "All hitched up.",
-            INMOOD = "It's too ornery to hitch up.",
+            WRONGKEY = "Hm. Didn't work.",
+            KLAUS = "Success!",
+			QUAGMIRE_WRONGKEY = "There's another key around here somewhere.",
         },
-        MARK =
+        WRAPBUNDLE =
         {
-            ALREADY_MARKED = "This one looks like a winner!",
-            NOT_PARTICIPANT = "Guess I'll wait for the next round.",
+            EMPTY = "I can't wrap up thin air.",
+        },
+        WRITE =
+        {
+            GENERIC = "I'm better with my hands than my words.",
+            INUSE = "Workin' hard, or hardly workin'?",
         },
         YOTB_STARTCONTEST =
         {
@@ -327,80 +429,6 @@ return{
         {
             ALREADYKNOWN = "I've already got this one down pat.",
         },
-        CARNIVALGAME_FEED =
-        {
-            TOO_LATE = "Shoot! I've gotta be faster next time!",
-        },
-        HERD_FOLLOWERS =
-        {
-            WEBBERONLY = "Looks like I'm not the boss here.",
-        },
-        BEDAZZLE =
-        {
---fallback to speech_wilson.lua             BURNING = "only_used_by_webber",
---fallback to speech_wilson.lua             BURNT = "only_used_by_webber",
---fallback to speech_wilson.lua             FROZEN = "only_used_by_webber",
---fallback to speech_wilson.lua             ALREADY_BEDAZZLED = "only_used_by_webber",
-        },
-        UPGRADE =
-        {
---fallback to speech_wilson.lua             BEDAZZLED = "only_used_by_webber",
-        },
-		CAST_POCKETWATCH =
-		{
---fallback to speech_wilson.lua 			GENERIC = "only_used_by_wanda",
---fallback to speech_wilson.lua 			REVIVE_FAILED = "only_used_by_wanda",
---fallback to speech_wilson.lua 			WARP_NO_POINTS_LEFT = "only_used_by_wanda",
---fallback to speech_wilson.lua 			SHARD_UNAVAILABLE = "only_used_by_wanda",
-		},
-        DISMANTLE_POCKETWATCH =
-        {
---fallback to speech_wilson.lua             ONCOOLDOWN = "only_used_by_wanda",
-        },
-
-        ENTER_GYM =
-        {
---fallback to speech_wilson.lua             NOWEIGHT = "only_used_by_wolfang",
---fallback to speech_wilson.lua             UNBALANCED = "only_used_by_wolfang",
---fallback to speech_wilson.lua             ONFIRE = "only_used_by_wolfang",
---fallback to speech_wilson.lua             SMOULDER = "only_used_by_wolfang",
---fallback to speech_wilson.lua             HUNGRY = "only_used_by_wolfang",
---fallback to speech_wilson.lua             FULL = "only_used_by_wolfang",
-        },
-
-        APPLYMODULE =
-        {
-            COOLDOWN = "only_used_by_wx78",
-            NOTENOUGHSLOTS = "only_used_by_wx78",
-        },
-        REMOVEMODULES =
-        {
-            NO_MODULES = "only_used_by_wx78",
-        },
-        CHARGE_FROM =
-        {
-            NOT_ENOUGH_CHARGE = "only_used_by_wx78",
-            CHARGE_FULL = "only_used_by_wx78",
-        },
-
-        HARVEST =
-        {
-            DOER_ISNT_MODULE_OWNER = "I just thought the lil guy could use a polish.",
-        },
-
-		CAST_SPELLBOOK =
-		{
---fallback to speech_wilson.lua 			NO_TOPHAT = "only_used_by_waxwell",
-		},
-
-		CASTAOE =
-		{
---fallback to speech_wilson.lua 			NO_MAX_SANITY = "only_used_by_waxwell",
-            NOT_ENOUGH_EMBERS = "only_used_by_willow",
-            NO_TARGETS = "only_used_by_willow",
-            CANT_SPELL_MOUNTED = "only_used_by_willow",
-            SPELL_ON_COOLDOWN = "only_used_by_willow", 
-		},
     },
 
 	ANNOUNCE_CANNOT_BUILD =
@@ -413,6 +441,7 @@ return{
 	ACTIONFAIL_GENERIC = "I sure gummed the works there.",
 	ANNOUNCE_BOAT_LEAK = "We gotta repair this ol'girl!",
 	ANNOUNCE_BOAT_SINK = "We're goin' down!",
+    ANNOUNCE_PREFALLINVOID = "Best hustle!",
 	ANNOUNCE_DIG_DISEASE_WARNING = "That helped a bit.", --removed
 	ANNOUNCE_PICK_DISEASE_WARNING = "Whew! If that isn't the mightiest smell.", --removed
 	ANNOUNCE_ADVENTUREFAIL = "Yeow. Don't make me come back in there!",
@@ -471,6 +500,21 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_CHARGE = "only_used_by_wx78",
 --fallback to speech_wilson.lua 	ANNOUNCE_DISCHARGE = "only_used_by_wx78",
 
+    -- Winona specific
+    ANNOUNCE_ROSEGLASSES = 
+    {
+        "Gotcha, sis!",
+        "Charlie was here.",
+        "I'm pickin' up traces of her magic.",
+    },
+    ANNOUNCE_CHARLIESAVE = 
+    {
+        "Yeesh! I can't tell if she's tryin' to help me or kill me.",
+    },
+	ANNOUNCE_ENGINEERING_CAN_UPGRADE = "Easy peasy, my version is miles ahead.",
+	ANNOUNCE_ENGINEERING_CAN_DOWNGRADE = "Whoa, this one is more advanced than my version.",
+	ANNOUNCE_ENGINEERING_CAN_SIDEGRADE = "Interestin'. This version and mine are ahead in different ways.",
+
 	ANNOUNCE_EAT =
 	{
 		GENERIC = "That hits the spot.",
@@ -523,6 +567,7 @@ return{
 	ANNOUNCE_HIGHRESEARCH = "Cutting edge!",
 	ANNOUNCE_HOUNDS = "Are those dogs I hear?",
 	ANNOUNCE_WORMS = "Was that a tremor?",
+    ANNOUNCE_WORMS_BOSS = "Oh man, that's a big one.",
     ANNOUNCE_ACIDBATS = "I don't like the sound of that.",
 	ANNOUNCE_HUNGRY = "When's lunch?",
 	ANNOUNCE_HUNT_BEAST_NEARBY = "I didn't order lunch to go. Get'em!",
@@ -563,6 +608,7 @@ return{
 	ANNOUNCE_TRAP_WENT_OFF = "Heh, whoops.",
 	ANNOUNCE_UNIMPLEMENTED = "Yeow! That still needs some tinkering!",
 	ANNOUNCE_WORMHOLE = "That'll get the adrenaline pumping!",
+    ANNOUNCE_WORMHOLE_SAMESPOT = "Sheesh. Just took the long way to nowhere.",
 	ANNOUNCE_TOWNPORTALTELEPORT = "Thanks for the lift!",
 	ANNOUNCE_CANFIX = "\nIt'd be a pleasure to fix it.",
 	ANNOUNCE_ACCOMPLISHMENT = "I can do ANYTHING!",
@@ -769,6 +815,7 @@ return{
 --fallback to speech_wilson.lua         BOOK_RESEARCH_STATION = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_LIGHT_UPGRADED = "only_used_by_wurt",
     },
+
     ANNOUNCE_WEAK_RAT = "It's too tuckered out.",
 
     ANNOUNCE_CARRAT_START_RACE = "And they're off!",
@@ -939,6 +986,20 @@ return{
     ANNOUNCE_YOTD_NOBOATS = "Whoops, that start point's a bit far off.",
     ANNOUNCE_YOTD_NOCHECKPOINTS = "Can't start before I've finished settin' up the race!",
     ANNOUNCE_YOTD_NOTENOUGHBOATS = "I guess there ain't much room for anyone else to join, huh?",
+
+    ANNOUNCE_OTTERBOAT_OUTOFSHALLOWS = "This rickety thing wasn't built for deep water!",
+    ANNOUNCE_OTTERBOAT_DENBROKEN = "Looks like the den was the main structural support...",
+
+    ANNOUNCE_GATHER_MERM = "only_used_by_wurt",
+
+    -- rifts 4
+    ANNOUNCE_EXIT_GELBLOB = "Let's not speak of this again.",
+	ANNOUNCE_SHADOWTHRALL_STEALTH = "Ow! Quit skulkin' and fight me fair!",
+    ANNOUNCE_RABBITKING_AGGRESSIVE = "What's with all that scratchin'?",
+    ANNOUNCE_RABBITKING_PASSIVE = "I hear a critter comin'.",
+    ANNOUNCE_RABBITKING_LUCKY = "There is somethin' about that rabbit!",
+    ANNOUNCE_RABBITKING_LUCKYCAUGHT = "Gotcha, rabbit!",
+    ANNOUNCE_RABBITKINGHORN_BADSPAWNPOINT = "Nope, ain't the right spot.",
 
 	BATTLECRY =
 	{
@@ -1590,7 +1651,8 @@ return{
                 "How are you, boo?",
                 "How are you, boo?",
             },
-		},
+        },
+
 		ADVENTURE_PORTAL = "I ain't jumping willy-nilly through strange portals!",
 		AMULET = "Jewelry ain't really my thing.",
 		ANIMAL_TRACK = "Something tasty passed through here.",
@@ -1674,6 +1736,8 @@ return{
             RIDER = "Wow! You're in top form!",
             PUDGY = "You're getting soft!",
             MYPARTNER = "We're buddies!",
+            DEAD = "That's unfortunate.",
+            DEAD_MYPARTNER = "It wasn't its time.",
 		},
 
 		BEEFALOHAT = "Seem secretive.",
@@ -1735,7 +1799,7 @@ return{
             RARE = "Progress on paper!",
         },
         SKETCH = "What a nice drawing.",
-		COOKINGRECIPECARD = 
+		COOKINGRECIPECARD =
 		{
 			GENERIC = "I can't make heads or tails of it.",
 		},
@@ -1864,6 +1928,7 @@ return{
         CHESSPIECE_DEERCLOPS_MUTATED = "She's almost a looker.",
         CHESSPIECE_WARG_MUTATED = "Now this is a pooch I could play with.",
         CHESSPIECE_BEARGER_MUTATED = "That was one ornery son of a beast.",
+        CHESSPIECE_SHARKBOI = "That shark was kind of a jerk.",
 
         CHESSJUNK1 = "A heap of spare parts.",
         CHESSJUNK2 = "A heap of spare parts.",
@@ -2849,13 +2914,13 @@ return{
         },
         CLAYWARG =
         {
-        	GENERIC = "You lookin' to scrap, big guy?",
-        	STATUE = "I'm glad it ain't movin'.",
+            GENERIC = "You lookin' to scrap, big guy?",
+            STATUE = "I'm glad it ain't movin'.",
         },
         CLAYHOUND =
         {
-        	GENERIC = "I'll send you runnin', mutt!",
-        	STATUE = "How earthy.",
+            GENERIC = "I'll send you runnin', mutt!",
+            STATUE = "How earthy.",
         },
         HOUNDWHISTLE = "This oughta give them paws pause.",
         CHESSPIECE_CLAYHOUND = "A good boy if ever I saw one.",
@@ -3457,6 +3522,7 @@ return{
         	OFF = "Gotta hook it up to the generator.",
         	BURNING = "Quick! Put it out!",
         	BURNT = "Aw, nuts and bolts!",
+			SLEEP = "Not a bad result considering the materials.",
         },
         WINONA_SPOTLIGHT =
         {
@@ -3464,6 +3530,7 @@ return{
         	OFF = "Gotta hook it up to the generator.",
         	BURNING = "Quick! Put it out!",
         	BURNT = "Criminy! My machine!",
+			SLEEP = "Ready to go.",
         },
         WINONA_BATTERY_LOW =
         {
@@ -3475,12 +3542,64 @@ return{
         },
         WINONA_BATTERY_HIGH =
         {
-        	GENERIC = "I don't get how gems work, I just know they do.",
-        	LOWPOWER = "Gonna need a top up soon.",
-        	OFF = "Needs a few more'a those gem thingies.",
-        	BURNING = "Quick! Put it out!",
-        	BURNT = "Criminy! My machine!",
+			GENERIC = "I don't get how gems work, I just know they do.",
+			LOWPOWER = "Gonna need a top up soon.",
+			OFF = "Needs a few more'a those gem thingies.",
+			BURNING = "Quick! Put it out!",
+			BURNT = "Criminy! My machine!",
+			OVERLOADED = "Yikes! Better give it a minute to cool off!",
         },
+		--v3 Winona
+		WINONA_REMOTE =
+		{
+			GENERIC = "It ain't magic, just some good engineering!",
+			OFF = "Gotta hook it up to the generator.",
+			CHARGING = "Needs some more time to charge.",
+			CHARGED = "Charged and ready to go.",
+		},
+		WINONA_TELEBRELLA =
+		{
+			GENERIC = "I made a few adjustments to the bossman's design.",
+            MISSINGSKILL = "Interesting design, but above my pay grade...",
+			OFF = "Gotta hook it up to the generator.",
+			CHARGING = "Needs some more time to charge.",
+			CHARGED = "Charged and ready to go.",
+		},
+		WINONA_TELEPORT_PAD_ITEM =
+		{
+			GENERIC = "Sure beats luggin' stuff around!",
+            MISSINGSKILL = "Interesting design, but above my pay grade...",
+			OFF = "I'd better hook it up to some power.",
+			BURNING = "Quick! Put it out!",
+			BURNT = "Aw, nuts and bolts!",
+		},
+		WINONA_STORAGE_ROBOT =
+		{
+			GENERIC = "Nice to have a helpin' hand around here!",
+			OFF = "Poor little guy, let's get you hooked up to some power.",
+			SLEEP = "Take five, little guy!",
+			CHARGING = "Needs some more time to charge.",
+			CHARGED = "Charged and ready to go.",
+		},
+		INSPECTACLESBOX = "Sure hope the bossman doesn't mind me borrowing a few things.",
+		INSPECTACLESBOX2 = "Jackpot!",
+		INSPECTACLESHAT = 
+        {
+            GENERIC = "Now I can track down the bossman's loot!",
+            MISSINGSKILL = "I'd love to know the specs for those specs! Ha!",
+        },
+		ROSEGLASSESHAT =
+        {
+            GENERIC = "Alright, Charlie. Show me the way.",
+            MISSINGSKILL = "Something about 'em makes me really miss Charlie.",
+        },
+		CHARLIERESIDUE = "I must've just missed her... but she left somethin' behind.",
+		CHARLIEROSE = "Oh, Charlie. What are you gettin' me into now?",
+        WINONA_MACHINEPARTS_1 = "You just can't get quality manufactured parts like this out here!",
+        WINONA_MACHINEPARTS_2 = "Oh, I've got big plans for this.",
+		WINONA_RECIPESCANNER = "One scan with this Calibrated Perceiver, and I'll know how somethin's built!",
+		WINONA_HOLOTELEPAD = "Looks like one of the boss's old designs. I should give it a scan.",
+		WINONA_HOLOTELEBRELLA = "I should give it a scan with the ol' Calibrated Perceiver.",
 
         --Wormwood
         COMPOSTWRAP = "Heh. That bean sprout's a gross little guy.",
@@ -3962,12 +4081,17 @@ return{
         WEREITEM_GOOSE = "Does he hafta leave these creepy things lyin' around?",
         WEREITEM_MOOSE = "I ain't one for er... decorations.",
 
-        MERMHAT = "Do I look a little green around the gills? Ha!",
+        MERMHAT = "Do I look a little green around the gills? Ha!",        
         MERMTHRONE =
         {
             GENERIC = "Not bad handiwork.",
             BURNT = "Yeesh, what a mess.",
         },
+        MOSQUITOMUSK = "Somehow it's still not the creepiest doll I've seen.",
+        MOSQUITOBOMB = "Talk about a buzz-kill. Ha!",
+        MOSQUITOFERTILIZER = "Just throw a healthy dollop on the ground.",
+        MOSQUITOMERMSALVE = "I almost feel sorry for the bloodsucker. Almost.",
+
         MERMTHRONE_CONSTRUCTION =
         {
             GENERIC = "Whatcha makin' there, kid?",
@@ -4721,6 +4845,9 @@ return{
         BOAT_BUMPER_KELP_KIT = "Extra protection's always good, 'specially on water.",
 		BOAT_BUMPER_SHELL = "Turns out seashells are good for givin' shellter from the sea. Ha!",
         BOAT_BUMPER_SHELL_KIT = "Extra protection's always good, 'specially on water.",
+        BOAT_BUMPER_CRABKING = "It sometimes pays to have a tough exterior.",
+        BOAT_BUMPER_CRABKING_KIT = "Extra protection's always good, 'specially on water.",
+
         BOAT_CANNON = {
             GENERIC = "It won't do much good if it's not loaded.",
             AMMOLOADED = "All you sea critters better think twice about messing with my boat!",
@@ -4926,6 +5053,7 @@ return{
 		SHADOWTHRALL_HANDS = "What? Mad I left ya hanging?",
 		SHADOWTHRALL_HORNS = "It's gonna chew me up and spit me back out! Literally!",
 		SHADOWTHRALL_WINGS = "Must be one of the higher-ups. Ha...",
+		SHADOWTHRALL_MOUTH = "Somebody's got a big mouth!",
 
         CHARLIE_NPC = "Charlie, wait!!",
         CHARLIE_HAND = "You want something, huh?",
@@ -5148,6 +5276,131 @@ return{
         JUNK_PILE_BIG = "Who's in charge here? Someone could get hurt!",
 
         ARMOR_LUNARPLANT_HUSK = "Pretty well constructed, for a plant.",
+
+        -- Meta 4 / Ocean QoL
+
+        OTTER = "Nasty lil hoarder ain't it?",
+        OTTERDEN = {
+            GENERIC = "Looks tapped out.",
+            HAS_LOOT = "It might have left us some goodies.",
+        },
+        OTTERDEN_DEAD = "It was definitely holding it all together.",
+
+        BOAT_ANCIENT_ITEM = "They sure don't build 'em like they used to.",
+        BOAT_ANCIENT_CONTAINER = "Plenty of space for storage.",
+        WALKINGPLANK_ANCIENT = "That thing don't look stable.",
+
+        ANCIENTTREE_SEED = "I believe this goes in the dirt.",
+
+        ANCIENTTREE_GEM = {
+            GENERIC = "That tree has got fire in its belly.",
+            STUMP = "Just a pile of rubble now.",
+        },
+
+        ANCIENTTREE_SAPLING_ITEM = "This might be one of them finicky trees.",
+
+        ANCIENTTREE_SAPLING = {
+            GENERIC = "Looks like it's on its way.",
+            WRONG_TILE = "Maybe it ain't in the right spot.",
+            WRONG_SEASON = "I don't think the time is right.",
+        },
+ 
+        ANCIENTTREE_NIGHTVISION = {
+            GENERIC = "That is one gloomy tree.",
+            STUMP = "Can't say I'm sad to see it gone.",
+        },
+
+        ANCIENTFRUIT_GEM = "For a fruit, it's one tough nut to crack.",
+        ANCIENTFRUIT_NIGHTVISION = "I don't think berries are supposed to do that.",
+        ANCIENTFRUIT_NIGHTVISION_COOKED = "At least it ain't pulsin'.",
+
+        BOATPATCH_KELP = "Just a quick fix until I can do some proper repairs.",
+
+        CRABKING_MOB = "Just a hired hand. Er, claw.",
+        CRABKING_MOB_KNIGHT = "I've had supervisors crabbier than him.",
+        CRABKING_CANNONTOWER = "There's no way they've got a permit for that.",
+        CRABKING_ICEWALL = "Heh. I think this guy's tryin' to ice me out!",
+
+        SALTLICK_IMPROVED = "Do you sea salt?",
+
+        OFFERING_POT =
+        {
+            GENERIC = "Shucks, I can't just leave it empty!",
+            SOME_KELP = "I should add a little more, wouldn't want them to run out.",
+            LOTS_OF_KELP = "That should keep'em well fed.",
+        },
+
+        OFFERING_POT_UPGRADED =
+        {
+            GENERIC = "Shucks, I can't just leave it empty!",
+            SOME_KELP = "I should add a little more, wouldn't want them to run out.",
+            LOTS_OF_KELP = "That should keep'em well fed.",
+        },
+
+        MERM_ARMORY = "Get your merm hats here!",
+        MERM_ARMORY_UPGRADED = "Get your merm hats here!",
+        MERM_TOOLSHED = "I know a toolshed when I see one.",
+        MERM_TOOLSHED_UPGRADED = "I know a toolshed when I see one.",
+        MERMARMORHAT = "Ain’t my style.",
+        MERMARMORUPGRADEDHAT = "Ain’t my style.",
+        MERM_TOOL = "Should get the job done... I hope.",
+        MERM_TOOL_UPGRADED = "It's an improvement.",
+
+        WURT_SWAMPITEM_SHADOW = "Aw, she made a lil' shadow wand thing.",
+        WURT_SWAMPITEM_LUNAR = "Wurt is tappin' into some weird stuff here.",
+
+        MERM_SHADOW = "Can't seem to catch a break, can ya?",
+        MERMGUARD_SHADOW = "Whoa, I'll just stay outta your way.",
+
+        MERM_LUNAR = "You're a rather prickly one, ain't ya?",
+        MERMGUARD_LUNAR = "I'm sure he's got a sparkling personality.",
+
+        -- Rifts 4
+
+        SHADOW_BEEF_BELL = "One lucky beefalo is gonna get a second chance.",
+        SADDLE_SHADOW = "Looks kinda forebodin', don't it?",
+        SHADOW_BATTLEAXE = "It ain't a precision tool.",
+        VOIDCLOTH_BOOMERANG = "Round trip included!",
+		ROPE_BRIDGE_KIT = "We're puttin' a lot of trust in this thing.",
+		GELBLOB =
+		{
+			GENERIC = "That ain't no engine grease I ever seen.",
+			HAS_ITEM = "Looks like somethin's caught inside.",
+			HAS_CHARACTER = "Someone's in tough spot.",
+		},
+        RABBITKING_AGGRESSIVE = "What is your problem, rabbit?!",
+        RABBITKING_PASSIVE = "Friendly lil' fella ain't he?",
+        RABBITKING_LUCKY = "Gotta catch me that rabbit!",
+        RABBITKINGMINION_BUNNYMAN = "Must be somethin' in the carrots.",
+        ARMOR_CARROTLURE = "Huh. Guess ya can make clothes out of just about anything.",
+        RABBITKINGHORN = "It must play a thumpin' tune.",
+        RABBITKINGHORN_CHEST = "Mighty kind of them rabbits.",
+        RABBITKINGSPEAR = "Never thought of makin' weapons out of rabbit parts.",
+        RABBITHAT = "Okay, that's pretty darn cute.",
+        WORM_BOSS = "Now that's a big ol' worm.",
+
+        STONE_TABLE = -- Shared between the round and square tables.
+        {
+            GENERIC = "I don't care if it's fancy, just solidly built.",
+            HAS_ITEM = "It's doin' what tables do.",
+        },
+
+        STONE_CHAIR =
+        {
+            GENERIC = "Looks sturdy enough.",
+            OCCUPIED = "Looks like that seat's spoken for.",
+        },
+
+        CARPENTRY_BLADE_MOONGLASS = "That is one sweet saw blade.",
+
+        CHEST_MIMIC_REVEALED = "Didn't I tell ya?!",
+
+        GELBLOB_STORAGE = {
+            GENERIC  = "At least we found some use for that muck.",
+            FULL = "And just like that, I ain't hungry no more.",
+        },
+        GELBLOB_STORAGE_KIT = "Guess I should put'er together.",
+        GELBLOB_BOTTLE = "We can take it to go!",
     },
 
     DESCRIBE_GENERIC = "Incredible! I have no idea what that is.",

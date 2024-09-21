@@ -49,7 +49,7 @@ local function NoHoles(pt)
 end
 
 local function GetSpawnPoint(pt)
-    local offset = FindWalkableOffset(pt, math.random() * 2 * PI, SPAWN_DIST, 12, true, true, NoHoles)
+    local offset = FindWalkableOffset(pt, math.random() * TWOPI, SPAWN_DIST, 12, true, true, NoHoles)
     if offset ~= nil then
         offset.x = offset.x + pt.x
         offset.z = offset.z + pt.z
@@ -176,9 +176,13 @@ local function fn()
 
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
+    inst.entity:AddMiniMapEntity()
     inst.entity:AddNetwork()
 
     MakeInventoryPhysics(inst)
+
+    inst.MiniMapEntity:SetIcon("hutch_fishbowl.png")
+    inst.MiniMapEntity:SetPriority(7)
 
     inst:AddTag("hutch_fishbowl")
     inst:AddTag("irreplaceable")

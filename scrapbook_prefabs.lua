@@ -736,7 +736,7 @@ local PREFABS =
     ["terrarium"] = true,
     ["walrus_tusk"] = true,
     ["lifeinjector"] = true,
-    ["beefalo_groomer_item"] = true,
+    --["beefalo_groomer_item"] = true, -- Unused.
     ["wall_ruins_item"] = true,
     ["cutless"] = true,
     ["yellowmooneye"] = true,
@@ -1186,7 +1186,7 @@ local PREFABS =
     ["alterguardian_contained"] = true,
     ["anchor"] = true,
     ["ancient_altar"] = true,
-    ["ancient_altar_broken"] = true,    
+    ["ancient_altar_broken"] = true,
     ["animal_track"] = true,
     ["antlion"] = true,
     ["antlion_sinkhole"] = true,
@@ -1212,7 +1212,7 @@ local PREFABS =
     ["beebox"] = true,
     ["beebox_hermit"] = true,
     ["beefalo_groomer"] = true,
-    ["beehive"] = true,    
+    ["beehive"] = true,
     ["berrybush"] = true,
     ["berrybush_juicy"] = true,
     ["berrybush2"] = true,
@@ -1443,11 +1443,11 @@ local PREFABS =
     ["rock_petrified_tree"] = true,
     ["rock1"] = true,
     --["rubble"] = true,
-    
+
     ["ruins_cavein_obstacle"] = true,
 
     ["ruins_chair"] = true,
-        --["ruins_bowl"] = true,    
+        --["ruins_bowl"] = true,
         --["ruins_chipbowl"] = true,
         --["ruins_plate"] = true,
         --["ruins_rubble_chair"] = true,
@@ -1491,7 +1491,7 @@ local PREFABS =
     ["spiderhole_rock"] = true,
     ["stafflight"] = true,
     ["staffcoldlight"] = true,
-    ["stalagmite"] = true,    
+    ["stalagmite"] = true,
     ["statueglommer"] = true,
     ["statueharp"] = true,
     ["statuemaxwell"] = true,
@@ -1602,7 +1602,7 @@ local PREFABS =
     ["stalker_minion"] = true,
     ["support_pillar_scaffold"] = true,
     ["support_pillar_dreadstone_scaffold"] = true,
-    
+
     ["walking_stick"] = true,
     ["woodcarvedhat"] = true,
     ["leif_idol"] = true,
@@ -1685,7 +1685,7 @@ local PREFABS =
 
     ["sharkboi"] = true,
     ["sharkboi_icespike"] = true,
-    
+
     ["bootleg"] = true,
     ["oceanwhirlportal"] = true,
 
@@ -1712,6 +1712,98 @@ local PREFABS =
     ["scraphat"] = true,
     ["armor_lunarplant_husk"] = true,
 
+    -- Meta 4 / Ocean QoL
+
+    ["ancientfruit_gem"] = true,
+    ["ancientfruit_nightvision_cooked"] = true,
+    ["ancientfruit_nightvision"] = true,
+    ["ancienttree_gem_sapling_item"] = true,
+    ["ancienttree_gem_sapling"] = true,
+    ["ancienttree_gem"] = true,
+    ["ancienttree_nightvision_sapling_item"] = true,
+    ["ancienttree_nightvision_sapling"] = true,
+    ["ancienttree_nightvision"] = true,
+    ["ancienttree_seed"] = true,
+    ["boat_ancient_item"] = true,
+    ["boat_ancient"] = true,
+    ["boat_bumper_crabking_kit"] = true,
+    ["boat_bumper_crabking"] = true,
+    ["boatpatch_kelp"] = true,
+    --["charlieresidue"] = true,
+    --["charlierose"] = true, -- Should this be in the scrapbook?
+    ["chesspiece_sharkboi"] = true,
+    ["crabking_cannontower"] = true,
+    ["crabking_mob_knight"] = true,
+    ["crabking_mob"] = true,
+    --["inspectaclesbox"] = true,
+    --["inspectaclesbox2"] = true,
+    ["inspectacleshat"] = true,
+    ["merm_armory_upgraded"] = true,
+    ["merm_armory"] = true,
+    ["merm_lunar"] = true,
+    ["merm_shadow"] = true,
+    ["merm_tool_upgraded"] = true,
+    ["merm_tool"] = true,
+    ["merm_toolshed_upgraded"] = true,
+    ["merm_toolshed"] = true,
+    ["mermarmorhat"] = true,
+    ["mermarmorupgradedhat"] = true,
+    ["mermguard_lunar"] = true,
+    ["mermguard_shadow"] = true,
+    ["mosquitobomb"] = true,
+    ["mosquitofertilizer"] = true,
+    ["mosquitomermsalve"] = true,
+    ["mosquitomusk"] = true,
+    ["offering_pot_upgraded"] = true,
+    ["offering_pot"] = true,
+    ["otter"] = true,
+    ["otterden"] = true,
+    ["roseglasseshat"] = true,
+    ["saltlick_improved"] = true,
+    --["winona_holotelebrella"] = true,
+    --["winona_holotelepad"] = true,
+    --["winona_machineparts_1"] = true,
+    --["winona_machineparts_2"] = true,
+    --["winona_recipescanner"] = true,
+    ["winona_remote"] = true,
+    ["winona_storage_robot"] = true,
+    ["winona_telebrella"] = true,
+    ["winona_teleport_pad"] = true,
+    ["wurt_swampitem_lunar"] = true,
+    ["wurt_swampitem_shadow"] = true,
+
+    -- Rifts 4
+
+    ["armor_carrotlure"] = true,
+    ["carpentry_blade_moonglass"] = true,
+    ["chest_mimic_revealed"] = true,
+    ["gelblob"] = true,
+    ["itemmimic_revealed"] = true,
+    ["rabbithat"] = true,
+    ["rabbitking_aggressive"] = true,
+    ["rabbitking_lucky"] = true,
+    ["rabbitking_passive"] = true,
+    ["rabbitkinghorn_chest"] = true,
+    ["rabbitkinghorn"] = true,
+    ["rabbitkingminion_bunnyman"] = true,
+    ["rabbitkingspear"] = true,
+    ["rope_bridge_kit"] = true,
+    ["ruinsnightmare"] = true,
+    ["saddle_shadow"] = true,
+    ["shadow_battleaxe"] = true,
+    ["shadow_beef_bell"] = true,
+    ["shadowthrall_mouth"] = true,
+    ["stone_chair"] = true,
+    ["stone_stool"] = true,
+    ["stone_table_round"] = true,
+    ["stone_table_square"] = true,
+    ["voidcloth_boomerang"] = true,
+    ["worm_boss"] = true,
+    ["gelblob_storage"] = true,
+    ["gelblob_storage_kit"] = true,
+    ["shadowheart_infused"] = true,
+    ["gelblob_bottle"] = true,
+
     --[[POI]]
     ["charlie_stage_post"] = true,
     ["beequeenhivegrown"] = true,
@@ -1719,7 +1811,7 @@ local PREFABS =
     ["moon_altar_link"] = true,
     ["hermitcrab"] = true,
     ["resurrectionstone"] = true,
-    ["oasislake"] = true,    
+    ["oasislake"] = true,
     ["sculpture_bishopbody"] = true,
     ["sculpture_knightbody"] = true,
     ["sculpture_rookbody"] = true,
@@ -1730,12 +1822,11 @@ local PREFABS =
     ["archive_orchestrina_main"] = true,
     ["multiplayer_portal"] = true,
 
-
     -----------------------------------------------
 
     --["archive_switch"] = true, proxy for archive_switch_base
     --["charlie_lecturn"] = true, proxy for stage
-    
+
     --["multiplayer_portal_moonrock"] = true,
 
     --["dropperweb"] = true, ? THIS ONE DOES NOT HAVE A PHYSICCAL THING

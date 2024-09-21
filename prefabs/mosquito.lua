@@ -20,26 +20,26 @@ local sounds =
     explode = "dontstarve/creatures/mosquito/mosquito_explo",
 }
 
-SetSharedLootTable('mosquito',
+SetSharedLootTable("mosquito",
 {
-    {'mosquitosack', .5},
+    {"mosquitosack", .5},
 })
 
 local SHARE_TARGET_DIST = 30
 local MAX_TARGET_SHARES = 10
 
 local function OnWorked(inst, worker)
-    local owner = inst.components.homeseeker ~= nil and inst.components.homeseeker.home or nil
-    if owner ~= nil and owner.components.childspawner ~= nil then
-        owner.components.childspawner:OnChildKilled(inst)
-    end
+    inst:PushEvent("detachchild")
+
     if worker.components.inventory ~= nil then
+        inst.SoundEmitter:KillAllSounds()
+
         worker.components.inventory:GiveItem(inst, nil, inst:GetPosition())
     end
 end
 
 local function StartBuzz(inst)
-    if not inst.components.inventoryitem:IsHeld() then
+    if not (inst.components.inventoryitem:IsHeld() or inst:IsAsleep() or inst.SoundEmitter:PlayingSound("buzz")) then
         inst.SoundEmitter:PlaySound(inst.sounds.buzz, "buzz")
     end
 end
@@ -48,46 +48,64 @@ local function StopBuzz(inst)
     inst.SoundEmitter:KillSound("buzz")
 end
 
+local function StoreHomePos(inst, allow_overwrite)
+    inst.components.knownlocations:RememberLocation("home", inst:GetPosition(), not allow_overwrite)
+end
 local function OnDropped(inst)
     inst.sg:GoToState("idle")
+
+    if not inst:IsAsleep() and not inst.SoundEmitter:PlayingSound("buzz") then
+        inst.SoundEmitter:PlaySound(inst.sounds.buzz, "buzz")
+    end
+
     if inst.components.workable ~= nil then
         inst.components.workable:SetWorkLeft(1)
     end
-    if inst.brain ~= nil then
-        inst.brain:Start()
-    end
-    if inst.sg ~= nil then
-        inst.sg:Start()
-    end
+
     if inst.components.stackable ~= nil and inst.components.stackable:IsStack() then
         local x, y, z = inst.Transform:GetWorldPosition()
-        while inst.components.stackable:IsStack()do
+        while inst.components.stackable:IsStack() do
             local item = inst.components.stackable:Get()
             if item ~= nil then
                 if item.components.inventoryitem ~= nil then
                     item.components.inventoryitem:OnDropped()
                 end
                 item.Physics:Teleport(x, y, z)
+                StoreHomePos(item, true)
             end
         end
     end
+    StoreHomePos(inst)
 end
 
 local function OnPickedUp(inst)
+    inst.sg:GoToState("idle")
     inst.SoundEmitter:KillSound("buzz")
+    inst.SoundEmitter:KillAllSounds()
+end
+
+local function IsMosquitoMusk(item)
+    return item:HasTag("mosquitomusk")
 end
 
 local RETARGET_MUST_TAGS = { "_combat", "_health" }
 local RETARGET_CANT_TAGS = { "insect", "INLIMBO" }
 local RETARGET_ONEOF_TAGS = { "character", "animal", "monster" }
+
 local function KillerRetarget(inst)
+    local leader = inst.components.follower ~= nil and inst.components.follower:GetLeader() or nil
+    
     return FindEntity(inst, SpringCombatMod(20),
         function(guy)
-            return inst.components.combat:CanTarget(guy)
+            local has_musk = guy.components.inventory ~= nil and guy.components.inventory:FindItem(IsMosquitoMusk)
+            local is_ally = inst.components.combat:IsAlly(guy) or (leader ~= nil and leader.components.combat:IsAlly(guy))
+
+            return not has_musk and not is_ally and inst.components.combat:CanTarget(guy)
         end,
         RETARGET_MUST_TAGS,
         RETARGET_CANT_TAGS,
-        RETARGET_ONEOF_TAGS)
+        RETARGET_ONEOF_TAGS
+    )
 end
 
 local function SwapBelly(inst, size)
@@ -102,6 +120,7 @@ end
 
 local function TakeDrink(inst, data)
     inst.drinks = inst.drinks + 1
+
     if inst.drinks > inst.maxdrinks then
         inst.toofat = true
         inst.components.health:Kill()
@@ -117,6 +136,12 @@ end
 local function OnAttacked(inst, data)
     inst.components.combat:SetTarget(data.attacker)
     inst.components.combat:ShareTarget(data.attacker, SpringCombatMod(SHARE_TARGET_DIST), ShareTargetFn, MAX_TARGET_SHARES)
+end
+
+local function OnChangedLeader(inst, new_leader, prev_leader)
+    if new_leader ~= nil then
+        inst.lastleader = new_leader
+    end
 end
 
 local function mosquito()
@@ -177,11 +202,12 @@ local function mosquito()
     inst.components.inventoryitem.canbepickedup = false
     inst.components.inventoryitem.canbepickedupalive = true
     inst.components.inventoryitem.pushlandedevents = false
+    inst.components.inventoryitem.grabbableoverridetag = "mosquitograbber"
 
     ---------------------
 
     inst:AddComponent("lootdropper")
-    inst.components.lootdropper:SetChanceLootTable('mosquito')
+    inst.components.lootdropper:SetChanceLootTable("mosquito")
 
     inst:AddComponent("tradable")
 
@@ -194,6 +220,11 @@ local function mosquito()
     MakeSmallBurnableCharacter(inst, "body", Vector3(0, -1, 1))
     MakeTinyFreezableCharacter(inst, "body", Vector3(0, -1, 1))
 
+
+    ------------------
+    inst:AddComponent("follower")
+    inst.components.follower.OnChangedLeader = OnChangedLeader
+    
     ------------------
     inst:AddComponent("health")
     inst.components.health:SetMaxHealth(TUNING.MOSQUITO_HEALTH)

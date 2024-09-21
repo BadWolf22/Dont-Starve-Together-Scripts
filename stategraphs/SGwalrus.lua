@@ -15,6 +15,7 @@ local events=
 {
     CommonHandlers.OnStep(),
     CommonHandlers.OnLocomote(true,true),
+    CommonHandlers.OnSink(),
     CommonHandlers.OnSleep(),
     CommonHandlers.OnFreeze(),
     EventHandler("newcombattarget", function(inst) if not inst.components.health:IsDead() and not (inst.sg:HasStateTag("attack") or inst.sg:HasStateTag("busy")) then inst.sg:GoToState("taunt_newtarget") end end),
@@ -47,6 +48,8 @@ local states=
             inst.AnimState:PlayAnimation("death")
             inst.components.locomotor:StopMoving()
             inst.components.lootdropper:DropLoot(Vector3(inst.Transform:GetWorldPosition()))
+
+            RemovePhysicsColliders(inst)
         end,
 
     },
@@ -238,6 +241,7 @@ CommonStates.AddIdle(states, "funny_idle")
 
 CommonStates.AddSimpleActionState(states, "gohome", "pig_take", 15*FRAMES, {"busy"})
 CommonStates.AddFrozenStates(states)
+CommonStates.AddSinkAndWashAshoreStates(states)
 
 
 return StateGraph("walrus", states, events, "idle", actionhandlers)

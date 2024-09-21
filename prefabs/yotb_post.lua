@@ -24,7 +24,7 @@ local assets_light =
 
 local assets_rug =
 {
-    Asset("ANIM", "anim/yotb_beefalo_rug.zip"),
+    Asset("ANIM", "anim/yotb_post_rug.zip"),
 }
 
 local assets_ribbon =
@@ -157,6 +157,10 @@ local function onbuilt(inst)
     inst.AnimState:PushAnimation("idle",true)
 end
 
+local function IsLinkedBell(item)
+    return item:HasTag("bell") and item:HasBeefalo()
+end
+
 local function fn()
     local inst = CreateEntity()
 
@@ -208,7 +212,7 @@ local function fn()
     inst.components.markable.unmarkallfn = unmarkall
     inst.components.markable.canmarkfn = function(inst,doer)
         local pass = false
-        local bell = doer.components.inventory:FindItem(function(item) return item.prefab == "beef_bell" and item:_HasBeefalo() end)
+        local bell = doer.components.inventory:FindItem(IsLinkedBell)
 
         if bell then
             local beef = bell:GetBeefalo()

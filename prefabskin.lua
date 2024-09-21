@@ -126,6 +126,9 @@ krampus_sack_clear_fn = function(inst) basic_clear_fn(inst, "swap_krampus_sack" 
 piggyback_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "swap_piggyback" ) end
 piggyback_clear_fn = function(inst) basic_clear_fn(inst, "swap_piggyback" ) end
 
+icepack_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "swap_icepack") end
+icepack_clear_fn = function(inst) basic_clear_fn(inst, "swap_icepack") end
+
 ruins_bat_init_fn = function(inst, build_name) basic_init_fn( inst, build_name, "swap_ruins_bat" ) end
 ruins_bat_clear_fn = function(inst) basic_clear_fn(inst, "swap_ruins_bat" ) end
 
@@ -179,6 +182,30 @@ wood_chair_clear_fn = function(inst)
         inst.back.AnimState:ClearOverrideSymbol("chair01_parts")
     end
 end
+stone_table_round_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "stone_table_round") end
+stone_table_round_clear_fn = function(inst) basic_clear_fn(inst, "stone_table_round") end
+stone_table_square_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "stone_table_square") end
+stone_table_square_clear_fn = function(inst) basic_clear_fn(inst, "stone_table_square") end
+stone_stool_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "stone_chair_stool") end
+stone_stool_clear_fn = function(inst) basic_clear_fn(inst, "stone_chair_stool") end
+stone_chair_init_fn = function(inst, build_name)
+    basic_init_fn(inst, build_name, "stone_chair_chair")
+    if not TheWorld.ismastersim then
+        return
+    end
+    if inst.back then
+        inst.back.AnimState:OverrideItemSkinSymbol("chair01_parts", build_name, "chair01_parts", inst.GUID, "stone_chair_chair")
+    end
+end
+stone_chair_clear_fn = function(inst)
+    basic_clear_fn(inst, "stone_chair_chair")
+    if not TheWorld.ismastersim then
+        return
+    end
+    if inst.back then
+        inst.back.AnimState:ClearOverrideSymbol("chair01_parts")
+    end
+end
 decor_centerpiece_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "decor_centerpiece") end
 decor_centerpiece_clear_fn = function(inst) basic_clear_fn(inst, "decor_centerpiece") end
 decor_flowervase_init_fn = function(inst, build_name)
@@ -215,6 +242,407 @@ decor_pictureframe_clear_fn = function(inst)
 end
 decor_portraitframe_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "decor_portraitframe") end
 decor_portraitframe_clear_fn = function(inst) basic_clear_fn(inst, "decor_portraitframe") end
+magician_chest_init_fn = function(inst, build_name) basic_init_fn(inst, build_name, "magician_chest") end
+magician_chest_clear_fn = function(inst) basic_clear_fn(inst, "magician_chest") end
+
+function critter_lunarmothling_clear_fn(inst)
+    inst.AnimState:SetBuild("lunarmoth_build")
+end
+function critter_lunarmothling_builder_clear_fn(inst)
+    inst.linked_skinname = nil
+end
+function staff_tornado_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "tornado_stick")
+    inst.linked_skinname = build_name:gsub("stick_", "") -- tornado_stick_skinname -> tornado_skinname
+end
+function staff_tornado_clear_fn(inst)
+    basic_clear_fn(inst, "tornado_stick")
+    inst.linked_skinname = nil
+end
+function tornado_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "tornado")
+end
+function tornado_clear_fn(inst)
+    basic_clear_fn(inst, "tornado")
+end
+function succulent_potted_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "succulent_potted")
+    inst.AnimState:ClearOverrideSymbol("succulent")
+end
+function succulent_potted_clear_fn(inst)
+    basic_clear_fn(inst, "succulent_potted")
+    inst:SetupPlant()
+end
+function raincoat_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "torso_rain")
+end
+function raincoat_clear_fn(inst)
+    basic_clear_fn(inst, "torso_rain")
+end
+local function FixBeefBellInvIcon(inst, build_name)
+    if inst.components.inventoryitem ~= nil then
+        if inst:HasTag("nobundling") then
+            build_name = (build_name or inst.prefab) .. "_linked"
+        end
+        inst.components.inventoryitem:ChangeImageName(build_name)
+    end
+end
+function beef_bell_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "cowbell")
+    FixBeefBellInvIcon(inst, build_name)
+end
+function beef_bell_clear_fn(inst)
+    basic_clear_fn(inst, "cowbell")
+    FixBeefBellInvIcon(inst, nil)
+end
+function deserthat_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "hat_desert")
+end
+function deserthat_clear_fn(inst)
+    basic_clear_fn(inst, "hat_desert")
+end
+function goggleshat_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "hat_goggles")
+end
+function goggleshat_clear_fn(inst)
+    basic_clear_fn(inst, "hat_goggles")
+end
+function eyeturret_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "eyeball_turret")
+    if inst.components.placer then
+        inst.AnimState:ClearOverrideSymbol("horn")
+    end
+    inst.AnimState:OverrideSymbol("click", "eyeball_turret", "click")
+    inst.AnimState:OverrideSymbol("glow", "eyeball_turret", "glow")
+    inst.AnimState:OverrideSymbol("redeye", "eyeball_turret", "redeye")
+    for i = 1, 6 do
+        local symbol = "Symbol " .. tostring(i) -- Old art file.
+        inst.AnimState:OverrideSymbol(symbol, "eyeball_turret", symbol)
+    end
+    if inst.base then
+        inst.base:FixupSkins()
+    end
+end
+function eyeturret_clear_fn(inst)
+    basic_clear_fn(inst, "eyeball_turret")
+    inst.AnimState:ClearOverrideSymbol("click")
+    inst.AnimState:ClearOverrideSymbol("glow")
+    inst.AnimState:ClearOverrideSymbol("redeye")
+    for i = 1, 6 do
+        local symbol = "Symbol " .. tostring(i) -- Old art file.
+        inst.AnimState:ClearOverrideSymbol(symbol)
+    end
+    if inst.base then
+        inst.base:FixupSkins()
+    end
+end
+function eyeturret_item_init_fn(inst, build_name)
+    inst.linked_skinname = build_name
+    basic_init_fn(inst, build_name, "eyeball_turret_object")
+end
+function eyeturret_item_clear_fn(inst)
+    inst.linked_skinname = nil
+    basic_clear_fn(inst, "eyeball_turret_object")
+end
+function moondial_init_fn(inst, build_name)
+    inst.AnimState:OverrideItemSkinSymbol("basin", build_name, "basin", inst.GUID, "moondial_build")
+end
+function moondial_clear_fn(inst)
+    inst.AnimState:ClearOverrideSymbol("basin")
+end
+function sewing_mannequin_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "sewing_mannequin")
+end
+function sewing_mannequin_clear_fn(inst)
+    basic_clear_fn(inst, "sewing_mannequin")
+end
+
+local winona_battery_high_skin_symbols = {
+    "wire_tip", "wire_red", "wire_blue",
+    "plug_off", "plug",
+    "panel",
+    "burnt",
+    "body",
+    "rack_frame_back", "rack_frame", "rack_base",
+}
+function winona_battery_high_init_fn(inst, build_name)
+    if inst.prefab == "winona_battery_high_item" then
+        winona_battery_high_item_init_fn(inst, build_name)
+        return
+    end
+
+    if inst.prefab == "winona_battery_high_item_placer" and inst.components.placer then
+        for _, v in pairs(inst.components.placer.linked) do
+            for _, symbol in ipairs(winona_battery_high_skin_symbols) do
+                v.AnimState:OverrideItemSkinSymbol(symbol, build_name, symbol, inst.GUID, "winonabattery_high")
+            end
+        end
+    end
+    for _, symbol in ipairs(winona_battery_high_skin_symbols) do
+        inst.AnimState:OverrideItemSkinSymbol(symbol, build_name, symbol, inst.GUID, "winonabattery_high")
+    end
+end
+function winona_battery_high_clear_fn(inst)
+    if inst.prefab == "winona_battery_high_item" then
+        winona_battery_high_item_clear_fn(inst)
+        return
+    end
+
+    for _, symbol in ipairs(winona_battery_high_skin_symbols) do
+        inst.AnimState:ClearOverrideSymbol(symbol)
+    end
+end
+local function winona_battery_high_item_filter(skin_name)
+    if not skin_name:find("_item") then
+        skin_name = skin_name:gsub("winonabattery_high", "winonabattery_high_item")
+    end
+    return skin_name
+end
+function winona_battery_high_item_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "winona_battery_high_item", winona_battery_high_item_filter)
+end
+function winona_battery_high_item_clear_fn(inst)
+    basic_clear_fn(inst, "winona_battery_high")
+end
+
+local winona_battery_low_skin_symbols = {
+    "wire_tip", "wire_red", "wire_blue",
+    "plug_off", "plug",
+    "panel",
+    "burnt",
+    "body", "body_2",
+}
+function winona_battery_low_init_fn(inst, build_name)
+    if inst.prefab == "winona_battery_low_item" then
+        winona_battery_low_item_init_fn(inst, build_name)
+        return
+    end
+
+    if inst.prefab == "winona_battery_low_item_placer" and inst.components.placer then
+        for _, v in pairs(inst.components.placer.linked) do
+            for _, symbol in ipairs(winona_battery_low_skin_symbols) do
+                v.AnimState:OverrideItemSkinSymbol(symbol, build_name, symbol, inst.GUID, "winona_battery_low")
+            end
+        end
+    end
+    for _, symbol in ipairs(winona_battery_low_skin_symbols) do
+        inst.AnimState:OverrideItemSkinSymbol(symbol, build_name, symbol, inst.GUID, "winona_battery_low")
+    end
+end
+function winona_battery_low_clear_fn(inst)
+    if inst.prefab == "winona_battery_low_item" then
+        winona_battery_low_item_clear_fn(inst)
+        return
+    end
+
+    for _, symbol in ipairs(winona_battery_low_skin_symbols) do
+        inst.AnimState:ClearOverrideSymbol(symbol)
+    end
+end
+local function winona_battery_low_item_filter(skin_name)
+    if not skin_name:find("_item") then
+        skin_name = skin_name:gsub("winonabattery_low", "winonabattery_low_item")
+    end
+    return skin_name
+end
+function winona_battery_low_item_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "winona_battery_low_item", winona_battery_low_item_filter)
+end
+function winona_battery_low_item_clear_fn(inst)
+    basic_clear_fn(inst, "winona_battery_low")
+end
+
+local winona_catapult_skin_symbols = {
+    "wire",
+    "scoop",
+    "led_parts",
+    "cog",
+    "light",
+    "base_bottom", "base_back", "base",
+    "arm",
+    "burnt1", "burnt2", "burnt3", "burnt4",
+    "burnt5", "burnt6", "burnt7",
+}
+function winona_catapult_init_fn(inst, build_name)
+    if inst.prefab == "winona_catapult_item" then
+        winona_catapult_item_init_fn(inst, build_name)
+        return
+    end
+
+    if inst.prefab == "winona_catapult_item_placer" and inst.components.placer then
+        for _, v in pairs(inst.components.placer.linked) do
+            for _, symbol in ipairs(winona_catapult_skin_symbols) do
+                v.AnimState:OverrideItemSkinSymbol(symbol, build_name, symbol, inst.GUID, "winona_catapult")
+            end
+        end
+    end
+    for _, symbol in ipairs(winona_catapult_skin_symbols) do
+        inst.AnimState:OverrideItemSkinSymbol(symbol, build_name, symbol, inst.GUID, "winona_catapult")
+    end
+    if TheWorld.ismastersim and not inst._wired then
+        inst.AnimState:OverrideSymbol("wire", "winona_catapult", "dummy")
+    end
+end
+function winona_catapult_clear_fn(inst)
+    if inst.prefab == "winona_catapult_item" then
+        winona_catapult_item_clear_fn(inst)
+        return
+    end
+
+    for _, symbol in ipairs(winona_catapult_skin_symbols) do
+        inst.AnimState:ClearOverrideSymbol(symbol)
+    end
+end
+local function winona_catapult_item_filter(skin_name)
+    if not skin_name:find("_item") then
+        skin_name = skin_name:gsub("winona_catapult", "winona_catapult_item")
+    end
+    return skin_name
+end
+function winona_catapult_item_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "winona_catapult_item", winona_catapult_item_filter)
+end
+function winona_catapult_item_clear_fn(inst)
+    basic_clear_fn(inst, "winona_catapult")
+end
+
+local winona_spotlight_skin_symbols = {
+    "wire",
+    "swivel",
+    "light_tilt1", "light_tilt2",
+    "light_base",
+    "light",
+    "leg1", "leg2", "leg3",
+    "led_parts",
+    "cap_OL",
+    "bracket1", "bracket2",
+    "b0", "b1", "b2", "b3", "b4",
+    "b5", "b6", "b7", "b8", "b9",
+    "b10", "b11", "b12", "b13",
+}
+function winona_spotlight_init_fn(inst, build_name)
+    if inst.prefab == "winona_spotlight_item" then
+        winona_spotlight_item_init_fn(inst, build_name)
+        return
+    end
+
+    if inst.prefab == "winona_spotlight_item_placer" and inst.components.placer then
+        for _, v in pairs(inst.components.placer.linked) do
+            for _, symbol in ipairs(winona_spotlight_skin_symbols) do
+                v.AnimState:OverrideItemSkinSymbol(symbol, build_name, symbol, inst.GUID, "winona_spotlight")
+            end
+        end
+    end
+    for _, symbol in ipairs(winona_spotlight_skin_symbols) do
+        inst.AnimState:OverrideItemSkinSymbol(symbol, build_name, symbol, inst.GUID, "winona_spotlight")
+    end
+    if TheWorld.ismastersim and not inst._wired then
+        inst.AnimState:OverrideSymbol("wire", "winona_spotlight", "dummy")
+    end
+    if inst._headinst then
+        for _, symbol in ipairs(winona_spotlight_skin_symbols) do
+            inst._headinst.AnimState:OverrideItemSkinSymbol(symbol, build_name, symbol, inst.GUID, "winona_spotlight")
+        end
+    end
+end
+function winona_spotlight_clear_fn(inst)
+    if inst.prefab == "winona_spotlight_item" then
+        winona_spotlight_item_clear_fn(inst)
+        return
+    end
+
+    for _, symbol in ipairs(winona_spotlight_skin_symbols) do
+        inst.AnimState:ClearOverrideSymbol(symbol)
+    end
+    if inst._headinst then
+        for _, symbol in ipairs(winona_spotlight_skin_symbols) do
+            inst._headinst.AnimState:ClearOverrideSymbol(symbol)
+        end
+    end
+end
+local function winona_spotlight_item_filter(skin_name)
+    if not skin_name:find("_item") then
+        skin_name = skin_name:gsub("winona_spotlight", "winona_spotlight_item")
+    end
+    return skin_name
+end
+function winona_spotlight_item_init_fn(inst, build_name)
+    basic_init_fn(inst, build_name, "winona_spotlight_item", winona_spotlight_item_filter)
+end
+function winona_spotlight_item_clear_fn(inst)
+    basic_clear_fn(inst, "winona_spotlight")
+end
+
+function boat_grass_item_init_fn(inst, build_name)
+    inst.linked_skinname = build_name --hack that relies on the build name to match the linked skinname
+    inst.AnimState:SetSkin(build_name, "seafarer_boat") --same hack is used here by the deployable code in player controller
+    inst.components.inventoryitem:ChangeImageName(inst:GetSkinName())
+end
+function boat_grass_item_clear_fn(inst)
+    inst.linked_skinname = nil
+    inst.AnimState:SetBuild("seafarer_boat")
+    inst.components.inventoryitem:ChangeImageName()
+end
+function boat_grass_init_fn(inst, build_name)
+    if inst.components.placer == nil and not TheWorld.ismastersim then
+        return
+    end
+    inst.AnimState:SetSkin(build_name, "boat_grass")
+end
+function boat_grass_clear_fn(inst)
+    inst.AnimState:SetBuild("boat_grass")
+end
+
+
+function walkingplank_grass_init_fn(inst, build_name)
+    if inst.components.placer == nil and not TheWorld.ismastersim then
+        return
+    end
+    inst.AnimState:SetSkin(build_name, "boat_plank_grass_build")
+end
+function walkingplank_grass_clear_fn(inst, build_name)
+    inst.AnimState:SetBuild("boat_plank_grass_build")
+end
+
+function winch_init_fn(inst, build_name)
+    if inst.components.placer ~= nil then
+        --Placers can run this on clients as well as servers
+        inst.AnimState:SetSkin(build_name, "boat_winch")
+        return
+    elseif not TheWorld.ismastersim then
+        return
+    end
+    inst.AnimState:SetSkin(build_name, "boat_winch")
+end
+function winch_clear_fn(inst)
+    inst.AnimState:SetBuild("boat_winch")
+end
+
+function ocean_trawler_init_fn(inst, build_name)
+    inst.AnimState:OverrideSymbol("water_shadow", "ocean_trawler", "water_shadow")
+    if inst.components.placer ~= nil then
+        --Placers can run this on clients as well as servers
+        inst.AnimState:SetSkin(build_name, "ocean_trawler")
+        return
+    elseif not TheWorld.ismastersim then
+        return
+    end
+    inst.AnimState:SetSkin(build_name, "ocean_trawler")
+end
+function ocean_trawler_clear_fn(inst)
+    inst.AnimState:ClearOverrideSymbol("water_shadow")
+    inst.AnimState:SetBuild("ocean_trawler")
+end
+function ocean_trawler_kit_init_fn(inst, build_name)
+    inst.linked_skinname = build_name --hack that relies on the build name to match the linked skinname
+    inst.AnimState:SetSkin(build_name, "ocean_trawler") --same hack is used here by the deployable code in player controller
+    inst.components.inventoryitem:ChangeImageName(inst:GetSkinName())
+end
+function ocean_trawler_kit_clear_fn(inst)
+    inst.linked_skinname = nil
+    inst.AnimState:SetBuild("ocean_trawler")
+    inst.components.inventoryitem:ChangeImageName()
+end
 
 hammer_init_fn = function(inst, build_name)
     if string.find( build_name, "_invisible") ~= nil then
@@ -281,6 +709,21 @@ whip_init_fn = function(inst, build_name)
 end
 whip_clear_fn = function(inst)
     basic_clear_fn( inst, "whip" )
+    RemoveSkinSounds(inst)
+end
+
+
+trident_init_fn = function(inst, build_name)
+    basic_init_fn(inst, build_name, "trident")
+
+    if not TheWorld.ismastersim then
+        return
+    end
+
+    AddSkinSounds(inst)
+end
+trident_clear_fn = function(inst)
+    basic_clear_fn(inst, "trident")
     RemoveSkinSounds(inst)
 end
 
@@ -2027,7 +2470,7 @@ local function cane_do_trail(inst)
     local mounted = owner.components.rider ~= nil and owner.components.rider:IsRiding()
     local map = TheWorld.Map
     local offset = FindValidPositionByFan(
-        math.random() * 2 * PI,
+        math.random() * TWOPI,
         (mounted and 1 or .5) + math.random() * .5,
         4,
         function(offset)

@@ -396,6 +396,11 @@ function Builder:AddRecipe(recname)
     self.inst.replica.builder:AddRecipe(recname)
 end
 
+function Builder:RemoveRecipe(recname)
+	table.removearrayvalue(self.recipes, recname)
+	self.inst.replica.builder:RemoveRecipe(recname)
+end
+
 function Builder:UnlockRecipe(recname)
     local recipe = GetValidRecipe(recname)
     if recipe ~= nil and not recipe.nounlock then
@@ -450,6 +455,19 @@ function Builder:GetIngredients(recname)
         end
         return ingredients, discounted
     end
+end
+
+function Builder:CheckIngredientsForMimic(ingredients)
+    for _, ents in pairs(ingredients) do
+        for item in pairs(ents) do
+            if item.components.itemmimic then
+                item.components.itemmimic:TurnEvil(self.inst)
+                return true
+            end
+        end
+    end
+
+    return false
 end
 
 function Builder:RemoveIngredients(ingredients, recname, discounted)
@@ -536,7 +554,7 @@ function Builder:HasTechIngredient(ingredient)
 end
 
 function Builder:MakeRecipe(recipe, pt, rot, skin, onsuccess)
-    if recipe ~= nil and not self.inst.sg:HasStateTag("drowning") then -- TODO(JBK): Check if "drowning" can be replaced with "busy" instead with no side effects.
+    if recipe ~= nil and not self.inst.sg:HasStateTag("drowning") and not self.inst.sg:HasStateTag("falling") then -- TODO(JBK): Check if "drowning" can be replaced with "busy" instead with no side effects.
         self.inst:PushEvent("makerecipe", { recipe = recipe })
         if self:IsBuildBuffered(recipe.name) or self:HasIngredients(recipe) then
             self.inst.components.locomotor:Stop()
@@ -587,7 +605,7 @@ function Builder:DoBuild(recname, pt, rotation, skin)
         end
 
         if recipe.canbuild ~= nil then
-			local success, msg = recipe.canbuild(recipe, self.inst, pt, rotation)
+			local success, msg = recipe.canbuild(recipe, self.inst, pt, rotation, self.current_prototyper)
 			if not success then
 				return false, msg
 			end
@@ -618,6 +636,10 @@ function Builder:DoBuild(recname, pt, rotation, skin)
 
 		if recipe.manufactured then
 			local materials, discounted = self:GetIngredients(recname)
+            if self:CheckIngredientsForMimic(materials) then
+                return false, "ITEMMIMIC"
+            end
+
 			self:RemoveIngredients(materials, recname, discounted)
 			   -- its up to the prototyper to implement onactivate and handle spawning the prefab
 		   return true
@@ -630,6 +652,9 @@ function Builder:DoBuild(recname, pt, rotation, skin)
             if prod.components.inventoryitem ~= nil then
                 if self.inst.components.inventory ~= nil then
 					local materials, discounted = self:GetIngredients(recname)
+                    if self:CheckIngredientsForMimic(materials) then
+                        return false, "ITEMMIMIC"
+                    end
 
 					local wetlevel = self:GetIngredientWetness(materials)
 					if wetlevel > 0 and prod.components.inventoryitem ~= nil then
@@ -701,6 +726,10 @@ function Builder:DoBuild(recname, pt, rotation, skin)
             else
 				if not is_buffered_build then -- items that have intermediate build items (like statues)
 					local materials, discounted = self:GetIngredients(recname)
+                    if self:CheckIngredientsForMimic(materials) then
+                        return false, "ITEMMIMIC"
+                    end
+
 					self:RemoveIngredients(materials, recname, discounted)
 				end
 
@@ -751,6 +780,8 @@ function Builder:KnowsRecipe(recipe, ignore_tempbonus)
 		return true
 	elseif recipe.builder_tag ~= nil and not self.inst:HasTag(recipe.builder_tag) then -- builder_tag cehck is require due to character swapping
 		return false
+    elseif recipe.builder_skill ~= nil and not self.inst.components.skilltreeupdater:IsActivated(recipe.builder_skill) then -- builder_skill check is require due to character swapping
+        return false
 	elseif self.station_recipes[recipe.name] or table.contains(self.recipes, recipe.name) then
 		return true
 	end
@@ -807,8 +838,8 @@ end
 function Builder:CanLearn(recname)
     local recipe = GetValidRecipe(recname)
     return recipe ~= nil
-        and (recipe.builder_tag == nil or
-            self.inst:HasTag(recipe.builder_tag))
+        and (recipe.builder_tag == nil or self.inst:HasTag(recipe.builder_tag))
+        and (recipe.builder_skill == nil or self.inst.components.skilltreeupdater:IsActivated(recipe.builder_skill))
 end
 
 function Builder:LongUpdate(dt)
@@ -986,6 +1017,10 @@ function Builder:BufferBuild(recname)
 		end
 
         local materials, discounted = self:GetIngredients(recname)
+        if self:CheckIngredientsForMimic(materials) then
+            return
+        end
+
         self:RemoveIngredients(materials, recname, discounted)
         self.buffered_builds[recname] = true
         self.inst.replica.builder:SetIsBuildBuffered(recname, true)

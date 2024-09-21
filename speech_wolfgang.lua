@@ -2,59 +2,11 @@
 return{
 	ACTIONFAIL =
 	{
-        APPRAISE =
+        GENERIC =
         {
-            NOTNOW = "Judge man is busy.",
+            ITEMMIMIC = "Fool Wolfgang, shame on you!",
         },
-        REPAIR =
-        {
-            WRONGPIECE = "Is wrong piece for little statue!",
-        },
-        BUILD =
-        {
-            MOUNTED = "Hair-cow is too tall. I can't reach.",
-            HASPET = "Wolfgang has animal friend already!",
-			TICOON = "Wolfgang already has good furry friend.",
-        },
-		SHAVE =
-		{
-			AWAKEBEEFALO = "I will wait until he is not looking.",
-			GENERIC = "That cannot be shaved.",
-			NOBITS = "I cannot shave when there are no hairs.",
---fallback to speech_wilson.lua             REFUSE = "only_used_by_woodie",
-            SOMEONEELSESBEEFALO = "Is not Wolfgang's for shaving.",
-		},
-		STORE =
-		{
-			GENERIC = "I will make it fit!",
-			NOTALLOWED = "Bah! Useless.",
-			INUSE = "Wolfgang can share!",
-            NOTMASTERCHEF = "Warly is very nice to cook. Wolfgang will not get in way.",
-		},
-        CONSTRUCT =
-        {
-            INUSE = "Wolfgang can share?",
-            NOTALLOWED = "Is not right place for that.",
-            EMPTY = "Wolfgang needs something to put here.",
-            MISMATCH = "Wolfgang have wrong plans.",
-            NOTREADY = "Is too scary here! Will come back later!",
-        },
-		RUMMAGE =
-		{
-			GENERIC = "Maybe Wolfgang do later.",
-			INUSE = "Wolfgang would like to use after you, if okay.",
-            NOTMASTERCHEF = "Warly is very nice to cook. Wolfgang will not get in way.",
-		},
-		UNLOCK =
-        {
---fallback to speech_wilson.lua         	WRONGKEY = "I can't do that.",
-        },
-		USEKLAUSSACKKEY =
-        {
-        	WRONGKEY = "Is not right key!",
-        	KLAUS = "Later! Now we FIGHT!",
-			QUAGMIRE_WRONGKEY = "Is wrong key.",
-        },
+
 		ACTIVATE =
 		{
 			LOCKED_GATE = "Let Wolfgang in!",
@@ -68,55 +20,138 @@ return{
             MANNEQUIN_EQUIPSWAPFAILED = "Is not for cloth man. Wolfgang will keep.",
             PILLOWFIGHT_NO_HANDPILLOW = "Wolfgang needs pillow for fighting!",
             NOTMYBERNIE = "Giant murder bear only follow to tiny torchlady.",
+            NOTMERM = "Fish men only trust Wurt.",
+            NOKELP = "only_used_by_wurt",
+--fallback to speech_wilson.lua             HASMERMLEADER = "only_used_by_wurt",
 		},
-		OPEN_CRAFTING =
+        APPLYMODULE =
+        {
+            COOLDOWN = "only_used_by_wx78",
+            NOTENOUGHSLOTS = "only_used_by_wx78",
+        },
+        APPRAISE =
+        {
+            NOTNOW = "Judge man is busy.",
+        },
+        ATTUNE =
+        {
+            NOHEALTH = "Wolfgang is too woozy to do this.",
+        },
+        BATHBOMB =
+        {
+            GLASSED = "Is covered in see-through sharp stuff!",
+            ALREADY_BOMBED = "Is already prettified.",
+        },
+        BEDAZZLE =
+        {
+--fallback to speech_wilson.lua             BURNING = "only_used_by_webber",
+--fallback to speech_wilson.lua             BURNT = "only_used_by_webber",
+--fallback to speech_wilson.lua             FROZEN = "only_used_by_webber",
+--fallback to speech_wilson.lua             ALREADY_BEDAZZLED = "only_used_by_webber",
+        },
+        BEGIN_QUEST =
+        {
+            ONEGHOST = "only_used_by_wendy",
+        },
+        BUILD =
+        {
+            MOUNTED = "Hair-cow is too tall. I can't reach.",
+            HASPET = "Wolfgang has animal friend already!",
+			TICOON = "Wolfgang already has good furry friend.",
+            BUSY_STATION = "Wolfgang must wait.",
+        },
+        CARNIVALGAME_FEED =
+        {
+            TOO_LATE = "Little bird is too fast!",
+        },
+		CAST_POCKETWATCH =
 		{
-            PROFESSIONALCHEF = "Warly is very nice to cook. Wolfgang will not get in way.",
-			SHADOWMAGIC = "Wolfgang is glad he cannot read!",
+--fallback to speech_wilson.lua 			GENERIC = "only_used_by_wanda",
+--fallback to speech_wilson.lua 			REVIVE_FAILED = "only_used_by_wanda",
+--fallback to speech_wilson.lua 			WARP_NO_POINTS_LEFT = "only_used_by_wanda",
+--fallback to speech_wilson.lua 			SHARD_UNAVAILABLE = "only_used_by_wanda",
 		},
+		CAST_SPELLBOOK =
+		{
+--fallback to speech_wilson.lua 			NO_TOPHAT = "only_used_by_waxwell",
+		},
+		CASTAOE =
+		{
+--fallback to speech_wilson.lua 			NO_MAX_SANITY = "only_used_by_waxwell",
+            NOT_ENOUGH_EMBERS = "only_used_by_willow",
+            NO_TARGETS = "only_used_by_willow",
+            CANT_SPELL_MOUNTED = "only_used_by_willow",
+            SPELL_ON_COOLDOWN = "only_used_by_willow",
+			NO_BATTERY = "only_used_by_winona",
+			NO_CATAPULTS = "only_used_by_winona",
+		},
+        CASTSPELL =
+        {
+            TERRAFORM_TOO_SOON = "only_used_by_wurt",
+        },
+        CHANGEIN =
+        {
+            GENERIC = "Clothes only good for ripping with strong muscles!",
+            BURNING = "Wolfgang's weekday undergarments burning? Wolfgang is sad.",
+            INUSE = "Wolfgang will wait til they leave to change. He is shy.",
+            NOTENOUGHHAIR = "Will wait for hairs to grow back.",
+            NOOCCUPANT = "Wolfgang needs beefalo to hitch.",
+        },
+        CHARGE_FROM =
+        {
+            NOT_ENOUGH_CHARGE = "only_used_by_wx78",
+            CHARGE_FULL = "only_used_by_wx78",
+        },
+		COMPARE_WEIGHABLE =
+		{
+            FISH_TOO_SMALL = "Tiny fish not mighty enough!",
+            OVERSIZEDVEGGIES_TOO_SMALL = "Wolfgang is able to lift it too easily, is not heavy enough!",
+		},
+        CONSTRUCT =
+        {
+            INUSE = "Wolfgang can share?",
+            NOTALLOWED = "Is not right place for that.",
+            EMPTY = "Wolfgang needs something to put here.",
+            MISMATCH = "Wolfgang have wrong plans.",
+            NOTREADY = "Is too scary here! Will come back later!",
+        },
         COOK =
         {
             GENERIC = "Wolfgang not in cooking mood.",
             INUSE = "Oh, smells good, friend!",
             TOOFAR = "Is pot very small, or just far away?",
         },
-        START_CARRAT_RACE =
-        {
-            NO_RACERS = "Wolfgang must find leggy carrots for race!",
-        },
-
-		DISMANTLE = 
+		DISMANTLE =
 		{
 			COOKING = "Delicious meal must finish first.",
 			INUSE = "Wolfgang would like to use after you, if okay.",
 			NOTEMPTY = "Is still filled with things.",
         },
+        DISMANTLE_POCKETWATCH =
+        {
+--fallback to speech_wilson.lua             ONCOOLDOWN = "only_used_by_wanda",
+        },
+        DRAW =
+        {
+            NOIMAGE = "Wolfgang no good at drawing pictures from head.",
+        },
+        ENTER_GYM =
+        {
+            NOWEIGHT = "Wolfgang needs to find something to lift!",
+            UNBALANCED = "Wolfgang does not want one arm mightier than other!",
+            ONFIRE = "Is good to feel burn, but not that much.",
+            SMOULDER = "Wolfgang will stomp puny fire out first.",
+            HUNGRY = "Too hungry... can't lift with tummy grumbling...",
+            FULL = "Is Wolfgang's turn for lifting now! Wait...",
+        },
+        FILL_OCEAN =
+        {
+            UNSUITABLE_FOR_PLANTS = "Salt water not good for plants.",
+        },
         FISH_OCEAN =
 		{
 			TOODEEP = "Wolfgang can't reach fish with tiny rod!",
 		},
-        OCEAN_FISHING_POND =
-		{
-			WRONGGEAR = "Don't need mighty fishing rod for tiny pond!",
-		},
-        --wickerbottom specific action
---fallback to speech_wilson.lua         READ =
---fallback to speech_wilson.lua         {
---fallback to speech_wilson.lua             GENERIC = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOBIRDS = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOWATERNEARBY = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             TOOMANYBIRDS = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             WAYTOOMANYBIRDS = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOFIRES =       "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOSILVICULTURE = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOHORTICULTURE = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOTENTACLEGROUND = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOSLEEPTARGETS = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             TOOMANYBEES = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             NOMOONINCAVES = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua             ALREADYFULLMOON = "only_used_by_waxwell_and_wicker",
---fallback to speech_wilson.lua         },
-
         GIVE =
         {
             GENERIC = "Wolfgang does not think that goes there.",
@@ -127,6 +162,7 @@ return{
             GHOSTHEART = "No!",
             NOTGEM = "Not even mighty muscles can make fit!",
             WRONGGEM = "Little rock does not want to go there.",
+			NOGENERATORSKILL = "Not even mighty muscles can make fit!",
             NOTSTAFF = "I do not think little platform would like that.",
             MUSHROOMFARM_NEEDSSHROOM = "Is needing tiny mushy-room, I think.",
             MUSHROOMFARM_NEEDSLOG = "Is needing tiny log with face.",
@@ -151,6 +187,10 @@ return{
             NOTAMONKEY = "Wolfgang does not speak monkey.",
             QUEENBUSY = "Hairy lady is busy. Wolfgang will wait.",
         },
+        GIVE_TACKLESKETCH =
+		{
+			DUPLICATE = "Little recipe is already in there!",
+        },
         GIVETOPLAYER =
         {
             FULL = "Make room for Wolfgang's presents!",
@@ -165,26 +205,44 @@ return{
             SLEEPING = "Friend is sleeping now!",
             BUSY = "Please give Mighty Wolfgang your attention!",
         },
-        WRITE =
+        HARVEST =
         {
-            GENERIC = "Wolfgang not good with tiny letters.",
-            INUSE = "Can Wolfgang help make scribblemarks when you're done?",
+            DOER_ISNT_MODULE_OWNER = "Wolfgang thinks it only speaks robot.",
         },
-        DRAW =
+        HEAL =
         {
-            NOIMAGE = "Wolfgang no good at drawing pictures from head.",
+            NOT_MERM = "Only fish men would like that.",
         },
-        CHANGEIN =
+        HERD_FOLLOWERS =
         {
-            GENERIC = "Clothes only good for ripping with strong muscles!",
-            BURNING = "Wolfgang's weekday undergarments burning? Wolfgang is sad.",
-            INUSE = "Wolfgang will wait til they leave to change. He is shy.",
-            NOTENOUGHHAIR = "Will wait for hairs to grow back.",
-            NOOCCUPANT = "Wolfgang needs beefalo to hitch.",
+            WEBBERONLY = "Eep! Creepy bugs not listen to Wolfgang!",
         },
-        ATTUNE =
+        HITCHUP =
         {
-            NOHEALTH = "Wolfgang is too woozy to do this.",
+            NEEDBEEF = "Wolfgang needs hair-cow!",
+            NEEDBEEF_CLOSER = "Hair-cow is too far away.",
+            BEEF_HITCHED = "Is staying put.",
+            INMOOD = "Is too feisty for hitching!",
+        },
+		LOOKAT = --fail strings for close inspection
+		{
+			-- Winona specific
+--fallback to speech_wilson.lua 			ROSEGLASSES_INVALID = "only_used_by_winona",
+--fallback to speech_wilson.lua 			ROSEGLASSES_COOLDOWN = "only_used_by_winona",
+--fallback to speech_wilson.lua             ROSEGLASSES_DISMISS = "only_used_by_winona",
+--fallback to speech_wilson.lua             ROSEGLASSES_STUMPED = "only_used_by_winona",
+			--
+		},
+        LOWER_SAIL_FAIL =
+        {
+            "Tiny wind cloth not listening to Wolfgang!",
+            "Wolfgang will show tiny boat who's mightier!",
+            "Argh! Taking down big circus tent was easier than this!",
+        },
+        MARK =
+        {
+            ALREADY_MARKED = "Wolfgang has chosen this one!",
+            NOT_PARTICIPANT = "Wolfgang will wait for next time.",
         },
         MOUNT =
         {
@@ -192,27 +250,18 @@ return{
             INUSE = "Hair-cow is occupied by another.",
 			SLEEPING = "Is time for waking, hair-cow!",
         },
-        SADDLE =
+        OCEAN_FISHING_POND =
+		{
+			WRONGGEAR = "Don't need mighty fishing rod for tiny pond!",
+		},
+		OPEN_CRAFTING =
+		{
+            PROFESSIONALCHEF = "Warly is very nice to cook. Wolfgang will not get in way.",
+			SHADOWMAGIC = "Wolfgang is glad he cannot read!",
+		},
+        PICK =
         {
-            TARGETINCOMBAT = "I cannot ride it now! Hair-cow is proving itself in battle!",
-        },
-        TEACH =
-        {
-            --Recipes/Teacher
-            KNOWN = "Wolfgang already knows this!",
-            CANTLEARN = "I do not get it.",
-
-            --MapRecorder/MapExplorer
-            WRONGWORLD = "Little paper is not for here!",
-
-			--MapSpotRevealer/messagebottle
-			MESSAGEBOTTLEMANAGER_NOT_FOUND = "Wolfgang can't read in here.",--Likely trying to read messagebottle treasure map in caves
-
-            STASH_MAP_NOT_FOUND = "Is hard to read monkey writing.",-- Likely trying to read stash map  in world without stash                  
-        },
-        WRAPBUNDLE =
-        {
-            EMPTY = "Wolfgang has no little things to wrap!",
+            NOTHING_INSIDE = "Is nothing.",
         },
         PICKUP =
         {
@@ -227,67 +276,10 @@ return{
 --fallback to speech_wilson.lua 			NO_HEAVY_LIFTING = "only_used_by_wanda",
             FULL_OF_CURSES = "Wolfgang won't fall for monkey trick... again!",
         },
-        SLAUGHTER =
-        {
-            TOOFAR = "Come back so Wolfgang can eat you!",
-        },
-        REPLATE =
-        {
-            MISMATCH = "Food need different dish.",
-            SAMEDISH = "Wolfgang already put on dish.",
-        },
-        SAIL =
-        {
-        	REPAIR = "Tiny boat is strong, no need.",
-        },
-        ROW_FAIL =
-        {
-            BAD_TIMING0 = "Need to paddle at right time!",
-            BAD_TIMING1 = "Wolfgang need to concentrate.",
-            BAD_TIMING2 = "Is easy! That was just practice run.",
-        },
-        LOWER_SAIL_FAIL =
-        {
-            "Tiny wind cloth not listening to Wolfgang!",
-            "Wolfgang will show tiny boat who's mightier!",
-            "Argh! Taking down big circus tent was easier than this!",
-        },
-        BATHBOMB =
-        {
-            GLASSED = "Is covered in see-through sharp stuff!",
-            ALREADY_BOMBED = "Is already prettified.",
-        },
-		GIVE_TACKLESKETCH =
-		{
-			DUPLICATE = "Little recipe is already in there!",
-		},
-		COMPARE_WEIGHABLE =
-		{
-            FISH_TOO_SMALL = "Tiny fish not mighty enough!",
-            OVERSIZEDVEGGIES_TOO_SMALL = "Wolfgang is able to lift it too easily, is not heavy enough!",
-		},
-        BEGIN_QUEST =
-        {
-            ONEGHOST = "only_used_by_wendy",
-        },
-		TELLSTORY =
-		{
-			GENERIC = "only_used_by_walter",
---fallback to speech_wilson.lua 			NOT_NIGHT = "only_used_by_walter",
---fallback to speech_wilson.lua 			NO_FIRE = "only_used_by_walter",
-		},
-        SING_FAIL =
-        {
---fallback to speech_wilson.lua             SAMESONG = "only_used_by_wathgrithr",
-        },
         PLANTREGISTRY_RESEARCH_FAIL =
         {
             GENERIC = "This plant is known to Wolfgang.",
             FERTILIZER = "This is known to Wolfgang.",
-        },
-        FILL_OCEAN =
-        {
-            UNSUITABLE_FOR_PLANTS = "Salt water not good for plants.",
         },
         POUR_WATER =
         {
@@ -296,6 +288,113 @@ return{
         POUR_WATER_GROUNDTILE =
         {
             OUT_OF_WATER = "Water is run out.",
+        },
+        --wickerbottom specific action
+--fallback to speech_wilson.lua         READ =
+--fallback to speech_wilson.lua         {
+--fallback to speech_wilson.lua             GENERIC = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOBIRDS = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOWATERNEARBY = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             TOOMANYBIRDS = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             WAYTOOMANYBIRDS = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOFIRES =       "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOSILVICULTURE = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOHORTICULTURE = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOTENTACLEGROUND = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOSLEEPTARGETS = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             TOOMANYBEES = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             NOMOONINCAVES = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua             ALREADYFULLMOON = "only_used_by_waxwell_and_wicker",
+--fallback to speech_wilson.lua         },
+		REMOTE_TELEPORT =
+		{
+			NOSKILL = "only_used_by_winona",
+			NODEST = "only_used_by_winona",
+		},
+        REMOVEMODULES =
+        {
+            NO_MODULES = "only_used_by_wx78",
+        },
+        REPAIR =
+        {
+            WRONGPIECE = "Is wrong piece for little statue!",
+        },
+        REPLATE =
+        {
+            MISMATCH = "Food need different dish.",
+            SAMEDISH = "Wolfgang already put on dish.",
+        },
+        ROW_FAIL =
+        {
+            BAD_TIMING0 = "Need to paddle at right time!",
+            BAD_TIMING1 = "Wolfgang need to concentrate.",
+            BAD_TIMING2 = "Is easy! That was just practice run.",
+        },
+		RUMMAGE =
+		{
+			GENERIC = "Maybe Wolfgang do later.",
+			INUSE = "Wolfgang would like to use after you, if okay.",
+            NOTMASTERCHEF = "Warly is very nice to cook. Wolfgang will not get in way.",
+            NOTAMERM = "Wolfgang not want upset fish man.",
+		},
+        SADDLE =
+        {
+            TARGETINCOMBAT = "I cannot ride it now! Hair-cow is proving itself in battle!",
+        },
+		SHAVE =
+		{
+			AWAKEBEEFALO = "I will wait until he is not looking.",
+			GENERIC = "That cannot be shaved.",
+			NOBITS = "I cannot shave when there are no hairs.",
+--fallback to speech_wilson.lua             REFUSE = "only_used_by_woodie",
+            SOMEONEELSESBEEFALO = "Is not Wolfgang's for shaving.",
+		},
+        SING_FAIL =
+        {
+--fallback to speech_wilson.lua             SAMESONG = "only_used_by_wathgrithr",
+        },
+        SLAUGHTER =
+        {
+            TOOFAR = "Come back so Wolfgang can eat you!",
+        },
+        START_CARRAT_RACE =
+        {
+            NO_RACERS = "Wolfgang must find leggy carrots for race!",
+        },
+		STORE =
+		{
+			GENERIC = "I will make it fit!",
+			NOTALLOWED = "Bah! Useless.",
+			INUSE = "Wolfgang can share!",
+            NOTMASTERCHEF = "Warly is very nice to cook. Wolfgang will not get in way.",
+		},
+        TEACH =
+        {
+            --Recipes/Teacher
+            KNOWN = "Wolfgang already knows this!",
+            CANTLEARN = "I do not get it.",
+
+            --MapRecorder/MapExplorer
+            WRONGWORLD = "Little paper is not for here!",
+
+			--MapSpotRevealer/messagebottle
+			MESSAGEBOTTLEMANAGER_NOT_FOUND = "Wolfgang can't read in here.",--Likely trying to read messagebottle treasure map in caves
+
+            STASH_MAP_NOT_FOUND = "Is hard to read monkey writing.",-- Likely trying to read stash map  in world without stash                  
+        },
+		TELLSTORY =
+		{
+			GENERIC = "only_used_by_walter",
+--fallback to speech_wilson.lua 			NOT_NIGHT = "only_used_by_walter",
+--fallback to speech_wilson.lua 			NO_FIRE = "only_used_by_walter",
+		},
+		UNLOCK =
+        {
+--fallback to speech_wilson.lua             WRONGKEY = "I can't do that.",
+        },
+        UPGRADE =
+        {
+--fallback to speech_wilson.lua             BEDAZZLED = "only_used_by_webber",
         },
         USEITEMON =
         {
@@ -306,17 +405,20 @@ return{
             BEEF_BELL_ALREADY_USED = "This hair-cow already has friend.",
             BEEF_BELL_HAS_BEEF_ALREADY = "Wolfgang already picked best hair-cow to befriend!",
         },
-        HITCHUP =
+		USEKLAUSSACKKEY =
         {
-            NEEDBEEF = "Wolfgang needs hair-cow!",
-            NEEDBEEF_CLOSER = "Hair-cow is too far away.",
-            BEEF_HITCHED = "Is staying put.",
-            INMOOD = "Is too feisty for hitching!",
+            WRONGKEY = "Is not right key!",
+            KLAUS = "Later! Now we FIGHT!",
+			QUAGMIRE_WRONGKEY = "Is wrong key.",
         },
-        MARK =
+        WRAPBUNDLE =
         {
-            ALREADY_MARKED = "Wolfgang has chosen this one!",
-            NOT_PARTICIPANT = "Wolfgang will wait for next time.",
+            EMPTY = "Wolfgang has no little things to wrap!",
+        },
+        WRITE =
+        {
+            GENERIC = "Wolfgang not good with tiny letters.",
+            INUSE = "Can Wolfgang help make scribblemarks when you're done?",
         },
         YOTB_STARTCONTEST =
         {
@@ -327,80 +429,6 @@ return{
         {
             ALREADYKNOWN = "Ha! Was already there in Wolfgang's big brain!",
         },
-        CARNIVALGAME_FEED =
-        {
-            TOO_LATE = "Little bird is too fast!",
-        },
-        HERD_FOLLOWERS =
-        {
-            WEBBERONLY = "Eep! Creepy bugs not listen to Wolfgang!",
-        },
-        BEDAZZLE =
-        {
---fallback to speech_wilson.lua             BURNING = "only_used_by_webber",
---fallback to speech_wilson.lua             BURNT = "only_used_by_webber",
---fallback to speech_wilson.lua             FROZEN = "only_used_by_webber",
---fallback to speech_wilson.lua             ALREADY_BEDAZZLED = "only_used_by_webber",
-        },
-        UPGRADE =
-        {
---fallback to speech_wilson.lua             BEDAZZLED = "only_used_by_webber",
-        },
-		CAST_POCKETWATCH =
-		{
---fallback to speech_wilson.lua 			GENERIC = "only_used_by_wanda",
---fallback to speech_wilson.lua 			REVIVE_FAILED = "only_used_by_wanda",
---fallback to speech_wilson.lua 			WARP_NO_POINTS_LEFT = "only_used_by_wanda",
---fallback to speech_wilson.lua 			SHARD_UNAVAILABLE = "only_used_by_wanda",
-		},
-        DISMANTLE_POCKETWATCH =
-        {
---fallback to speech_wilson.lua             ONCOOLDOWN = "only_used_by_wanda",
-        },
-
-        ENTER_GYM =
-        {
-            NOWEIGHT = "Wolfgang needs to find something to lift!",
-            UNBALANCED = "Wolfgang does not want one arm mightier than other!",
-            ONFIRE = "Is good to feel burn, but not that much.",
-            SMOULDER = "Wolfgang will stomp puny fire out first.",
-            HUNGRY = "Too hungry... can't lift with tummy grumbling...",
-            FULL = "Is Wolfgang's turn for lifting now! Wait...",
-        },
-
-        APPLYMODULE =
-        {
-            COOLDOWN = "only_used_by_wx78",
-            NOTENOUGHSLOTS = "only_used_by_wx78",
-        },
-        REMOVEMODULES =
-        {
-            NO_MODULES = "only_used_by_wx78",
-        },
-        CHARGE_FROM =
-        {
-            NOT_ENOUGH_CHARGE = "only_used_by_wx78",
-            CHARGE_FULL = "only_used_by_wx78",
-        },
-
-        HARVEST =
-        {
-            DOER_ISNT_MODULE_OWNER = "Wolfgang thinks it only speaks robot.",
-        },
-
-		CAST_SPELLBOOK =
-		{
---fallback to speech_wilson.lua 			NO_TOPHAT = "only_used_by_waxwell",
-		},
-
-		CASTAOE =
-		{
---fallback to speech_wilson.lua 			NO_MAX_SANITY = "only_used_by_waxwell",
-            NOT_ENOUGH_EMBERS = "only_used_by_willow",
-            NO_TARGETS = "only_used_by_willow",
-            CANT_SPELL_MOUNTED = "only_used_by_willow",
-            SPELL_ON_COOLDOWN = "only_used_by_willow", 
-		},
     },
 
 	ANNOUNCE_CANNOT_BUILD =
@@ -413,6 +441,7 @@ return{
 	ACTIONFAIL_GENERIC = "I am not mighty enough to do that.",
 	ANNOUNCE_BOAT_LEAK = "Drippy drops is come through boat!",
 	ANNOUNCE_BOAT_SINK = "Wolfgang cannot swim!",
+    ANNOUNCE_PREFALLINVOID = "The void hungers for sweet Wolfgang!",
 	ANNOUNCE_DIG_DISEASE_WARNING = "Ha! Dirt spoon fix it!", --removed
 	ANNOUNCE_PICK_DISEASE_WARNING = "Bah! Tiny plant is smell terrible!", --removed
 	ANNOUNCE_ADVENTUREFAIL = "Next time I will be mightier!",
@@ -471,6 +500,21 @@ return{
 --fallback to speech_wilson.lua     ANNOUNCE_CHARGE = "only_used_by_wx78",
 --fallback to speech_wilson.lua 	ANNOUNCE_DISCHARGE = "only_used_by_wx78",
 
+    -- Winona specific
+--fallback to speech_wilson.lua     ANNOUNCE_ROSEGLASSES = 
+--fallback to speech_wilson.lua     {
+--fallback to speech_wilson.lua         "only_used_by_winona",
+--fallback to speech_wilson.lua         "only_used_by_winona",
+--fallback to speech_wilson.lua         "only_used_by_winona",
+--fallback to speech_wilson.lua     },
+    ANNOUNCE_CHARLIESAVE = 
+    {
+        "only_used_by_winona",
+    },
+	ANNOUNCE_ENGINEERING_CAN_UPGRADE = "only_used_by_winona",
+	ANNOUNCE_ENGINEERING_CAN_DOWNGRADE = "only_used_by_winona",
+	ANNOUNCE_ENGINEERING_CAN_SIDEGRADE = "only_used_by_winona",
+
 	ANNOUNCE_EAT =
 	{
 		GENERIC = "Good food make Wolfgang strong!",
@@ -524,6 +568,7 @@ return{
 	ANNOUNCE_HIGHRESEARCH = "Is maybe too much information.",
 	ANNOUNCE_HOUNDS = "I hear puppies!",
 	ANNOUNCE_WORMS = "Earth is tremble beneath Wolfgang's mighty feet!",
+    ANNOUNCE_WORMS_BOSS = "Wolfgang suggest run and live to fight another day.",
     ANNOUNCE_ACIDBATS = "Wolfgang not afraid. You are afraid.",
 	ANNOUNCE_HUNGRY = "My mighty belly is empty!",
 	ANNOUNCE_HUNT_BEAST_NEARBY = "Animal is close!",
@@ -564,6 +609,7 @@ return{
 	ANNOUNCE_TRAP_WENT_OFF = "Ack! Do not surprise Wolfgang!",
 	ANNOUNCE_UNIMPLEMENTED = "Is not ready.",
 	ANNOUNCE_WORMHOLE = "It makes me feel alive!",
+--fallback to speech_wilson.lua     ANNOUNCE_WORMHOLE_SAMESPOT = "only_used_by_winona",
 	ANNOUNCE_TOWNPORTALTELEPORT = "Wolfgang is here!",
 	ANNOUNCE_CANFIX = "\nMighty brain could make this better!",
 	ANNOUNCE_ACCOMPLISHMENT = "I am doing great things with tiny arrow!",
@@ -764,6 +810,7 @@ return{
 --fallback to speech_wilson.lua         BOOK_RESEARCH_STATION = "only_used_by_wurt",
 --fallback to speech_wilson.lua         BOOK_LIGHT_UPGRADED = "only_used_by_wurt",
     },
+
     ANNOUNCE_WEAK_RAT = "Is too weak for race.",
 
     ANNOUNCE_CARRAT_START_RACE = "Leggy carrot race start NOW!",
@@ -934,6 +981,20 @@ return{
     ANNOUNCE_YOTD_NOBOATS = "Wolfgang must get closer to start!",
     ANNOUNCE_YOTD_NOCHECKPOINTS = "Would be very short race...",
     ANNOUNCE_YOTD_NOTENOUGHBOATS = "Wolfgang must make room for other racers!",
+
+    ANNOUNCE_OTTERBOAT_OUTOFSHALLOWS = "Little boat doesn't like deep water, is falling apart!",
+    ANNOUNCE_OTTERBOAT_DENBROKEN = "Was little den holding whole boat together?",
+
+    ANNOUNCE_GATHER_MERM = "only_used_by_wurt",
+
+    -- rifts 4
+    ANNOUNCE_EXIT_GELBLOB = "That is no place for Wolfgang.",
+	ANNOUNCE_SHADOWTHRALL_STEALTH = "Aah! Who... what bite Wolfgang?",
+    ANNOUNCE_RABBITKING_AGGRESSIVE = "What is that digging? Sound angry.",
+    ANNOUNCE_RABBITKING_PASSIVE = "Wolfgang hear something softly digging.",
+    ANNOUNCE_RABBITKING_LUCKY = "That is strange rabbit!",
+    ANNOUNCE_RABBITKING_LUCKYCAUGHT = "Wolfgang!",
+    ANNOUNCE_RABBITKINGHORN_BADSPAWNPOINT = "Wolfgang in wrong place.",
 
 	BATTLECRY =
 	{
@@ -1585,7 +1646,8 @@ return{
                 "Are you friendly ghost?",
                 "Are you friendly ghost?",
             },
-		},
+        },
+
 		ADVENTURE_PORTAL = "Is mouth door! Say Ahhhhh!",
 		AMULET = "Is very pretty.",
 		ANIMAL_TRACK = "Animal went this way.",
@@ -1669,6 +1731,8 @@ return{
             RIDER = "Like I'm back in cavalry!",
             PUDGY = "A critter after own heart!",
             MYPARTNER = "Is good hair-cow, very good.",
+            DEAD = "Hair-cow is dead.",
+            DEAD_MYPARTNER = "Why, my poor hair-cow? Why?",
 		},
 
 		BEEFALOHAT = "Is good hat!",
@@ -1730,7 +1794,7 @@ return{
             RARE = "Very, very fancy pictures!",
         },
         SKETCH = "Picture will help Wolfgang carve nice rocks!",
-		COOKINGRECIPECARD = 
+		COOKINGRECIPECARD =
 		{
 			GENERIC = "Wolfgang can't read puny writing!",
 		},
@@ -1859,6 +1923,7 @@ return{
         CHESSPIECE_DEERCLOPS_MUTATED = "Wolfgang not scared of statue, but be careful with pointy part.",
         CHESSPIECE_WARG_MUTATED = "Cute doggy, but dead is better.",
         CHESSPIECE_BEARGER_MUTATED = "Wolfgang stronger than bear. Even weird bear.",
+        CHESSPIECE_SHARKBOI = "Wolfgang and talking shark could be buddy in different life.",
 
         CHESSJUNK1 = "Metal junk.",
         CHESSJUNK2 = "Metal junk.",
@@ -2844,13 +2909,13 @@ return{
         },
         CLAYWARG =
         {
-        	GENERIC = "Big clay puppy!",
-        	STATUE = "Is scary statue.",
+            GENERIC = "Big clay puppy!",
+            STATUE = "Is scary statue.",
         },
         CLAYHOUND =
         {
-        	GENERIC = "Ruff, ruff!",
-        	STATUE = "Little dog does not bark!",
+            GENERIC = "Ruff, ruff!",
+            STATUE = "Little dog does not bark!",
         },
         HOUNDWHISTLE = "Tiny whistle stick makes no noise!",
         CHESSPIECE_CLAYHOUND = "Is nice little doggy.",
@@ -3452,6 +3517,7 @@ return{
         	OFF = "Is not working.",
         	BURNING = "Is burning!",
         	BURNT = "Is all burned up.",
+			SLEEP = "Little fixing lady has very big brainmeats.",
         },
         WINONA_SPOTLIGHT =
         {
@@ -3459,6 +3525,7 @@ return{
         	OFF = "Is not working.",
         	BURNING = "Is burning!",
         	BURNT = "Is all burned up.",
+			SLEEP = "Fixing lady knows Wolfgang not like dark.",
         },
         WINONA_BATTERY_LOW =
         {
@@ -3470,12 +3537,64 @@ return{
         },
         WINONA_BATTERY_HIGH =
         {
-        	GENERIC = "Fixing lady doohickeys.",
-        	LOWPOWER = "It does not look so good.",
-        	OFF = "Fixing lady, quick, come fix!",
-        	BURNING = "Is burning!",
-        	BURNT = "Is all burned up.",
+			GENERIC = "Fixing lady doohickeys.",
+			LOWPOWER = "It does not look so good.",
+			OFF = "Fixing lady, quick, come fix!",
+			BURNING = "Is burning!",
+			BURNT = "Is all burned up.",
+			OVERLOADED = "Is supposed to do that, yes?",
         },
+		--v3 Winona
+		WINONA_REMOTE =
+		{
+			GENERIC = "Wolfgang is pretty sure little box is magic.",
+			OFF = "Is not working.",
+			CHARGING = "Wolfgang is pretty sure little box is magic.",
+			CHARGED = "Wolfgang is pretty sure little box is magic.",
+		},
+		WINONA_TELEBRELLA =
+		{
+			GENERIC = "Is very funny umbrella.",
+--fallback to speech_wilson.lua             MISSINGSKILL = "only_used_by_winona",
+			OFF = "Is not working.",
+			CHARGING = "Is very funny umbrella.",
+			CHARGED = "Is very funny umbrella.",
+		},
+		WINONA_TELEPORT_PAD_ITEM =
+		{
+			GENERIC = "Fixing lady doesn't need machine, Wolfgang can help carry!",
+--fallback to speech_wilson.lua             MISSINGSKILL = "only_used_by_winona",
+			OFF = "Is not working.",
+			BURNING = "Is burning!",
+			BURNT = "Is all burned up.",
+		},
+		WINONA_STORAGE_ROBOT =
+		{
+			GENERIC = "Is little metal helper.",
+			OFF = "Little helper is sleeping now.",
+			SLEEP = "Is little metal helper.",
+			CHARGING = "Little helper is sleeping now.",
+			CHARGED = "Little helper is sleeping now.",
+		},
+		INSPECTACLESBOX = "only_used_by_winona",
+		INSPECTACLESBOX2 = "only_used_by_winona",
+		INSPECTACLESHAT = 
+        {
+            GENERIC = "Little fixing lady's funny glasses.",
+            MISSINGSKILL = "only_used_by_winona",
+        },
+		ROSEGLASSESHAT =
+        {
+            GENERIC = "Only for little fixing lady? Really bring out Wolfgang eyes.",
+            MISSINGSKILL = "only_used_by_winona",
+        },
+		CHARLIERESIDUE = "only_used_by_winona",
+		CHARLIEROSE = "only_used_by_winona",
+        WINONA_MACHINEPARTS_1 = "only_used_by_winona",
+        WINONA_MACHINEPARTS_2 = "only_used_by_winona",
+		WINONA_RECIPESCANNER = "only_used_by_winona",
+		WINONA_HOLOTELEPAD = "only_used_by_winona",
+		WINONA_HOLOTELEBRELLA = "only_used_by_winona",
 
         --Wormwood
         COMPOSTWRAP = "Is very mighty poop.",
@@ -3957,12 +4076,17 @@ return{
         WEREITEM_GOOSE = "Wolfgang getting a bit worried about beardy friend...",
         WEREITEM_MOOSE = "This make beardman mighty like Wolfgang?",
 
-        MERMHAT = "Wolfgang will be biggest and strongest fish man!",
+        MERMHAT = "Wolfgang will be biggest and strongest fish man!",        
         MERMTHRONE =
         {
             GENERIC = "Big sitting mat looks very inviting.",
             BURNT = "Is burnt up.",
         },
+        MOSQUITOMUSK = "Is huggable bug friend!",
+        MOSQUITOBOMB = "Buzzing boom bag.",
+        MOSQUITOFERTILIZER = "Blech, little bag smells of month-old borscht!",
+        MOSQUITOMERMSALVE = "Wolfgang already hates needles... this make it even worse.",
+
         MERMTHRONE_CONSTRUCTION =
         {
             GENERIC = "Tiny fish girl seems very busy.",
@@ -4716,6 +4840,9 @@ return{
         BOAT_BUMPER_KELP_KIT = "Will keep boat safe.",
 		BOAT_BUMPER_SHELL = "Wolfgang feels better now.",
         BOAT_BUMPER_SHELL_KIT = "Will keep boat safe.",
+        BOAT_BUMPER_CRABKING = "Wolfgang feels better now.",
+        BOAT_BUMPER_CRABKING_KIT = "Will keep boat safe.",
+
         BOAT_CANNON = {
             GENERIC = "Cannon is empty, but still very scary looking!",
             AMMOLOADED = "Is ready for firing!",
@@ -4921,6 +5048,7 @@ return{
 		SHADOWTHRALL_HANDS = "Creepy shadow wants to arm wrestle?",
 		SHADOWTHRALL_HORNS = "Eep! Wolfgang's muscles are too tough for chewing!",
 		SHADOWTHRALL_WINGS = "Scary flapper!",
+		SHADOWTHRALL_MOUTH = "That smile make Wolfgang uncomfortable.",
 
         CHARLIE_NPC = "Wolfgang has seen that face in the dark...",
         CHARLIE_HAND = "Is needing something, yes?",
@@ -5143,6 +5271,131 @@ return{
         JUNK_PILE_BIG = "Wolfgang not like the way big pile teeter-totters...",
 
         ARMOR_LUNARPLANT_HUSK = "Only for leafy friend? Too small for Wolfgang muscles anyway.",
+
+        -- Meta 4 / Ocean QoL
+
+        OTTER = "Is kind of cute except for love of stealing.",
+        OTTERDEN = {
+            GENERIC = "Wolfgang see nothing to get.",
+            HAS_LOOT = "Ooh, maybe something for Wolfgang?",
+        },
+        OTTERDEN_DEAD = "This is not good.",
+
+        BOAT_ANCIENT_ITEM = "Wolfgang will build mighty ship!",
+        BOAT_ANCIENT_CONTAINER = "Hmm... how many potatoes could Wolfgang store in there?",
+        WALKINGPLANK_ANCIENT = "Maybe Wolfgang go for dip.",
+
+        ANCIENTTREE_SEED = "What does little seed want to be when it grow up?",
+
+        ANCIENTTREE_GEM = {
+            GENERIC = "Rocky tree have big strong trunk like Wolfgang.",
+            STUMP = "You give to us everything.",
+        },
+
+        ANCIENTTREE_SAPLING_ITEM = "Don't worry, little tree. Wolfgang find good home for you.",
+
+        ANCIENTTREE_SAPLING = {
+            GENERIC = "Little tree, grow mighty like Wolfgang!",
+            WRONG_TILE = "Little one don't like it here?",
+            WRONG_SEASON = "Maybe try again later, little one.",
+        },
+ 
+        ANCIENTTREE_NIGHTVISION = {
+            GENERIC = "Tree give Wolfgang sad feelings.",
+            STUMP = "Much better.",
+        },
+
+        ANCIENTFRUIT_GEM = "Even Wolfgang's mighty jaw can't bite into funny rock-fruit.",
+        ANCIENTFRUIT_NIGHTVISION = "Eeep!",
+        ANCIENTFRUIT_NIGHTVISION_COOKED = "Is less gross, but still not look yummy.",
+
+        BOATPATCH_KELP = "Hm. Slimy patch is not very strong, but will do for now.",
+
+        CRABKING_MOB = "Little crab is very bold for creature that is so delicious.",
+        CRABKING_MOB_KNIGHT = "Come, tough guy. Wolfgang just warmed up.",
+        CRABKING_CANNONTOWER = "Cowardly crabs like to toss rock.",
+        CRABKING_ICEWALL = "Puny ice wall not stop Wolfgang.",
+
+        SALTLICK_IMPROVED = "Wolfgang is on low sodium diet.",
+
+        OFFERING_POT =
+        {
+            GENERIC = "Bowl is empty? Poor fish men must be hungry...",
+            SOME_KELP = "Wolfgang will find more sea spinach to fill their bellies!",
+            LOTS_OF_KELP = "Eat, fish men! Grow big and strong like Wolfgang!",
+        },
+
+        OFFERING_POT_UPGRADED =
+        {
+            GENERIC = "Bowl is empty? Poor fish men must be hungry...",
+            SOME_KELP = "Wolfgang will find more sea spinach to fill their bellies!",
+            LOTS_OF_KELP = "Eat, fish men! Grow big and strong like Wolfgang!",
+        },
+
+        MERM_ARMORY = "For fish man only.",
+        MERM_ARMORY_UPGRADED = "For fish man only.",
+        MERM_TOOLSHED = "No Wolfgangs allowed. Aw.",
+        MERM_TOOLSHED_UPGRADED = "No Wolfgangs allowed. Aw.",
+        MERMARMORHAT = "Is helmet special for fish man.",
+        MERMARMORUPGRADEDHAT = "Is helmet special for fish man.",
+        MERM_TOOL = "Fish man tools for fish man work.",
+        MERM_TOOL_UPGRADED = "Fish man tool not bad.",
+
+        WURT_SWAMPITEM_SHADOW = "Why little fish girl make such scary thing?",
+        WURT_SWAMPITEM_LUNAR = "It give Wolfgang strange brain feeling.",
+
+        MERM_SHADOW = "Wow, fish man working overtime.",
+        MERMGUARD_SHADOW = "Fighting fish man dutiful even in death.",
+
+        MERM_LUNAR = "Er... looking good, fish man. Purple suit you. Really...",
+        MERMGUARD_LUNAR = "Nice spiky fish man... Wolfgang is friend.",
+
+        -- Rifts 4
+
+        SHADOW_BEEF_BELL = "Can bring back Wolfgang hair-cow?",
+        SADDLE_SHADOW = "Saddle make Wolfgang look dangerous, no?",
+        SHADOW_BATTLEAXE = "Does axe have to be so scary?",
+        VOIDCLOTH_BOOMERANG = "Wolfgang never miss... most of time.",
+		ROPE_BRIDGE_KIT = "Promise it will keep Wolfgang from falling to death?",
+		GELBLOB =
+		{
+			GENERIC = "Don't let it get on Wolfgang.",
+			HAS_ITEM = "Something inside but Wolfgang not like getting hands dirty.",
+			HAS_CHARACTER = "Don't fear, Wolfgang save you!",
+		},
+        RABBITKING_AGGRESSIVE = "Nasty little guy.",
+        RABBITKING_PASSIVE = "Aww, is good-natured rabbit.",
+        RABBITKING_LUCKY = "Let Wolfgang catch you, little rabbit!",
+        RABBITKINGMINION_BUNNYMAN = "Bad bunny! Don't hit Wolfgang!",
+        ARMOR_CARROTLURE = "Looks healthy.",
+        RABBITKINGHORN = "Wolfgang is jazz man.",
+        RABBITKINGHORN_CHEST = "Rabbit take care of Wolfgang things!",
+        RABBITKINGSPEAR = "Is horn of mean rabbit.",
+        RABBITHAT = "Cute, no?",
+        WORM_BOSS = "It is the mama worm.",
+
+        STONE_TABLE = -- Shared between the round and square tables.
+        {
+            GENERIC = "Is table.",
+            HAS_ITEM = "Is table.",
+        },
+
+        STONE_CHAIR =
+        {
+            GENERIC = "Is tiny chair strong enough to hold Wolfgang?",
+            OCCUPIED = "Do not worry, friend. Wolfgang will stand.",
+        },
+
+        CARPENTRY_BLADE_MOONGLASS = "Wolfgang once receive nasty cut from glass.",
+
+        CHEST_MIMIC_REVEALED = "Wolfgang knew box too fancy to be true!",
+
+        GELBLOB_STORAGE = {
+            GENERIC  = "Good place for Wolfgang snacks.",
+            FULL = "Hungry Wolfgang is not picky Wolfgang.",
+        },
+        GELBLOB_STORAGE_KIT = "Easy job for Wolfgang.",
+        GELBLOB_BOTTLE = "This not edible.",
     },
 
     DESCRIBE_GENERIC = "What is this thing?",

@@ -333,12 +333,14 @@ local function fn()
     inst.entity:AddMiniMapEntity()
     inst.entity:AddNetwork()
 
+	inst:SetDeploySmartRadius(DEPLOYSPACING_RADIUS[DEPLOYSPACING.DEFAULT] / 2) --lureplantbulb deployspacing/2
     inst:SetPhysicsRadiusOverride(.7)
     MakeObstaclePhysics(inst, inst.physicsradiusoverride)
 
     inst:AddTag("lureplant")
     inst:AddTag("hostile")
     inst:AddTag("veggie")
+	inst:AddTag("lifedrainable")
     inst:AddTag("wildfirepriority")
     inst:AddTag("NPCcanaggro")
 	inst:AddTag("NPC_workable")

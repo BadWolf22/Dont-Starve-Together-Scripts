@@ -49,7 +49,7 @@ end
 --     e.g. other players' shadow creatures
 --NOTE: Normally, non-hostile creatures still show "Attack" when you mouseover.
 function fns.TargetForceAttackOnly(inst, target)
-	return target.HostileToPlayerTest ~= nil and target:HasTag("shadowcreature") and not target:HostileToPlayerTest(inst)
+	return target.HostileToPlayerTest and target:HasAnyTag("shadowcreature", "nightmarecreature") and not target:HostileToPlayerTest(inst)
 end
 
 function fns.SetGymStartState(inst)
@@ -391,12 +391,12 @@ local function DropWetTool(inst, data)
                 local x1, y1, z1 = inst.Transform:GetWorldPosition()
                 x, y, z = data.target.Transform:GetWorldPosition()
                 angle = angle + (
-                    (x1 == x and z1 == z and math.random() * 2 * PI) or
+                    (x1 == x and z1 == z and math.random() * TWOPI) or
                     (projectile and math.atan2(z - z1, x - x1)) or
                     math.atan2(z1 - z, x1 - x)
                 )
             else
-                angle = angle + math.random() * 2 * PI
+                angle = angle + math.random() * TWOPI
             end
             local speed = projectile and 2 + math.random() or 3 + math.random() * 2
             tool.Physics:SetVel(math.cos(angle) * speed, 10, math.sin(angle) * speed)
@@ -670,6 +670,7 @@ local function RegisterMasterEventListeners(inst)
 	inst:ListenForEvent("changearea", fns.OnChangeArea)
 	inst:ListenForEvent("stormlevel", fns.OnStormLevelChanged)
 	inst:ListenForEvent("on_RIFT_MOON_tile", fns.OnRiftMoonTile)
+	inst:ListenForEvent("on_LUNAR_MARSH_tile", fns.OnRiftMoonTile)
 	inst:WatchWorldState("isnight", fns.OnAlterNight)
 	inst:WatchWorldState("isalterawake", fns.OnAlterNight)
 
@@ -1750,6 +1751,18 @@ local function OnSharkSound(inst)
     end
 end
 
+local function OnWormDigestionSound(inst)
+    if ThePlayer ~= nil and  ThePlayer == inst then
+        if inst._wormdigestionsound:value() == true then
+            if not TheFocalPoint.SoundEmitter:PlayingSound("worm_boss_digest") then
+                TheFocalPoint.SoundEmitter:PlaySound("rifts4/worm_boss/beingdigested_lp" ,"worm_boss_digest")
+            end
+        else
+            TheFocalPoint.SoundEmitter:KillSound("worm_boss_digest")
+        end
+    end 
+end
+
 --------------------------------------------------------------------------
 
 --V2C: starting_inventory passed as a parameter here is now deprecated
@@ -1808,6 +1821,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         Asset("ANIM", "anim/player_jump.zip"),
         Asset("ANIM", "anim/player_amulet_resurrect.zip"),
         Asset("ANIM", "anim/player_teleport.zip"),
+		Asset("ANIM", "anim/player_abyss_fall.zip"),
         Asset("ANIM", "anim/wilson_fx.zip"),
         Asset("ANIM", "anim/player_one_man_band.zip"),
 		Asset("ANIM", "anim/player_sit.zip"),
@@ -1854,6 +1868,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         Asset("ANIM", "anim/player_wrap_bundle.zip"),
         Asset("ANIM", "anim/player_hideseek.zip"),
 		Asset("ANIM", "anim/player_slip.zip"),
+		Asset("ANIM", "anim/player_suspended.zip"),
 
         Asset("ANIM", "anim/player_wardrobe.zip"),
         Asset("ANIM", "anim/player_skin_change.zip"),
@@ -1937,6 +1952,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         Asset("ANIM", "anim/player_monkey_run.zip"),
 
         Asset("ANIM", "anim/player_acting.zip"),
+		Asset("ANIM", "anim/player_closeinspect.zip"),
 
         Asset("ANIM", "anim/player_attack_pillows.zip"),
 
@@ -2053,10 +2069,6 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
                 CanEntitySeeTarget(viewer, inst)
     end
 
-    local function OnUnderLeafCanopy(inst)
-
-    end
-
     local function OnChangeCanopyZone(inst, underleaves)
         inst._underleafcanopy:set(underleaves)
     end
@@ -2113,6 +2125,18 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
             elseif data.oldprefab == "wonkey" then
                 TheFocalPoint.SoundEmitter:PlaySound("monkeyisland/wonkycurse/detransform_music")
             end
+        end
+    end
+
+    local function OnFollowerRemoved(inst, follower)
+        if inst.additional_OnFollowerRemoved then
+            inst:additional_OnFollowerRemoved(follower)
+        end
+    end
+
+    local function OnFollowerAdded(inst, follower)
+        if inst.additional_OnFollowerAdded then
+            inst:additional_OnFollowerAdded(follower)
         end
     end
 
@@ -2295,6 +2319,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         inst._lunarportalmax = net_event(inst.GUID, "localplayer._lunarportalmax")
         inst._shadowportalmax = net_event(inst.GUID, "localplayer._shadowportalmax")
         inst._skilltreeactivatedany = net_event(inst.GUID, "localplayer._skilltreeactivatedany")
+        inst._wormdigestionsound = net_bool(inst.GUID, "localplayer._wormdigestionsound","wormdigestionsounddirty")
 
         if IsSpecialEventActive(SPECIAL_EVENTS.YOTB) then
             inst.yotb_skins_sets = net_shortint(inst.GUID, "player.yotb_skins_sets")
@@ -2312,7 +2337,8 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         end
 
         inst:ListenForEvent("sharksounddirty", OnSharkSound)
-        inst:ListenForEvent("underleafcanopydirty", OnUnderLeafCanopy)
+        inst:ListenForEvent("wormdigestionsounddirty", OnWormDigestionSound)
+        --inst:ListenForEvent("underleafcanopydirty", OnUnderLeafCanopy)
 
         inst:ListenForEvent("finishseamlessplayerswap", onfinishseamlessplayerswap)
 
@@ -2381,6 +2407,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         end
 
 		inst.components.areaaware:StartWatchingTile(WORLD_TILES.RIFT_MOON)
+		inst.components.areaaware:StartWatchingTile(WORLD_TILES.LUNAR_MARSH)
 		inst.components.areaaware:StartWatchingTile(WORLD_TILES.OCEAN_ICE)
 
         inst:AddComponent("bloomer")
@@ -2502,6 +2529,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
         inst.components.trader:SetAcceptTest(ShouldAcceptItem)
         inst.components.trader.onaccept = OnGetItem
         inst.components.trader.deleteitemonaccept = false
+        inst.components.trader.acceptsmimics = true
 
         -------
 
@@ -2511,6 +2539,9 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
 	    inst:AddComponent("foodaffinity")
 
         inst:AddComponent("leader")
+        inst.components.leader.onfolloweradded = OnFollowerAdded  
+        inst.components.leader.onremovefollower = OnFollowerRemoved
+
         inst:AddComponent("age")
         inst:AddComponent("rider")
 
@@ -2545,9 +2576,7 @@ local function MakePlayerCharacter(name, customprefabs, customassets, common_pos
             inst:AddComponent("giftreceiver")
         end
 
-		if TheWorld.has_ocean then
-	        inst:AddComponent("drownable")
-		end
+		inst:AddComponent("drownable") -- NOTES(JBK): Now for caves too because void is a drown state.
 
         inst:AddComponent("steeringwheeluser")
 		inst:AddComponent("walkingplankuser")

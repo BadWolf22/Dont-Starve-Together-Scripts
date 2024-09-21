@@ -23,6 +23,14 @@ local Placer = Class(function(self, inst)
     self.BOAT_MUST_TAGS = { "boat" } --probably don't want static, but still cached per placer at least
 end)
 
+function Placer:OnRemoveEntity()
+    if self.builder ~= nil and self.hide_inv_icon then
+        self.builder:PushEvent("onplacerhidden")
+    end
+end
+
+Placer.OnRemoveFromEntity = Placer.OnRemoveEntity
+
 function Placer:SetBuilder(builder, recipe, invobject)
     self.builder = builder
     self.recipe = recipe
@@ -57,6 +65,22 @@ function Placer:TestCanBuild() -- NOTES(JBK): This component assumes the self.in
         mouse_blocked = false
     end
     return can_build, mouse_blocked
+end
+
+function Placer:ToggleHideInvIcon(hide)
+	if hide then
+		if not self.hide_inv_icon then
+			self.hide_inv_icon = true
+			if self.builder and not self.mouse_blocked then
+				self.builder:PushEvent("onplacershown")
+			end
+		end
+	elseif self.hide_inv_icon then
+		self.hide_inv_icon = false
+		if self.builder and not self.mouse_blocked then
+			self.builder:PushEvent("onplacerhidden") --this event is what makes the icon show again
+		end
+	end
 end
 
 function Placer:OnUpdate(dt)

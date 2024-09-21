@@ -162,6 +162,7 @@ local function BuildSkillsData(SkillTreeFns)
             connects = {
                 "willow_lightradius_2",
             },
+            defaultfocus = true,
         },
 
         willow_lightradius_2 = {
@@ -180,7 +181,7 @@ local function BuildSkillsData(SkillTreeFns)
             icon = "willow_bernieregen_1",
             pos = {CAT2+B1X,TOP+B1Y},
             group = "bernie",
-            tags = {"bernie"},
+            tags = {"bernie", "bernie4", "bernie8"},
             root = true,
             onactivate = function(inst, fromload)
                     if inst.bigbernies then
@@ -201,7 +202,7 @@ local function BuildSkillsData(SkillTreeFns)
             pos = {CAT2+B1X,TOP-HGAP+B1Y-4},
             --pos = {1,0},
             group = "bernie",
-            tags = {"bernie"},
+            tags = {"bernie", "bernie4", "bernie8"},
             onactivate = function(inst, fromload)
                     if inst.bigbernies then
                         for bern, val in pairs(inst.bigbernies)do
@@ -217,7 +218,7 @@ local function BuildSkillsData(SkillTreeFns)
             icon = "willow_berniesanity_1",
             pos = {CAT2+WGAP+B1X,TOP+B1Y},
             group = "bernie",
-            tags = {"bernie"},
+            tags = {"bernie", "bernie4", "bernie8"},
             root = true,
             connects = {
                 "willow_berniesanity_2",
@@ -230,7 +231,7 @@ local function BuildSkillsData(SkillTreeFns)
             icon = "willow_berniesanity_2",
             pos = {CAT2+WGAP+B1X,TOP-HGAP+B1Y-4},
             group = "bernie",
-            tags = {"bernie"},
+            tags = {"bernie", "bernie4", "bernie8"},
             connects = {
                 "willow_bernieai",
             }
@@ -242,7 +243,7 @@ local function BuildSkillsData(SkillTreeFns)
             icon = "willow_bernieai",
             pos = {CAT2+WGAP+B1X,TOP-HGAP-HGAP+B1Y-8},
             group = "bernie",
-            tags = {"bernie"},
+            tags = {"bernie", "bernie4", "bernie8"},
             onactivate = function(inst, fromload)
 
                 end,
@@ -254,7 +255,7 @@ local function BuildSkillsData(SkillTreeFns)
             icon = "willow_berniespeed_1",
             pos = {CAT2+WGAP+WGAP+B1X,TOP+B1Y},
             group = "bernie",
-            tags = {"bernie"},
+            tags = {"bernie", "bernie4", "bernie8"},
             onactivate = function(inst, fromload)
                     if inst.bigbernies then
                         for bern, val in pairs(inst.bigbernies)do
@@ -274,7 +275,7 @@ local function BuildSkillsData(SkillTreeFns)
             icon = "willow_berniespeed_2",
             pos = {CAT2+WGAP+WGAP+B1X,TOP-HGAP+B1Y-4},
             group = "bernie",
-            tags = {"bernie"},
+            tags = {"bernie", "bernie4", "bernie8"},
             onactivate = function(inst, fromload)
                     if inst.bigbernies then
                         for bern, val in pairs(inst.bigbernies)do
@@ -291,7 +292,7 @@ local function BuildSkillsData(SkillTreeFns)
             tags = {"lock"},
             root = true,
             lock_open = function(prefabname, activatedskills, readonly)
-                local bernie_skills = SkillTreeFns.CountTags(prefabname, "bernie", activatedskills)
+                local bernie_skills = SkillTreeFns.CountTags(prefabname, "bernie4", activatedskills)
                 return bernie_skills >= 4
             end,            
             onactivate = function(inst, fromload)
@@ -308,7 +309,7 @@ local function BuildSkillsData(SkillTreeFns)
             icon = "willow_berniehealth_1",
             pos = {CAT2+B2X,TOP-HGAP-HGAP-HGAP-HGAP+B2Y},
             group = "bernie",
-            tags = {"bernie"},
+            tags = {"bernie", "bernie8"},
             onactivate = function(inst, fromload)
                     if inst.bigbernies then
                         for bern, val in pairs(inst.bigbernies)do
@@ -327,7 +328,7 @@ local function BuildSkillsData(SkillTreeFns)
             icon = "willow_berniehealth_2",
             pos = {CAT2+B2X,TOP-HGAP-HGAP-HGAP-HGAP-HGAP+B2Y},
             group = "bernie",
-            tags = {"bernie"},
+            tags = {"bernie", "bernie8"},
             onactivate = function(inst, fromload)
                     if inst.bigbernies then
                         for bern, val in pairs(inst.bigbernies)do
@@ -345,7 +346,7 @@ local function BuildSkillsData(SkillTreeFns)
             tags = {"lock"},
             root = true,
             lock_open = function(prefabname, activatedskills, readonly)
-                local bernie_skills = SkillTreeFns.CountTags(prefabname, "bernie", activatedskills)
+                local bernie_skills = SkillTreeFns.CountTags(prefabname, "bernie8", activatedskills)
                 return bernie_skills >= 8
             end,            
             onactivate = function(inst, fromload)
@@ -364,7 +365,7 @@ local function BuildSkillsData(SkillTreeFns)
             pos = {CAT2+WGAP+WGAP+B2X,TOP-HGAP-HGAP-HGAP-HGAP+B2Y},
             --pos = {1,0},
             group = "bernie",
-            tags = {"bernie"},
+            tags = {"bernie", "bernie4"},
             onactivate = function(inst, fromload)
                     if inst.bigbernies then
                         for bern, val in pairs(inst.bigbernies)do

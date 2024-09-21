@@ -268,7 +268,7 @@ local function spawnfirefx(pos)
     local ring = SpawnPrefab("firering_fx")
     ring.Transform:SetPosition(pos.x,pos.y,pos.z)
 
-    local theta = math.random(2*PI)
+    local theta = math.random(TWOPI)
 
     for i=1,4 do
         local radius = 4
@@ -678,7 +678,7 @@ local SKILLTREE_SPELL_DEFS =
             inst.components.aoetargeting.reticule.updatepositionfn = burst_reticule_update_position_function
 
             if TheWorld.ismastersim then
-                inst.components.aoetargeting:SetTargetFX("reticulemultitarget")
+				inst.components.aoetargeting:SetTargetFX(nil)
                 inst.components.aoespell:SetSpellFn(FireBurstSpellFn)
                 inst.components.spellbook:SetSpellFn(nil)
             end
@@ -743,7 +743,7 @@ local SKILLTREE_SPELL_DEFS =
             inst.components.aoetargeting.reticule.updatepositionfn = single_reticule_update_position_function
 
             if TheWorld.ismastersim then
-                inst.components.aoetargeting:SetTargetFX("reticuleaoefiretarget_1")
+				inst.components.aoetargeting:SetTargetFX(nil)
                 inst.components.aoespell:SetSpellFn(FireFrenzySpellFn)
                 inst.components.spellbook:SetSpellFn(nil)
             end
@@ -775,7 +775,7 @@ local SKILLTREE_SPELL_DEFS =
             inst.components.aoetargeting.reticule.updatepositionfn = line_reticule_update_position_function
 
             if TheWorld.ismastersim then
-                inst.components.aoetargeting:SetTargetFX("reticuleaoefiretarget_1")
+				inst.components.aoetargeting:SetTargetFX(nil)
                 inst.components.aoespell:SetSpellFn(LunarFireSpellFn)
                 inst.components.spellbook:SetSpellFn(nil)
             end
@@ -822,7 +822,7 @@ local SKILLTREE_SPELL_DEFS =
             inst.components.aoetargeting.reticule.updatepositionfn = line_reticule_update_position_function
 
             if TheWorld.ismastersim then
-                inst.components.aoetargeting:SetTargetFX("reticuleaoe5line")
+				inst.components.aoetargeting:SetTargetFX(nil)
                 inst.components.aoespell:SetSpellFn(ShadowFireSpellFn)
                 inst.components.spellbook:SetSpellFn(nil)
             end
@@ -871,7 +871,7 @@ local function updatespells(inst,owner)
     inst.components.spellbook:SetItems(spells)
 end
 
-local function OnUpdateSpellsDirty(inst, force)
+local function DoClientUpdateSpells(inst, force)
 	--V2C: inst.replica.inventoryitem:IsHeldBy(ThePlayer) won't work for new ember
 	--     spawned directly in pocket, because inventory preview won't have been
 	--     resolved yet.
@@ -888,10 +888,14 @@ local function OnUpdateSpellsDirty(inst, force)
 	end
 end
 
+local function OnUpdateSpellsDirty(inst)
+	inst:DoTaskInTime(0, DoClientUpdateSpells)
+end
+
 local function DoOnClientInit(inst)
 	inst:ListenForEvent("willow_ember._tempdisablepickupsound", OnTempDisablePickupSound)
     inst:ListenForEvent("willow_ember._updatespells", OnUpdateSpellsDirty)
-    OnUpdateSpellsDirty(inst)
+	DoClientUpdateSpells(inst)
 end
 
 local function topocket(inst, owner)
@@ -960,7 +964,7 @@ local function fn()
 
     if not TheWorld.ismastersim then
         inst:DoTaskInTime(0,DoOnClientInit)
-		inst._onskillrefresh_client = function(owner) OnUpdateSpellsDirty(inst, true) end
+		inst._onskillrefresh_client = function(owner) DoClientUpdateSpells(inst, true) end
 
         return inst
     end

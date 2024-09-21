@@ -55,6 +55,7 @@ local Inventory = Class(function(self, inst)
     self.isexternallyinsulated = SourceModifierList(inst, false, SourceModifierList.boolean)
 
 	-- self.noheavylifting = false
+	--self.ignorecombat = false
 
     inst:ListenForEvent("player_despawn", OnOwnerDespawned)
 
@@ -87,10 +88,19 @@ Inventory.OnRemoveFromEntity = Inventory.DisableDropOnDeath
 
 function Inventory:NumItems()
     local num = 0
-    for k,v in pairs(self.itemslots) do
+    for _ in pairs(self.itemslots) do
         num = num + 1
     end
 
+    return num
+end
+
+function Inventory:NumStackedItems()
+    local num = 0
+    for _, item in pairs(self.itemslots) do
+        num = num + ((item.components.stackable == nil and 1)
+            or item.components.stackable:StackSize())
+    end
     return num
 end
 
@@ -105,24 +115,24 @@ function Inventory:TransferInventory(receiver)
     -- NOTES(JBK): Weapons that are given to specific entities to use have the "nosteal" tag but also do not persist.
     --             The tag can not be used because of Wanda watches for this TransferInventory function to work.
     --             The restriction that specific entities that have these unique weapons must also make them not persist.
-    for k,v in pairs(self.itemslots) do
+    for k in pairs(self.itemslots) do
         local item = self:RemoveItemBySlot(k)
         if item and item.persists then
             inv:GiveItem(item)
         end
     end
 
-    for k,v in pairs(self.equipslots) do
+    for k in pairs(self.equipslots) do
         local equip = self:Unequip(k)
         if equip and equip.persists then
             if inv.equipslots ~= nil then
                 if equip.components.equippable and equip.components.equippable:IsRestricted(receiver) then
-                    inv:GiveItem(equip) 
+                    inv:GiveItem(equip)
                 else
                     inv:Equip(equip)
                 end
             else
-                inv:GiveItem(equip) 
+                inv:GiveItem(equip)
             end
         end
     end
@@ -319,11 +329,7 @@ function Inventory:ReturnActiveActionItem(item, instant)
 end
 
 function Inventory:HasAnyEquipment()
-    for k, v in pairs(self.equipslots) do
-        return true
-    end
-
-    return false
+    return next(self.equipslots) ~= nil
 end
 
 function Inventory:IsWearingArmor()
@@ -730,11 +736,9 @@ function Inventory:GetNextAvailableSlot(item)
     local overflow = self:GetOverflowContainer()
     local prioritize_container = overflow and overflow:ShouldPrioritizeContainer(item)
 
-    local prefabname = nil
-    local prefabskinname = nil
     if item.components.stackable ~= nil then
-        prefabname = item.prefab
-        prefabskinname = item.skinname
+        local prefabname = item.prefab
+        local prefabskinname = item.skinname
 
         --check for stacks that aren't full
         for k, v in pairs(self.equipslots) do
@@ -1018,8 +1022,15 @@ function Inventory:GiveItem(inst, slot, src_pos)
             self.activeitem.prefab == inst.prefab and
             self.activeitem.skinname == inst.skinname and
             not self.activeitem.components.stackable:IsFull()
-            then
-            self.activeitem.components.stackable:Put(inst, Vector3(self.inst.Transform:GetWorldPosition()))
+        then
+            local leftovers = self.activeitem.components.stackable:Put(inst, self.inst:GetPosition())
+
+            if leftovers ~= nil then
+                self.silentfull = true
+                self:GiveItem(leftovers)
+                self.silentfull = false
+            end
+
             self.inst:PushEvent("gotnewitem", { item = inst, toactiveitem = true, })
             returnvalue = true
             shouldwisecrack = false
@@ -1076,7 +1087,12 @@ function Inventory:SetActiveItem(item)
 end
 
 function Inventory:Equip(item, old_to_active, no_animation, force_ui_anim)
-    if item == nil or item.components.equippable == nil or not item:IsValid() or item.components.equippable:IsRestricted(self.inst) or (self.noheavylifting and item:HasTag("heavy")) then
+    if item == nil or
+        item.components.equippable == nil or
+        not item:IsValid() or
+        (not self.isloading and item.components.equippable:IsRestricted(self.inst) or self.isloading and item.components.equippable:IsRestricted_FromLoad(self.inst)) or
+        (self.noheavylifting and item:HasTag("heavy"))
+    then
         return
     end
     -----
@@ -1620,7 +1636,7 @@ function Inventory:DropEverything(ondeath, keepequip)
     if not keepequip then
         if self.inst.EmptyBeard ~= nil then
             self.inst:EmptyBeard()
-        end    
+        end
 
         for k, v in pairs(self.equipslots) do
             if not (ondeath and v.components.inventoryitem.keepondeath) then
@@ -1635,6 +1651,45 @@ function Inventory:DropEquipped(keepBackpack)
         if not (keepBackpack and v:HasTag("backpack")) then
             self:DropItem(v, true, true)
         end
+    end
+end
+
+function Inventory:DestroyContents(onpredestroyitemcallbackfn)
+    if self.activeitem then
+        local item = self.activeitem
+        if onpredestroyitemcallbackfn then
+            onpredestroyitemcallbackfn(self.inst, item)
+        end
+        if item:IsValid() then
+            self:SetActiveItem(nil)
+            if item.components.container then
+                item.components.container:DestroyContents(onpredestroyitemcallbackfn)
+            end
+            item:Remove()
+        end
+    end
+
+    for k = 1, self.maxslots do
+        local item = self.itemslots[k]
+        if item then
+            if onpredestroyitemcallbackfn then
+                onpredestroyitemcallbackfn(self.inst, item)
+            end
+            if item.components.container then
+                item.components.container:DestroyContents(onpredestroyitemcallbackfn)
+            end
+            self:RemoveItem(item):Remove()
+        end
+    end
+
+    for _, item in pairs(self.equipslots) do
+        if onpredestroyitemcallbackfn then
+            onpredestroyitemcallbackfn(self.inst, item)
+        end
+        if item.components.container then
+            item.components.container:DestroyContents(onpredestroyitemcallbackfn)
+        end
+        self:RemoveItem(item):Remove()
     end
 end
 

@@ -98,7 +98,7 @@ local function MorphNormalEyebone(inst)
 end
 
 local function GetSpawnPoint(pt)
-    local theta = math.random() * 2 * PI
+    local theta = math.random() * TWOPI
     local radius = SPAWN_DIST
     local offset = FindWalkableOffset(pt, theta, radius, 12, true)
     return offset ~= nil and (pt + offset) or nil
@@ -220,9 +220,13 @@ local function fn()
 
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
+    inst.entity:AddMiniMapEntity()
     inst.entity:AddNetwork()
 
     MakeInventoryPhysics(inst)
+
+    inst.MiniMapEntity:SetIcon("chester_eyebone.png")
+    inst.MiniMapEntity:SetPriority(7)
 
     inst:AddTag("chester_eyebone")
     inst:AddTag("irreplaceable")

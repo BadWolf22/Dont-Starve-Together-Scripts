@@ -85,7 +85,7 @@ local function fn(common_init, mastersim_init, nutrients, kind)
 	inst:AddTag("saltbox_valid")
     inst:AddTag("show_spoiled")
 
-    MakeInventoryFloatable(inst, "med", nil, 0.73)
+    MakeInventoryFloatable(inst, "med", .04, 0.73)
     MakeDeployableFertilizerPristine(inst)
 
     inst:AddTag("fertilizerresearchable")
@@ -95,6 +95,9 @@ local function fn(common_init, mastersim_init, nutrients, kind)
 	end
 
     inst.GetFertilizerKey = GetFertilizerKey
+
+    --selfstacker (from selfstacker component) added to pristine state for optimization
+    inst:AddTag("selfstacker")
 
     inst.entity:SetPristine()
 
@@ -149,35 +152,48 @@ local function food_init(inst)
 	inst:AddTag("oceanfishing_lure")
 end
 
-local function food_OnIsRaining(inst, israining)
-    if inst.components.inventoryitem.owner ~= nil then
-        -- NOTES(JBK): Do nothing if the item is in any inventory.
-        return
+--------------------------------------------------------------------------------------------------------------------------------
+
+local function food_IsExposedToRain(inst, israining)
+    if israining == nil then
+        israining = TheWorld.state.israining
     end
 
-    if israining then
+	return israining and inst.components.rainimmunity == nil and not inst.components.inventoryitem:IsHeld()
+end
+
+local function food_OnIsRaining(inst, israining)
+    if food_IsExposedToRain(inst, israining) then
         inst.components.disappears:PrepareDisappear()
     else
         inst.components.disappears:StopDisappear()
     end
 end
 
-local function food_OnPickup(inst)
+local function food_OnRainImmunity(inst)
     inst.components.disappears:StopDisappear()
 end
 
-local function food_OnDropped(inst)
+local function food_OnRainVulnerable(inst)
     food_OnIsRaining(inst, TheWorld.state.israining)
 end
+
+--------------------------------------------------------------------------------------------------------------------------------
 
 local function food_mastersim_init(inst)
 	inst:AddComponent("oceanfishingtackle")
 	inst.components.oceanfishingtackle:SetupLure({build = "oceanfishing_lure_mis", symbol = "hook_spoiledfood", single_use = true, lure_data = TUNING.OCEANFISHING_LURE.SPOILED_FOOD})
+
     local disappears = inst:AddComponent("disappears")
     disappears.sound = "dontstarve/common/dust_blowaway" -- FIXME(JBK): Audio path.
     disappears.anim = "dissolve"
-    inst:ListenForEvent("ondropped", food_OnDropped)
-    inst.components.inventoryitem:SetOnPutInInventoryFn(food_OnPickup)
+
+    inst:ListenForEvent("gainrainimmunity", food_OnRainImmunity)
+    inst:ListenForEvent("loserainimmunity", food_OnRainVulnerable)
+    inst:ListenForEvent("ondropped", food_OnRainVulnerable)
+
+    inst.components.inventoryitem:SetOnPutInInventoryFn(food_OnRainImmunity)
+
     inst:WatchWorldState("israining", food_OnIsRaining)
     food_OnIsRaining(inst, TheWorld.state.israining)
 end
@@ -186,6 +202,8 @@ local function fish_init(inst)
     inst.AnimState:SetBank("spoiled_fish")
     inst.AnimState:SetBuild("spoiled_fish")
     inst:AddTag("spoiled_fish")
+
+    inst.components.floater:SetScale(0.6)
 
     inst.Transform:SetScale(1.3, 1.3, 1.3)
 end
@@ -207,6 +225,8 @@ local function fish_small_init(inst)
     inst.AnimState:SetBank("spoiled_fish_small")
     inst.AnimState:SetBuild("spoiled_fish_small")
     inst:AddTag("spoiled_fish")
+
+    inst.components.floater:SetScale(0.35)
 
     inst.Transform:SetScale(1.3, 1.3, 1.3)
 end

@@ -400,6 +400,26 @@ local function MakeLunarMutantsBanner_hallowednights(self, banner_root, anim)
     anim_front:SetScale(.667)
 end
 
+local function MakeWurtWinonaQOLBanner(self, banner_root, anim)
+    anim:GetAnimState():SetBuild("dst_menu_winona_wurt")
+    anim:GetAnimState():SetBank("dst_menu_winona_wurt")
+    anim:GetAnimState():PlayAnimation("loop", true)
+    anim:SetScale(.667)
+
+    local anim_front = banner_root:AddChild(UIAnim())
+    anim_front:GetAnimState():SetBuild("dst_menu_winona_wurt_carnival_foreground")
+    anim_front:GetAnimState():SetBank ("dst_menu_winona_wurt")
+    anim_front:GetAnimState():PlayAnimation("loop_foreground", true)
+    anim_front:SetScale(.667)  
+end
+
+local function MakeRift4Banner(self, banner_root, anim)
+    anim:GetAnimState():SetBuild("dst_menu_rift4")
+    anim:GetAnimState():SetBank("dst_menu_rift4")
+    anim:GetAnimState():PlayAnimation("loop", true)
+    anim:SetScale(.667)
+end
+
 
 local function MakeDefaultBanner(self, banner_root, anim)
 	local banner_height = 350
@@ -456,7 +476,8 @@ function MakeBanner(self)
 		--
 		--REMINDER: Check MakeBannerFront as well!
 		--
-        MakeRiftsMetaQoLBanner(self, banner_root, anim)
+        MakeRift4Banner(self, banner_root, anim)
+        --MakeWurtWinonaQOLBanner(self, banner_root, anim)
     elseif IsSpecialEventActive(SPECIAL_EVENTS.YOTD) then
         MakeYOTDBanner(self, banner_root, anim)
     elseif IsSpecialEventActive(SPECIAL_EVENTS.YOTR) then
@@ -470,13 +491,17 @@ function MakeBanner(self)
         --MakeHallowedNightsBanner(self, banner_root, anim)
         MakeMeta3Banner(self, banner_root, anim)
 	elseif IsSpecialEventActive(SPECIAL_EVENTS.CARNIVAL) then
+
         --MakeMeta2Banner(self, banner_root, anim)
-        MakeCawnivalBanner(self, banner_root, anim)
+        --MakeCawnivalBanner(self, banner_root, anim)
+        MakeWurtWinonaQOLBanner(self, banner_root, anim)
 	else
 		--*** !!! ***
 		--REMINDER: Check MakeBannerFront as well!
 		--
-        MakeRiftsMetaQoLBanner(self, banner_root, anim)
+        MakeRift4Banner(self, banner_root, anim)
+        --MakeWurtWinonaQOLBanner(self, banner_root, anim)
+        --MakeRiftsMetaQoLBanner(self, banner_root, anim)
 		--MakeMeta2Banner(self, banner_root, anim)
         --MakeDramaBanner(self, banner_root, anim)
         --MakeDefaultBanner(self, banner_root, anim)
@@ -533,6 +558,14 @@ local function MakeDramaBannerFront(self, banner_front, anim)
     anim:SetScale(0.667)
 end
 
+local function MakeWinonaWurtCarnivalBannerFront(self, banner_front, anim)
+    anim:GetAnimState():SetBuild("dst_menu_winona_wurt_carnival_foreground")
+    anim:GetAnimState():SetBank ("dst_menu_winona_wurt")
+
+    anim:GetAnimState():PlayAnimation("loop_foreground", true)
+    anim:SetScale(0.667)
+end
+
 -- For drawing things in front of the MOTD panels
 local function MakeBannerFront(self)
     if IS_BETA then
@@ -548,7 +581,18 @@ local function MakeBannerFront(self)
         MakeDramaBannerFront(self, banner_front, anim)
 
         return banner_front]]
-		return nil
+
+		--[[ 
+        local banner_front = Widget("banner_front")
+        banner_front:SetPosition(0, 0)
+        banner_front:SetClickable(false)
+        local anim = banner_front:AddChild(UIAnim())
+
+        MakeWinonaWurtCarnivalBannerFront(self, banner_front, anim)
+        
+        return banner_front
+		]]
+        return nil
 
     elseif IsSpecialEventActive(SPECIAL_EVENTS.YOTC) then
         return nil
@@ -565,7 +609,15 @@ local function MakeBannerFront(self)
         return banner_front
 
     elseif IsSpecialEventActive(SPECIAL_EVENTS.CARNIVAL) then
-        return nil
+
+        local banner_front = Widget("banner_front")
+        banner_front:SetPosition(0, 0)
+        banner_front:SetClickable(false)
+        local anim = banner_front:AddChild(UIAnim())
+
+        MakeWinonaWurtCarnivalBannerFront(self, banner_front, anim)
+        
+        return banner_front
     else
         --[[local banner_front = Widget("banner_front")
         banner_front:SetPosition(0, 0)

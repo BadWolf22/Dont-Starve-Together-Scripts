@@ -78,14 +78,17 @@ local prefabs =
 local brain = require "brains/spiderbrain"
 
 local function ShouldAcceptItem(inst, item, giver)
+    if inst.components.health ~= nil and inst.components.health:IsDead() then
+        return false, "DEAD"
+    end
 
-    local in_inventory = inst.components.inventoryitem.owner ~= nil
-    if in_inventory and not inst.components.eater:CanEat(item) then
+    if inst.components.inventoryitem:IsHeld() and not inst.components.eater:CanEat(item) then
         return false, "SPIDERNOHAT"
     end
 
-    return (giver:HasTag("spiderwhisperer") and inst.components.eater:CanEat(item)) or
-           (item.components.equippable ~= nil and item.components.equippable.equipslot == EQUIPSLOTS.HEAD)
+    return
+        (giver:HasTag("spiderwhisperer") and inst.components.eater:CanEat(item)) or
+        (item.components.equippable ~= nil and item.components.equippable.equipslot == EQUIPSLOTS.HEAD)
 end
 
 local SPIDER_TAGS = { "spider" }
@@ -445,24 +448,21 @@ local variations = {1, 2, 3, 4, 5}
 local function DoSpikeAttack(inst, pt)
     local x, y, z = pt:Get()
     local inital_r = 1
-    
+
     x = GetRandomWithVariance(x, inital_r)
     z = GetRandomWithVariance(z, inital_r)
 
     shuffleArray(variations)
 
     local num = math.random(2, 4)
-    local dtheta = PI * 2 / num
-    local thetaoffset = math.random() * PI * 2
-    local delaytoggle = 0
-    
+    local dtheta = TWOPI / num
+
     for i = 1, num do
-        
         local r = 1.1 + math.random() * 1.75
         local theta = i * dtheta + math.random() * dtheta * 0.8 + dtheta * 0.2
         local x1 = x + r * math.cos(theta)
         local z1 = z + r * math.sin(theta)
-        
+
         if TheWorld.Map:IsVisualGroundAtPoint(x1, 0, z1) and not TheWorld.Map:IsPointNearHole(Vector3(x1, 0, z1)) then
             local spike = SpawnPrefab("moonspider_spike")
             spike.Transform:SetPosition(x1, 0, z1)

@@ -260,7 +260,7 @@ function Combat:SetRetargetFunction(period, fn)
         self.retargettask = nil
     end
 
-    if period ~= nil and fn ~= nil then
+	if period and fn and not self.inst:IsAsleep() then
         self.retargettask = self.inst:DoPeriodicTask(period, dotryretarget, period*math.random(), self)
     end
 end
@@ -397,6 +397,9 @@ function Combat:ShouldAggro(target, ignore_forbidden)
                 end
             end
         end
+		if target:HasTag("stealth") then
+			return false
+		end
 		if target.components.health ~= nil and (target.components.health.minhealth or 0) > 0 and not target:HasTag("hostile") then
 			target = target.components.follower ~= nil and target.components.follower:GetLeader() or target
 			if not target:HasTag("player") then
@@ -543,11 +546,11 @@ function Combat:GetAttacked(attacker, damage, weapon, stimuli, spdamage)
 
     if self.inst.components.health ~= nil and damage ~= nil and damageredirecttarget == nil then
         if self.inst.components.attackdodger ~= nil and self.inst.components.attackdodger:CanDodge(attacker) then
-            self.inst.components.attackdodger:Dodge()
+            self.inst.components.attackdodger:Dodge(attacker)
             damage, spdamage = 0, nil
         end
 
-        if self.inst.components.inventory ~= nil then
+		if self.inst.components.inventory and not self.inst.components.inventory.ignorecombat then
 			if attacker ~= nil and attacker.components.planarentity ~= nil and not self.inst.components.inventory:EquipHasSpDefenseForType("planar") then
 				attacker.components.planarentity:OnPlanarAttackUndefended(self.inst)
 			end

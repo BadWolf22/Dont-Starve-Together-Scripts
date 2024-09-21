@@ -199,6 +199,9 @@ function ItemBoxOpenerPopup:OnUpdate(dt)
 
     elseif self.ui_state == "BUNDLE_OPENING" and self.bundle:GetAnimState():IsCurrentAnimation("skin_loop") then
         self.ui_state = "WAIT_ON_NEXT"
+        if not self.back_button and not TheInput:ControllerAttached() then
+            self.back_button = self.center_root:AddChild(TEMPLATES.BackButton(function() self:SkipWaitOnNext() end))
+        end
 
         if self.bolts_source ~= nil then
             self.current_item_summary:UpdateSummary(self.bolts_source)
@@ -235,6 +238,10 @@ function ItemBoxOpenerPopup:OnUpdate(dt)
                 self.bundle_root:SetPosition(0,185)
                 self.bundle_root:SetScale(0.7,0.7)
             end
+            if self.resize_root_thisisreallybig then
+                self.bundle_root:SetPosition(0,230)
+                self.bundle_root:SetScale(0.6,0.6)
+            end
 
             -- update the background size
             local rows = math.ceil(#self.items/columns)
@@ -255,7 +262,7 @@ end
 function ItemBoxOpenerPopup:CanExit()
     return self.swap_task == nil
         and ((self.allow_cancel and self.ui_state == "PENDING_OPEN")
-            or self.ui_state == "BUNDLE_REVIEW")
+        or self.ui_state == "BUNDLE_REVIEW" or self.ui_state == "WAIT_ON_NEXT")
 end
 
 function ItemBoxOpenerPopup:GetItem(index)
@@ -313,7 +320,7 @@ function ItemBoxOpenerPopup:_OpenItemBox()
                 table.insert(item_images, item_widget)
             end
 
-            columns, self.resize_root, self.resize_root_small, self.resize_root_small_higher = GetBoxPopupLayoutDetails( #item_types )
+            columns, self.resize_root, self.resize_root_small, self.resize_root_small_higher, self.resize_root_thisisreallybig = GetBoxPopupLayoutDetails( #item_types )
 
             self.opened_item_display:FillGrid(columns, COLUMN_WIDTH, COLUMN_HEIGHT, item_images)
             self:_UpdateSwapIcon(1)
@@ -401,21 +408,37 @@ function ItemBoxOpenerPopup:OnControl(control, down)
         end
 
     elseif control == CONTROL_CANCEL then
+        if self.ui_state == "WAIT_ON_NEXT" then -- NOTES(JBK): Let players skip the boxes if there are a bunch of items because the presentation loses the fun factor quickly.
+            self:SkipWaitOnNext()
+        end
         return self:_TryClose()
+    end
+end
+function ItemBoxOpenerPopup:SkipWaitOnNext()
+    self.current_item_summary:Hide()
+    self.bundle:GetAnimState():PlayAnimation("skin_out")
+    self.bundle_bg:GetAnimState():PlayAnimation("skin_out")
+    TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/Together_HUD/collectionscreen/mysterybox/outro")
+    self.ui_state = "BUNDLE_CLOSING"
+    if self.back_button then
+        self.back_button:Kill()
+        self.back_button = nil
     end
 end
 
 function ItemBoxOpenerPopup:GetHelpText()
     local controller_id = TheInput:GetControllerID()
     local t = {}
-
+    local has_stop = false
     if self.ui_state == "PENDING_OPEN" then
         table.insert(t,  TheInput:GetLocalizedControl(controller_id, CONTROL_ACCEPT) .. " " .. STRINGS.UI.ITEM_SCREEN.OPEN_BUTTON)
     elseif self.ui_state == "WAIT_ON_NEXT" then
         table.insert(t,  TheInput:GetLocalizedControl(controller_id, CONTROL_ACCEPT) .. " " .. STRINGS.UI.ITEM_SCREEN.OPEN_NEXT)
+        table.insert(t,  TheInput:GetLocalizedControl(controller_id, CONTROL_CANCEL) .. " " .. STRINGS.UI.ITEM_SCREEN.SKIP_REST)
+        has_stop = true
     end
 
-    if self:CanExit() then
+    if not has_stop and self:CanExit() then
         table.insert(t,  TheInput:GetLocalizedControl(controller_id, CONTROL_CANCEL) .. " " .. STRINGS.UI.ITEM_SCREEN.BACK)
     end
 

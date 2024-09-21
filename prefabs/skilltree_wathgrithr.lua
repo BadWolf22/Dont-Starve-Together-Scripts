@@ -138,7 +138,6 @@ local ONACTIVATE_FNS = {
 
     AllegianceShadow = function(inst)
         inst:AddTag("player_shadow_aligned")
-        inst:AddTag("battlesongshadowalignedmaker")
 
         if inst.components.damagetyperesist ~= nil then
             inst.components.damagetyperesist:AddResist("shadow_aligned", inst, TUNING.SKILLS.WATHGRITHR.ALLEGIANCE_SHADOW_RESIST, "allegiance_shadow")
@@ -151,7 +150,6 @@ local ONACTIVATE_FNS = {
 
     AllegianceLunar = function(inst)
         inst:AddTag("player_lunar_aligned")
-        inst:AddTag("battlesonglunaralignedmaker")
 
         if inst.components.damagetyperesist ~= nil then
             inst.components.damagetyperesist:AddResist("lunar_aligned", inst, TUNING.SKILLS.WATHGRITHR.ALLEGIANCE_LUNAR_RESIST, "allegiance_lunar")
@@ -172,7 +170,6 @@ local ONDEACTIVATE_FNS = {
 
     AllegianceShadow = function(inst)
         inst:RemoveTag("player_shadow_aligned")
-        inst:RemoveTag("battlesongshadowalignedmaker")
 
         if inst.components.damagetyperesist ~= nil then
             inst.components.damagetyperesist:RemoveResist("shadow_aligned", inst, "allegiance_shadow")
@@ -185,7 +182,6 @@ local ONDEACTIVATE_FNS = {
 
     AllegianceLunar = function(inst)
         inst:RemoveTag("player_lunar_aligned")
-        inst:RemoveTag("battlesonglunaralignedmaker")
 
         if inst.components.damagetyperesist ~= nil then
             inst.components.damagetyperesist:RemoveResist("lunar_aligned", inst, "allegiance_lunar")
@@ -222,6 +218,7 @@ local function BuildSkillsData(SkillTreeFns)
 
             root = true,
             connects = { "wathgrithr_arsenal_spear_2" },
+            defaultfocus = true,
         },
 
         -- Inspiration gain rate will increase a fair amount when attacking using Battle Spears.
@@ -243,9 +240,6 @@ local function BuildSkillsData(SkillTreeFns)
 
                 "wathgrithr_arsenal_shield_1",
             },
-
-            onactivate   = CreateAddTagFn("spearwathgrithrlightningmaker"),
-            ondeactivate = CreateRemoveTagFn("spearwathgrithrlightningmaker"),
         },
 
         -- The Lightning Spear can now perform a special attack.\nThis attack repairs Charged Lightning Spears if it hits a target.
@@ -293,9 +287,6 @@ local function BuildSkillsData(SkillTreeFns)
 
                 "wathgrithr_arsenal_shield_1",
             },
-
-            onactivate   = CreateAddTagFn("wathgrithrimprovedhatmaker"),
-            ondeactivate = CreateRemoveTagFn("wathgrithrimprovedhatmaker"),
         },
 
         -- The Commander's Helm now has protection against planar damage.
@@ -322,8 +313,8 @@ local function BuildSkillsData(SkillTreeFns)
                 "wathgrithr_arsenal_shield_3",
             },
 
-            onactivate   = CreateAddTagFn("wathgrithrshieldmaker"),
-            ondeactivate = CreateRemoveTagFn("wathgrithrshieldmaker"),
+            onactivate   = CreateAddTagFn("wathgrithrshielduser"),
+            ondeactivate = CreateRemoveTagFn("wathgrithrshielduser"),
         },
 
         -- The duration of the Battle Rönd's ability to block attacks will be increased.
@@ -371,9 +362,6 @@ local function BuildSkillsData(SkillTreeFns)
         wathgrithr_beefalo_saddle = {
             group = "beefalo",
             tags = { "saddle" },
-
-            onactivate   = CreateAddTagFn("saddlewathgrithrmaker"),
-            ondeactivate = CreateRemoveTagFn("saddlewathgrithrmaker"),
         },
 
         --------------------------------------------------------------------------
@@ -406,9 +394,6 @@ local function BuildSkillsData(SkillTreeFns)
         -- Quote battle songs now no longer consume Inspiration, and instead have a cooldown.
         wathgrithr_songs_container = {
             group = "songs",
-
-            onactivate   = CreateAddTagFn("battlesongcontainermaker"),
-            ondeactivate = CreateRemoveTagFn("battlesongcontainermaker"),
         },
 
         -- Play a Beefalo Horn to unlock.
@@ -424,9 +409,6 @@ local function BuildSkillsData(SkillTreeFns)
         -- Learn to craft the Warrior's Reprise: Bring your allies back to life so they can fight for Valhalla.
         wathgrithr_songs_revivewarrior = {
             group = "songs",
-
-            onactivate   = CreateAddTagFn("battlesonginstantrevivemaker"),
-            ondeactivate = CreateRemoveTagFn("battlesonginstantrevivemaker"),
         },
 
         --------------------------------------------------------------------------

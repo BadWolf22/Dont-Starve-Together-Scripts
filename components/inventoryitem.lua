@@ -26,6 +26,10 @@ local function onisacidsizzling(self, isacidsizzling)
     self.inst.replica.inventoryitem:SetIsAcidSizzling(isacidsizzling)
 end
 
+local function ongrabbableoverridetag(self, tag)
+    self.inst.replica.inventoryitem:SetGrabbableOverrideTag(tag)
+end
+
 local function OnStackSizeChange(inst, data)
     local self = inst.components.inventoryitem
     if self.owner ~= nil then
@@ -61,6 +65,7 @@ local InventoryItem = Class(function(self, inst)
     self.sinks = false
     self.droprandomdir = false
     self.isacidsizzling = false
+    self.grabbableoverridetag = nil
 
     self.pushlandedevents = true
     self:SetLanded(false, true)
@@ -83,6 +88,7 @@ nil,
     cangoincontainer = oncangoincontainer,
     canonlygoinpocket = oncanonlygoinpocket,
     isacidsizzling = onisacidsizzling,
+    grabbableoverridetag = ongrabbableoverridetag,
 })
 
 function InventoryItem:OnRemoveFromEntity()
@@ -289,7 +295,7 @@ function InventoryItem:DoDropPhysics(x, y, z, randomdir, speedmult)
         -- convert x, y, z to velocity
         if randomdir then
             local speed = ((heavy and 1 or 2) + math.random()) * (speedmult or 1)
-            local angle = math.random() * 2 * PI
+            local angle = math.random() * TWOPI
 			local cos_angle = math.cos(angle)
 			local sin_angle = math.sin(angle)
 			self.inst.Physics:Teleport(x + .01 * cos_angle, y, z - .01 * sin_angle)

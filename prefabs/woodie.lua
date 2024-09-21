@@ -12,6 +12,7 @@ local assets =
     Asset("ANIM", "anim/werebeaver_boat_jump.zip"),
     Asset("ANIM", "anim/werebeaver_boat_plank.zip"),
     Asset("ANIM", "anim/werebeaver_boat_sink.zip"),
+	Asset("ANIM", "anim/werebeaver_abyss_fall.zip"),
     --Asset("ANIM", "anim/weremoose_basic.zip"), --Moved to global.lua for use in Item Collection
     Asset("ANIM", "anim/weremoose_attacks.zip"),
     Asset("ANIM", "anim/weremoose_transform.zip"),
@@ -20,6 +21,7 @@ local assets =
     Asset("ANIM", "anim/weremoose_boat_jump.zip"),
     Asset("ANIM", "anim/weremoose_boat_plank.zip"),
     Asset("ANIM", "anim/weremoose_boat_sink.zip"),
+	Asset("ANIM", "anim/weremoose_abyss_fall.zip"),
     --Asset("ANIM", "anim/weregoose_basic.zip"), --Moved to global.lua for use in Item Collection
     Asset("ANIM", "anim/weregoose_groggy.zip"),
     Asset("ANIM", "anim/weregoose_dance.zip"),
@@ -387,11 +389,9 @@ end
 
 local function SetWereVision(inst, mode)
     if IsWereMode(mode) then
-        inst.components.playervision:ForceNightVision(true)
-        inst.components.playervision:SetCustomCCTable(BEAVERVISION_COLOURCUBES)
+        inst.components.playervision:PushForcedNightVision(inst, 2, BEAVERVISION_COLOURCUBES, false)
     else
-        inst.components.playervision:ForceNightVision(false)
-        inst.components.playervision:SetCustomCCTable(nil)
+        inst.components.playervision:PopForcedNightVision(inst)
     end
 end
 
@@ -710,7 +710,7 @@ local function SetWereDrowning(inst, mode)
     --V2C: drownable HACKS, using "false" to override "nil" load behaviour
     --     Please refactor drownable to use POST LOAD timing.
     if inst.components.drownable ~= nil then
-        if mode == WEREMODES.GOOSE then
+        if mode == WEREMODES.GOOSE and not TheWorld:HasTag("cave") then
             if inst.components.drownable.enabled ~= false then
                 inst.components.drownable.enabled = false
                 inst.Physics:ClearCollisionMask()
@@ -906,9 +906,8 @@ local function SetWereFighter(inst, mode)
         local planardefense_skill = skilltreeupdater:IsActivated("woodie_curse_epic_moose")
 
         if healthregen_skill then
-            -- FIXME(JBK): Change this to a buff and remove health StartRegen StopRegen calls.
             local regendata = TUNING.SKILLS.WOODIE.MOOSE_HEALTH_REGEN
-            inst.components.health:StartRegen(regendata.amount, regendata.period)
+            inst.components.health:AddRegenSource(inst, regendata.amount, regendata.period, "weremoose_skill")
         end
 
         if planardefense_skill then
@@ -931,8 +930,7 @@ local function SetWereFighter(inst, mode)
         end
 
         inst.components.planardefense:RemoveBonus(inst, "weremoose_skill")
-        -- FIXME(JBK): Change this to a buff and remove health StartRegen StopRegen calls.
-        inst.components.health:StopRegen()
+        inst.components.health:RemoveRegenSource(inst, "weremoose_skill")
     end
 end
 
@@ -1541,7 +1539,7 @@ local function OnTakeDrowningDamage(inst, tuning)
     end
 end
 
-local function GetDowningDamgeTunings(inst)
+local function GetDrowningDamageTunings(inst)
     return TUNING.DROWNING_DAMAGE[IsWereMode(inst.weremode:value()) and "WEREWOODIE" or "WOODIE"]
 end
 
@@ -1780,7 +1778,7 @@ local function master_postinit(inst)
 
         if inst.components.drownable ~= nil then
             inst.components.drownable:SetOnTakeDrowningDamageFn(OnTakeDrowningDamage)
-            inst.components.drownable:SetCustomTuningsFn(GetDowningDamgeTunings)
+            inst.components.drownable:SetCustomTuningsFn(GetDrowningDamageTunings)
         end
 
         inst.IsWerebeaver = IsWerebeaver

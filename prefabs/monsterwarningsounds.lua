@@ -5,7 +5,7 @@ local RANGE_BUFFER = 10 --buffer for sound to "bleed" over the monster's range
 
 local monster_params =
 {
-    deerclops =
+    deerclops = -- Search strings "deerclopswarning_lvl1" "deerclopswarning_lvl2" "deerclopswarning_lvl3"
     {
         range = 40, --deerclopsspawner.lua::HASSLER_SPAWN_DIST
         levels =
@@ -28,7 +28,7 @@ local monster_params =
             },
         }
     },
-    bearger =
+    bearger = -- Search strings "beargerwarning_lvl1" "beargerwarning_lvl2" "beargerwarning_lvl3"
     {
         range = 40, --beargerspawner.lua::HASSLER_SPAWN_DIST
         levels =
@@ -51,7 +51,7 @@ local monster_params =
             },
         },
     },
-    krampus =
+    krampus = -- Search strings "krampuswarning_lvl1" "krampuswarning_lvl2" "krampuswarning_lvl3"
     {
         range = 30, --kramped.lua::SPAWN_DIST
         levels =
@@ -70,7 +70,7 @@ local monster_params =
             },
         },
     },
-    acidbatwave =
+    acidbatwave = -- Search strings "acidbatwavewarning_lvl1"
     {
         range = TUNING.ACIDBATWAVE_SPAWN_DISTANCE,
         levels =
@@ -113,7 +113,7 @@ local function OnRandDirty(inst)
     --Delay one frame so that we are positioned properly before starting the effect
     --or in case we are about to be removed
     local leveldata = inst._params.levels[inst._level]
-    inst:DoTaskInTime(0, PlayWarningSound, leveldata.sound, inst._params.range, inst._rand:value() / 255 * 2 * PI, leveldata.distance)
+    inst:DoTaskInTime(0, PlayWarningSound, leveldata.sound, inst._params.range, inst._rand:value() / 255 * TWOPI, leveldata.distance)
     inst._params = nil
     inst._level = nil
 end

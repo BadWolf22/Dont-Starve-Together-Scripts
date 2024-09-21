@@ -29,7 +29,9 @@ local function onworked(inst)
         inst._task2:Cancel()
         inst._task2 = nil
 
-        inst.SoundEmitter:PlaySound("dontstarve/common/together/dragonfly_furnace/fire_LP", "loop")
+		if not inst:IsAsleep() then
+			inst.SoundEmitter:PlaySound("dontstarve/common/together/dragonfly_furnace/fire_LP", "loop")
+		end
 
         if inst._task1 ~= nil then
             inst._task1:Cancel()
@@ -53,7 +55,9 @@ end
 local function BuiltTimeLine2(inst)
     inst._task2 = nil
     inst.SoundEmitter:PlaySound("dontstarve/common/together/dragonfly_furnace/light")
-    inst.SoundEmitter:PlaySound("dontstarve/common/together/dragonfly_furnace/fire_LP", "loop")
+	if not inst:IsAsleep() then
+		inst.SoundEmitter:PlaySound("dontstarve/common/together/dragonfly_furnace/fire_LP", "loop")
+	end
 end
 
 local function onbuilt(inst)
@@ -89,6 +93,16 @@ local function onload(inst, data)
     if data ~= nil and data.salad then
         makesalad(inst)
     end
+end
+
+local function OnEntitySleep(inst)
+	inst.SoundEmitter:KillSound("loop")
+end
+
+local function OnEntityWake(inst)
+	if inst._task2 == nil then
+		inst.SoundEmitter:PlaySound("dontstarve/common/together/dragonfly_furnace/fire_LP", "loop")
+	end
 end
 
 local function _CanBeOpened(inst)
@@ -134,6 +148,7 @@ local function fn()
     inst.entity:AddLight()
     inst.entity:AddNetwork()
 
+	inst:SetDeploySmartRadius(1.25) --recipe min_spacing/2
     MakeObstaclePhysics(inst, .5)
 
     inst.MiniMapEntity:SetIcon("dragonfly_furnace.png")
@@ -158,8 +173,6 @@ local function fn()
 
     --HASHEATER (from heater component) added to pristine state for optimization
     inst:AddTag("HASHEATER")
-
-    inst.SoundEmitter:PlaySound("dontstarve/common/together/dragonfly_furnace/fire_LP", "loop")
 
     inst.entity:SetPristine()
 
@@ -202,6 +215,8 @@ local function fn()
 
     inst:ListenForEvent("onbuilt", onbuilt)
     inst.OnLoad = onload
+	inst.OnEntitySleep = OnEntitySleep
+	inst.OnEntityWake = OnEntityWake
 
     return inst
 end

@@ -143,6 +143,11 @@ local TRIGGERED_DANGER_MUSIC =
 		"dontstarve/music/music_epicfight_sharkboy",
 	},
 
+    worm_boss =
+    {
+        "dontstarve/music/music_epicfight_worm",
+    },
+
     default =
     {
         "dontstarve/music/music_epicfight_ruins",
@@ -651,9 +656,8 @@ local function OnInsane()
 end
 
 local function OnEnlightened()
-	-- TEMP
     if _dangertask == nil and _isenabled and (_extendtime == 0 or GetTime() >= _extendtime) then
-        _soundemitter:PlaySound("dontstarve/sanity/gonecrazy_stinger")
+        _soundemitter:PlaySound("dontstarve/sanity/lunacy_stinger")
         StopBusy()
         --Repurpose this as a delay before stingers or busy can start again
         _extendtime = GetTime() + 15

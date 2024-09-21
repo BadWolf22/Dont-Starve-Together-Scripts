@@ -72,7 +72,9 @@ local function Relocate(inst)
     inst._stolen_fish_count = 0
     inst.components.health:SetCurrentHealth(inst.components.health:GetMaxWithPenalty())
 
-    TheWorld.components.malbatrossspawner:Relocate(inst)
+    if TheWorld.components.malbatrossspawner ~= nil then
+        TheWorld.components.malbatrossspawner:Relocate(inst)
+    end
 end
 
 local TARGET_DIST = 16
@@ -185,7 +187,7 @@ end
 local function spawnfeather(inst,time)
     local feather = SpawnPrefab("malbatross_feather_fall")
     local pos = Vector3(inst.Transform:GetWorldPosition())
-    local angle = math.random() * 2* PI
+    local angle = math.random() * TWOPI
     local offset = Vector3(math.cos(angle), 0, -math.sin(angle)):Normalize() * (math.random()*2+ 1)
     pos = pos + offset
     feather.Transform:SetPosition(pos.x,pos.y,pos.z)

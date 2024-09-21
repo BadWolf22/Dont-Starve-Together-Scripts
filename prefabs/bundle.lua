@@ -33,10 +33,9 @@ local function MakeWrap(name, containerprefab, tag, cheapfuel)
             inst:AddTag(tag)
         end
 
-        inst.scrapbook_specialinfo = "BUNDLEWRAP",
+        inst.scrapbook_specialinfo = "BUNDLEWRAP"
 
         inst.entity:SetPristine()
-
         if not TheWorld.ismastersim then
             return inst
         end
@@ -146,7 +145,7 @@ local function MakeBundle(name, onesize, variations, loot, tossloot, setupdata, 
     }
 
     if loot ~= nil then
-        for i, v in ipairs(loot) do
+        for _, v in ipairs(loot) do
             table.insert(prefabs, v)
         end
     end
@@ -154,24 +153,14 @@ local function MakeBundle(name, onesize, variations, loot, tossloot, setupdata, 
     local function UpdateInventoryImage(inst)
         local suffix = inst.suffix or "_small"
         if variations ~= nil then
-            if inst.variation == nil then
-                inst.variation = math.random(variations)
-            end
-            suffix = suffix..tostring(inst.variation)
+            inst.variation = inst.variation or math.random(variations)
+            local variation_string = tostring(inst.variation)
 
-            local skin_name = inst:GetSkinName()
-            if skin_name ~= nil then
-                inst.components.inventoryitem:ChangeImageName(skin_name..(onesize and tostring(inst.variation) or suffix))
-            else
-                inst.components.inventoryitem:ChangeImageName(name..(onesize and tostring(inst.variation) or suffix))
-            end
+            suffix = (onesize and variation_string) or suffix..variation_string
+
+            inst.components.inventoryitem:ChangeImageName((inst:GetSkinName() or name)..suffix)
         elseif not onesize then
-            local skin_name = inst:GetSkinName()
-            if skin_name ~= nil then
-                inst.components.inventoryitem:ChangeImageName(skin_name..suffix)
-            else
-                inst.components.inventoryitem:ChangeImageName(name..suffix)
-            end
+            inst.components.inventoryitem:ChangeImageName((inst:GetSkinName() or name)..suffix)
         end
     end
 
@@ -320,6 +309,20 @@ local function MakeBundle(name, onesize, variations, loot, tossloot, setupdata, 
 
     return Prefab(name, fn, assets, prefabs)
 end
+
+local bundle =
+{
+	common_postinit = function(inst, setupdata)
+		inst.SCANNABLE_RECIPENAME = "bundlewrap"
+	end,
+}
+
+local gift =
+{
+	common_postinit = function(inst, setupdata)
+		inst.SCANNABLE_RECIPENAME = "giftwrap"
+	end,
+}
 
 local redpouch =
 {
@@ -574,10 +577,10 @@ return MakeContainer("bundle_container", "ui_bundle_2x2"),
 	MakeContainer("construction_repair_container", "ui_construction_4x1", "repairconstructionsite"),
 	MakeContainer("construction_rebuild_container", "ui_construction_4x1", "rebuildconstructionsite"),
     --"bundle", "bundlewrap"
-    MakeBundle("bundle", false, nil, { "waxpaper" }),
+	MakeBundle("bundle", false, nil, { "waxpaper" }, nil, bundle),
     MakeWrap("bundle", "bundle_container", nil, false),
     --"gift", "giftwrap"
-    MakeBundle("gift", false, 2),
+	MakeBundle("gift", false, 2, nil, nil, gift),
     MakeWrap("gift", "bundle_container", nil, true),
     --"redpouch"
     MakeBundle("redpouch", true, nil, { "lucky_goldnugget" }, true, redpouch),
@@ -593,4 +596,3 @@ return MakeContainer("bundle_container", "ui_bundle_2x2"),
     MakeBundle("hermit_bundle", true, nil, nil, true, hermit_bundle),
     MakeBundle("hermit_bundle_shells", true, nil, nil, true, hermit_bundle_shells, "hermit_bundle","hermit_bundle","hermit_bundle"),
     MakeBundle("wetpouch", true, nil, JoinArrays(table.getkeys(wetpouch.loottable), GetAllWinterOrnamentPrefabs()), false, wetpouch)
-

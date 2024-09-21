@@ -14,13 +14,11 @@ local HoundBrain = Class(Brain, function(self, inst)
 end)
 
 local SEE_DIST = 30
+local FINDFOOD_CANT_TAGS = { "INLIMBO", "outofreach" }
 
 local MIN_FOLLOW_LEADER = 2
 local MAX_FOLLOW_LEADER = 6
 local TARGET_FOLLOW_LEADER = (MAX_FOLLOW_LEADER + MIN_FOLLOW_LEADER) / 2
-
-local LEASH_RETURN_DIST = 10
-local LEASH_MAX_DIST = 40
 
 local HOUSE_MAX_DIST = 40
 local HOUSE_RETURN_DIST = 50
@@ -31,7 +29,7 @@ local function EatFoodAction(inst)
 	if inst.sg:HasStateTag("busy") and not inst.sg:HasStateTag("wantstoeat") then
 		return
 	end
-    local target = FindEntity(inst, SEE_DIST, function(item) return inst.components.eater:CanEat(item) and item:IsOnPassablePoint(true) end)
+	local target = FindEntity(inst, SEE_DIST, function(item) return inst.components.eater:CanEat(item) and item:IsOnPassablePoint(true) end, nil, FINDFOOD_CANT_TAGS)
     return target ~= nil and BufferedAction(inst, target, ACTIONS.EAT) or nil
 end
 

@@ -13,9 +13,6 @@ local assets =
     Asset("ATLAS", "images/fx4.xml"),
     Asset("IMAGE", "images/fx4.tex"),
 
-    Asset("ATLAS", "images/fx5.xml"),
-    Asset("IMAGE", "images/fx5.tex"),
-
 	Asset("ATLAS", "images/rain_dome_over.xml"),
 	Asset("IMAGE", "images/rain_dome_over.tex"),
 
@@ -135,6 +132,11 @@ local assets =
     Asset("ANIM", "anim/wagpunk_over.zip"),
 
     Asset("ANIM", "anim/scrap_monocle_over.zip"),
+    Asset("ANIM", "anim/nightvision_fruit_over.zip"),
+    Asset("ANIM", "anim/inspectacles_over.zip"),
+    Asset("ANIM", "anim/winona_inspectacles_fx.zip"),
+    Asset("ANIM", "anim/inspectacles.zip"),
+    Asset("ANIM", "anim/roseglasseshat_over.zip"),
 }
 
 local prefabs =

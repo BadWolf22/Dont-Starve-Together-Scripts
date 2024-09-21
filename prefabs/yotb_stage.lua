@@ -72,6 +72,7 @@ local function fn()
     inst.entity:AddMiniMapEntity()
     inst.entity:AddNetwork()
 
+	inst:SetDeploySmartRadius(DEPLOYSPACING_RADIUS[DEPLOYSPACING.DEFAULT] / 2)
     inst:SetPhysicsRadiusOverride(.5)
     MakeObstaclePhysics(inst, inst.physicsradiusoverride)
 
@@ -200,7 +201,7 @@ local function itemfn()
     inst.AnimState:SetBuild("yotb_stagebooth_item")
     inst.AnimState:PlayAnimation("idle")
 
-    inst:AddTag("portableitem")
+	inst:AddTag("deploykititem")
 
     MakeInventoryFloatable(inst, "med", 0.05, 0.9)
 

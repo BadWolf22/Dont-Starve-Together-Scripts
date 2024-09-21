@@ -36,6 +36,8 @@ end
 local events =
 {
 	CommonHandlers.OnLocomote(true, true),
+    CommonHandlers.OnSink(),
+    CommonHandlers.OnFallInVoid(),
 	EventHandler("freeze", function(inst)
 		if not inst.defeated then
 			inst.sg:GoToState("frozen")
@@ -306,7 +308,7 @@ local function TossLaunch(inst, launcher, basespeed, startheight)
 		local dist = math.sqrt(dsq)
 		angle = math.atan2(dz / dist, dx / dist) + (math.random() * 20 - 10) * DEGREES
 	else
-		angle = 2 * PI * math.random()
+		angle = TWOPI * math.random()
 	end
 	local sina, cosa = math.sin(angle), math.cos(angle)
 	local speed = basespeed + math.random()
@@ -2471,5 +2473,7 @@ CommonStates.AddSleepExStates(states,
 })
 
 CommonStates.AddFrozenStates(states)
+CommonStates.AddSinkAndWashAshoreStates(states, {washashore = "hit",})
+CommonStates.AddVoidFallStates(states, {voiddrop = "hit",})
 
 return StateGraph("daywalker2", states, events, "idle")

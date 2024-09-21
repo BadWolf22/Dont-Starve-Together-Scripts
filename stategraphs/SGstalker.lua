@@ -116,6 +116,7 @@ local events =
 {
     CommonHandlers.OnLocomote(false, true),
     CommonHandlers.OnSink(),
+    CommonHandlers.OnFallInVoid(),
     EventHandler("death", function(inst)
         if not inst.sg:HasStateTag("delaydeath") then
             if inst.atriumstalker then
@@ -713,7 +714,9 @@ local states =
                 if inst.persists then
                     inst.persists = false
                     local pos = inst:GetPosition()
-                    SpawnPrefab("flower_rose").Transform:SetPosition(pos:Get())
+                    local rose = SpawnPrefab("flower_rose")
+                    rose.planted = true
+                    rose.Transform:SetPosition(pos:Get())
                     inst.components.lootdropper:DropLoot(pos)
                 end
             end),

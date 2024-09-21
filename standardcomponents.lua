@@ -163,11 +163,7 @@ function MakeSmallBurnable(inst, time, offset, structure, sym)
     burnable:AddBurnFX(burnfx.generic, offset or Vector3(0, 0, 0), sym )
     burnable:SetOnIgniteFn(DefaultBurnFn)
     burnable:SetOnExtinguishFn(DefaultExtinguishFn)
-    if structure then
-        burnable:SetOnBurntFn(DefaultBurntStructureFn)
-    else
-        burnable:SetOnBurntFn(DefaultBurntFn)
-    end
+    burnable:SetOnBurntFn((structure and DefaultBurntStructureFn) or DefaultBurntFn)
 
     return burnable
 end
@@ -179,11 +175,7 @@ function MakeMediumBurnable(inst, time, offset, structure, sym)
     burnable:AddBurnFX(burnfx.generic, offset or Vector3(0, 0, 0), sym )
     burnable:SetOnIgniteFn(DefaultBurnFn)
     burnable:SetOnExtinguishFn(DefaultExtinguishFn)
-    if structure then
-        burnable:SetOnBurntFn(DefaultBurntStructureFn)
-    else
-        burnable:SetOnBurntFn(DefaultBurntFn)
-    end
+    burnable:SetOnBurntFn((structure and DefaultBurntStructureFn) or DefaultBurntFn)
 
     return burnable
 end
@@ -195,11 +187,7 @@ function MakeLargeBurnable(inst, time, offset, structure, sym)
     burnable:AddBurnFX(burnfx.generic, offset or Vector3(0, 0, 0), sym )
     burnable:SetOnIgniteFn(DefaultBurnFn)
     burnable:SetOnExtinguishFn(DefaultExtinguishFn)
-    if structure then
-        burnable:SetOnBurntFn(DefaultBurntStructureFn)
-    else
-        burnable:SetOnBurntFn(DefaultBurntFn)
-    end
+    burnable:SetOnBurntFn((structure and DefaultBurntStructureFn) or DefaultBurntFn)
 
     return burnable
 end
@@ -430,7 +418,7 @@ function MakeFlyingCharacterPhysics(inst, mass, rad)
     phys:SetDamping(5)
     phys:SetCollisionGroup(COLLISION.FLYERS)
     phys:ClearCollisionMask()
-    phys:CollidesWith((TheWorld.has_ocean and COLLISION.GROUND) or COLLISION.WORLD)
+    phys:CollidesWith((TheWorld:CanFlyingCrossBarriers() and COLLISION.GROUND) or COLLISION.WORLD)
     phys:CollidesWith(COLLISION.FLYERS)
     phys:SetCapsule(rad, 1)
     return phys
@@ -443,7 +431,7 @@ function MakeTinyFlyingCharacterPhysics(inst, mass, rad)
     phys:SetDamping(5)
     phys:SetCollisionGroup(COLLISION.FLYERS)
     phys:ClearCollisionMask()
-    phys:CollidesWith((TheWorld.has_ocean and COLLISION.GROUND) or COLLISION.WORLD)
+    phys:CollidesWith((TheWorld:CanFlyingCrossBarriers() and COLLISION.GROUND) or COLLISION.WORLD)
     phys:SetCapsule(rad, 1)
     return phys
 end
@@ -470,7 +458,7 @@ function MakeFlyingGiantCharacterPhysics(inst, mass, rad)
     phys:SetDamping(5)
     phys:SetCollisionGroup(COLLISION.GIANTS)
     phys:ClearCollisionMask()
-    phys:CollidesWith((TheWorld.has_ocean and COLLISION.GROUND) or COLLISION.WORLD)
+    phys:CollidesWith((TheWorld:CanFlyingCrossBarriers() and COLLISION.GROUND) or COLLISION.WORLD)
     --phys:CollidesWith(COLLISION.OBSTACLES)
     phys:CollidesWith(COLLISION.CHARACTERS)
     phys:CollidesWith(COLLISION.GIANTS)
@@ -485,7 +473,7 @@ function MakeGhostPhysics(inst, mass, rad)
     phys:SetDamping(5)
     phys:SetCollisionGroup(COLLISION.CHARACTERS)
     phys:ClearCollisionMask()
-    phys:CollidesWith((TheWorld.has_ocean and COLLISION.GROUND) or COLLISION.WORLD)
+    phys:CollidesWith((TheWorld:CanFlyingCrossBarriers() and COLLISION.GROUND) or COLLISION.WORLD)
     --phys:CollidesWith(COLLISION.OBSTACLES)
     phys:CollidesWith(COLLISION.CHARACTERS)
     phys:CollidesWith(COLLISION.GIANTS)
@@ -500,7 +488,7 @@ function MakeTinyGhostPhysics(inst, mass, rad)
     phys:SetDamping(5)
     phys:SetCollisionGroup(COLLISION.CHARACTERS)
     phys:ClearCollisionMask()
-    phys:CollidesWith((TheWorld.has_ocean and COLLISION.GROUND) or COLLISION.WORLD)
+    phys:CollidesWith((TheWorld:CanFlyingCrossBarriers() and COLLISION.GROUND) or COLLISION.WORLD)
     phys:SetCapsule(rad, 1)
     return phys
 end
@@ -509,7 +497,7 @@ function ChangeToGhostPhysics(inst)
     local phys = inst.Physics
     phys:SetCollisionGroup(COLLISION.CHARACTERS)
     phys:ClearCollisionMask()
-    phys:CollidesWith((TheWorld.has_ocean and COLLISION.GROUND) or COLLISION.WORLD)
+    phys:CollidesWith((TheWorld:CanFlyingCrossBarriers() and COLLISION.GROUND) or COLLISION.WORLD)
     --phys:CollidesWith(COLLISION.OBSTACLES)
     phys:CollidesWith(COLLISION.CHARACTERS)
     phys:CollidesWith(COLLISION.GIANTS)
@@ -570,6 +558,23 @@ function ChangeToWaterObstaclePhysics(inst)
     return phys
 end
 
+function ChangeToInventoryItemPhysics(inst, mass, rad)
+    local phys = inst.Physics
+    if mass then
+        phys:SetMass(mass)
+        phys:SetFriction(.1)
+        phys:SetDamping(0)
+        phys:SetRestitution(.5)
+    end    
+    phys:SetCollisionGroup(COLLISION.ITEMS)
+    phys:SetCollisionMask(COLLISION.WORLD, COLLISION.OBSTACLES, COLLISION.SMALLOBSTACLES)
+    if rad then
+        phys:SetSphere(rad, 1)
+    end    
+    return phys
+end
+
+-- USED FOR THE DEPTH WORM
 function ChangeToInventoryPhysics(inst)
     local phys = inst.Physics
     phys:SetCollisionGroup(COLLISION.OBSTACLES)
@@ -761,6 +766,11 @@ local function onperish(inst)
 				container:GiveItem(v)
 			end
 		end
+    else
+        if inst.components.lootdropper ~= nil then
+            inst.components.lootdropper:DropLoot()
+        end
+        inst:Remove()
     end
 end
 
@@ -786,6 +796,28 @@ function MakeSmallPerishableCreature(inst, starvetime, oninventory, ondropped)
 
     inst.components.inventoryitem:SetOnDroppedFn(function(inst)
         inst.components.perishable:StopPerishing()
+        if ondropped ~= nil then
+            ondropped(inst)
+        end
+    end)
+end
+
+function MakeSmallPerishableCreatureAlwaysPerishing(inst, starvetime, oninventory, ondropped)
+    MakeSmallPerishableCreaturePristine(inst)
+
+    --We want to see the warnings for duplicating perishable
+    inst:AddComponent("perishable")
+    inst.components.perishable:SetPerishTime(starvetime)
+    inst.components.perishable:StartPerishing()
+    inst.components.perishable:SetOnPerishFn(onperish)
+
+    inst.components.inventoryitem:SetOnPutInInventoryFn(function(inst, owner)
+        if oninventory ~= nil then
+            oninventory(inst, owner)
+        end
+    end)
+
+    inst.components.inventoryitem:SetOnDroppedFn(function(inst)
         if ondropped ~= nil then
             ondropped(inst)
         end
@@ -1561,10 +1593,14 @@ local function fertilizer_ondeploy(inst, pt, deployer)
     local tile_x, tile_z = TheWorld.Map:GetTileCoordsAtPoint(pt:Get())
     local nutrients = inst.components.fertilizer.nutrients
     TheWorld.components.farming_manager:AddTileNutrients(tile_x, tile_z, nutrients[1], nutrients[2], nutrients[3])
-
+    
     inst.components.fertilizer:OnApplied(deployer)
     if deployer ~= nil and deployer.SoundEmitter ~= nil and inst.components.fertilizer.fertilize_sound ~= nil then
         deployer.SoundEmitter:PlaySound(inst.components.fertilizer.fertilize_sound)
+    end
+
+    if inst.ondeployed_fertilzier_extra_fn then
+        inst.ondeployed_fertilzier_extra_fn(inst, pt, deployer)
     end
 end
 
@@ -1594,8 +1630,14 @@ local function OnStartRegrowth(inst, data)
     -- NOTES(JBK): inst will most likely be not valid right after this.
     TheWorld:PushEvent("beginregrowth", inst)
 end
+function RemoveFromRegrowthManager(inst)
+    inst:RemoveEventCallback("onremove", OnStartRegrowth)
+    inst:RemoveEventCallback("despawnedfromhaunt", RemoveFromRegrowthManager)
+    inst.OnStartRegrowth = nil
+end
 function AddToRegrowthManager(inst)
     inst:ListenForEvent("onremove", OnStartRegrowth)
+    inst:ListenForEvent("despawnedfromhaunt", RemoveFromRegrowthManager)
     inst.OnStartRegrowth = OnStartRegrowth -- For any special cases that need to call this.
 end
 
