@@ -5,5 +5,5 @@ chmod u+x ./depotDownloader/DepotDownloader
 ./depotDownloader/DepotDownloader -app 343050 -filelist ./Dont-Starve-Together-Scripts/.github/workflows/files.txt
 find -name "scripts.zip" -type f -exec mv -- {} . \;
 unzip ./scripts.zip
-rm -rf ./Dont-Starve-Together-Scripts/Dont-Starve-Together-Scripts/*
-mv -v ./scripts/* ./Dont-Starve-Together-Scripts/Dont-Starve-Together-Scripts
+rm -rf ./Dont-Starve-Together-Scripts/*
+mv -v ./scripts/* ./Dont-Starve-Together-Scripts
