@@ -47,6 +47,7 @@ LOADING_IMAGES =
         { atlas = "images/bg_loading_yotcc1.xml", tex = "bg_image1.tex" },
     },
 
+
     [SPECIAL_EVENTS.NONE] =
     {
         { atlas = "images/bg_spiral_fill1.xml", tex = "bg_image1.tex", spiral = true },
@@ -89,7 +90,8 @@ local SPECIAL_EVENT_DEPS =
         {
             assets =
             {
-                Asset("ANIM", "anim/dst_menu_meta3.zip"),
+                Asset("ANIM", "anim/dst_menu_winter2024.zip"),
+                Asset("PKGREF", "anim/dst_menu_meta3.zip"),
                 Asset("PKGREF", "anim/dst_menu_waxwell.zip"),
 	            Asset("PKGREF", "anim/dst_menu_feast.zip"),
                 Asset("PKGREF", "anim/dst_menu_feast_bg.zip"),
@@ -203,6 +205,18 @@ local SPECIAL_EVENT_DEPS =
             },
         },
     },
+
+    [SPECIAL_EVENTS.YOTS] =
+    {
+        frontend =
+        {
+            assets =
+            {
+                Asset("ANIM", "anim/dst_menu_yots.zip"),
+            },
+        },
+    },
+
 
     [SPECIAL_EVENTS.YOTR] =
     {

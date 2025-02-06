@@ -429,6 +429,18 @@ return{
         {
             ALREADYKNOWN = "Know it",
         },
+		CARVEPUMPKIN =
+		{
+			INUSE = "Friend doing it",
+			BURNING = "Hot ouch",
+		},
+		DECORATESNOWMAN =
+		{
+			INUSE = "Friend doing it",
+			HASHAT = "Hat there",
+			STACKEDTOOHIGH = "Much tall",
+			MELTING = "Can't. Melting",
+		},
     },
 
 	ANNOUNCE_CANNOT_BUILD =
@@ -1001,6 +1013,10 @@ return{
 
 	-- Hallowed Nights 2024
 	ANNOUNCE_NOPUMPKINCARVINGONFIRE = "Naughty fire!",
+
+	-- Winter's Feast 2024
+	ANNOUNCE_SNOWBALL_TOO_BIG = "Big no more",
+	ANNOUNCE_SNOWBALL_NO_SNOW = "No snow",
 
 	BATTLECRY =
 	{
@@ -1926,10 +1942,13 @@ return{
         CHESSPIECE_EYEOFTERROR = "Not watching?",
         CHESSPIECE_TWINSOFTERROR = "Can't see now",
         CHESSPIECE_DAYWALKER = "Hello? Can't talk?",
+        CHESSPIECE_DAYWALKER2 = "Hello again!",
         CHESSPIECE_DEERCLOPS_MUTATED = "Eye ouchie still ouchie?",
         CHESSPIECE_WARG_MUTATED = "Woofer, stay",
         CHESSPIECE_BEARGER_MUTATED = "Fuzzy hungry?",
         CHESSPIECE_SHARKBOI = "Toothy Fish Friend",
+        CHESSPIECE_WORMBOSS = "Don't eat me!",
+        CHESSPIECE_YOTS = "Little wiggly",
 
         CHESSJUNK1 = "Machine stuff",
         CHESSJUNK2 = "Lots of machine stuff",
@@ -5418,6 +5437,28 @@ return{
         SHADOWTHRALL_PARASITE = "What Grabby Face want? Face?",
 
         PUMPKINCARVER = "Make pumpkin friend face",
+		SNOWMAN =
+		{
+			GENERIC = "Snow friend cold?",
+			SNOWBALL = "Snow friend head?",
+		},
+        SNOWBALL_ITEM = "Snowthrow!",
+
+        -- Year of the Snake
+        YOTS_SNAKESHRINE =
+        {
+            GENERIC = "Wiggly full",
+            EMPTY = "What wiggly eat?",
+            BURNT = "Bad, bad fire",
+        },
+        YOTS_WORM = "Shiny wiggly?",
+        YOTS_LANTERN_POST = 
+        {
+            GENERIC = "Pretty tall friend",
+            BURNT = "Poor tall friend",
+        },
+        YOTS_LANTERN_POST_ITEM = "Make tall friend!",
+        CHESSPIECE_DEPTHWORM  = "Little wiggly",
     },
 
     DESCRIBE_GENERIC = "Friend?",

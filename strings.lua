@@ -607,6 +607,7 @@ STRINGS =
             SPIN = "Spin",
             CALM = "Calm",
             GATHER_MERM = "Gather Merm",
+            FAKE_PICKUP = "Pick up",
         },
 
 		OPEN_CRAFTING =
@@ -1045,6 +1046,18 @@ STRINGS =
 
 		-- Hallowed Nights 2024
 		CARVEPUMPKIN = "Carve",
+
+		-- Winter's Feast 2024
+		DECORATESNOWMAN =
+		{
+			GENERIC = "Decorate",
+			STACK = "Stack",
+		},
+		START_PUSHING =
+		{
+			GENERIC = "Push",
+			ROLL = "Roll",
+		},
     },
 
     -- PC controls get hex ranges EE90xx to EE9Fxx
@@ -2310,11 +2323,14 @@ STRINGS =
 		CHESSPIECE_EYEOFTERROR = "Eye Of Terror Figure",
         CHESSPIECE_TWINSOFTERROR = "Twins of Terror Figure",
         CHESSPIECE_DAYWALKER = "Nightmare Werepig Figure",
+        CHESSPIECE_DAYWALKER2 = "Scrappy Werepig Figure",
         CHESSPIECE_DEERCLOPS_MUTATED = "Crystal Deerclops Figure",
         CHESSPIECE_WARG_MUTATED = "Possessed Varg Figure",
         CHESSPIECE_BEARGER_MUTATED = "Armored Bearger Figure",
         CHESSPIECE_YOTD = "Start Tower Figure",
         CHESSPIECE_SHARKBOI = "Frostjaw Figure",
+        CHESSPIECE_WORMBOSS = "Great Depths Worm Figure",
+        CHESSPIECE_YOTS = "Gilded Depths Worm Figure",
 
         CHESSPIECE_PAWN_BUILDER = "Pawn Figure",
         CHESSPIECE_ROOK_BUILDER = "Rook Figure",
@@ -2350,11 +2366,14 @@ STRINGS =
 		CHESSPIECE_EYEOFTERROR_BUILDER = "Eye Of Terror Figure",
         CHESSPIECE_TWINSOFTERROR_BUILDER = "Twins of Terror Figure",
         CHESSPIECE_DAYWALKER_BUILDER = "Nightmare Werepig Figure",
+        CHESSPIECE_DAYWALKER2_BUILDER = "Scrappy Werepig Figure",
         CHESSPIECE_DEERCLOPS_MUTATED_BUILDER = "Crystal Deerclops Figure",
         CHESSPIECE_WARG_MUTATED_BUILDER = "Possessed Varg Figure",
         CHESSPIECE_BEARGER_MUTATED_BUILDER = "Armored Bearger Figure",
         CHESSPIECE_YOTD_BUILDER = "Start Tower Figure",
         CHESSPIECE_SHARKBOI_BUILDER = "Frostjaw Figure",
+        CHESSPIECE_WORMBOSS_BUILDER = "Great Depths Worm Figure",
+        CHESSPIECE_YOTS_BUILDER = "Gilded Depths Worm Figure",
 
         CHESSPIECE_BUTTERFLY_SKETCH = "Moon Moth Figure Sketch",
         CHESSPIECE_ANCHOR_SKETCH = "Anchor Figure Sketch",
@@ -2368,11 +2387,13 @@ STRINGS =
         CHESSPIECE_GUARDIANPHASE3_SKETCH = "Celestial Champion Figure Sketch",
         CHESSPIECE_MANRABBIT_SKETCH = "Bunnyman Figure Sketch",
         CHESSPIECE_DAYWALKER_SKETCH = "Nightmare Werepig Figure Sketch",
+        CHESSPIECE_DAYWALKER2_SKETCH = "Scrappy Werepig Figure Sketch",
         CHESSPIECE_DEERCLOPS_MUTATED_SKETCH = "Crystal Deerclops Figure Sketch",
         CHESSPIECE_WARG_MUTATED_SKETCH = "Possessed Varg Figure Sketch",
         CHESSPIECE_BEARGER_MUTATED_SKETCH = "Armored Bearger Figure Sketch",
         CHESSPIECE_YOTD_SKETCH = "Start Tower Figure Sketch",
         CHESSPIECE_SHARKBOI_SKETCH = "Frostjaw Figure Sketch",
+        CHESSPIECE_YOTS_SKETCH = "Gilded Depths Worm Figure Sketch",
 
         SHADOW_ROOK = "Shadow Rook",
         SHADOW_KNIGHT = "Shadow Knight",
@@ -4114,6 +4135,17 @@ STRINGS =
         PUMPKINCARVER1 = "Pumpkin Scooper",
         PUMPKINCARVER2 = "Pumpkin Knife",
         PUMPKINCARVER3 = "Pumpkin Saw",
+
+		SNOWMAN = "Snowman",
+		SNOWBALL_LARGE = "Large Snowball",
+		SNOWBALL_ITEM = "Snowball",
+
+        -- Year of the Snake
+        YOTS_SNAKESHRINE = "Depths Worm Shrine",
+        YOTS_WORM = "Gilded Depths Worm",
+        YOTS_LANTERN_POST = "Jubilantern Post",
+        YOTS_LANTERN_POST_ITEM = "Jubilantern Post Kit",        
+
 	},
 
     NAME_DETAIL_EXTENTION =
@@ -4542,11 +4574,13 @@ STRINGS =
 		CHESSPIECE_EYEOFTERROR_BUILDER = "Its stony gaze reminds you of an evil presence.",
         CHESSPIECE_TWINSOFTERROR_BUILDER = "Double the eyes, double the terror.",
         CHESSPIECE_DAYWALKER_BUILDER = "A stone likeness of a pig-headed prisoner.",
+        CHESSPIECE_DAYWALKER2_BUILDER = "He sure was a scrappy fellow.",
         CHESSPIECE_DEERCLOPS_MUTATED_BUILDER = "A truly eye-catching sculpture.",
         CHESSPIECE_WARG_MUTATED_BUILDER = "A rather fetching statue.",
         CHESSPIECE_BEARGER_MUTATED_BUILDER = "A soul-bearing rendition of a ferocious favorite.",
         CHESSPIECE_YOTD_BUILDER = "A tribute to getting things off to a fiery start.",
         CHESSPIECE_SHARKBOI_BUILDER = "An homage to a cold-blooded bully.",
+        CHESSPIECE_WORMBOSS_BUILDER = "Brings back memories of being digested.",
 
         CHESSPIECE_BUTTERFLY_SKETCH = "A sculpture sketch of a Moon Moth.",
         CHESSPIECE_ANCHOR_SKETCH = "A sculpture sketch of an anchor.",
@@ -5180,6 +5214,10 @@ STRINGS =
         CARPENTRY_BLADE_MOONGLASS = "For when a regular blade just won't cut it.",
 
         GELBLOB_STORAGE_KIT = "Keep your perishables fresh in this deadly dark jelly.",
+
+        YOTS_SNAKESHRINE = "Make offerings to the hungry Depths Worm.",
+        YOTS_LANTERN_POST = "A most festive post for stringing lanterns.",
+        YOTS_LANTERN_POST_ITEM = "A most festive post for stringing lanterns.",
     },
 
     -- MAXWELL_TEST = {"Say pal, you don't look so good.", "You better find something to eat before night comes!"},
@@ -7675,6 +7713,8 @@ STRINGS.UI =
         NEEDSYOTR = "Available during Year of the Bunnyman!",
 		NEEDSHALLOWED_NIGHTS = "Available during Hallowed Nights!",
 		NEEDSWINTERS_FEAST = "Available during Winter's Feast!",
+        NEEDSYOTD = "Available during Year of the Dragonfly!",
+        NEEDSYOTS = "Available during Year of the Depths Worm!",
 
         NEEDSPERDSHRINE = "Make an offering at the Gobbler Shrine!",
         NEEDSWARGSHRINE = "Make an offering at the Varg Shrine!",
@@ -8868,7 +8908,15 @@ STRINGS.UI =
 		CANCEL = "Cancel",
 		MAX_CUTS = "You have reached the maximum number of cuts on this pumpkin!",
 		CARVE = "Carve",
-		
+	},
+
+	SNOWMAN_DECORATING_POPUP =
+	{
+		MAX_DECOR = "You have reached the maximum number of decorations!",
+		PLACE = "Place",
+		FLIP = "Flip",
+		SET = "Done!",
+		CANCEL = "Cancel",
 	},
 
     OPTIONS =
@@ -10047,6 +10095,7 @@ STRINGS.UI =
 		YEAR_OF_THE_CATCOON = "Year of the Catcoon",
         YEAR_OF_THE_BUNNYMAN = "Year of the Bunnyman",
         YEAR_OF_THE_DRAGONFLY = "Year of the Dragonfly",
+        YEAR_OF_THE_SNAKE = "Year of the Depths Worm",        
 
         PREFABSWAPS = "Changing Resources",
         PREFABSWAPS_START = "Starting Resource Variety",
@@ -15848,6 +15897,7 @@ STRINGS.SCRAPBOOK = {
     DATA_BURNABLE = "CAN BE BURNED",
     DATA_NON_PLAYER_FOOD = "NON-SURVIVOR FOOD",
     DATA_INSULATION = " INSULATION",
+    DATA_SNOWMANDECO = "SNOWMAN DECOR",
 
     NOTE_SHADOW_ALIGNED = "SHADOW ALIGNED",
     NOTE_LUNAR_ALIGNED = "LUNAR ALIGNED",
@@ -16343,6 +16393,11 @@ STRINGS.SCRAPBOOK = {
         -- HallowedNights2024
 
         PUMPKINCARVER = "Can be used to carve specific shapes on Giant Pumpkins.",
+
+		-- WintersFeast2024
+
+		SNOWMAN = "Roll'em! Stack'em! Decorate them with a variety of items!",
+
     },
 
     -- Full name: "{name} Scrapbook Page"

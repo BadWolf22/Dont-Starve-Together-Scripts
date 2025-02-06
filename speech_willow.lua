@@ -429,6 +429,18 @@ return{
         {
             ALREADYKNOWN = "Ugh, I already know this one!",
         },
+		CARVEPUMPKIN =
+		{
+			INUSE = "That pumpkin is occupied.",
+			BURNING = "What the heck, fire! It's me!",
+		},
+		DECORATESNOWMAN =
+		{
+			INUSE = "Someone's doing that one.",
+			HASHAT = "There's a dumb hat on it.",
+			STACKEDTOOHIGH = "I can't get it up there.",
+			MELTING = "Nope. It's melting. Haha.",
+		},
     },
 
 	ANNOUNCE_CANNOT_BUILD =
@@ -1004,6 +1016,10 @@ return{
 
 	-- Hallowed Nights 2024
 	ANNOUNCE_NOPUMPKINCARVINGONFIRE = "It's perfect.",
+
+	-- Winter's Feast 2024
+	ANNOUNCE_SNOWBALL_TOO_BIG = "It's useless to try and roll it any bigger.",
+	ANNOUNCE_SNOWBALL_NO_SNOW = "There's no snow here.",
 
 	BATTLECRY =
 	{
@@ -1929,10 +1945,13 @@ return{
         CHESSPIECE_EYEOFTERROR = "I still feel an evil presence watching me...",
         CHESSPIECE_TWINSOFTERROR = "Great, another creepy statue.",
         CHESSPIECE_DAYWALKER = "How come jerks always seem to get statues?",
+        CHESSPIECE_DAYWALKER2 = "Another one?! This jerk gets another statue?",
         CHESSPIECE_DEERCLOPS_MUTATED = "We kicked its butt, and then we kicked it again.",
         CHESSPIECE_WARG_MUTATED = "I SAID we should've burned it, but nope, nobody listens to me...",
         CHESSPIECE_BEARGER_MUTATED = "I guess I'd be cranky too if I was woken up from the Big Sleep.",
         CHESSPIECE_SHARKBOI = "Reminded me of someone from my old neighborhood.",
+        CHESSPIECE_WORMBOSS = "I hope it gets indigestion.",
+        CHESSPIECE_YOTS = "Still gross.",
 
         CHESSJUNK1 = "Dead windup horsey.",
         CHESSJUNK2 = "Dead windup priest.",
@@ -5421,6 +5440,28 @@ return{
         SHADOWTHRALL_PARASITE = "Feed it to the flames!",
 
         PUMPKINCARVER = "Who's the lucky pumpkin?",
+		SNOWMAN =
+		{
+			GENERIC = "Whatever.",
+			SNOWBALL = "Great. Now what?",
+		},
+        SNOWBALL_ITEM = "Who needs a snowball to the face?",
+
+        -- Year of the Snake
+        YOTS_SNAKESHRINE =
+        {
+            GENERIC = "I still think we should torch it.",
+            EMPTY = "I vote for torching it.",
+            BURNT = "See? It worked!",
+        },
+        YOTS_WORM = " Are those scales wooden? Interesting.",
+        YOTS_LANTERN_POST = 
+        {
+            GENERIC = "It'll be brighter if I burn it.",
+            BURNT = "At least it burned bright!",
+        },
+        YOTS_LANTERN_POST_ITEM = "I can burn it as is.",
+        CHESSPIECE_DEPTHWORM  = "Still gross.",
     },
 
     DESCRIBE_GENERIC = "I have no idea what that is!",

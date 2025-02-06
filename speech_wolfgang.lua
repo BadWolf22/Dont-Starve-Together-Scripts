@@ -429,6 +429,18 @@ return{
         {
             ALREADYKNOWN = "Ha! Was already there in Wolfgang's big brain!",
         },
+		CARVEPUMPKIN =
+		{
+			INUSE = "This pumpkin not for Wolfgang.",
+			BURNING = "Wolfgang burning!",
+		},
+		DECORATESNOWMAN =
+		{
+			INUSE = "Not Wolfgang turn.",
+			HASHAT = "Cannot smush hat.",
+			STACKEDTOOHIGH = "Too tall, even for Wolfgang.",
+			MELTING = "Noooo. It's melting. Wolfgang not crying.",
+		},
     },
 
 	ANNOUNCE_CANNOT_BUILD =
@@ -998,6 +1010,10 @@ return{
 
 	-- Hallowed Nights 2024
 	ANNOUNCE_NOPUMPKINCARVINGONFIRE = "No! Wolfgang's pumpkin!",
+
+	-- Winter's Feast 2024
+	ANNOUNCE_SNOWBALL_TOO_BIG = "Snowball will not grow bigger.",
+	ANNOUNCE_SNOWBALL_NO_SNOW = "Not enough snow here.",
 
 	BATTLECRY =
 	{
@@ -1923,10 +1939,13 @@ return{
         CHESSPIECE_EYEOFTERROR = "No like the way it look at Wolfgang.",
         CHESSPIECE_TWINSOFTERROR = "Brrr, still sends chill down Wolfgang's spine.",
         CHESSPIECE_DAYWALKER = "Wolfgang has bigger muscles, see?",
+        CHESSPIECE_DAYWALKER2 = "Okay, he is quite mighty, but Wolfgang still mightier.",
         CHESSPIECE_DEERCLOPS_MUTATED = "Wolfgang not scared of statue, but be careful with pointy part.",
         CHESSPIECE_WARG_MUTATED = "Cute doggy, but dead is better.",
         CHESSPIECE_BEARGER_MUTATED = "Wolfgang stronger than bear. Even weird bear.",
         CHESSPIECE_SHARKBOI = "Wolfgang and talking shark could be buddy in different life.",
+        CHESSPIECE_WORMBOSS = "Wolfgang prefer not to talk about giant worm experience.",
+        CHESSPIECE_YOTS = "Worm was no match for Wolfgang.",
 
         CHESSJUNK1 = "Metal junk.",
         CHESSJUNK2 = "Metal junk.",
@@ -5415,6 +5434,28 @@ return{
         SHADOWTHRALL_PARASITE = "Just stay away from Wolfgang, okay?",
 
         PUMPKINCARVER = "Wolfgang is best pumpkin carver. Best.",
+		SNOWMAN =
+		{
+			GENERIC = "Pretty!",
+			SNOWBALL = "What a cute snowball.",
+		},
+        SNOWBALL_ITEM = "Wolfgang is snowball fight champion.",
+
+        -- Year of the Snake
+        YOTS_SNAKESHRINE =
+        {
+            GENERIC = "Wormy treats for Wolfgang!",
+            EMPTY = "Are you hungry, wormy?",
+            BURNT = "Wolfgang not crying. Just smokey.",
+        },
+        YOTS_WORM = "Hey, worm not allowed up here!",
+        YOTS_LANTERN_POST = 
+        {
+            GENERIC = "Post is both dazzling and useful, like Wolfgang.",
+            BURNT = "It was good post.",
+        },
+        YOTS_LANTERN_POST_ITEM = "Wolfgang light up the dance floor.",
+        CHESSPIECE_DEPTHWORM  = "Worm was no match for Wolfgang.",
     },
 
     DESCRIBE_GENERIC = "What is this thing?",

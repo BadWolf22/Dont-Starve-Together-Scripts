@@ -880,7 +880,6 @@ PREFABFILES = {
   "propsign",
   "pumpkin_lantern",
   "pumpkincarver",
-  "pumpkincarving_fx",
   "punchingbag",
   "purebrilliance",
   "quagmire",
@@ -1083,6 +1082,8 @@ PREFABFILES = {
   "smashables",
   "smoke_plant",
   "snow",
+  "snowball_item",
+  "snowman",
   "soil_amender",
   "sounddebugicon",
   "sparks",
@@ -1219,6 +1220,7 @@ PREFABFILES = {
   "turfcraftingstation",
   "turfs",
   "twigs",
+  "ugc_swap_fx",
   "umbrella",
   "underwater_salvageable",
   "veggies",
@@ -1372,5 +1374,8 @@ PREFABFILES = {
   "yotr_fightring",
   "yotr_food",
   "yotr_rabbitshrine",
-  "yotr_token" 
+  "yotr_token",
+  "yots_lantern_post",
+  "yots_snakeshrine",
+  "yots_worm_lantern" 
 }

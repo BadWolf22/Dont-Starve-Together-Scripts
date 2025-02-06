@@ -1338,6 +1338,11 @@ function Tune(overrides)
                 PERDOFFERING = 1,
             }),
 
+            WORMSHRINE = TechTree.Create({
+                WORMOFFERING = 3,
+                PERDOFFERING = 1,
+            }),
+
             MADSCIENCE = TechTree.Create({
                 MADSCIENCE = 1,
             }),
@@ -3539,11 +3544,14 @@ function Tune(overrides)
             TWINOFTERROR1    = {basic=1, special="winter_ornament_boss_eyeofterror1"},
             TWINOFTERROR2    = {basic=1, special="winter_ornament_boss_eyeofterror2"},
             ALTERGUARDIAN_PHASE3 = {basic=2},
-    
+
             DAYWALKER        = {basic=1, special="winter_ornament_boss_daywalker"},
             MUTATEDDEERCLOPS = {basic=1, special="winter_ornament_boss_mutateddeerclops"},
             MUTATEDBEARGER   = {basic=1, special="winter_ornament_boss_mutatedbearger"},
             MUTATEDWARG      = {basic=1, special="winter_ornament_boss_mutatedwarg"},
+
+            DAYWALKER2        = {basic=1, special="winter_ornament_boss_daywalker2"},
+            WORM_BOSS         = {basic=1, special="winter_ornament_boss_wormboss"},
         },
 
         WINTERS_FEAST_LOOT_EXCLUSION =
@@ -8044,6 +8052,34 @@ function Tune(overrides)
 
         SHADOWTHRALL_PARASITE_MASK_ARMOR = wilson_health*20*multiplayer_armor_durability_modifier,
         SHADOWTHRALL_PARASITE_MASK_ABSORPTION = 0.2,
+
+        SHADOWTHRALL_PARASITE_TIMEOUT = total_day_time*5,
+
+		-- Winter's Feast 2024
+		SNOWMAN_MAX_DECOR = { 5, 15, 20 },
+
+        SNOWBALL_WATERSOURCE_FILL_USES = .3,
+        SNOWBALL_MELT_MOISTURE = 1,
+        SNOWBALL_MELT_MOISTURE_ITEMS = 3,
+        SNOWBALL_MELT_MOISTURE_GROUND = 10,
+
+        SNOWBALL_EFFECTS_DIST = 1.25,
+        SNOWBALL_EXTINGUISH_HEAT_PERCENT = -1,
+        SNOWBALL_TEMP_REDUCTION = 2,
+        SNOWBALL_PROTECTION_TIME = 15,
+        SNOWBALL_ADD_COLDNESS = .2,
+
+		SNOWBALL_ROLLING_SPEED = 3,
+
+        SNOWBALLMANAGER_SPACING = 10, -- In tiles for each world partition.
+        SNOWBALLMANAGER_DENSITY = 2, -- Max number of weather created snow balls to create per partition.
+        SNOWBALLMANAGER_SECONDS_PER_SPAWN = 5,
+        SNOWBALLMANAGER_SECONDS_PER_DESPAWN = 0.5,
+
+        -- Year of the Snake
+        YOTS_LANTERN_POST_FUEL_MAX = total_day_time*2,
+        YOTS_WORM_HEALTH = 600,
+        YOTS_WORM_COUNT = 3,
     }
 
     TUNING_MODIFIERS = {}

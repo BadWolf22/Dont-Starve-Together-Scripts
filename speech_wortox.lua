@@ -429,6 +429,18 @@ return{
         {
             ALREADYKNOWN = "Oh what a bore, I've seen it before.",
         },
+		CARVEPUMPKIN =
+		{
+			INUSE = "Another soul is carving it.",
+			BURNING = "Fire! My fir!",
+		},
+		DECORATESNOWMAN =
+		{
+			INUSE = "Another soul is building it!",
+			HASHAT = "Drat! That hat!",
+			STACKEDTOOHIGH = "Sigh, too high.",
+			MELTING = "I felt it melt.",
+		},
     },
 
 	ANNOUNCE_CANNOT_BUILD =
@@ -1002,6 +1014,10 @@ return{
 
 	-- Hallowed Nights 2024
 	ANNOUNCE_NOPUMPKINCARVINGONFIRE = "I weren't done, this burnt one!",
+
+	-- Winter's Feast 2024
+	ANNOUNCE_SNOWBALL_TOO_BIG = "I tell no lies! It's at full size!",
+	ANNOUNCE_SNOWBALL_NO_SNOW = "It won't grow without more snow.",
 
 	BATTLECRY =
 	{
@@ -1928,10 +1944,13 @@ return{
         CHESSPIECE_EYEOFTERROR = "He's gone, no matter how you look at it, hyuyu!",
         CHESSPIECE_TWINSOFTERROR = "What an eye-catching statue, hyuyu!",
         CHESSPIECE_DAYWALKER = "A boorish boar's bust!",
+        CHESSPIECE_DAYWALKER2 = "The hog heaved through heaps of junk.",
         CHESSPIECE_DEERCLOPS_MUTATED = "She got quite the eyeful.",
         CHESSPIECE_WARG_MUTATED = "Must we memorialize the mutated mutt?",
         CHESSPIECE_BEARGER_MUTATED = "It bears a strong resemblance.",
         CHESSPIECE_SHARKBOI = "We avoided the maw of the rowdy Frostjaw.",
+        CHESSPIECE_WORMBOSS = "Its jaws were near, but I disappeared! Hyuyu!",
+        CHESSPIECE_YOTS = "Make no error facing this writhing terror.",
 
         CHESSJUNK1 = "It looks quite broke, and that's no joke!",
         CHESSJUNK2 = "It looks quite broke, and that's no joke!",
@@ -5420,6 +5439,28 @@ return{
         SHADOWTHRALL_PARASITE = "That thingy looks clingy.",
 
         PUMPKINCARVER = "My turn to carve the lantern!",
+		SNOWMAN =
+		{
+			GENERIC = "Whoa, man. Snowman!",
+			SNOWBALL = "Of all the snowballs...",
+		},
+        SNOWBALL_ITEM = "No greater delight than a snowball fight!",
+
+        -- Year of the Snake
+        YOTS_SNAKESHRINE =
+        {
+            GENERIC = "The worm’s terms are met!",
+            EMPTY = "On what does the beast wish to feast?",
+            BURNT = "My head was turned, and it was burned.",
+        },
+        YOTS_WORM = "Stand firm against the squirm of the worm!",
+        YOTS_LANTERN_POST = 
+        {
+            GENERIC = "A post with the most to boast!",
+            BURNT = "Who cares! We have spares! Right?",
+        },
+        YOTS_LANTERN_POST_ITEM = "It will stand tall with them all!",
+        CHESSPIECE_DEPTHWORM  = "Make no error facing this writhing terror.",
     },
 
     DESCRIBE_GENERIC = "Ooo, a mystery!",
