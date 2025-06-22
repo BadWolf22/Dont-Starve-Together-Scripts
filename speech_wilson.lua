@@ -5712,7 +5712,11 @@ return {
 
         HERMITCRAB_RELOCATION_KIT = "The crab's new home will be pitcher perfect.",
 
-        WANDERINGTRADER = "If we make a trade, will we beef friends!",
+        WANDERINGTRADER =
+        {
+            REVEALED = "If we trade, will we beef friends!",
+            GENERIC = "Looks like it's about to turn.",
+        },
 
         GESTALT_GUARD_EVOLVED = "These ones have an explosive personality.",
         FLOTATIONCUSHION = "Oh, buoyancy!",

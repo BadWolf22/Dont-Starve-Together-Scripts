@@ -1,12 +1,38 @@
 require("stategraphs/commonstates")
 
 local MISSILE_TARGET_RANGE = 18
+local MISSILE_LOCAL_TARGET_RANGE = 8
 local NUM_MISSILES = 3
 local REGISTERED_HEAT_TAGS
+local HEATER_TEMPERATURE_SCORE_OFFSET = 1000
+
+local function _CollectMissileTargetEntities(x, z, r, tbl)
+	local ents = TheSim:FindEntities_Registered(x, 0, z, r, REGISTERED_HEAT_TAGS)
+	if tbl then
+		for i = 1, #ents do
+			tbl[ents[i]] = true
+		end
+		return tbl
+	end
+	for i = 1, #ents do
+		ents[ents[i]] = true
+		ents[i] = nil
+	end
+	return ents
+end
+
+local function _DistSqToNearestMissile(ent, _missiles)
+	local x, _, z = ent.Transform:GetWorldPosition()
+	local dsq = math.huge
+	for k in pairs(_missiles) do
+		dsq = math.min(dsq, distsq(x, z, k.targetpos.x, k.targetpos.z))
+	end
+	return dsq
+end
 
 --Returns true if any targets are found
 --Pass optional maxtargets(int) and targets(table) to get the actual list of targets
-local function _FindMissileTargets(inst, x, z, maxtargets, targets)
+local function _FindMissileTargets(inst, maxtargets, targets, _missiles)
 	if REGISTERED_HEAT_TAGS == nil then
 		REGISTERED_HEAT_TAGS = TheSim:RegisterFindTags(
 			nil,
@@ -14,9 +40,26 @@ local function _FindMissileTargets(inst, x, z, maxtargets, targets)
 			{ "fire", "smolder", "HASHEATER", "engineeringbattery", "spotlight", "_combat" }
 		)
 	end
+
+	local x, _, z = inst.Transform:GetWorldPosition()
+	local ents = _CollectMissileTargetEntities(x, z, MISSILE_TARGET_RANGE)
+	if _missiles then
+		assert(next(targets) == nil)
+		for k in pairs(_missiles) do
+			local posid = string.format("%d,%d", k.targetpos.x + 0.5, k.targetpos.z + 0.5)
+			if targets[posid] == nil then
+				targets[posid] = true
+				_CollectMissileTargetEntities(k.targetpos.x, k.targetpos.z, MISSILE_LOCAL_TARGET_RANGE, ents)
+			end
+		end
+		for k in pairs(targets) do
+			targets[k] = nil
+		end
+	end
+
 	local map = TheWorld.Map
 	local inarena = map:IsPointInWagPunkArena(x, 0, z)
-	for i, v in ipairs(TheSim:FindEntities_Registered(x, 0, z, MISSILE_TARGET_RANGE, REGISTERED_HEAT_TAGS)) do
+	for v in pairs(ents) do
 		if v ~= inst and
 			not inst.components.commander:IsSoldier(v) and
 			not (v.components.freezable and v.components.freezable:IsFrozen()) and
@@ -31,52 +74,62 @@ local function _FindMissileTargets(inst, x, z, maxtargets, targets)
 			local heater = v._lightinst and v._lightinst.components.heater or v.components.heater
 			if heater then
 				--NOTE: GetHeat() can be nil!
-				if heater:IsExothermic() then
-					temperature = math.max(temperature, heater:GetHeat(v) or temperature)
+				--V2C: GetHeat first. Some heaters update thermics in their heatfn.
+				local heat = heater:GetHeat(v)
+				if heat == nil then
+					heater = nil
+				elseif heater:IsExothermic() then
+					temperature = HEATER_TEMPERATURE_SCORE_OFFSET + heat
 				elseif heater:IsEndothermic() then
 					endo = true
-					temperature = math.min(temperature, heater:GetHeat(v) or temperature)
-				elseif v.currentTempRange then
-					--heatrock special case because thermics setup isn't reliable
-					endo = v.currentTempRange < 3
-					if v.currentTempRange ~= 3 and v.components.temperature then
-						temperature = v.components.temperature:GetCurrent()
-					end
+					temperature = math.min(temperature, heat)
 				else
-					--for other things that don't setup thermics
-					temperature = heater:GetHeat(v) or temperature
-					endo = temperature < ambient_temp
+					--thermics not setup; heater is not active
+					heater = nil
 				end
-			elseif v.components.temperature then
-				temperature = v.components.temperature:GetCurrent()
-			elseif v.components.fueled and not v.components.fueled:IsEmpty() and v:HasTag("engineeringbattery") then
-				temperature = temperature + 10
-			elseif v.components.burnable and v.components.burnable:IsSmoldering() then
-				--only add smoldering bonus if we don't have an actual temperature
-				temperature = temperature + 5
+			end
+
+			if heater == nil then
+				if v.components.temperature then
+					temperature = v.components.temperature:GetCurrent()
+				elseif v.components.fueled and not v.components.fueled:IsEmpty() and v:HasTag("engineeringbattery") then
+					temperature = temperature + 10
+				elseif v.components.burnable and v.components.burnable:IsSmoldering() then
+					--only add smoldering bonus if we don't have an actual temperature
+					temperature = temperature + 5
+				end
 			end
 
 			if v.components.burnable and v.components.burnable:IsBurning() then
 				local fire = v.components.burnable.fxchildren[1]
 				if fire and fire.components.heater then
 					--NOTE: GetHeat() can be nil!
-					if fire.components.heater:IsExothermic() then
-						temperature = math.max(temperature, fire.components.heater:GetHeat(v) or temperature)
-					else
-						temperature = math.min(temperature, fire.components.heater:GetHeat(v) or temperature)
+					--V2C: GetHeat first. Some heaters update thermics in their heatfn.
+					local heat = fire.components.heater:GetHeat(v)
+					if heat then
+						if fire.components.heater:IsExothermic() then
+							temperature = math.max(temperature, HEATER_TEMPERATURE_SCORE_OFFSET + heat)
+						elseif fire.components.heater:IsEndothermic() then
+							endo = true
+							temperature = math.min(temperature, heat)
+						else
+							--thermics not setup
+							print("Fire missing heat signature on", v)
+						end
 					end
 				else
 					print("Fire missing heat signature on", v)
-					temperature = math.max(temperature, 100)
 				end
 			end
 
-			if endo then
+			if endo or temperature <= 0 then
 				--skip heaters completely if marked as endothermic
+				--skip if freezing temperature
 			elseif temperature > ambient_temp or
 				(	v.components.combat and
+					not (v.components.health and v.components.health:IsDead()) and
 					v:HasAnyTag("animal", "largecreature", "monster", "character") and
-					not v:HasAnyTag("smallcreature", "veggie", "fish") and
+					not v:HasAnyTag("critter", "smallcreature", "veggie", "fish", "deadcreature") and
 					(	v.components.combat:IsRecentTarget(inst) or
 						not v:HasTag("companion")
 					)
@@ -87,15 +140,18 @@ local function _FindMissileTargets(inst, x, z, maxtargets, targets)
 				end
 				local found
 				for i1, v1 in ipairs(targets) do
-					if temperature > v1.temp then
-						table.insert(targets, i1, { ent = v, temp = temperature })
-						targets[maxtargets + 1] = nil
-						found = true
-						break
+					if temperature >= v1.temp then
+						local dsq = _missiles and _DistSqToNearestMissile(v, _missiles)
+						if temperature > v1.temp or (temperature == v1.temp and dsq and dsq < v1.dsq) then
+							table.insert(targets, i1, { ent = v, temp = temperature, dsq = dsq })
+							targets[maxtargets + 1] = nil
+							found = true
+							break
+						end
 					end
 				end
 				if not found and #targets < maxtargets then
-					table.insert(targets, { ent = v, temp = temperature })
+					table.insert(targets, { ent = v, temp = temperature, dsq = _missiles and _DistSqToNearestMissile(v, _missiles) })
 				end
 			end
 		end
@@ -110,13 +166,20 @@ local function _FindMissileTargets(inst, x, z, maxtargets, targets)
 end
 
 local CollectMissileTargets = _FindMissileTargets
-
-local function HasAnyMissileTarget(inst)
-	local x, y, z = inst.Transform:GetWorldPosition()
-	return _FindMissileTargets(inst, x, z)
-end
+--local HasAnyMissileTarget = _FindMissileTargets --HasAnyMissileTarget(inst), no extra params
 
 local function TryRetargetMissiles(inst, data)
+	if inst.components.combat == nil or (inst.components.health and inst.components.health:IsDead()) then
+		--no longer in combat
+		for i, v in ipairs(data.missiles) do
+			if v:IsValid() then
+				v:CancelTargetLock()
+			end
+		end
+		data.task:Cancel()
+		return
+	end
+
 	assert(next(inst._temptbl1) == nil)
 	local toretarget = inst._temptbl1
 	local maxnum = 0
@@ -135,7 +198,7 @@ local function TryRetargetMissiles(inst, data)
 
 	assert(next(inst._temptbl2) == nil)
 	local targets = inst._temptbl2
-	if not _FindMissileTargets(inst, data.x, data.z, maxnum, targets) then
+	if not _FindMissileTargets(inst, maxnum, targets, toretarget) then
 		for k in pairs(toretarget) do
 			toretarget[k] = nil
 		end
@@ -143,6 +206,8 @@ local function TryRetargetMissiles(inst, data)
 		return
 	end
 	local num = #targets
+
+	inst.sg:RemoveStateTag("missiles_target_fail")
 
 	--After one missile detonates, don't retarget the remaining missiles
 	--if it would just end up redistributing to the same set of targets.
@@ -357,8 +422,8 @@ local function ChooseAttack(inst, target)
 		inst.sg:GoToState("signal_pre")
 		return true
 	elseif inst.canmissiles and
-		(inst.canmissilebarrage or not inst.components.timer:TimerExists("missiles_cd")) and
-		HasAnyMissileTarget(inst)
+		(inst.canmissilebarrage or not inst.components.timer:TimerExists("missiles_cd"))
+		--and HasAnyMissileTarget(inst)
 	then
 		inst.sg:GoToState("missiles_pre")
 		return true
@@ -480,7 +545,7 @@ end
 
 local AOE_RANGE_PADDING = 3
 local AOE_TARGET_MUSTHAVE_TAGS = { "_combat" }
-local AOE_TARGET_CANT_TAGS = { "INLIMBO", "flight", "invisible", "notarget", "noattack" }
+local AOE_TARGET_CANT_TAGS = { "INLIMBO", "flight", "invisible", "notarget", "noattack", "brightmare" }
 
 local function _AOEAttack(inst, radius, heavymult, mult, forcelanded, targets)
 	inst.components.combat.ignorehitrange = true
@@ -836,6 +901,9 @@ local states =
 			inst.components.locomotor:Stop()
 			inst.AnimState:PlayAnimation("activate2")
 			TheWorld:PushEvent("ms_wagboss_robot_losecontrol")
+			if not (TheWorld.components.wagboss_tracker and TheWorld.components.wagboss_tracker:IsWagbossDefeated()) then
+				inst:EnableCameraFocus(true)
+			end
 		end,
 
 		timeline =
@@ -899,6 +967,7 @@ local states =
 			if inst.hostile and not (inst.sg.statemem.off or inst.components.health:IsDead()) then
 				inst:SetMusicLevel(1)
 			end
+			inst:EnableCameraFocus(false)
 		end,
 	},
 
@@ -1306,7 +1375,7 @@ local states =
 			FrameEvent(42, function(inst)
 				inst.sg:AddStateTag("nointerrupt")
 				SetShadowScale(inst, 0.93)
-				inst.Physics:SetCollisionMask(COLLISION.WORLD)
+				inst:SetTempNoCollide(true, "leap")
 			end),
 			FrameEvent(43, function(inst)
 				SetShadowScale(inst, 0.88)
@@ -1344,7 +1413,7 @@ local states =
 
 		onexit = function(inst)
 			if not inst.sg.statemem.leaping then
-				inst.Physics:SetCollisionMask(COLLISION.WORLD, COLLISION.OBSTACLES, COLLISION.GIANTS)
+				inst:SetTempNoCollide(false, "leap")
 				inst.Physics:ClearMotorVelOverride()
 				inst.Physics:Stop()
 				SetShadowScale(inst, 1)
@@ -1366,7 +1435,7 @@ local states =
 				inst.components.locomotor:Stop()
 			end
 			SetShadowScale(inst, 0.84)
-			inst.Physics:SetCollisionMask(COLLISION.WORLD)
+			inst:SetTempNoCollide(true, "leap")
 		end,
 
 		onupdate = OnUpdateLeap,
@@ -1396,7 +1465,7 @@ local states =
 
 		onexit = function(inst)
 			if not inst.sg.statemem.leaping then
-				inst.Physics:SetCollisionMask(COLLISION.WORLD, COLLISION.OBSTACLES, COLLISION.GIANTS)
+				inst:SetTempNoCollide(false, "leap")
 				inst.Physics:ClearMotorVelOverride()
 				inst.Physics:Stop()
 				SetShadowScale(inst, 1)
@@ -1411,7 +1480,7 @@ local states =
 		onenter = function(inst)
 			inst.AnimState:PlayAnimation("atk_leap_pst")
 			SetShadowScale(inst, 0.84)
-			inst.Physics:SetCollisionMask(COLLISION.WORLD)
+			inst:SetTempNoCollide(true, "leap")
 		end,
 
 		onupdate = OnUpdateLeap,
@@ -1423,7 +1492,7 @@ local states =
 			FrameEvent(3, function(inst) SetShadowScale(inst, 0.93) end),
 			FrameEvent(4, function(inst)
 				SetShadowScale(inst, 1)
-				inst.Physics:SetCollisionMask(COLLISION.WORLD, COLLISION.OBSTACLES, COLLISION.GIANTS)
+				inst:SetTempNoCollide(false, "leap")
 				inst.sg.statemem.landed = true
 				inst.sg.statemem.shakeonexit = true
 				inst:StartStompFx()
@@ -1468,7 +1537,7 @@ local states =
 
 		onexit = function(inst)
 			if not inst.sg.statemem.landed then
-				inst.Physics:SetCollisionMask(COLLISION.WORLD, COLLISION.OBSTACLES, COLLISION.GIANTS)
+				inst:SetTempNoCollide(false, "leap")
 			end
 			if inst.sg.statemem.speed then
 				inst.Physics:ClearMotorVelOverride()
@@ -1483,7 +1552,7 @@ local states =
 
 	State{
 		name = "missiles_pre",
-		tags = { "attack", "missiles", "busy" },
+		tags = { "attack", "missiles", "busy", "first_missile" },
 
 		onenter = function(inst)
 			inst.components.locomotor:Stop()
@@ -1520,6 +1589,9 @@ local states =
 		tags = { "attack", "missiles", "busy" },
 
 		onenter = function(inst)
+			if inst.sg.lasttags and inst.sg.lasttags["missiles_target_fail"] then
+				inst.sg:AddStateTag("missiles_target_fail")
+			end
 			inst.components.locomotor:Stop()
 			inst.AnimState:PlayAnimation("atk_missile_pre2")
 			GetUpShake2(inst)
@@ -1550,17 +1622,19 @@ local states =
 		name = "missiles",
 		tags = { "attack", "missiles", "busy" },
 
-		onenter = function(inst, pretargets)
+		onenter = function(inst)
 			inst.components.locomotor:Stop()
 			inst.AnimState:PlayAnimation("atk_missile")
 			DoFootstepHeavyShake(inst)
 
-			local x, y, z = inst.Transform:GetWorldPosition()
 			assert(next(inst._temptbl1) == nil)
 			local targets = inst._temptbl1
-			CollectMissileTargets(inst, x, z, NUM_MISSILES, targets)
+			if not CollectMissileTargets(inst, NUM_MISSILES, targets) then
+				inst.sg:AddStateTag("missiles_target_fail")
+			end
 
 			inst.sg.statemem.missiles = {}
+			local x, _, z = inst.Transform:GetWorldPosition()
 			local dir = math.random() * 360
 			local dirdelta = 360 / NUM_MISSILES
 			local dirvar = dirdelta / 3
@@ -1585,8 +1659,10 @@ local states =
 			end
 			--assert(next(targets) == nil)
 
-			local taskdata = { x = x, z = z, missiles = inst.sg.statemem.missiles, grouptargets = grouptargets }
+			local taskdata = { missiles = inst.sg.statemem.missiles, grouptargets = grouptargets }
 			taskdata.task = inst:DoPeriodicTask(1, TryRetargetMissiles, nil, taskdata)
+
+			inst.components.epicscare:Scare(5)
 
 			--inst.components.combat:RestartCooldown()
 			inst.components.timer:StopTimer("missiles_cd")
@@ -1629,13 +1705,20 @@ local states =
 		tags = { "attack", "missiles", "busy" },
 
 		onenter = function(inst, missiles_time)
+			if inst.sg.lasttags and inst.sg.lasttags["missiles_target_fail"] then
+				inst.sg:AddStateTag("missiles_target_fail")
+			end
 			local t = GetTime()
 			inst.sg.statemem.t = missiles_time or t + TUNING.WAGBOSS_ROBOT_MISSILE_BARRAGE_PERIOD[inst.threatlevel or 1]
 			local timeout = inst.sg.statemem.t - t
 			if timeout > 0 then
 				inst.sg:SetTimeout(timeout)
+			elseif inst.canmissilebarrage and inst.sg:HasStateTag("missiles_target_fail") then
+				inst:SkipBarragePhase()
+				inst.sg:GoToState("missiles_pst")
+				return
 			else
-				inst.sg:GoToState(inst.canmissilebarrage and HasAnyMissileTarget(inst) and "missiles_pre2" or "missiles_pst")
+				inst.sg:GoToState(inst.canmissilebarrage --[[and HasAnyMissileTarget(inst)]] and "missiles_pre2" or "missiles_pst")
 				return
 			end
 			inst.components.locomotor:Stop()
@@ -1643,7 +1726,12 @@ local states =
 		end,
 
 		ontimeout = function(inst)
-			inst.sg:GoToState(inst.canmissilebarrage and HasAnyMissileTarget(inst) and "missiles_pre2" or "missiles_pst")
+			if inst.canmissilebarrage and inst.sg:HasStateTag("missiles_target_fail") then
+				inst:SkipBarragePhase()
+				inst.sg:GoToState("missiles_pst")
+			else
+				inst.sg:GoToState(inst.canmissilebarrage --[[and HasAnyMissileTarget(inst)]] and "missiles_pre2" or "missiles_pst")
+			end
 		end,
 
 		events =
@@ -1660,6 +1748,9 @@ local states =
 		tags = { "hit", "missiles", "busy" },
 
 		onenter = function(inst, missiles_time)
+			if inst.sg.lasttags and inst.sg.lasttags["missiles_target_fail"] then
+				inst.sg:AddStateTag("missiles_target_fail")
+			end
 			inst.components.locomotor:Stop()
 			inst.AnimState:PlayAnimation("atk_missile_hit")
 			CommonHandlers.UpdateHitRecoveryDelay(inst)
@@ -1674,7 +1765,7 @@ local states =
 				end
 			end),
 			FrameEvent(17, function(inst)
-				if inst.canmissilebarrage and not inst.sg:HasStateTag("caninterrupt") and HasAnyMissileTarget(inst) then
+				if inst.canmissilebarrage and not inst.sg:HasAnyStateTag("caninterrupt", "missiles_target_fail") --[[and HasAnyMissileTarget(inst)]] then
 					inst.sg:GoToState("missiles_pre2")
 				end
 			end),
@@ -1708,6 +1799,9 @@ local states =
 		tags = { "attack", "missiles", "busy" },
 
 		onenter = function(inst)
+			if inst.sg.lasttags and inst.sg.lasttags["missiles_target_fail"] then
+				inst.sg:AddStateTag("missiles_target_fail")
+			end
 			inst.components.locomotor:Stop()
 			inst.AnimState:PlayAnimation("atk_missile_pst")
 		end,
@@ -1889,6 +1983,7 @@ local states =
 
 			inst:StartBackFx()
 			inst:AddAlterSymbols()
+			inst:EnableCameraFocus(true)
 
 			inst.sg.statemem.alter = SpawnPrefab("alterguardian_phase4_lunarrift")
 			inst.sg.statemem.alter.Transform:SetPosition(inst.Transform:GetWorldPosition())
@@ -1911,7 +2006,6 @@ local states =
 				inst.sg:AddStateTag("noattack")
 				DoJumpShake(inst)
 				inst:SetMusicLevel(2) --silence
-				TheWorld:PushEvent("ms_wagstaff_arena_oneshot", { strname = "WAGSTAFF_WAGPUNK_ARENA_SCIONREVEAL", monologue = true, focusentity = inst })
 			end),
 			FrameEvent(54, function(inst) inst.SoundEmitter:KillSound("loop") end),
 			FrameEvent(72, GetUpShake1),
@@ -1991,6 +2085,7 @@ local states =
 			inst.Physics:SetActive(true)
 			inst.sg.statemem.alter:Remove()
 			inst:SetMusicLevel(1)
+			inst:EnableCameraFocus(false)
 		end,
 	},
 

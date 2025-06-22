@@ -5706,7 +5706,11 @@ return{
 
         HERMITCRAB_RELOCATION_KIT = "Find crabby friend new home",
 
-        WANDERINGTRADER = "Shaggy Buddy Man?",
+        WANDERINGTRADER =
+        {
+            REVEALED = "Shaggy Buddy Man!",
+            GENERIC = "Shaggy Buddy Man?",
+        },
 
         GESTALT_GUARD_EVOLVED = "Why friend mad? Why friend not friend?",
         FLOTATIONCUSHION = "No more scared biiig water",

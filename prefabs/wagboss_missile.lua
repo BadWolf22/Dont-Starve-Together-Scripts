@@ -374,6 +374,10 @@ local function UpdateFlightPath(inst, dt)
 		inst.tilt:set_local(tilt)
 		inst.tilt:set(tilt)
 	end
+
+	if inst.target then
+		inst.target:PushEvent("epicscare", { scarer = inst, duration = 1 })
+	end
 end
 
 local function Launch(inst, id, launcher, targetorpos, dir, grouptargets)
@@ -451,6 +455,17 @@ local function Retarget(inst, target)
 	inst.target = target
 	inst.targetpos.x, inst.targetpos.y, inst.targetpos.z = target.Transform:GetWorldPosition()
 	inst:ListenForEvent("wagboss_missile_target_detonated", inst._ontargetdetonated, target)
+end
+
+local function CancelTargetLock(inst)
+	if inst.target then
+		inst:RemoveEventCallback("wagboss_missile_target_detonated", inst._ontargetdetonated, inst.target)
+		if inst.ring then
+			inst.ring:RemoveEventCallback("onremove", inst._onremoveringtarget, inst.target)
+			inst._onremoveringtarget(inst.target)
+		end
+		inst.target = nil
+	end
 end
 
 local function ShowMissile(inst)
@@ -541,6 +556,17 @@ local function Detonate(inst)
 						else
 							v.components.fueled:SetPercent(pct - deltapct)
 						end
+					elseif v.components.finiteuses then
+						local pct = v.components.finiteuses:GetPercent()
+						local deltapct = 2 / TUNING.HEATROCK_NUMUSES
+						if pct < deltapct * 1.1 then
+							local x1, y1, z1 = v.Transform:GetWorldPosition()
+							v:Remove()
+							v = SpawnPrefab("ash")
+							v.Transform:SetPosition(x1, y1, z1)
+						else
+							v.components.finiteuses:SetPercent(pct - deltapct)
+						end
 					end
 				elseif v.components.heater and v.components.perishable then
 					if v.components.perishable:GetPercent() < 0.35 then
@@ -622,6 +648,7 @@ local function fn()
 	inst.Physics:SetSphere(0.5)
 
 	inst:AddTag("CLASSIFIED")
+	inst:AddTag("pseudoprojectile")
 
 	inst.tilt = net_smallbyte(inst.GUID, "wagboss_missile.tilt", "tiltdirty")
 	inst.circling = net_bool(inst.GUID, "wagboss_missile.circling", "tiltdirty")
@@ -665,6 +692,7 @@ local function fn()
 
 	inst.Launch = Launch
 	inst.Retarget = Retarget
+	inst.CancelTargetLock = CancelTargetLock
 	inst.ShowMissile = ShowMissile
 	inst.Detonate = Detonate
 	inst.OnEntitySleep = inst.Remove

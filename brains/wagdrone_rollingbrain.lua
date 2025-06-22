@@ -4,6 +4,8 @@ require("behaviours/standstill")
 local easing = require("easing")
 local WagdroneCommon = require("prefabs/wagdrone_common")
 
+local DEBUG_MODE = BRANCH == "dev"
+
 local RECOIL_DURATION = 0.7
 local RECOIL_DECEL_DURATION = RECOIL_DURATION * 0.7
 local RECOIL_ACCEL_DURATION = RECOIL_DECEL_DURATION
@@ -42,39 +44,49 @@ local function IsPlayerTryingToPickup(inst)
 end
 
 local function GetDeployPoint(inst)
-	return inst.components.knownlocations and inst.components.knownlocations:GetLocation("deploypoint") or nil
+	return inst.components.knowndynamiclocations and inst.components.knowndynamiclocations:GetDynamicLocation("deploypoint")
+end
+
+local function ValidateExistingTarget(target, platform)
+	if target:IsInLimbo() or not (target:IsValid() and target.entity:IsVisible()) or
+		(target.components.health and target.components.health:IsDead()) or
+		target:GetCurrentPlatform() ~= platform
+	then
+		return false
+	elseif target:HasTag("wagdrone_rolling") then
+		return not target.sg:HasAnyStateTag("stationary", "broken", "off")
+			and not (target.components.workable and target.components.workable:CanBeWorked())
+			and not target:HasAnyTag("NOCLICK", "usesdepleted")
+	elseif target.components.workable and target.components.workable:CanBeWorked() then
+		local work_action = target.components.workable:GetWorkAction()
+		return work_action == ACTIONS.CHOP or work_action == ACTIONS.MINE
+			and not target:HasTag("NOCLICK")
+	end
+	return false
 end
 
 local DRONE_TAGS = { "wagdrone_rolling" }
 local DRONE_NO_TAGS = { "INLIMBO", "NOCLICK", "HAMMER_workable", "usesdepleted" }
 local WORK_TAGS = { "CHOP_workable", "MINE_workable" }
-local WORK_NO_TAGS = { "INLIMBO", "NOCLICK", }
+local WORK_NO_TAGS = { "INLIMBO", "NOCLICK", "waxedplant", "event_trigger" }
 
 function FriendlyTargeting(inst)
 	local x, y, z = inst.Transform:GetWorldPosition()
-	local pt = GetDeployPoint(inst)
-	if pt then
+	local pos = GetDeployPoint(inst)
+	if pos then
+		local x0, y0, z0 = pos:GetPosition():Get()
+		local platform0 = pos.walkable_platform
 		local r = TUNING.WAGDRONE_ROLLING_WORK_RADIUS
 		local mindsq = math.huge
 		local closest = nil
-		for i, v in ipairs(TheSim:FindEntities(pt.x, pt.y, pt.z, r, nil, WORK_NO_TAGS, WORK_TAGS)) do
+		for i, v in ipairs(TheSim:FindEntities(x0, y0, z0, r, nil, WORK_NO_TAGS, WORK_TAGS)) do
 			if v ~= inst and v.entity:IsVisible() and
-				not (v.components.health and v.components.health:IsDead())
+				not (v.components.health and v.components.health:IsDead()) and
+				v:GetCurrentPlatform() == platform0
 			then
-				local dsq = v:GetDistanceSqToPoint(x, y, z)
-				if dsq < mindsq then
-					mindsq = dsq
-					closest = v
-				end
-			end
-		end
-		if closest == nil then
-			for i, v in ipairs(TheSim:FindEntities(pt.x, pt.y, pt.z, r, DRONE_TAGS, DRONE_NO_TAGS)) do
-				if v ~= inst and v.entity:IsVisible() and
-					not (v.components.health and v.components.health:IsDead()) and
-					not v.sg:HasAnyStateTag("stationary", "broken", "off")
-				then
-					local dsq = v:GetDistanceSqToPoint(x, y, z)
+				local x1, y1, z1 = v.Transform:GetWorldPosition()
+				if distsq(x1, z1, x0, z0) < r * r then --FindEntities is <= r
+					local dsq = distsq(x1, z1, x, z)
 					if dsq < mindsq then
 						mindsq = dsq
 						closest = v
@@ -82,14 +94,40 @@ function FriendlyTargeting(inst)
 				end
 			end
 		end
+		if closest == nil then
+			for i, v in ipairs(TheSim:FindEntities(x0, y0, z0, r, DRONE_TAGS, DRONE_NO_TAGS)) do
+				if v ~= inst and v.entity:IsVisible() and
+					not v.components.health:IsDead() and
+					not v.sg:HasAnyStateTag("stationary", "broken", "off") and
+					v:GetCurrentPlatform() == platform0
+				then
+					local x1, y1, z1 = v.Transform:GetWorldPosition()
+					if distsq(x1, z1, x0, z0) < r * r then --FindEntities is <= r
+						local dsq = distsq(x1, z1, x, z)
+						if dsq < mindsq then
+							mindsq = dsq
+							closest = v
+						end
+					end
+				end
+			end
+		end
+		if DEBUG_MODE and closest then
+			assert(ValidateExistingTarget(closest, platform0))
+		end
 		return closest
 	end
 
+	local platform = inst:GetCurrentPlatform()
 	for i, v in ipairs(TheSim:FindEntities(x, y, z, 16, DRONE_TAGS, DRONE_NO_TAGS)) do
 		if v ~= inst and v.entity:IsVisible() and
 			not (v.components.health and v.components.health:IsDead()) and
-			not v.sg:HasAnyStateTag("stationary", "broken", "off")
+			not v.sg:HasAnyStateTag("stationary", "broken", "off") and
+			v:GetCurrentPlatform() == platform
 		then
+			if DEBUG_MODE then
+				assert(ValidateExistingTarget(v, platform))
+			end
 			return v
 		end
 	end
@@ -98,31 +136,42 @@ end
 function WagdroneRollingBrain:UpdateTargetDest()
 	local target
 	local x, y, z = self.inst.Transform:GetWorldPosition()
-	local pt = GetDeployPoint(self.inst)
-	local ignorerange
-	if pt then
+	local pos = GetDeployPoint(self.inst)
+	local ignorerange, validated
+	if pos then
+		local pt0 = pos:GetPosition()
+		local platform0 = pos.walkable_platform
 		local r = TUNING.WAGDRONE_ROLLING_WORK_RADIUS
-		target =
-			EntityScript.is_instance(self.target) and
-			self.target:IsValid() and
-			self.target:GetDistanceSqToPoint(x, y, z) < r * r and
-			self.target or
-			FriendlyTargeting(self.inst) or
-			(distsq(pt.x, pt.z, x, z) > 1 and pt) or
-			nil
-		if target == nil then
-			self:ResetTargets()
-			return nil
+		if EntityScript.is_instance(self.target) then
+			if not ValidateExistingTarget(self.target, platform0) or self.target:GetDistanceSqToPoint(pt0:Get()) >= r * r then
+				self:ResetTargets()
+				return nil
+			end
+			target = self.target
+		else
+			target =
+				FriendlyTargeting(self.inst) or
+				(distsq(pt0.x, pt0.z, x, z) > 1 and pt0) or
+				nil
+			if target == nil then
+				self:ResetTargets()
+				return nil
+			end
 		end
 		ignorerange = true
+		validated = true
 	else
-		target = self.inst.dest or self.target or FriendlyTargeting(self.inst)
+		target = self.inst.dest or self.target
+		if target == nil then
+			target = FriendlyTargeting(self.inst)
+			validated = true
+		end
 	end
 	if target then
 		local x1, y1, z1
 		if not target:is_a(EntityScript) then
 			x1, y1, z1 = target:Get()
-		elseif target:IsValid() then
+		elseif validated or ValidateExistingTarget(target, self.inst:GetCurrentPlatform()) then
 			x1, y1, z1 = target.Transform:GetWorldPosition()
 		else
 			self:ResetTargets()
@@ -252,7 +301,12 @@ function WagdroneRollingBrain:OnStop()
 		self.inst:RemoveEventCallback("spinning_recoil", self._onrecoil)
 		self._onrecoil = nil
 	end
-	self:ResetTargets()
+	self.target = nil
+	self.recoiltime = nil
+	if self.recoilacceltime then
+		self.recoilacceltime = nil
+		self.inst.components.locomotor:RemoveExternalSpeedMultiplier(self.inst, "recoil")
+	end
 end
 
 return WagdroneRollingBrain

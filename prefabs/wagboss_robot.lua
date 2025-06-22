@@ -44,12 +44,16 @@ local function UpdateFlyers(inst, dt)
 	inst.components.commander:CollectSoldiers(flyers, "wagdrone_flying")
 
 	local delay = inst.flyer_atk_delay
-	if delay > dt then
-		delay = delay - dt
-	else
-		for i, v in ipairs(flyers) do
-			v:PushEvent("doattack")
+	if inst.engaged then
+		if delay > dt then
+			delay = delay - dt
+		else
+			for i, v in ipairs(flyers) do
+				v:PushEvent("doattack")
+			end
+			delay = 4 + math.random() * 2
 		end
+	elseif delay < 4 then
 		delay = 4 + math.random() * 2
 	end
 	inst.flyer_atk_delay = delay
@@ -106,18 +110,30 @@ local function UpdateRollers(inst, dt)
 	inst.components.commander:CollectSoldiers(rollers, "wagdrone_rolling")
 
 	local delay = inst.roller_xform_delay
-	if #rollers > 1 then
-		if delay > dt then
-			delay = delay - dt
-		else
-			inst.roller_stationary = not inst.roller_stationary
-			delay = inst.roller_stationary and 14 + math.random() * 2 or 19 + math.random() * 5
-			local ev = inst.roller_stationary and "transform_to_stationary" or "transform_to_mobile"
+	if inst.engaged then
+		if #rollers > 1 then
+			if delay > dt then
+				delay = delay - dt
+			else
+				inst.roller_stationary = not inst.roller_stationary
+				delay = inst.roller_stationary and 14 + math.random() * 2 or 19 + math.random() * 5
+				local ev = inst.roller_stationary and "transform_to_stationary" or "transform_to_mobile"
+				for i, v in ipairs(rollers) do
+					v:PushEvent(ev)
+				end
+			end
+			inst.roller_xform_delay = delay
+		end
+	else
+		if delay < 14 then
+			delay = 14 + math.random() * 2
+		end
+		if inst.roller_stationary then
+			inst.roller_stationary = false
 			for i, v in ipairs(rollers) do
-				v:PushEvent(ev)
+				v:PushEvent("transform_to_mobile")
 			end
 		end
-		inst.roller_xform_delay = delay
 	end
 
 	local busy = true
@@ -455,6 +471,7 @@ local function DoOffScreenReset(inst)
 	inst._resettask = nil
 	inst.shouldreset = nil
 	inst:RemoveTag("notarget")
+	inst:SetTempNoCollide(false, "reset")
 	if not (inst.components.health and inst.components.health:IsDead()) then
 		local x, z = TheWorld.Map:GetWagPunkArenaCenterXZ()
 		if x and z then
@@ -472,6 +489,7 @@ local function DoReset(inst)
 			else
 				inst.shouldreset = true
 				inst:AddTag("notarget")
+				inst:SetTempNoCollide(true, "reset")
 			end
 		end
 	elseif inst:IsAsleep() and not (inst.components.health and inst.components.health:IsDead()) then
@@ -485,6 +503,7 @@ local function CancelReset(inst)
 	if inst.shouldreset then
 		inst.shouldreset = nil
 		inst:RemoveTag("notarget")
+		inst:SetTempNoCollide(false, "reset")
 		if inst._resettask then
 			inst._resettask:Cancel()
 			inst._resettask = nil
@@ -956,6 +975,7 @@ local PHASES =
 			inst.canhackdrones = false
 			inst.canorbitalstrike = false
 		end,
+		isbarragephase = true,
 	},
 	{
 		hp = 0.65,
@@ -989,6 +1009,7 @@ local PHASES =
 			inst.canhackdrones = true
 			inst.canorbitalstrike = true
 		end,
+		isbarragephase = true,
 	},
 	{
 		hp = 0.3,
@@ -1016,9 +1037,14 @@ local PHASES =
 
 local DEESCALATE_TIME = 30
 
-local function CalcThreatLevel(dps)
+local function CalcThreatLevel(inst, dps)
 	local numthreatlevels = #TUNING.WAGBOSS_ROBOT_ATTACK_PERIOD
-	return math.clamp(math.floor(Remap(dps, 150, 375, 1, numthreatlevels)), 1, numthreatlevels)
+	local level = math.floor(Remap(dps, 150, 375, 1, numthreatlevels))
+	if inst.sg:HasStateTag("missiles_target_fail") then
+		--missiles could not find any targets, but still taking damage, so raise threat level
+		level = level + 1
+	end
+	return math.clamp(level, 1, numthreatlevels)
 end
 
 local function SetThreatLevel(inst, level)
@@ -1037,9 +1063,22 @@ local function SetThreatLevel(inst, level)
 end
 
 local function OnDpsUpdate(inst, dps)
-	local threatlevel = CalcThreatLevel(dps)
+	local threatlevel = CalcThreatLevel(inst, dps)
 	if threatlevel >= inst.threatlevel then
 		SetThreatLevel(inst, threatlevel)
+	end
+end
+
+local function SkipBarragePhase(inst)
+	if inst.canmissilebarrage and inst.components.health then
+		local healthpct = inst.components.health:GetPercent()
+		for i = #PHASES - 1, 1, -1 do
+			local v = PHASES[i]
+			if healthpct <= v.hp and v.isbarragephase then
+				PHASES[i + 1].fn(inst)
+				break
+			end
+		end
 	end
 end
 
@@ -1111,6 +1150,9 @@ local function SetCombatEnabled(inst, enabled)
 			inst.components.planardamage:SetBaseDamage(TUNING.WAGBOSS_ROBOT_PLANAR_DAMAGE)
 
 			inst:AddComponent("explosiveresist")
+
+			inst:AddComponent("epicscare")
+			inst.components.epicscare:SetRange(18) --missiles target range
 
 			inst:AddComponent("timer")
 			inst:AddComponent("grouptargeter")
@@ -1394,8 +1436,26 @@ local function MakeObstacle(inst, isobstacle)
 		inst.isobstacle:set(false)
 		inst:RemoveTag("blocker")
 		ChangeToGiantCharacterPhysics(inst, 1000, STANDING_RADIUS)
-		inst.Physics:ClearCollidesWith(COLLISION.CHARACTERS)
+		if next(inst._nocollide) then
+			inst.Physics:SetCollisionMask(COLLISION.WORLD)
+		else
+			inst.Physics:ClearCollidesWith(COLLISION.CHARACTERS)
+		end
 		OnIsObstacleDirty(inst)
+	end
+end
+
+local function SetTempNoCollide(inst, nocollide, reason)
+	if nocollide then
+		if next(inst._nocollide) == nil and not inst.isobstacle:value() then
+			inst.Physics:SetCollisionMask(COLLISION.WORLD)
+		end
+		inst._nocollide[reason] = true
+	elseif inst._nocollide[reason] then
+		inst._nocollide[reason] = nil
+		if next(inst._nocollide) == nil and not inst.isobstacle:value() then
+			inst.Physics:SetCollisionMask(COLLISION.WORLD, COLLISION.OBSTACLES, COLLISION.GIANTS)
+		end
 	end
 end
 
@@ -1452,6 +1512,29 @@ local function SetMusicLevel(inst, level)
 		end
 	end
 end
+
+--------------------------------------------------------------------------
+
+local function OnCameraFocusDirty(inst)
+	if inst.camerafocus:value() then
+		TheFocalPoint.components.focalpoint:StartFocusSource(inst, nil, nil, 6, 22, 4)
+	else
+		TheFocalPoint.components.focalpoint:StopFocusSource(inst)
+	end
+end
+
+local function EnableCameraFocus(inst, enable)
+	if enable ~= inst.camerafocus:value() then
+		inst.camerafocus:set(enable)
+
+		--Dedicated server does not need to focus camera
+		if not TheNet:IsDedicated() then
+			OnCameraFocusDirty(inst)
+		end
+	end
+end
+
+--------------------------------------------------------------------------
 
 local function DisplayNameFn(inst)
 	return (inst.AnimState:IsCurrentAnimation("concealed_idle") and STRINGS.NAMES.WAGBOSS_ROBOT_SECRET)
@@ -1537,6 +1620,7 @@ local function fn()
 	inst.showstompfx = net_bool(inst.GUID, "wagboss_robot.showstompfx", "showstompfxdirty")
 	inst.showbackfx = net_bool(inst.GUID, "wagboss_robot.showbackfx", "showbackfxdirty")
 	inst.music = net_tinybyte(inst.GUID, "wagboss_robot.music", "musicdirty")
+	inst.camerafocus = net_bool(inst.GUID, "wagboss_robot.camerafocus", "camerafocusdirty")
 	inst.isobstacle = net_bool(inst.GUID, "wagboss_robot.isobstacle", "isobstacledirty")
 	inst.showcrown = net_bool(inst.GUID, "wagboss_robot.showcrown", "showcrowndirty")
 	inst.isobstacle:set(true)
@@ -1569,6 +1653,7 @@ local function fn()
 		inst:ListenForEvent("showbackfxdirty", OnShowBackFx_Client)
 		inst:ListenForEvent("showcrowndirty", OnShowCrownDirty)
 		inst:ListenForEvent("musicdirty", OnMusicDirty)
+		inst:ListenForEvent("camerafocusdirty", OnCameraFocusDirty)
 
 		return inst
 	end
@@ -1598,6 +1683,7 @@ local function fn()
 
 	inst._temptbl1 = {}
 	inst._temptbl2 = {}
+	inst._nocollide = {}
 
 	inst.active = false
 	inst.hostile = false
@@ -1617,7 +1703,10 @@ local function fn()
     inst.IsSocketed = IsSocketed
 	inst.BreakGlass = BreakGlass
 	inst.MakeObstacle = MakeObstacle
+	inst.SetTempNoCollide = SetTempNoCollide
+	inst.SkipBarragePhase = SkipBarragePhase
 	inst.SetMusicLevel = SetMusicLevel
+	inst.EnableCameraFocus = EnableCameraFocus
 	inst.AddAlterSymbols = AddAlterSymbols
 	inst.ClearAlterSymbols = ClearAlterSymbols
     inst.AddTrader = AddTrader

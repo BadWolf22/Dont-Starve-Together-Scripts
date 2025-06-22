@@ -4307,7 +4307,8 @@ STRINGS =
 
         HERMITCRAB_RELOCATION_KIT = "Hermit Rehomer",
 
-        WANDERINGTRADER = "Wandering Trader",
+        WANDERINGTRADER = "Odd Beefalo",
+        WANDERINGTRADER_REVEALED = "Wandering Trader",
 
         FLOTATIONCUSHION = "Personal Floater",
         GESTALT_GUARD_EVOLVED = "Inimical Gestalt",
@@ -5992,7 +5993,7 @@ STRINGS =
     HERMITCRAB_WANT_HOUSE = {"I could really use some help fixing up my house..."},
     HERMITCRAB_GIVE_PEARL = {"If you find my sweetie on your travels...","Could you... give him that pearl?","He'll recognize it."},
     HERMITCRAB_GOT_MAPSCROLL_BAD = {"This map is no good to me.", "It doesn't take me anywhere special."},
-    HERMITCRAB_GOT_MAPSCROLL_GOOD = {"The island on this map seems nice...", "and it will take me away from the junk collector.", "Thank you, I think I'll go.", "Perhaps it will even bring me closer to my sweetie...", "if he's still out there."},
+    HERMITCRAB_GOT_MAPSCROLL_GOOD = {"The island on this map seems nice...", "At least it's away from that junk collector.", "I would go but...","No. I'm going.","I'm done waiting for him."},
 
     HERMITCRAB_ANNOUNCE_SPOOKED = "Did you see that?!",
     HERMITCRAB_ANNOUNCE_TOOL_SLIP = "Wow, that tool is slippery!",
@@ -7640,9 +7641,9 @@ STRINGS =
         "Well, that's all she wrote! I'll go find more items to offer.",
     },
     WANDERINGTRADER_STARTTRADING = {
-        "Come'on over! I got goods galore for ya!",
+        "Friend, I got goods galore for ya!",
         "Buddy, whatcha need?",
-        "Saunter this way, let's trade!",
+        "Hey there, let's trade!",
     },
     WANDERINGTRADER_ENDTRADING_NOTRADES = {
         "Can't please everyone!",
@@ -9490,6 +9491,9 @@ STRINGS.UI =
         BOATHOPDELAY = "Boat Hop Delay:",
         MINIMAPZOOMCURSOR = "Zoom Cursor Focus:",
         VIBRATION = "Vibration:",
+        CONTROLLER_AUDIO = "Controller Audio:",
+        UI_HAPTICS = "Interface Haptics:",
+        UI_VIBRATION = "Interface Vibration:",
         WATHGRITHRFONT = "Wigfrid's Umlauts:",
         WALTERCAMERA = "Campfire Camera:",
         BOATCAMERA = "Seafaring Camera:",
@@ -9594,6 +9598,9 @@ STRINGS.UI =
             INPUT = "Controller or Keyboard? Play Don't Starve Together your way.",
             VIBRATION = "Make your controller vibrate at key gameplay moments.",
 			VIBRATION_WIRELESS = "Enable vibration of your wireless controller at key gameplay moments.",
+            CONTROLLER_AUDIO = "Enable audio from your wireless controller at key gameplay moments.",
+            UI_HAPTICS = "Enable vibration and/or audio from your wireless controller when interacting with the user interface.",
+            UI_VIBRATION = "Enable vibration when interacting with the user interface.",
             FX = "Change how loud things are in the world.",
             MUSIC = "Tone up or down the musical fanfare in your adventures.",
             AMBIENT = "The environment makes noise too, luckily you can control how loudly it does.",
@@ -9621,7 +9628,7 @@ STRINGS.UI =
             LOADING_TIPS = "Learn more about the lore and the gameplay of Don't Starve while your world loads.",
 			TARGETLOCKING = "Focus on one target at a time.",
 			PROMOTIONS = "Display store promotions in the main menus.",
-            AXISALIGNEDPLACEMENT = "Structures and other deployables will automatically lock onto to a grid for making buildings look structured.",
+            AXISALIGNEDPLACEMENT = "Structures and other deployables will automatically lock to a grid for making buildings look structured.",
             AXISALIGNEDPLACEMENTINTERVALS = "This sets how big the grid is between each, measured in common units such as Wall width or Tile width.",
 
             -- Graphics
@@ -9656,6 +9663,7 @@ STRINGS.UI =
 
             -- controls
             CONTROLLER_LAYOUT = "Use the default controls or customize them to your liking.",
+            CONTROL_SCHEME_CAM_AND_INV = "Choose between control schemes for the camera, inventory, and aiming.",
 
             CONTROLS_EDITOR =
             {
@@ -14079,8 +14087,8 @@ STRINGS.UI =
 
             L2 = "Open Crafting",
             R2 = "Manage Inventory",
-
-            L3 = "Chat*",
+            
+            L3 = "Toggle Target Locking",
             R3 = "Social Menu",
 
             TOUCH_BL = "Player List",
@@ -14109,8 +14117,8 @@ STRINGS.UI =
 
             L2 = "Open Crafting",
             R2 = "Manage Inventory",
-
-            L3 = "Chat*",
+            
+            L3 = "Toggle Target Locking",
             R3 = "Social Wheel",
 
             TOUCH_BL = "Player List",

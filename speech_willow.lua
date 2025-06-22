@@ -5709,7 +5709,11 @@ return{
 
         HERMITCRAB_RELOCATION_KIT = "What's the big deal where she lives?",
 
-        WANDERINGTRADER = "Heard you take ashes?",
+        WANDERINGTRADER =
+        {
+            REVEALED = "Heard you take ashes?",
+            GENERIC = "Weird.",
+        },
 
         GESTALT_GUARD_EVOLVED = "What did I ever do to you?",
         FLOTATIONCUSHION = "Oh good, because I hate drowning.",

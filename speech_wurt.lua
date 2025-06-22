@@ -5702,7 +5702,11 @@ return{
 
         HERMITCRAB_RELOCATION_KIT = "Can crabby lady live in swamp!? Florp!",
 
-        WANDERINGTRADER = "Hi, fuzzy guy! Florp!",
+        WANDERINGTRADER =
+        {
+            REVEALED = "Hi, fuzzy guy! Florp!",
+            GENERIC = "Glurgh. What wrong with it?",
+        },
 
         GESTALT_GUARD_EVOLVED = "You not nice! Flort!",
         FLOTATIONCUSHION = "Me best floater, florp!",

@@ -5703,7 +5703,11 @@ return{
 
         HERMITCRAB_RELOCATION_KIT = "Wolfgang help many friend move because muscles.",
 
-        WANDERINGTRADER = "Hello, hair-cow man! You wish to trade, yes?",
+        WANDERINGTRADER =
+        {
+            REVEALED = "Hello, hair-cow man! We trade, yes?",
+            GENERIC = "Is not normal hair-cow.",
+        },
 
         GESTALT_GUARD_EVOLVED = "It not Wolfgang fault!",
         FLOTATIONCUSHION = "Wolfgang exceptional swimmer, but keep just in case.",
